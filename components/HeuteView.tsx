@@ -24,7 +24,7 @@ export default function HeuteView() {
       sb.from("hot_flashes").select("at").gte("at", startOfToday().toISOString()).order("at", { ascending: false }),
     ]);
     if (c.error || f.error) {
-      setError("Daten konnten nicht geladen werden.");
+      setError("Daten konnten nicht geladen werden: " + (c.error ?? f.error)?.message);
       return;
     }
     if (c.data) {
@@ -42,8 +42,11 @@ export default function HeuteView() {
     const sb = supabase();
     if (!sb) return;
     const { error: e } = await sb.from("checkins").upsert({ day: today, ...checkin, source: "app" }, { onConflict: "user_id,day" });
-    if (e) setError("Check-in konnte nicht gespeichert werden.");
-    else setCheckinSaved(true);
+    if (e) setError("Check-in konnte nicht gespeichert werden: " + e.message);
+    else {
+      setError("");
+      setCheckinSaved(true);
+    }
   };
 
   const addFlash = async () => {
@@ -54,7 +57,7 @@ export default function HeuteView() {
     const { error: e } = await sb.from("hot_flashes").insert({ at: now.toISOString(), source: "app" });
     if (e) {
       setFlashes((list) => list.slice(1));
-      setError("Hitzewallung konnte nicht gespeichert werden.");
+      setError("Hitzewallung konnte nicht gespeichert werden: " + e.message);
     }
   };
 

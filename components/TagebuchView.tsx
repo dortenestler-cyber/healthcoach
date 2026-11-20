@@ -29,7 +29,7 @@ export default function TagebuchView() {
       .gte("day", isoDay(daysAgo(DAYS - 1)))
       .order("day");
     if (e) {
-      setError("Tagebuch konnte nicht geladen werden.");
+      setError("Tagebuch konnte nicht geladen werden: " + e.message);
       return;
     }
     const rows = (data ?? []) as Entry[];
@@ -57,9 +57,10 @@ export default function TagebuchView() {
       .from("diary_entries")
       .upsert({ day: today, bleeding, symptoms: clean, influences, updated_at: new Date().toISOString() }, { onConflict: "user_id,day" });
     if (e) {
-      setError("Eintrag konnte nicht gespeichert werden.");
+      setError("Eintrag konnte nicht gespeichert werden: " + e.message);
       return;
     }
+    setError("");
     setSaved(true);
     load();
   };
