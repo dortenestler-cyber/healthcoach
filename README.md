@@ -2,7 +2,19 @@
 
 Eine persönliche App für Training, Erholung und Perimenopause. Sie verbindet Garmin-Daten von der Fenix 9 Pro mit Tagebuch, Zyklus, Symptomen, Krankheiten, Verletzungen, Medikamenten und einem Coach auf Basis von Claude.
 
-**Stand:** Phase 0, Grundgerüst. Die fünf Reiter und der Coach-Knopf sind angelegt, aber noch ohne Daten.
+**Stand:** Phase 1, Fundament. Anmeldung mit Code per E-Mail, Morgen-Check-in, Hitzewallungen und Tagebuch speichern in Supabase. Die übrigen Reiter sind noch Platzhalter.
+
+## Einrichtung Supabase (einmalig)
+1. Im Supabase-Projekt den **SQL-Editor** öffnen, den Inhalt von `supabase/migrations/20261120120000_phase1_fundament.sql` einfügen und auf **Run** klicken.
+2. Unter **Authentication → Emails → Templates** die Vorlage **Magic Link** öffnen und den Code einfügen, zum Beispiel: `Dein Code für Health Coach: {{ .Token }}`. So bekommst du einen 6-stelligen Code statt nur eines Links. Der Code funktioniert auch in der App auf dem Startbildschirm.
+3. Nach deiner ersten Anmeldung unter **Authentication → Sign In / Providers** die Option **Allow new users to sign up** ausschalten. Dann kann sich niemand sonst ein Konto anlegen.
+
+## Einrichtung Vercel (einmalig)
+1. Auf vercel.com mit GitHub anmelden und das Repo `healthcoach` importieren.
+2. Unter **Environment Variables** eintragen:
+   - `NEXT_PUBLIC_SUPABASE_URL`: die Project URL aus Supabase
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: der Publishable key aus Supabase
+3. **Deploy** klicken. Jeder Merge auf `main` geht danach automatisch online.
 
 ## Technik
 - **Web-App** mit [Next.js](https://nextjs.org), lässt sich wie eine App auf den Startbildschirm legen
@@ -25,7 +37,9 @@ Dann im Browser `http://localhost:3000` öffnen.
 ## Aufbau
 ```
 app/            Seiten: Heute, Tagebuch, Training, Muster, Gesundheit, Coach
-components/     Navigation, Coach-Knopf, Seitenkopf
+components/     Navigation, Coach-Knopf, Anmeldung, Ansichten
+lib/            Supabase-Verbindung, Datum, feste Listen
+supabase/       Datenbank-Tabellen mit Zugriffsschutz
 public/icons/   App-Symbol hell und dunkel
 CLAUDE.md       Regeln für die Arbeit mit Claude
 ```

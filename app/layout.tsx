@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import TabBar from "@/components/TabBar";
-import CoachButton from "@/components/CoachButton";
+import AuthGate from "@/components/AuthGate";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -35,9 +34,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="de" className={inter.variable}>
       <body>
-        <main className="shell">{children}</main>
-        <CoachButton />
-        <TabBar />
+        <main className="shell">
+          <AuthGate>{children}</AuthGate>
+        </main>
       </body>
     </html>
   );
