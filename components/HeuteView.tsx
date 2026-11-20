@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { clock, isoDay, longDate, startOfToday } from "@/lib/dates";
 import { CHECKIN_LEVELS, CHECKIN_QUESTIONS } from "@/lib/catalog";
 import PageHead from "@/components/PageHead";
+import { clearPin } from "@/lib/pin";
 
 type Checkin = { energy: number | null; sleep: number | null; mood: number | null };
 const empty: Checkin = { energy: null, sleep: null, mood: null };
@@ -24,7 +25,7 @@ export default function HeuteView() {
       sb.from("hot_flashes").select("at").gte("at", startOfToday().toISOString()).order("at", { ascending: false }),
     ]);
     if (c.error || f.error) {
-      setError("Daten konnten nicht geladen werden.");
+      setError("Daten konnten nicht geladen werden: " + (c.error ?? f.error)?.message);
       return;
     }
     if (c.data) {
@@ -42,8 +43,11 @@ export default function HeuteView() {
     const sb = supabase();
     if (!sb) return;
     const { error: e } = await sb.from("checkins").upsert({ day: today, ...checkin, source: "app" }, { onConflict: "user_id,day" });
-    if (e) setError("Check-in konnte nicht gespeichert werden.");
-    else setCheckinSaved(true);
+    if (e) setError("Check-in konnte nicht gespeichert werden: " + e.message);
+    else {
+      setError("");
+      setCheckinSaved(true);
+    }
   };
 
   const addFlash = async () => {
@@ -54,12 +58,18 @@ export default function HeuteView() {
     const { error: e } = await sb.from("hot_flashes").insert({ at: now.toISOString(), source: "app" });
     if (e) {
       setFlashes((list) => list.slice(1));
-      setError("Hitzewallung konnte nicht gespeichert werden.");
+      setError("Hitzewallung konnte nicht gespeichert werden: " + e.message);
     }
   };
 
   const signOut = async () => {
+    clearPin();
     await supabase()?.auth.signOut();
+  };
+
+  const changePin = () => {
+    clearPin();
+    window.location.reload();
   };
 
   const complete = CHECKIN_QUESTIONS.every((q) => checkin[q.key] !== null);
@@ -124,9 +134,14 @@ export default function HeuteView() {
         <p>Kommt in Phase 3.</p>
       </section>
 
-      <button type="button" className="btn btn-link signout" onClick={signOut}>
-        Abmelden
-      </button>
+      <div className="footer-links">
+        <button type="button" className="btn btn-link" onClick={changePin}>
+          PIN ändern
+        </button>
+        <button type="button" className="btn btn-link" onClick={signOut}>
+          Abmelden
+        </button>
+      </div>
     </>
   );
 }
