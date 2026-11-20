@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { clock, isoDay, longDate, startOfToday } from "@/lib/dates";
 import { CHECKIN_LEVELS, CHECKIN_QUESTIONS } from "@/lib/catalog";
 import PageHead from "@/components/PageHead";
+import { clearPin } from "@/lib/pin";
 
 type Checkin = { energy: number | null; sleep: number | null; mood: number | null };
 const empty: Checkin = { energy: null, sleep: null, mood: null };
@@ -62,7 +63,13 @@ export default function HeuteView() {
   };
 
   const signOut = async () => {
+    clearPin();
     await supabase()?.auth.signOut();
+  };
+
+  const changePin = () => {
+    clearPin();
+    window.location.reload();
   };
 
   const complete = CHECKIN_QUESTIONS.every((q) => checkin[q.key] !== null);
@@ -127,9 +134,14 @@ export default function HeuteView() {
         <p>Kommt in Phase 3.</p>
       </section>
 
-      <button type="button" className="btn btn-link signout" onClick={signOut}>
-        Abmelden
-      </button>
+      <div className="footer-links">
+        <button type="button" className="btn btn-link" onClick={changePin}>
+          PIN ändern
+        </button>
+        <button type="button" className="btn btn-link" onClick={signOut}>
+          Abmelden
+        </button>
+      </div>
     </>
   );
 }
