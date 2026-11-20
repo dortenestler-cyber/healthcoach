@@ -1,0 +1,21 @@
+name: Prüfung
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Abhängigkeiten installieren
+        run: npm install --no-audit --no-fund
+      - name: Typen prüfen
+        run: npm run typecheck
+      - name: App bauen
+        run: npm run build

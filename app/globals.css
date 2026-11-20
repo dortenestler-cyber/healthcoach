@@ -1,0 +1,191 @@
+/* Health Coach · Designgrundlage
+   Hell und minimalistisch: heller Hintergrund, weiße Karten, Inter, eine Akzentfarbe (Beere). */
+
+:root {
+  --bg: #f5f5f4;
+  --card: #ffffff;
+  --line: #ecebe8;
+  --line-soft: #f0efec;
+  --text: #18181b;
+  --text-2: #3f3f46;
+  --muted: #66666b;
+  --accent: #a3234f;
+  --accent-dark: #7d1a3c;
+  --accent-soft: #f7e6ec;
+  --warn-bg: #fbf3e6;
+  --warn-fg: #6b4300;
+  --ok-bg: #e7f2ea;
+  --ok-fg: #2f6b3e;
+  --radius-card: 18px;
+  --radius-control: 12px;
+  --tabbar-h: 72px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent);
+}
+
+button {
+  font-family: inherit;
+}
+
+.shell {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  padding: calc(env(safe-area-inset-top) + 32px) 20px calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 96px);
+}
+
+.page-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.page-sub {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.page-title {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card + .card {
+  margin-top: 14px;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.card p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+.hint {
+  display: block;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Navigation unten */
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  background: var(--card);
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tabbar-inner {
+  max-width: 480px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  padding: 8px 6px 10px;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: 48px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #6b6b70;
+  text-decoration: none;
+}
+
+.tab[aria-current="page"] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tab svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Schwebender Coach-Knopf */
+.coach-fab {
+  position: fixed;
+  z-index: 11;
+  right: max(18px, calc((100vw - 480px) / 2 + 18px));
+  bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 20px);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(24, 24, 27, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.coach-fab[data-open="true"] {
+  background: var(--text);
+}
+
+.coach-fab svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.coach-fab:focus-visible,
+.tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
