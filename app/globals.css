@@ -79,7 +79,7 @@ button {
   gap: 8px;
 }
 
-.card + .card {
+.card + .card-unused {
   margin-top: 14px;
 }
 
@@ -510,4 +510,146 @@ button {
 .pin-key:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* Phase 2: Garmin */
+.shell > * + * {
+  margin-top: 14px;
+}
+
+.card-tight {
+  padding: 12px 14px;
+  border-radius: 14px;
+}
+
+.row-strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.right {
+  align-items: flex-end;
+}
+
+.meta-warn {
+  color: #9a5b00;
+}
+
+.alert-inline {
+  margin: 4px 0 0;
+}
+
+.btn-quiet {
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  min-height: 40px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.metric {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.metric-value {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.back-link {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  min-height: 32px;
+}
+
+.pills.scroll {
+  overflow-x: auto;
+  gap: 6px;
+  padding-bottom: 2px;
+}
+
+.pills.scroll .pill {
+  flex: none;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  background: #e9e8e5;
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.segmented button {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  border-radius: 9px;
+  min-height: 36px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.segmented button[aria-pressed="true"] {
+  background: var(--card);
+  font-weight: 600;
+}
+
+.chart {
+  width: 100%;
+  height: 160px;
+  display: block;
+  margin-top: 6px;
+}
+
+.chart-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+}
+
+.chart-band {
+  fill: var(--accent-soft);
+  opacity: 0.7;
+}
+
+.chart-period {
+  fill: #f2d3de;
+  opacity: 0.6;
+}
+
+.list-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.list-date {
+  font-size: 13px;
+  color: var(--muted);
 }
