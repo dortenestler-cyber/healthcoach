@@ -8,8 +8,8 @@ import CoachButton from "@/components/CoachButton";
 
 type State = "laden" | "aus" | "login" | "drin";
 
-// Zeigt die App nur mit Anmeldung. Anmeldung mit einem Code per E-Mail,
-// damit es auch in der App auf dem Startbildschirm funktioniert (ein Link würde sich in Safari öffnen).
+// Zeigt die App nur mit Anmeldung. Anmeldung mit E-Mail und Passwort,
+// damit es auch in der App auf dem Startbildschirm funktioniert.
 export default function AuthGate({ children }: { children: ReactNode }) {
   const [state, setState] = useState<State>("laden");
 
@@ -50,35 +50,39 @@ export default function AuthGate({ children }: { children: ReactNode }) {
 
 function Login() {
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [step, setStep] = useState<"email" | "code">("email");
+  const [password, setPassword] = useState("");
+  const [mode, setMode] = useState<"login" | "neu">("login");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
 
-  const sendCode = async (e: FormEvent) => {
-    e.preventDefault();
-    const sb = supabase();
-    if (!sb || !email.trim()) return;
-    setBusy(true);
-    setMsg("");
-    const { error } = await sb.auth.signInWithOtp({ email: email.trim(), options: { shouldCreateUser: true } });
-    setBusy(false);
-    if (error) setMsg("Das hat nicht geklappt: " + error.message);
-    else {
-      setStep("code");
-      setMsg("Wir haben dir einen Code per E-Mail geschickt.");
-    }
-  };
-
-  const checkCode = async (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
     const sb = supabase();
     if (!sb) return;
     setBusy(true);
     setMsg("");
-    const { error } = await sb.auth.verifyOtp({ email: email.trim(), token: code.trim(), type: "email" });
+    if (mode === "login") {
+      const { error } = await sb.auth.signInWithPassword({ email: email.trim(), password });
+      if (error) {
+        setMsg(
+          error.message.toLowerCase().includes("confirm")
+            ? "Bitte bestätige zuerst deine E-Mail-Adresse über den Link in der E-Mail von Supabase."
+            : "E-Mail oder Passwort stimmt nicht."
+        );
+      }
+    } else {
+      const { data, error } = await sb.auth.signUp({
+        email: email.trim(),
+        password,
+        options: { emailRedirectTo: window.location.origin },
+      });
+      if (error) setMsg("Das hat nicht geklappt: " + error.message);
+      else if (!data.session) {
+        setMsg("Fast geschafft: Bestätige deine E-Mail-Adresse über den Link in der E-Mail. Danach meldest du dich hier an.");
+        setMode("login");
+      }
+    }
     setBusy(false);
-    if (error) setMsg("Der Code passt nicht oder ist abgelaufen. Fordere einen neuen an.");
   };
 
   return (
@@ -86,20 +90,27 @@ function Login() {
       <img src="/icons/icon.svg" alt="" width={72} height={72} className="login-icon" />
       <h1 className="page-title">Health Coach</h1>
       <span className="page-sub">Training, Erholung und Perimenopause</span>
-      {step === "email" ? (
-        <form className="card login-card" onSubmit={sendCode}>
-          <label htmlFor="email" className="label">E-Mail-Adresse</label>
-          <input id="email" className="input" type="email" autoComplete="email" inputMode="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-          <button className="btn btn-primary" type="submit" disabled={busy}>{busy ? "Sende …" : "Code senden"}</button>
-        </form>
-      ) : (
-        <form className="card login-card" onSubmit={checkCode}>
-          <label htmlFor="code" className="label">Code aus der E-Mail</label>
-          <input id="code" className="input input-code" inputMode="numeric" autoComplete="one-time-code" maxLength={10} required value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} />
-          <button className="btn btn-primary" type="submit" disabled={busy}>{busy ? "Prüfe …" : "Anmelden"}</button>
-          <button className="btn btn-link" type="button" onClick={() => { setStep("email"); setCode(""); setMsg(""); }}>Andere E-Mail oder neuer Code</button>
-        </form>
-      )}
+      <form className="card login-card" onSubmit={submit}>
+        <label htmlFor="email" className="label">E-Mail-Adresse</label>
+        <input id="email" className="input" type="email" autoComplete="email" inputMode="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+        <label htmlFor="password" className="label">Passwort</label>
+        <input
+          id="password"
+          className="input"
+          type="password"
+          autoComplete={mode === "login" ? "current-password" : "new-password"}
+          minLength={8}
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button className="btn btn-primary" type="submit" disabled={busy}>
+          {busy ? "Einen Moment …" : mode === "login" ? "Anmelden" : "Konto anlegen"}
+        </button>
+        <button className="btn btn-link" type="button" onClick={() => { setMode(mode === "login" ? "neu" : "login"); setMsg(""); }}>
+          {mode === "login" ? "Noch kein Konto? Konto anlegen" : "Ich habe schon ein Konto"}
+        </button>
+      </form>
       {msg && <p className="login-msg" role="status">{msg}</p>}
     </div>
   );
