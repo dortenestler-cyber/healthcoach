@@ -2,7 +2,7 @@
 
 Eine persönliche App für Training, Erholung und Perimenopause. Sie verbindet Garmin-Daten von der Fenix 9 Pro mit Tagebuch, Zyklus, Symptomen, Krankheiten, Verletzungen, Medikamenten und einem Coach auf Basis von Claude.
 
-**Stand:** Phase 1, Fundament. Anmeldung mit E-Mail und Passwort, Morgen-Check-in, Hitzewallungen und Tagebuch speichern in Supabase. Die übrigen Reiter sind noch Platzhalter.
+**Stand:** Phase 2, Garmin-Daten. Anmeldung mit Passwort und PIN, Tagebuch, Check-in, Hitzewallungen sowie Schlaf, HRV, Ruhepuls, Body Battery und Aktivitäten aus Garmin mit Verlauf.
 
 ## Einrichtung Supabase (einmalig)
 1. Im Supabase-Projekt den **SQL-Editor** öffnen, den Inhalt von `supabase/migrations/20261120120000_phase1_fundament.sql` einfügen und auf **Run** klicken.
@@ -23,6 +23,15 @@ Eine persönliche App für Training, Erholung und Perimenopause. Sie verbindet G
 - **Claude-API** (ab Phase 4): Coach und Auswertungen, nur über das Backend
 - **Connect IQ** (ab Phase 5): Zifferblatt und Uhr-App für die Fenix 9 Pro
 
+## Einrichtung Garmin (einmalig)
+1. In Garmin Connect im Browser anmelden und https://connect.garmin.com/app/settings/personalApiToken öffnen.
+2. **Create Key** wählen, die Bedingungen lesen und annehmen, eine Laufzeit wählen (empfohlen: 1 Jahr) und den Schlüssel kopieren. Garmin zeigt ihn nur einmal.
+3. In Supabase unter **Edge Functions → Secrets** ein Secret `GARMIN_API_KEY` mit diesem Schlüssel anlegen. Der Schlüssel kommt nie ins Repo und nie in die App.
+4. In Supabase unter **Account → Access Tokens** einen Token anlegen und in GitHub unter **Settings → Secrets and variables → Actions** als `SUPABASE_ACCESS_TOKEN` speichern. Damit lädt GitHub die Funktion `garmin-sync` nach jedem Merge automatisch hoch.
+5. Die SQL-Datei `supabase/migrations/20261120140000_phase2_garmin.sql` im SQL-Editor ausführen.
+
+Garmin schickt etwa eine Woche vor Ablauf des Schlüssels eine Erinnerung. Dann einen neuen Schlüssel anlegen und das Secret ersetzen.
+
 ## Lokal starten
 Voraussetzung: Node.js 20 oder neuer.
 
@@ -39,7 +48,7 @@ Dann im Browser `http://localhost:3000` öffnen.
 app/            Seiten: Heute, Tagebuch, Training, Muster, Gesundheit, Coach
 components/     Navigation, Coach-Knopf, Anmeldung, Ansichten
 lib/            Supabase-Verbindung, Datum, feste Listen
-supabase/       Datenbank-Tabellen mit Zugriffsschutz
+supabase/       Datenbank-Tabellen mit Zugriffsschutz, Funktion garmin-sync
 public/icons/   App-Symbol hell und dunkel
 CLAUDE.md       Regeln für die Arbeit mit Claude
 ```
