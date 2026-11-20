@@ -2,12 +2,12 @@
 
 Eine persönliche App für Training, Erholung und Perimenopause. Sie verbindet Garmin-Daten von der Fenix 9 Pro mit Tagebuch, Zyklus, Symptomen, Krankheiten, Verletzungen, Medikamenten und einem Coach auf Basis von Claude.
 
-**Stand:** Phase 1, Fundament. Anmeldung mit Code per E-Mail, Morgen-Check-in, Hitzewallungen und Tagebuch speichern in Supabase. Die übrigen Reiter sind noch Platzhalter.
+**Stand:** Phase 1, Fundament. Anmeldung mit E-Mail und Passwort, Morgen-Check-in, Hitzewallungen und Tagebuch speichern in Supabase. Die übrigen Reiter sind noch Platzhalter.
 
 ## Einrichtung Supabase (einmalig)
 1. Im Supabase-Projekt den **SQL-Editor** öffnen, den Inhalt von `supabase/migrations/20261120120000_phase1_fundament.sql` einfügen und auf **Run** klicken.
-2. Unter **Authentication → Emails → Templates** die Vorlage **Magic Link** öffnen und den Code einfügen, zum Beispiel: `Dein Code für Health Coach: {{ .Token }}`. So bekommst du einen 6-stelligen Code statt nur eines Links. Der Code funktioniert auch in der App auf dem Startbildschirm.
-3. Nach deiner ersten Anmeldung unter **Authentication → Sign In / Providers** die Option **Allow new users to sign up** ausschalten. Dann kann sich niemand sonst ein Konto anlegen.
+2. Unter **Authentication → URL Configuration** als **Site URL** die Adresse der App eintragen (zum Beispiel `https://healthcoach-xi.vercel.app`). Dorthin führt der Bestätigungslink nach dem Anlegen des Kontos.
+3. In der App **Konto anlegen** wählen, E-Mail bestätigen und anmelden. Danach unter **Authentication → Sign In / Providers** die Option **Allow new users to sign up** ausschalten. Dann kann sich niemand sonst ein Konto anlegen.
 
 ## Einrichtung Vercel (einmalig)
 1. Auf vercel.com mit GitHub anmelden und das Repo `healthcoach` importieren.
