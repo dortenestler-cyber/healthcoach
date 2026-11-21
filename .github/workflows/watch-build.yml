@@ -1,8 +1,9 @@
 name: Uhr-App bauen
 
-# Baut die Uhr-App für die Fenix 9 Pro mit dem Connect IQ SDK.
+# Baut die Uhr-App und das Zifferblatt "Datenraster" für die Fenix 9 Pro mit dem Connect IQ SDK.
 # Ergebnis zum Herunterladen unter Actions → dieser Lauf → Artifacts:
 #   HealthCoach.iq      für das Hochladen im Garmin-Entwickler-Dashboard (Beta-App)
+#   HealthCoachFace.iq  Zifferblatt für das Entwickler-Dashboard (eigene Beta-App)
 #   HealthCoach-*.prg   zum Kopieren per USB auf die Uhr (Ordner GARMIN/APPS)
 #
 # Secrets (Settings → Secrets and variables → Actions):
@@ -15,10 +16,12 @@ on:
     branches: [main]
     paths:
       - "watch/**"
+      - "watchface/**"
       - ".github/workflows/watch-build.yml"
   pull_request:
     paths:
       - "watch/**"
+      - "watchface/**"
       - ".github/workflows/watch-build.yml"
   workflow_dispatch:
 
@@ -57,6 +60,7 @@ jobs:
           connect-iq-sdk-manager-cli sdk set "^9.0.0" || connect-iq-sdk-manager-cli sdk set "^8.0.0"
           echo "$(connect-iq-sdk-manager-cli sdk current-path --bin)" >> "$GITHUB_PATH"
           connect-iq-sdk-manager-cli device download --manifest=watch/manifest.xml
+          connect-iq-sdk-manager-cli device download --manifest=watchface/manifest.xml
 
       - name: Entwicklerschlüssel
         env:
@@ -76,6 +80,7 @@ jobs:
         run: |
           mkdir -p build
           monkeyc -f watch/monkey.jungle -e -o build/HealthCoach.iq -y "$RUNNER_TEMP/developer_key.der" -l 0 -w
+          monkeyc -f watchface/monkey.jungle -e -o build/HealthCoachFace.iq -y "$RUNNER_TEMP/developer_key.der" -l 0 -w
 
       - name: Dateien für USB bauen (.prg)
         env:
@@ -84,12 +89,13 @@ jobs:
           # Bei USB-Installation lassen sich Einstellungen nicht übers Handy ändern.
           # Deshalb kommt der Uhr-Schlüssel hier direkt in die Datei, falls er als Secret hinterlegt ist.
           if [ -n "$WATCH_TOKEN" ]; then
-            sed -i "s|<property id=\"token\" type=\"string\"></property>|<property id=\"token\" type=\"string\">${WATCH_TOKEN}</property>|" watch/resources/settings/properties.xml
+            sed -i "s|<property id=\"token\" type=\"string\"></property>|<property id=\"token\" type=\"string\">${WATCH_TOKEN}</property>|" watch/resources/settings/properties.xml watchface/resources/settings/properties.xml
           fi
           for dev in $(grep -o 'product id="[^"]*"' watch/manifest.xml | cut -d'"' -f2); do
             monkeyc -f watch/monkey.jungle -d "$dev" -o "build/HealthCoach-$dev.prg" -y "$RUNNER_TEMP/developer_key.der" -l 0 -w
+            monkeyc -f watchface/monkey.jungle -d "$dev" -o "build/HealthCoachFace-$dev.prg" -y "$RUNNER_TEMP/developer_key.der" -l 0 -w
           done
-          git checkout -- watch/resources/settings/properties.xml
+          git checkout -- watch/resources/settings/properties.xml watchface/resources/settings/properties.xml
 
       - name: Neuen Entwicklerschlüssel ablegen (nur beim ersten Mal)
         if: ${{ hashFiles('keyout/CIQ_DEVELOPER_KEY_B64.txt') != '' }}
