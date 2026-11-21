@@ -117,7 +117,15 @@ Deno.serve(async (req) => {
     }
 
     try {
-      return json(200, await today(sb, uid, day));
+      const t = await today(sb, uid, day);
+      // Kurzform für das Zifferblatt: der Hintergrundspeicher auf der Uhr ist klein
+      if (body?.compact) {
+        const next = (t.plan as Any[]).find((p) => !p.done) ?? (t.plan as Any[])[0] ?? null;
+        const hubs = (t.needed as Any[]).reduce((s, n) => s + (n.today ?? 0), 0);
+        const open = (t.slots as Any[]).filter((s) => !s.done).length;
+        return json(200, { time: t.time, cycleDay: t.cycleDay, pause: t.pause, hubs, open, flashes: t.flashes24h, next: next ? { label: next.label, time: next.time, done: next.done, note: next.note } : null });
+      }
+      return json(200, t);
     } catch (e) {
       return json(500, { error: "Übersicht: " + (e instanceof Error ? e.message : String(e)) });
     }

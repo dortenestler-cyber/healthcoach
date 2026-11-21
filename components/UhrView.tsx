@@ -60,7 +60,11 @@ export default function UhrView() {
         body: JSON.stringify({ action: "today" }),
       });
       const body = await res.json().catch(() => ({}));
-      setTest(res.ok ? `Verbindung klappt. Die Uhr bekommt ${body?.slots?.length ?? 0} Einnahmen und ${body?.plan?.length ?? 0} Einheiten für heute.` : `Fehler ${res.status}: ${body?.error ?? "ohne Grund"}`);
+      setTest(res.ok ? (() => {
+              const e = body?.slots?.length ?? 0;
+              const u = body?.plan?.length ?? 0;
+              return `Verbindung klappt. Die Uhr bekommt ${e} ${e === 1 ? "Einnahme" : "Einnahmen"} und ${u} ${u === 1 ? "Einheit" : "Einheiten"} für heute.`;
+            })() : `Fehler ${res.status}: ${body?.error ?? "ohne Grund"}`);
     } catch (e) {
       setTest("Test nicht möglich: " + (e instanceof Error ? e.message : String(e)));
     }
@@ -99,6 +103,7 @@ export default function UhrView() {
             <li>Garmin Connect IQ App auf dem Handy öffnen</li>
             <li>Meine Geräte → Fenix → Health Coach → Einstellungen</li>
             <li>Bei „Uhr-Schlüssel“ einfügen und speichern</li>
+            <li>Für das Zifferblatt genauso: Meine Geräte → Fenix → Zifferblätter → Health Coach → Einstellungen</li>
           </ol>
         </section>
       )}
