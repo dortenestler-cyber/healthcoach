@@ -10,7 +10,7 @@ const SHOWN: MetricKey[] = ["schlaf", "hrv", "ruhepuls", "bb"];
 const AUTO_SYNC_AFTER_MS = 2 * 60 * 60 * 1000;
 
 // Garmin-Werte auf der Seite Heute: Synchronisieren und vier Karten
-export default function GarminCards() {
+export default function GarminCards({ onSynced }: { onSynced?: () => void } = {}) {
   const [rows, setRows] = useState<Daily[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -39,8 +39,9 @@ export default function GarminCards() {
       setBusy(false);
       if (!res.ok) setError("Synchronisieren hat nicht geklappt: " + res.error);
       await load();
+      if (res.ok) onSynced?.();
     },
-    [load]
+    [load, onSynced]
   );
 
   useEffect(() => {
