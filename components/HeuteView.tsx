@@ -9,6 +9,7 @@ import { clearPin } from "@/lib/pin";
 import GarminCards from "@/components/GarminCards";
 import HealthToday from "@/components/HealthToday";
 import TodayPlan from "@/components/TodayPlan";
+import TargetCard from "@/components/TargetCard";
 
 type Checkin = { energy: number | null; sleep: number | null; mood: number | null };
 const empty: Checkin = { energy: null, sleep: null, mood: null };
@@ -82,6 +83,8 @@ export default function HeuteView() {
       <PageHead title="Heute" sub={longDate()} />
       {error && <p className="alert" role="alert">{error}</p>}
 
+      <TargetCard />
+
       <HealthToday />
 
       <GarminCards />
@@ -134,10 +137,6 @@ export default function HeuteView() {
         </div>
       </section>
 
-      <section className="card">
-        <h2>Tagesziel</h2>
-        <p>Kommt in Phase 4. Dafür sammelt die App jetzt ein paar Wochen Garmin-Daten.</p>
-      </section>
 
       <div className="footer-links">
         <button type="button" className="btn btn-link" onClick={changePin}>

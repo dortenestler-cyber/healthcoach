@@ -1137,3 +1137,94 @@ button {
   display: block;
   margin: 0 auto;
 }
+
+/* Phase 4a: Tagesziel und Muster */
+.target-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.target-label {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.target-text {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+.center-card {
+  align-items: center;
+  text-align: center;
+}
+
+.factor-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.factor-effect {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  min-width: 40px;
+  text-align: right;
+}
+
+.factor-effect.neg {
+  color: #9a5b00;
+}
+
+.target-bars {
+  display: grid;
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+  gap: 4px;
+  height: 110px;
+}
+
+.tb-col {
+  height: 100%;
+}
+
+.tb-track {
+  position: relative;
+  height: 100%;
+  background: var(--line-soft);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.tb-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: #f2d3de;
+}
+
+.tb-load {
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  bottom: 0;
+  border-radius: 3px 3px 0 0;
+}
+
+.pattern-row {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 80px;
+  align-items: center;
+  gap: 10px;
+}
+
+.pattern-row .row-strong {
+  text-align: right;
+  font-size: 13px;
+}
