@@ -2,7 +2,7 @@
 
 Eine persönliche App für Training, Erholung und Perimenopause. Sie verbindet Garmin-Daten von der Fenix 9 Pro mit Tagebuch, Zyklus, Symptomen, Krankheiten, Verletzungen, Medikamenten und einem Coach auf Basis von Claude.
 
-**Stand:** Phase 4a, Tagesziel und Muster. Alles aus Phase 1 bis 3 plus Tagesziel-Ring mit Faktoren und Muster aus Training, Erholung, Zyklus, Symptomen und Bedarfs-Hüben. Der Coach folgt in Phase 4b.
+**Stand:** Phase 4, Auswertung und Coach. Alles aus Phase 1 bis 3 plus Tagesziel-Ring, Muster und Coach-Chat mit Claude.
 
 ## Einrichtung Supabase (einmalig)
 1. Im Supabase-Projekt den **SQL-Editor** öffnen, den Inhalt von `supabase/migrations/20261120120000_phase1_fundament.sql` einfügen und auf **Run** klicken.
@@ -31,6 +31,12 @@ Eine persönliche App für Training, Erholung und Perimenopause. Sie verbindet G
 5. Die SQL-Datei `supabase/migrations/20261120140000_phase2_garmin.sql` im SQL-Editor ausführen.
 
 Garmin schickt etwa eine Woche vor Ablauf des Schlüssels eine Erinnerung. Dann einen neuen Schlüssel anlegen und das Secret ersetzen.
+
+## Einrichtung Coach (einmalig)
+1. Auf console.anthropic.com einen API-Schlüssel anlegen und Guthaben aufladen.
+2. In Supabase unter **Edge Functions → Secrets** ein Secret `ANTHROPIC_API_KEY` anlegen. Optional `COACH_MODEL` für ein anderes Modell (Standard: `claude-sonnet-5-5`).
+3. Die SQL-Datei `supabase/migrations/20261121110000_phase4b_coach.sql` im SQL-Editor ausführen.
+Der Coach beantwortet höchstens 40 Fragen pro Tag, damit die Kosten überschaubar bleiben.
 
 ## Lokal starten
 Voraussetzung: Node.js 20 oder neuer.

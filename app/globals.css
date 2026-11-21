@@ -1228,3 +1228,49 @@ button {
   text-align: right;
   font-size: 13px;
 }
+
+/* Phase 4b: Coach */
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bubble {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.bubble-user {
+  align-self: flex-end;
+  background: var(--text);
+  color: #ffffff;
+  border-bottom-right-radius: 6px;
+}
+
+.bubble-assistant {
+  align-self: flex-start;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-bottom-left-radius: 6px;
+}
+
+.bubble-wait {
+  color: var(--muted);
+}
+
+.chat-input {
+  display: flex;
+  gap: 8px;
+  padding-right: 72px;
+}
+
+.chat-send {
+  width: auto;
+  margin-top: 0;
+  min-height: 46px;
+}
