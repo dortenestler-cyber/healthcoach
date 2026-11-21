@@ -1511,3 +1511,100 @@ button {
   color: var(--text);
   font-weight: 700;
 }
+
+/* Einstellungen: Zahnrad im Seitenkopf und gruppierte Listen */
+.page-head-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.page-head-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.gear-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--text);
+}
+
+.gear-btn:focus-visible,
+.settings-row:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-title {
+  margin: 0 0 0 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.settings-card {
+  padding: 4px 20px;
+  gap: 0;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 10px 0;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  color: var(--text);
+  text-decoration: none;
+}
+
+button.settings-row {
+  cursor: pointer;
+}
+
+.settings-row + .settings-row {
+  border-top: 1px solid var(--line-soft);
+}
+
+.settings-row > .stack {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-value {
+  text-align: right;
+}
+
+.settings-chevron {
+  color: var(--line-strong);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.settings-note {
+  margin: 0;
+  padding: 14px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-2);
+}

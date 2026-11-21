@@ -5,7 +5,6 @@ import { supabase } from "@/lib/supabase";
 import { clock, isoDay, longDate, startOfToday } from "@/lib/dates";
 import { CHECKIN_LEVELS, CHECKIN_QUESTIONS } from "@/lib/catalog";
 import PageHead from "@/components/PageHead";
-import { clearPin } from "@/lib/pin";
 import GarminCards from "@/components/GarminCards";
 import HealthToday from "@/components/HealthToday";
 import TodayPlan from "@/components/TodayPlan";
@@ -116,16 +115,6 @@ export default function HeuteView() {
     }
   };
 
-  const signOut = async () => {
-    clearPin();
-    await supabase()?.auth.signOut();
-  };
-
-  const changePin = () => {
-    clearPin();
-    window.location.reload();
-  };
-
   const complete = CHECKIN_QUESTIONS.every((q) => checkin[q.key] !== null);
 
   return (
@@ -192,19 +181,6 @@ export default function HeuteView() {
           </button>
         </div>
       </section>
-
-
-      <div className="footer-links">
-        <a href="/uhr" className="btn btn-link link-btn">
-          Uhr verbinden
-        </a>
-        <button type="button" className="btn btn-link" onClick={changePin}>
-          PIN ändern
-        </button>
-        <button type="button" className="btn btn-link" onClick={signOut}>
-          Abmelden
-        </button>
-      </div>
     </>
   );
 }
