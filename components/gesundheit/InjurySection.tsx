@@ -139,7 +139,7 @@ export default function InjurySection() {
                 <div className="bars small">
                   {myPains.slice(-10).map((p) => (
                     <div key={p.day} className="bar-col">
-                      <span className="bar" style={{ height: Math.max(3, p.pain * 5) + "px", background: p.day === isoDay() ? "var(--accent)" : "#cfcdc8" }} />
+                      <span className="bar" style={{ height: Math.max(3, p.pain * 5) + "px", background: p.day === isoDay() ? "var(--warn)" : "var(--line-strong)" }} />
                       <span className="bar-val">{shortDate(toDate(p.day)).replace(/\.$/, "")}</span>
                     </div>
                   ))}

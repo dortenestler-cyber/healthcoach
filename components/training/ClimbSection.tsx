@@ -106,7 +106,7 @@ export default function ClimbSection() {
             <div key={g} className="pyramid-row">
               <span className="row-strong">{g}</span>
               <div className="pyramid-track">
-                <span style={{ width: (t / maxTops) * 100 + "%", background: g === GOAL_GRADE ? "var(--accent)" : "#cfcdc8" }} />
+                <span style={{ width: (t / maxTops) * 100 + "%", background: g === GOAL_GRADE ? "var(--training)" : "var(--line-strong)" }} />
               </div>
               <span className="meta">{n ? `${t} · ${Math.round((t / n) * 100)} %` : "–"}</span>
             </div>

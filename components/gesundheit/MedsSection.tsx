@@ -95,7 +95,7 @@ export default function MedsSection() {
                   {m.amount ? " · " + m.amount : ""}
                 </span>
               </span>
-              <span className={m.kind === "medikament" ? "badge badge-accent" : "badge"}>{m.kind === "medikament" ? "Medikament" : "Supplement"}</span>
+              <span className={m.kind === "medikament" ? "badge badge-strong" : "badge"}>{m.kind === "medikament" ? "Medikament" : "Supplement"}</span>
             </button>
             {isOpen && (
               <div className="expand">
@@ -160,7 +160,7 @@ export default function MedsSection() {
               return (
                 <div key={i} className="bar-col">
                   <span className="bar-val">{c}</span>
-                  <span className="bar" style={{ height: Math.max(3, c * 8) + "px", background: over ? (now ? "var(--accent)" : "#5a1029") : now ? "#e7a9be" : "#cfcdc8" }} />
+                  <span className="bar" style={{ height: Math.max(3, c * 8) + "px", background: over ? (now ? "var(--warn)" : "var(--warn-mid)") : now ? "var(--text)" : "var(--line-strong)" }} />
                 </div>
               );
             })}

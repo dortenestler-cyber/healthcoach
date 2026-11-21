@@ -126,8 +126,8 @@ export default function VerlaufView({ initial }: { initial: string }) {
           <span>heute</span>
         </div>
         <div className="legend">
-          <span><i style={{ background: "var(--accent-soft)", border: "1px solid #e7a9be" }} />Normalbereich</span>
-          <span><i style={{ background: "#f2d3de" }} />Periode</span>
+          <span><i style={{ background: "var(--recovery-bg)", border: "1px solid var(--recovery)" }} />Normalbereich</span>
+          <span><i style={{ background: "var(--menses-bg)" }} />Periode</span>
         </div>
         {st && (
           <p>

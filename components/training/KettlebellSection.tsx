@@ -150,7 +150,7 @@ export default function KettlebellSection() {
             <span className="meta">Aktiver Plan</span>
             <span className="row-strong">{plan.name}</span>
           </div>
-          <span className="badge badge-accent">Woche {week} von {plan.weeks}</span>
+          <span className="badge badge-training">Woche {week} von {plan.weeks}</span>
         </div>
         <div className="progress"><span style={{ width: Math.min(100, (sessionDays.length / total) * 100) + "%" }} /></div>
         <span className="meta">{sessionDays.length} von {total} Einheiten · {plan.per_week} pro Woche</span>
@@ -268,7 +268,7 @@ export default function KettlebellSection() {
           {volume.map((v, i) => (
             <div key={i} className="bar-col">
               <span className="bar-val">{v ? Math.round(v / 100) / 10 + " t" : ""}</span>
-              <span className="bar" style={{ height: Math.max(3, (v / maxVol) * 64) + "px", background: i === 7 ? "var(--accent)" : "#cfcdc8" }} />
+              <span className="bar" style={{ height: Math.max(3, (v / maxVol) * 64) + "px", background: i === 7 ? "var(--training)" : "var(--line-strong)" }} />
             </div>
           ))}
         </div>

@@ -9,7 +9,8 @@ import PageHead from "@/components/PageHead";
 type Entry = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[] };
 
 const DAYS = 28;
-const heat = ["var(--line-soft)", "#f7e6ec", "#e7a9be", "#a3234f"];
+// Symptom-Stärke 0 bis 3 in Amber
+const heat = ["var(--line-soft)", "var(--warn-bg)", "var(--warn-mid)", "var(--warn)"];
 
 export default function TagebuchView() {
   const today = isoDay();
@@ -70,7 +71,7 @@ export default function TagebuchView() {
   const cellColor = (rowKey: string, day: string) => {
     const e = day === today ? { day, bleeding, symptoms, influences } : byDay.get(day);
     if (!e) return "var(--line-soft)";
-    if (rowKey === "blut") return e.bleeding > 0 ? "#5a1029" : "var(--line-soft)";
+    if (rowKey === "blut") return e.bleeding > 0 ? "var(--menses-fg)" : "var(--line-soft)";
     return heat[e.symptoms?.[rowKey] ?? 0];
   };
 
@@ -151,7 +152,7 @@ export default function TagebuchView() {
           <span><i style={{ background: heat[1] }} />leicht</span>
           <span><i style={{ background: heat[2] }} />mittel</span>
           <span><i style={{ background: heat[3] }} />stark</span>
-          <span><i style={{ background: "#5a1029" }} />Periode</span>
+          <span><i style={{ background: "var(--menses-fg)" }} />Periode</span>
         </div>
         {history.length === 0 && <p>Sobald du Einträge machst, füllt sich das Raster.</p>}
       </section>

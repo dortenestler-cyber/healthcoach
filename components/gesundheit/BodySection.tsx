@@ -161,7 +161,7 @@ function TrendCard(props: {
         <svg className="chart" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label={`${label} der letzten 12 Wochen`}>
           {days.map((d, i) => (periodDays.has(d) ? <rect key={d} x={x(i) - 50 / DAYS} y={0} width={100 / DAYS} height={100} className="chart-period" /> : null))}
           <polyline points={raw} className="chart-raw" />
-          <polyline points={trend} className="chart-line" />
+          <polyline points={trend} className="chart-line chart-line-neutral" />
         </svg>
       )}
       {points.length > 1 && (

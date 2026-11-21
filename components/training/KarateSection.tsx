@@ -97,7 +97,7 @@ export default function KarateSection() {
           {weeks.map((c, i) => (
             <div key={i} className="bar-col">
               <span className="bar-val">{c || ""}</span>
-              <span className="bar" style={{ height: Math.max(3, c * 18) + "px", background: i === 7 ? "var(--accent)" : "#cfcdc8" }} />
+              <span className="bar" style={{ height: Math.max(3, c * 18) + "px", background: i === 7 ? "var(--training)" : "var(--line-strong)" }} />
             </div>
           ))}
         </div>

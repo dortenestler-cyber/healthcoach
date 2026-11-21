@@ -172,7 +172,7 @@ export default function CalendarSection() {
           {ADDABLE.map((s) => (
             <span key={s}><i style={{ background: SPORTS[s].color }} />{SPORTS[s].label}</span>
           ))}
-          <span><i style={{ background: "transparent", border: "1.5px solid #8a8a8f" }} />geplant</span>
+          <span><i style={{ background: "transparent", border: "1.5px solid var(--muted)" }} />geplant</span>
           <span><i className="legend-period" />Periode</span>
         </div>
       </section>

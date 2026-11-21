@@ -42,7 +42,7 @@ export default function MusterView() {
               <div key={b.label} className="pattern-row">
                 <span className="meta">{b.label}</span>
                 <div className="pyramid-track">
-                  <span style={{ width: (b.value / max) * 100 + "%", background: b.highlight ? "var(--accent)" : "#cfcdc8" }} />
+                  <span style={{ width: (b.value / max) * 100 + "%", background: b.highlight ? "var(--text)" : "var(--line-strong)" }} />
                 </div>
                 <span className="row-strong">{b.display}</span>
               </div>
