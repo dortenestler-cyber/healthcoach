@@ -6,11 +6,12 @@ import { illnessRule, SPOTS, type Illness, type Injury } from "@/lib/health";
 
 export type Sport = "karate" | "kettlebell" | "klettern" | "ausdauer" | "sonstiges";
 
+// Sportfarben: Familie Training (Slate-Blau), Ausdauer Petrol. Immer mit Text-Label.
 export const SPORTS: Record<Sport, { label: string; color: string }> = {
-  karate: { label: "Karate", color: "#a3234f" },
-  kettlebell: { label: "Kettlebell", color: "#3f3f46" },
-  klettern: { label: "Bouldern", color: "#b07a2a" },
-  ausdauer: { label: "Ausdauer", color: "#2f6b3e" },
+  karate: { label: "Karate", color: "#2b4378" },
+  kettlebell: { label: "Kettlebell", color: "#3b5998" },
+  klettern: { label: "Bouldern", color: "#7c93c9" },
+  ausdauer: { label: "Ausdauer", color: "#0e7490" },
   sonstiges: { label: "Sonstiges", color: "#8a8a8f" },
 };
 

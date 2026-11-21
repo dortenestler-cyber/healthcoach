@@ -14,8 +14,14 @@ Health Coach bringt Training, Erholung, Zyklus, Perimenopause-Symptome, Krankhei
 - Die App heißt „Health Coach“.
 
 ## Design
-- Hell und minimalistisch: heller Hintergrund, weiße Karten, Schrift Inter, eine Akzentfarbe Beere `#A3234F`.
-- Farben und Abstände kommen aus den Variablen in `app/globals.css`.
+- Stil angelehnt an Apple Health und Google Health: große weiße Karten auf `#F2F2F7`, Radius 24 (Kacheln 18), große Zahlen, Schrift Inter mit Ziffern in gleicher Breite.
+- Farben haben eine feste Bedeutung und stehen nie allein, immer mit Text:
+  Erholung/Readiness Sage `#2D6A4F` · Zyklus/Perimenopause Terracotta `#B4491F` · Menstruation `#7F1D1D` auf `#F6DADA` · Training/Garmin Slate-Blau `#3B5998` · Symptome/Warnung Amber `#B45309` · Mobility Violett `#6D4AA8`.
+- Hauptbutton, aktive Auswahl und Links in Dunkel `#1C1C1E`.
+- Beere `#A3234F` ist nur noch Markenfarbe: App-Symbol und Coach-Knopf.
+- Jedes Diagramm bekommt eine Überschrift mit einem Satz, der das Ergebnis nennt.
+- Farben und Abstände kommen aus den Variablen in `app/globals.css`, keine festen Farbwerte in Komponenten.
+- Tap-Ziele mindestens 44 px, Kontrast mindestens AA.
 - Navigation: Heute, Tagebuch, Training, Muster, Gesundheit. Der Coach ist ein schwebender Knopf auf jeder Seite.
 - App-Symbol: Tagesziel-Ring, hell (`public/icons/icon.svg`) und dunkel (`public/icons/icon-dark.svg`).
 

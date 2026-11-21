@@ -88,7 +88,7 @@ export default function TargetView() {
                 <div key={h.d} className="tb-col">
                   <div className="tb-track">
                     <span className="tb-band" style={{ bottom: h.lo + "%", height: h.hi - h.lo + "%" }} />
-                    <span className="tb-load" style={{ height: Math.max(2, h.load) + "%", background: h.load > h.hi ? "#5a1029" : "var(--accent)" }} />
+                    <span className="tb-load" style={{ height: Math.max(2, h.load) + "%", background: h.load > h.hi ? "var(--warn)" : "var(--training)" }} />
                   </div>
                 </div>
               ))}
@@ -98,9 +98,9 @@ export default function TargetView() {
               <span>heute</span>
             </div>
             <div className="legend">
-              <span><i style={{ background: "#f2d3de" }} />Zielbereich</span>
-              <span><i style={{ background: "var(--accent)" }} />Belastung</span>
-              <span><i style={{ background: "#5a1029" }} />über dem Ziel</span>
+              <span><i style={{ background: "var(--recovery-bg)" }} />Zielbereich</span>
+              <span><i style={{ background: "var(--training)" }} />Belastung</span>
+              <span><i style={{ background: "var(--warn)" }} />über dem Ziel</span>
             </div>
           </section>
         </>

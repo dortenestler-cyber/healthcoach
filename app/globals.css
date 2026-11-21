@@ -1,22 +1,62 @@
 /* Health Coach · Designgrundlage
-   Hell und minimalistisch: heller Hintergrund, weiße Karten, Inter, eine Akzentfarbe (Beere). */
+   Stil angelehnt an Apple Health: große weiße Karten auf hellgrauem Grund, Inter, große Zahlen.
+   Jede Farbe hat eine feste Bedeutung und steht nie allein, immer mit Text.
+   Beere bleibt nur Markenfarbe (App-Symbol und Coach-Knopf). */
 
 :root {
-  --bg: #f5f5f4;
+  /* Flächen und Text */
+  --bg: #f2f2f7;
   --card: #ffffff;
-  --line: #ecebe8;
-  --line-soft: #f0efec;
-  --text: #18181b;
-  --text-2: #3f3f46;
-  --muted: #66666b;
-  --accent: #a3234f;
-  --accent-dark: #7d1a3c;
-  --accent-soft: #f7e6ec;
-  --warn-bg: #fbf3e6;
-  --warn-fg: #6b4300;
-  --ok-bg: #e7f2ea;
-  --ok-fg: #2f6b3e;
-  --radius-card: 18px;
+  --fill: #e9e9ee;
+  --line: #e5e5ea;
+  --line-soft: #efeff4;
+  --line-strong: #c7c7cc;
+  --text: #1c1c1e;
+  --text-2: #3c4043;
+  --muted: #5f6368;
+
+  /* Hauptbutton, aktive Auswahl, Links */
+  --primary: #1c1c1e;
+  --on-primary: #ffffff;
+
+  /* Marke: nur App-Symbol und Coach-Knopf */
+  --brand: #a3234f;
+
+  /* Erholung und Readiness */
+  --recovery: #2d6a4f;
+  --recovery-bg: #e3f1e8;
+  --recovery-fg: #1e5a3f;
+
+  /* Zyklus und Perimenopause */
+  --cycle: #b4491f;
+  --cycle-bg: #fbe9e2;
+  --cycle-fg: #8f3a18;
+
+  /* Menstruation */
+  --menses-bg: #f6dada;
+  --menses-fg: #7f1d1d;
+
+  /* Training und Garmin */
+  --training: #3b5998;
+  --training-bg: #e4eaf7;
+  --training-fg: #2b4378;
+
+  /* Symptome und Warnung (Stufe 1 bis 3 für Stärke) */
+  --warn: #b45309;
+  --warn-bg: #fdf0d5;
+  --warn-mid: #f3c77e;
+  --warn-fg: #7a4306;
+
+  /* Mobility */
+  --mobility: #6d4aa8;
+
+  /* Alte Namen, damit nichts bricht */
+  --ok-bg: var(--recovery-bg);
+  --ok-fg: var(--recovery-fg);
+
+  /* Formen */
+  --radius-card: 24px;
+  --radius-tile: 18px;
   --radius-control: 12px;
   --tabbar-h: 72px;
 }
@@ -32,10 +72,12 @@ body {
   color: var(--text);
   font-family: var(--font-inter), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;
 }
 
 a {
-  color: var(--accent);
+  color: var(--primary);
+  font-weight: 600;
 }
 
 button {
@@ -63,17 +105,17 @@ button {
 
 .page-title {
   margin: 0;
-  font-size: 28px;
+  font-size: 32px;
   line-height: 1.1;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 .card {
   background: var(--card);
-  border: 1px solid var(--line);
+  border: 0;
   border-radius: var(--radius-card);
-  padding: 18px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -85,13 +127,13 @@ button {
 
 .card h2 {
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
 }
 
 .card p {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.5;
   color: var(--text-2);
 }
@@ -132,12 +174,12 @@ button {
   min-height: 48px;
   font-size: 11px;
   font-weight: 500;
-  color: #6b6b70;
+  color: var(--muted);
   text-decoration: none;
 }
 
 .tab[aria-current="page"] {
-  color: var(--accent);
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -161,7 +203,7 @@ button {
   height: 56px;
   border-radius: 50%;
   border: 0;
-  background: var(--accent);
+  background: var(--brand);
   color: #ffffff;
   box-shadow: 0 6px 18px rgba(24, 24, 27, 0.22);
   display: flex;
@@ -186,7 +228,7 @@ button {
 
 .coach-fab:focus-visible,
 .tab:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--text);
   outline-offset: 2px;
 }
 
@@ -214,14 +256,15 @@ button {
 }
 
 .big-number {
-  font-size: 32px;
-  font-weight: 600;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .alert {
   background: var(--warn-bg);
   color: var(--warn-fg);
-  border-radius: 14px;
+  border-radius: var(--radius-tile);
   padding: 12px 14px;
   font-size: 13px;
   margin: 0 0 14px;
@@ -238,7 +281,7 @@ button {
 }
 
 .pill {
-  border: 1px solid #e4e3e0;
+  border: 1px solid var(--line);
   background: var(--card);
   color: var(--text);
   border-radius: 999px;
@@ -267,9 +310,10 @@ button {
   color: #ffffff;
 }
 
-.pill.level-1 { background: #f7e6ec; border-color: #f7e6ec; color: var(--accent-dark); }
-.pill.level-2 { background: #e7a9be; border-color: #e7a9be; color: #5a1029; }
-.pill.level-3 { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+/* Symptom-Stärke: leicht, mittel, stark (Amber) */
+.pill.level-1 { background: var(--warn-bg); border-color: var(--warn-bg); color: var(--warn-fg); }
+.pill.level-2 { background: var(--warn-mid); border-color: var(--warn-mid); color: var(--warn-fg); }
+.pill.level-3 { background: var(--warn); border-color: var(--warn); color: #ffffff; }
 
 .grid-5 {
   display: grid;
@@ -293,7 +337,7 @@ button {
 }
 
 .btn-primary {
-  background: var(--accent);
+  background: var(--primary);
   color: #ffffff;
   width: 100%;
   margin-top: 14px;
@@ -307,16 +351,16 @@ button {
 }
 
 .btn-soft {
-  background: var(--accent-soft);
-  color: var(--accent);
+  background: var(--fill);
+  color: var(--text);
   font-size: 14px;
 }
 
 .btn-link {
   background: transparent;
-  color: var(--accent);
+  color: var(--primary);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .signout-unused {
@@ -344,7 +388,7 @@ button {
 .input:focus-visible,
 .btn:focus-visible,
 .pill:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--text);
   outline-offset: 2px;
 }
 
@@ -415,7 +459,7 @@ button {
   flex-wrap: wrap;
   gap: 12px;
   font-size: 12px;
-  color: #52525b;
+  color: var(--text-2);
   margin-top: 2px;
 }
 
@@ -498,7 +542,7 @@ button {
 }
 
 .pin-key:active {
-  background: var(--accent-soft);
+  background: var(--fill);
 }
 
 .pin-key-ghost {
@@ -508,7 +552,7 @@ button {
 }
 
 .pin-key:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--text);
   outline-offset: 2px;
 }
 
@@ -518,8 +562,8 @@ button {
 }
 
 .card-tight {
-  padding: 12px 14px;
-  border-radius: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-tile);
 }
 
 .row-strong {
@@ -532,7 +576,7 @@ button {
 }
 
 .meta-warn {
-  color: #9a5b00;
+  color: var(--warn-fg);
 }
 
 .alert-inline {
@@ -557,9 +601,9 @@ button {
 
 .metric {
   background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 14px;
+  border: 0;
+  border-radius: var(--radius-tile);
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -568,8 +612,8 @@ button {
 }
 
 .metric-value {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .back-link {
@@ -594,7 +638,7 @@ button {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 4px;
-  background: #e9e8e5;
+  background: var(--fill);
   border-radius: 12px;
   padding: 4px;
 }
@@ -624,19 +668,23 @@ button {
 
 .chart-line {
   fill: none;
-  stroke: var(--accent);
+  stroke: var(--recovery);
   stroke-width: 2;
   vector-effect: non-scaling-stroke;
   stroke-linejoin: round;
 }
 
+.chart-line-neutral {
+  stroke: var(--text-2);
+}
+
 .chart-band {
-  fill: var(--accent-soft);
-  opacity: 0.7;
+  fill: var(--recovery-bg);
+  opacity: 0.9;
 }
 
 .chart-period {
-  fill: #f2d3de;
+  fill: var(--menses-bg);
   opacity: 0.6;
 }
 
@@ -680,9 +728,19 @@ button {
   font-weight: 600;
 }
 
-.badge-accent {
-  background: var(--accent-soft);
-  color: var(--accent);
+.badge-strong {
+  background: var(--fill);
+  color: var(--text);
+}
+
+.badge-training {
+  background: var(--training-bg);
+  color: var(--training-fg);
+}
+
+.badge-cycle {
+  background: var(--cycle-bg);
+  color: var(--cycle-fg);
 }
 
 .expand {
@@ -697,7 +755,7 @@ button {
 .eyebrow {
   font-size: 12px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--muted);
 }
 
 .tips {
@@ -712,12 +770,12 @@ button {
 }
 
 .tips li::marker {
-  color: var(--accent);
+  color: var(--muted);
 }
 
 .note-ok {
-  background: var(--ok-bg);
-  color: #1f4d2b;
+  background: var(--recovery-bg);
+  color: var(--recovery-fg);
   border-radius: 14px;
   padding: 12px 14px;
   font-size: 13px;
@@ -767,7 +825,7 @@ button {
 }
 
 .btn-dashed {
-  border: 1px dashed #cfcdc8;
+  border: 1px dashed var(--line-strong);
   background: var(--card);
   color: var(--text);
   font-size: 14px;
@@ -805,8 +863,8 @@ button {
 }
 
 .rule {
-  background: var(--accent-soft);
-  color: var(--accent-dark);
+  background: var(--recovery-bg);
+  color: var(--recovery-fg);
   border-radius: 12px;
   padding: 12px 14px;
   display: flex;
@@ -832,7 +890,7 @@ button {
   position: absolute;
   inset: 0;
   fill: none;
-  stroke: #cfcdc8;
+  stroke: var(--line-strong);
   stroke-width: 10;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -843,20 +901,20 @@ button {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 2px solid #a1a1aa;
+  border: 2px solid var(--muted);
   background: rgba(255, 255, 255, 0.9);
   padding: 0;
   cursor: pointer;
 }
 
 .spot[data-active="true"] {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+  border-color: var(--warn);
+  background: var(--warn-bg);
 }
 
 .spot[data-selected="true"] {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--warn);
+  border-color: var(--warn);
 }
 
 .pills.center {
@@ -873,7 +931,7 @@ button {
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  border: 1px solid #e4e3e0;
+  border: 1px solid var(--line);
   background: var(--card);
   font-size: 18px;
   color: var(--text);
@@ -888,8 +946,8 @@ button {
 }
 
 .kyu {
-  background: var(--accent-soft);
-  color: var(--accent-dark) !important;
+  background: var(--training-bg);
+  color: var(--training-fg) !important;
   border-radius: 12px;
   padding: 12px 14px;
   font-size: 13px !important;
@@ -933,7 +991,7 @@ button {
 
 .chart-raw {
   fill: none;
-  stroke: #d4d2cd;
+  stroke: var(--line-strong);
   stroke-width: 1.2;
   vector-effect: non-scaling-stroke;
 }
@@ -992,11 +1050,11 @@ button {
 }
 
 .cal-cell[data-period="true"] .cal-num {
-  border-bottom: 2px solid #e7a9be;
+  border-bottom: 2px solid var(--menses-fg);
 }
 
 .cal-cell[data-today="true"] .cal-num {
-  color: var(--accent);
+  color: var(--text);
   font-weight: 700;
 }
 
@@ -1026,7 +1084,7 @@ button {
 
 .legend-period {
   background: transparent !important;
-  border-bottom: 2px solid #e7a9be;
+  border-bottom: 2px solid var(--menses-fg);
   border-radius: 0 !important;
 }
 
@@ -1045,7 +1103,7 @@ button {
 .progress span {
   display: block;
   height: 100%;
-  background: var(--accent);
+  background: var(--training);
   border-radius: 99px;
 }
 
@@ -1119,7 +1177,7 @@ button {
   width: 22px;
   height: 22px;
   border-radius: 6px;
-  border: 1.5px solid #cfcdc8;
+  border: 1.5px solid var(--line-strong);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1180,7 +1238,7 @@ button {
 }
 
 .factor-effect.neg {
-  color: #9a5b00;
+  color: var(--warn-fg);
 }
 
 .target-bars {
@@ -1206,7 +1264,7 @@ button {
   position: absolute;
   left: 0;
   right: 0;
-  background: #f2d3de;
+  background: var(--recovery-bg);
 }
 
 .tb-load {
