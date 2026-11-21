@@ -59,7 +59,7 @@ export default function TodayPlan() {
                 {SPORTS[s.sport].label}
                 {s.time ? " · " + s.time : ""}
               </span>
-              <span className={done ? "badge badge-ok" : eff && eff.kind !== "angepasst" ? "badge badge-warn" : "badge badge-accent"}>
+              <span className={done ? "badge badge-ok" : eff && eff.kind !== "angepasst" ? "badge badge-warn" : "badge badge-training"}>
                 {done ? "erledigt" : eff?.kind === "pause" ? "Pause" : eff?.kind === "gesperrt" ? "pausiert" : "geplant"}
               </span>
             </div>
