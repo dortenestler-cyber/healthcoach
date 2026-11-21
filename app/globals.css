@@ -1060,8 +1060,8 @@ button {
 }
 
 .cal-cell[data-selected="true"] {
-  background: var(--bg);
-  outline: 1px solid var(--line);
+  outline: 2px solid var(--text);
+  outline-offset: -2px;
 }
 
 .cal-num {
@@ -1462,4 +1462,52 @@ button {
   stroke-width: 1;
   stroke-dasharray: 2 2;
   vector-effect: non-scaling-stroke;
+}
+
+/* Übernahme Schritt 4: Training und Kalender */
+.segmented-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cal-cell[data-phase="menses"] { background-color: var(--menses-bg); }
+.cal-cell[data-phase="follikel"] { background-color: var(--phase-follikel); }
+.cal-cell[data-phase="luteal"] { background-color: var(--cycle-bg); }
+
+/* Kommende Tage sind nur geschätzt: heller */
+.cal-cell[data-future="true"][data-phase] {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5));
+}
+
+.week-bars {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  height: 128px;
+}
+
+.week-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+}
+
+.week-col .tb-track {
+  flex: 1;
+}
+
+.week-col .tb-track[data-future="true"] {
+  background: transparent;
+  border: 1px dashed var(--line-strong);
+}
+
+.week-col small {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.week-col[data-today="true"] small {
+  color: var(--text);
+  font-weight: 700;
 }
