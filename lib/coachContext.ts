@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay } from "@/lib/dates";
 import { loadInsightData } from "@/lib/insightData";
 import { computeTarget, cycleInfo, loadPercent, patterns } from "@/lib/insights";
+import { cycleToday, PHASES } from "@/lib/cycle";
 import { METRICS, stats } from "@/lib/garmin";
 import { SPOTS, type Injury, type Medication } from "@/lib/health";
 import { SPORTS, type Session } from "@/lib/training";
@@ -33,6 +34,9 @@ export async function buildCoachContext(): Promise<string> {
 
   const cyc = cycleInfo(day, data.diary);
   lines.push(cyc.cycleDay ? `Zyklustag ${cyc.cycleDay}, Zyklus etwa ${cyc.length} Tage${cyc.beforePeriod ? ", Tage vor der Periode" : ""}.` : "Zyklus: noch keine Periode im Tagebuch.");
+  const ct = cycleToday(day, data.diary);
+  if (ct.phase) lines.push(`Geschätzte Phase: ${PHASES[ct.phase].label}.`);
+  if (ct.window) lines.push(`Nächste Periode geschätzt zwischen ${ct.window.earliest} und ${ct.window.latest} (aus ${ct.window.basis} Zyklen).`);
 
   // Symptome der letzten 7 Tage
   const recent = data.diary.filter((d) => d.day >= isoDay(daysAgo(6)));
