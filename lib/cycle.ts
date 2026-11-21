@@ -160,12 +160,15 @@ function redFlagFor(day: string, diary: Diary[]): string | null {
 // 2. Infekt-Verdacht: Ruhepuls mindestens 6 bpm über dem Schnitt und HRV darunter
 function infectionFor(day: string, data: Data): boolean {
   const today = data.daily.find((r) => r.day === day);
-  if (!today || today.resting_hr === null || today.hrv_last_night === null) return false;
+  if (!today || today.hrv_last_night === null) return false;
+  if (today.resting_hr === null && typeof today.skin_temp_delta !== "number") return false;
   const hist = data.daily.filter((r) => r.day < day && r.day >= addDays(day, -30));
   const rhr = mean(hist.map((r) => r.resting_hr).filter((v): v is number => v !== null));
   const hrv = mean(hist.map((r) => r.hrv_last_night).filter((v): v is number => v !== null));
   if (rhr === null || hrv === null || hist.length < 7) return false;
-  return today.resting_hr >= rhr + 6 && today.hrv_last_night < hrv;
+  const temp = typeof today.skin_temp_delta === "number" ? Number(today.skin_temp_delta) : null;
+  // Ruhepuls deutlich höher oder Hauttemperatur mindestens 0,5 °C über dem Normalwert, jeweils zusammen mit niedriger HRV
+  return ((today.resting_hr !== null && today.resting_hr >= rhr + 6) || (temp !== null && temp >= 0.5)) && today.hrv_last_night < hrv;
 }
 
 // 4. Symptome plus niedrige HRV (beides muss zusammenkommen)
@@ -209,7 +212,7 @@ export function dayRule(day: string, data: Data, injuredSports: string[] = []): 
       ...base,
       level: "infekt",
       title: "Schongang empfohlen",
-      text: "Dein Ruhepuls ist deutlich höher und deine HRV niedriger als sonst. Das kann auf einen Infekt hindeuten. Vorschlag: heute Pause oder nur ruhig gehen. Du entscheidest.",
+      text: "Ruhepuls oder Hauttemperatur sind deutlich höher und deine HRV niedriger als sonst. Das kann auf einen Infekt hindeuten. Vorschlag: heute Pause oder nur ruhig gehen. Du entscheidest.",
     };
   if (rehaSports.length)
     return {
@@ -262,4 +265,41 @@ export function hrvInsight(day: string, data: Data): string {
   const z = d > 0 ? (today - m) / d : 0;
   if (Math.abs(z) < 0.75) return `Deine HRV liegt im üblichen Bereich ${where}.`;
   return `Deine HRV liegt ${z > 0 ? "über" : "unter"} dem Üblichen ${where}.`;
+}
+
+// ---------- Vergleich zwischen Phasen (Verlauf und Muster-Karte)
+
+export type PhaseGroup = "menstruation" | "follikel" | "luteal";
+export const PHASE_GROUPS: [PhaseGroup, string][] = [
+  ["menstruation", "Menstruation"],
+  ["follikel", "Follikel"],
+  ["luteal", "Luteal"],
+];
+export const groupOf = (p: Phase | null): PhaseGroup | null =>
+  p === "menstruation" ? "menstruation" : p === "follikel" || p === "eisprung" ? "follikel" : p ? "luteal" : null;
+
+// Schnitt eines Werts je Phasengruppe, nur Tage mit Wert
+export function phaseMeans(values: { day: string; value: number | null }[], diary: Diary[]): Record<PhaseGroup, { mean: number | null; n: number }> {
+  const acc: Record<PhaseGroup, number[]> = { menstruation: [], follikel: [], luteal: [] };
+  for (const v of values) {
+    if (v.value === null) continue;
+    const g = groupOf(cycleToday(v.day, diary).phase);
+    if (g) acc[g].push(v.value);
+  }
+  const out = {} as Record<PhaseGroup, { mean: number | null; n: number }>;
+  for (const g of Object.keys(acc) as PhaseGroup[]) out[g] = { mean: mean(acc[g]), n: acc[g].length };
+  return out;
+}
+
+// Ein Satz: Lutealphase im Vergleich zur Follikelphase, vorsichtig formuliert
+export function phaseInsight(label: string, values: { day: string; value: number | null }[], diary: Diary[], fmtDiff: (v: number) => string): string | null {
+  const pm = phaseMeans(values, diary);
+  const l = pm.luteal;
+  const f = pm.follikel;
+  if (l.mean === null || f.mean === null || l.n < 5 || f.n < 5) return null;
+  const all = values.map((v) => v.value).filter((v): v is number => v !== null);
+  const spread = sd(all) ?? 0;
+  const diff = l.mean - f.mean;
+  if (Math.abs(diff) < 0.25 * spread || diff === 0) return `${label}: in Follikel- und Lutealphase etwa gleich.`;
+  return `${label} liegt in der Lutealphase im Schnitt ${fmtDiff(Math.abs(diff))} ${diff > 0 ? "höher" : "niedriger"} als in der Follikelphase.`;
 }

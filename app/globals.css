@@ -1608,3 +1608,42 @@ button.settings-row {
   line-height: 1.5;
   color: var(--text-2);
 }
+
+/* Übernahme Schritt 5: Verlauf mit Phasen */
+.chart-norm {
+  stroke: var(--recovery);
+  stroke-width: 1;
+  stroke-dasharray: 3 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.legend .legend-norm {
+  background: transparent;
+  border-top: 2px dashed var(--recovery);
+  border-radius: 0;
+  height: 0;
+}
+
+.chart-sweat {
+  stroke: var(--warn);
+  stroke-width: 4;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.legend .legend-sweat {
+  background: var(--warn);
+  border-radius: 99px;
+}
+
+.pattern-grid {
+  display: grid;
+  grid-template-columns: 1.3fr repeat(3, minmax(0, 1fr));
+  gap: 8px 6px;
+  font-size: 13px;
+  align-items: baseline;
+}
+
+.pattern-row {
+  display: contents;
+}
