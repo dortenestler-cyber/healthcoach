@@ -4,7 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { isoDay, longDate } from "@/lib/dates";
 import { activityLabel, durationText, type Activity } from "@/lib/garmin";
-import type { Illness, Injury } from "@/lib/health";
+import { SPOTS, type Illness, type Injury } from "@/lib/health";
+import type { Data } from "@/lib/insights";
+import { cycleToday, dayRule, PHASES, type Phase } from "@/lib/cycle";
 import {
   applyWeek,
   DEFAULT_TIMES,
@@ -24,8 +26,18 @@ import {
 
 const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 const ADDABLE: Sport[] = ["karate", "kettlebell", "klettern", "ausdauer"];
+const FILTERS: [Filter, string][] = [
+  ["alles", "Alles"],
+  ["training", "Training"],
+  ["zyklus", "Zyklus"],
+];
+type Filter = "alles" | "training" | "zyklus";
 
-export default function CalendarSection() {
+// Drei Flächen im Kalender: Menstruation, Follikel (mit Eisprung-Fenster), Luteal
+const band = (p: Phase | null) => (p === "menstruation" ? "menses" : p === "follikel" || p === "eisprung" ? "follikel" : p ? "luteal" : undefined);
+
+export default function CalendarSection({ data }: { data: Data | null }) {
+  const [filter, setFilter] = useState<Filter>("alles");
   const [month, setMonth] = useState(() => {
     const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1);
@@ -104,6 +116,28 @@ export default function CalendarSection() {
     return dots.slice(0, 4);
   };
 
+  const today = isoDay();
+  const showPhase = filter !== "training" && !!data;
+  const showDots = filter !== "zyklus";
+  const phaseOf = (day: string) => (data ? cycleToday(day, data.diary).phase : null);
+
+  // Tagesdetail: heute mit voller Regelreihenfolge, sonst nur der Phasenvorschlag
+  const rehaSports = [...new Set(injuries.flatMap((i) => SPOTS[i.spot]?.sports ?? []))].map((s) => SPORTS[s as Sport]?.label ?? s);
+  const selPhase = phaseOf(selected);
+  const selCycle = data ? cycleToday(selected, data.diary) : null;
+  const rule = data && selected === today ? dayRule(today, data, rehaSports) : null;
+  const dayBlock = (() => {
+    if (!data || !selCycle) return null;
+    const p = selPhase ? PHASES[selPhase] : null;
+    const head = selCycle.cycleDay !== null ? `Zyklustag ${selCycle.cycleDay}${p ? " · " + p.label + " (geschätzt)" : ""}` : "Zyklus: noch keine Periode im Tagebuch";
+    if (rule && rule.level !== "phase") {
+      const tone = rule.level === "reha" ? "suggest-training" : "suggest-warn";
+      return { head, title: rule.title, text: rule.text, rpe: null as string | null, tone };
+    }
+    if (!p) return { head, title: "Phase noch unbekannt", text: "Trag deine Periode im Tagebuch ein, dann kann die App die Phase schätzen.", rpe: null, tone: "" };
+    return { head, title: selected < today ? "Vorschlag für diese Phase" : "Vorschlag", text: `${p.suggestion}. ${p.hint}`, rpe: p.rpe, tone: "suggest-cycle" };
+  })();
+
   const shift = (n: number) => setMonth(new Date(month.getFullYear(), month.getMonth() + n, 1));
   const selSessions = sessOn(selected);
   const selActs = actsOn(selected);
@@ -138,6 +172,13 @@ export default function CalendarSection() {
           <h2>{MONTHS[month.getMonth()]} {month.getFullYear()}</h2>
           <button type="button" className="btn btn-link" aria-label="Nächster Monat" onClick={() => shift(1)}>›</button>
         </div>
+        <div className="segmented segmented-3">
+          {FILTERS.map(([k, l]) => (
+            <button key={k} type="button" aria-pressed={filter === k} onClick={() => setFilter(k)}>
+              {l}
+            </button>
+          ))}
+        </div>
         <div className="cal-grid cal-head">
           {WEEKDAY_LABELS.map((w) => (
             <span key={w}>{w}</span>
@@ -150,17 +191,20 @@ export default function CalendarSection() {
                 key={day}
                 type="button"
                 className="cal-cell"
-                data-today={day === isoDay()}
+                data-today={day === today}
                 data-selected={day === selected}
-                data-period={period.has(day)}
+                data-period={showPhase && period.has(day)}
+                data-phase={showPhase ? band(phaseOf(day)) : undefined}
+                data-future={day > today}
                 onClick={() => setSelected(day)}
-                aria-label={longDate(fromIso(day))}
+                aria-label={longDate(fromIso(day)) + (showPhase && phaseOf(day) ? ", " + PHASES[phaseOf(day)!].label + " geschätzt" : "")}
               >
                 <span className="cal-num">{Number(day.slice(8, 10))}</span>
                 <span className="cal-dots">
-                  {dotsFor(day).map((d) => (
-                    <i key={d.key} style={{ borderColor: d.color, background: d.filled ? d.color : "transparent" }} />
-                  ))}
+                  {showDots &&
+                    dotsFor(day).map((d) => (
+                      <i key={d.key} style={{ borderColor: d.color, background: d.filled ? d.color : "transparent" }} />
+                    ))}
                 </span>
               </button>
             ) : (
@@ -169,16 +213,38 @@ export default function CalendarSection() {
           )}
         </div>
         <div className="legend">
-          {ADDABLE.map((s) => (
-            <span key={s}><i style={{ background: SPORTS[s].color }} />{SPORTS[s].label}</span>
-          ))}
-          <span><i style={{ background: "transparent", border: "1.5px solid var(--muted)" }} />geplant</span>
-          <span><i className="legend-period" />Periode</span>
+          {showDots && (
+            <>
+              {ADDABLE.map((s) => (
+                <span key={s}><i style={{ background: SPORTS[s].color }} />{SPORTS[s].label}</span>
+              ))}
+              <span><i style={{ background: "transparent", border: "1.5px solid var(--muted)" }} />geplant</span>
+            </>
+          )}
+          {showPhase && (
+            <>
+              <span><i className="ph-menses-bg" />Menstruation</span>
+              <span><i className="ph-follikel-bg" />Follikel</span>
+              <span><i className="ph-luteal-bg" />Luteal</span>
+              <span><i className="legend-period" />Periode eingetragen</span>
+              <span>Phasen geschätzt, kommende Tage heller</span>
+            </>
+          )}
         </div>
       </section>
 
       <section className="card">
         <h2>{longDate(fromIso(selected))}</h2>
+        {dayBlock && (
+          <>
+            <span className="meta">{dayBlock.head}</span>
+            <div className={"suggest " + dayBlock.tone}>
+              <span className="row-strong">{dayBlock.title}</span>
+              <span>{dayBlock.text}</span>
+              {dayBlock.rpe && <span>Anstrengung (1–10): {dayBlock.rpe}</span>}
+            </div>
+          </>
+        )}
         {!selSessions.length && !selActs.length && <p>Nichts geplant.</p>}
         {selSessions.map((s) => {
           const garmin = doneByGarmin(s);
