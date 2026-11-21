@@ -15,6 +15,7 @@ export default function GarminCards() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [loaded, setLoaded] = useState(false);
+  const [morning, setMorning] = useState<{ at: string; ok: boolean; message: string | null } | null>(null);
   const autoDone = useRef(false);
 
   const load = useCallback(async () => {
@@ -28,6 +29,9 @@ export default function GarminCards() {
     const list = (data ?? []) as Daily[];
     setRows(list);
     setLoaded(true);
+    // Letzter automatischer Abruf am Morgen (fehlt die Tabelle noch, bleibt es still)
+    const run = await sb.from("garmin_sync_runs").select("at, ok, message").order("at", { ascending: false }).limit(1).maybeSingle();
+    setMorning(!run.error && run.data && isoDay(new Date(run.data.at)) === isoDay() ? run.data : null);
     return list;
   }, []);
 
@@ -95,6 +99,11 @@ export default function GarminCards() {
             {busy ? "Läuft …" : "Synchronisieren"}
           </button>
         </div>
+        {morning && !morning.ok && lastSync < new Date(morning.at).getTime() && (
+          <p className="alert alert-inline">
+            Der Abruf heute Morgen um {clock(new Date(morning.at))} hat nicht geklappt. Tippe auf „Synchronisieren“, um es jetzt zu versuchen. ({morning.message ?? "unbekannter Fehler"})
+          </p>
+        )}
         {error && <p className="alert alert-inline">{error}</p>}
       </section>
       <div className="metric-grid">{SHOWN.map(card)}</div>

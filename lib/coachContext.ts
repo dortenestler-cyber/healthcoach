@@ -32,7 +32,7 @@ export async function buildCoachContext(): Promise<string> {
   }
 
   const cyc = cycleInfo(day, data.diary);
-  lines.push(cyc.cycleDay ? `Zyklustag ${cyc.cycleDay}, Zyklus etwa ${cyc.length} Tage${cyc.beforePeriod ? ", Tage vor der Periode" : ""}.` : "Zyklus: noch keine Periode im Tagebuch.");
+  lines.push(cyc.cycleDay ? `Zyklustag ${cyc.cycleDay}, Zyklus etwa ${cyc.length} Tage${cyc.beforePeriod ? ", Tage vor der Periode" : ""}${cyc.fromGarmin ? " (Beginn aus Garmin)" : ""}.` : "Zyklus: noch keine Periode eingetragen.");
 
   // Symptome der letzten 7 Tage
   const recent = data.diary.filter((d) => d.day >= isoDay(daysAgo(6)));

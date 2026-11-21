@@ -33,7 +33,8 @@ jobs:
             name=$(basename "$dir")
             echo "Lade $name hoch …"
             extra=""
-            # Die Uhr meldet sich mit ihrem eigenen Uhr-Schlüssel an, nicht mit einem Supabase-Login
-            if [ "$name" = "watch" ]; then extra="--no-verify-jwt"; fi
+            # Die Uhr meldet sich mit ihrem eigenen Uhr-Schlüssel an, nicht mit einem Supabase-Login.
+            # garmin-sync prüft Login oder Schlüssel des Morgen-Abrufs selbst.
+            if [ "$name" = "watch" ] || [ "$name" = "garmin-sync" ]; then extra="--no-verify-jwt"; fi
             supabase functions deploy "$name" --project-ref "$SUPABASE_PROJECT_REF" --use-api --yes $extra
           done
