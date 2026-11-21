@@ -106,7 +106,7 @@ Deno.serve(async (req) => {
 
 // Alles, was die Uhr für heute braucht, kompakt und in Großbuchstaben für das Datenraster
 async function today(sb: Any, uid: string, day: string) {
-  const [meds, intakes, flashes, checkin, plan, illness, injuries, daily, kbPlan, diary] = await Promise.all([
+  const [meds, intakes, flashes, checkin, plan, illness, injuries, daily, kbPlan, diary, gcycles] = await Promise.all([
     sb.from("medications").select("id, name, kind, regular, as_needed, times, notes_key").eq("user_id", uid).eq("active", true).order("created_at"),
     sb.from("medication_intakes").select("medication_id, as_needed, slot, day, at").eq("user_id", uid).gte("day", addDays(day, -6)),
     sb.from("hot_flashes").select("id", { count: "exact", head: true }).eq("user_id", uid).gte("at", new Date(Date.now() - 864e5).toISOString()),
@@ -117,6 +117,7 @@ async function today(sb: Any, uid: string, day: string) {
     sb.from("garmin_daily").select("bb_max, hrv_last_night, sleep_score").eq("user_id", uid).eq("day", day).maybeSingle(),
     sb.from("kb_plans").select("id, name, weeks, step_kg, step_every_weeks, start_date").eq("user_id", uid).eq("active", true).order("created_at", { ascending: false }).limit(1),
     sb.from("diary_entries").select("day, bleeding").eq("user_id", uid).gte("day", addDays(day, -60)).order("day"),
+    sb.from("garmin_cycles").select("start_date").eq("user_id", uid).gte("start_date", addDays(day, -60)).lte("start_date", day),
   ]);
 
   const ins = (intakes.data ?? []) as Any[];
@@ -170,6 +171,13 @@ async function today(sb: Any, uid: string, day: string) {
   const di = (diary.data ?? []) as Any[];
   const any = new Set(di.filter((d) => d.bleeding >= 1).map((d) => d.day));
   const starts = di.filter((d) => d.bleeding >= 2 && !any.has(addDays(d.day, -1)) && !any.has(addDays(d.day, -2))).map((d) => d.day);
+  // Garmin-Zyklen ergänzen, wenn im Tagebuch innerhalb von 3 Tagen kein Beginn steht (wie in der App)
+  const bleedDays = [...any];
+  const near = (a: string, b: string) => Math.abs(new Date(a).getTime() - new Date(b).getTime()) <= 3 * 864e5;
+  for (const c of (gcycles.error ? [] : gcycles.data ?? []) as Any[]) {
+    if (!bleedDays.some((d) => near(d, c.start_date))) starts.push(c.start_date);
+  }
+  starts.sort();
   const last = starts[starts.length - 1];
   const cycleDay = last ? Math.round((new Date(day).getTime() - new Date(last).getTime()) / 864e5) + 1 : null;
 

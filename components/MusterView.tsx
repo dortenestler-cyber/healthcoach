@@ -24,7 +24,7 @@ export default function MusterView() {
 
   return (
     <>
-      <PageHead title="Muster" sub={cyc?.cycleDay ? `Zyklustag ${cyc.cycleDay} · Zyklus etwa ${cyc.length} Tage` : "Training, Erholung und Zyklus zusammen"} />
+      <PageHead title="Muster" sub={cyc?.cycleDay ? `Zyklustag ${cyc.cycleDay} · Zyklus etwa ${cyc.length} Tage${cyc.fromGarmin ? " · Beginn aus Garmin" : ""}` : "Training, Erholung und Zyklus zusammen"} />
       {error && <p className="alert">{error}</p>}
       {data && !ready.length && (
         <section className="card">

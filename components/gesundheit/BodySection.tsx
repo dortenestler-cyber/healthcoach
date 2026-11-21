@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { loadPeriodDays } from "@/lib/cycle";
 import { daysAgo, isoDay, shortDate } from "@/lib/dates";
 
 type Row = { day: string; weight_kg: number | null; waist_cm: number | null };
@@ -30,14 +31,14 @@ export default function BodySection() {
     const [s, b, d] = await Promise.all([
       sb.from("settings").select("data").maybeSingle(),
       sb.from("body_measurements").select("day, weight_kg, waist_cm").gte("day", from).order("day"),
-      sb.from("diary_entries").select("day").gte("day", from).gt("bleeding", 0),
+      loadPeriodDays(sb, from),
     ]);
     if (b.error) setError("Körperwerte konnten nicht geladen werden: " + b.error.message);
     const data = ((s.data as { data?: Record<string, unknown> } | null)?.data ?? {}) as Record<string, unknown>;
     setSettings(data);
     if (typeof data.body === "string") setMode(data.body as Mode);
     setRows(((b.data ?? []) as Row[]).map((r) => ({ ...r, weight_kg: r.weight_kg === null ? null : Number(r.weight_kg), waist_cm: r.waist_cm === null ? null : Number(r.waist_cm) })));
-    setPeriodDays(new Set(((d.data ?? []) as { day: string }[]).map((r) => r.day)));
+    setPeriodDays(d);
   }, []);
 
   useEffect(() => {

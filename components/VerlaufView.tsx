@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { loadPeriodDays } from "@/lib/cycle";
 import { daysAgo, isoDay, shortDate } from "@/lib/dates";
 import { METRICS, stats, syncGarmin, type Daily, type MetricKey } from "@/lib/garmin";
 import PageHead from "@/components/PageHead";
@@ -27,16 +28,16 @@ export default function VerlaufView({ initial }: { initial: string }) {
     const sb = supabase();
     if (!sb) return;
     const from = isoDay(daysAgo(range - 1));
-    const [g, d] = await Promise.all([
+    const [g, period] = await Promise.all([
       sb.from("garmin_daily").select("*").gte("day", from).order("day"),
-      sb.from("diary_entries").select("day, bleeding").gte("day", from).gt("bleeding", 0),
+      loadPeriodDays(sb, from),
     ]);
     if (g.error) {
       setError("Verlauf konnte nicht geladen werden: " + g.error.message);
       return;
     }
     setRows((g.data ?? []) as Daily[]);
-    setPeriodDays(new Set(((d.data ?? []) as { day: string }[]).map((r) => r.day)));
+    setPeriodDays(period);
   }, [range]);
 
   useEffect(() => {

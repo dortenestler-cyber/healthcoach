@@ -5,7 +5,8 @@ import type { Activity, Daily } from "@/lib/garmin";
 import { illnessRule, type Illness } from "@/lib/health";
 import { sportOfGarmin, type Sport } from "@/lib/training";
 
-export type Diary = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[] };
+export type Diary = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[]; fromGarmin?: boolean; garminOnly?: boolean };
+// fromGarmin: Blutung an diesem Tag stammt aus Garmin · garminOnly: kein eigener Tagebucheintrag an diesem Tag
 export type Checkin = { day: string; energy: number | null; sleep: number | null; mood: number | null };
 export type Hub = { day: string };
 
@@ -48,7 +49,7 @@ export function periodStarts(diary: Diary[]): string[] {
   return [...bleed].filter((d) => !any.has(addDays(d, -1)) && !any.has(addDays(d, -2))).sort();
 }
 
-export function cycleInfo(day: string, diary: Diary[]): { cycleDay: number | null; length: number; beforePeriod: boolean; cycles: number } {
+export function cycleInfo(day: string, diary: Diary[]): { cycleDay: number | null; length: number; beforePeriod: boolean; cycles: number; fromGarmin: boolean } {
   const starts = periodStarts(diary).filter((s) => s <= day);
   const lens: number[] = [];
   for (let i = 1; i < starts.length; i++) {
@@ -57,9 +58,10 @@ export function cycleInfo(day: string, diary: Diary[]): { cycleDay: number | nul
   }
   const length = Math.round(mean(lens) ?? 28);
   const last = starts[starts.length - 1];
-  if (!last) return { cycleDay: null, length, beforePeriod: false, cycles: lens.length };
+  if (!last) return { cycleDay: null, length, beforePeriod: false, cycles: lens.length, fromGarmin: false };
   const cycleDay = Math.round((new Date(day).getTime() - new Date(last).getTime()) / 864e5) + 1;
-  return { cycleDay, length, beforePeriod: cycleDay > length - 5 && cycleDay <= length + 3, cycles: lens.length };
+  const fromGarmin = !!diary.find((d) => d.day === last)?.fromGarmin;
+  return { cycleDay, length, beforePeriod: cycleDay > length - 5 && cycleDay <= length + 3, cycles: lens.length, fromGarmin };
 }
 
 // ---------- Tagesziel
@@ -291,7 +293,7 @@ export function patterns(data: Data): Pattern[] {
   const rows: { label: string; with: number; without: number; n: number }[] = [];
   for (const k of infl) {
     const withD = data.diary.filter((d) => d.influences?.includes(k)).map((d) => d.day);
-    const withoutD = data.diary.filter((d) => !d.influences?.includes(k)).map((d) => d.day);
+    const withoutD = data.diary.filter((d) => !d.garminOnly && !d.influences?.includes(k)).map((d) => d.day);
     const sleep = (days: string[]) => days.map((d) => dm.get(addDays(d, 1))?.sleep_score ?? null).filter((v): v is number => v !== null);
     const a = mean(sleep(withD));
     const b = mean(sleep(withoutD));
