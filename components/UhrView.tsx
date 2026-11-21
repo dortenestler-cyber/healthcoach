@@ -50,6 +50,22 @@ export default function UhrView() {
     load();
   };
 
+  const [test, setTest] = useState<string>("");
+  const runTest = async (token: string) => {
+    setTest("Teste …");
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/watch`, {
+        method: "POST",
+        headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "today" }),
+      });
+      const body = await res.json().catch(() => ({}));
+      setTest(res.ok ? `Verbindung klappt. Die Uhr bekommt ${body?.slots?.length ?? 0} Einnahmen und ${body?.plan?.length ?? 0} Einheiten für heute.` : `Fehler ${res.status}: ${body?.error ?? "ohne Grund"}`);
+    } catch (e) {
+      setTest("Test nicht möglich: " + (e instanceof Error ? e.message : String(e)));
+    }
+  };
+
   const remove = async (id: string) => {
     await supabase()?.from("watch_tokens").delete().eq("id", id);
     load();
@@ -77,6 +93,8 @@ export default function UhrView() {
           <p>Er wird nur jetzt angezeigt. Kopiere ihn und füge ihn in den Einstellungen der Uhr-App ein.</p>
           <code className="token">{fresh}</code>
           <button type="button" className="btn btn-dark" onClick={copy}>{copied ? "Kopiert" : "Kopieren"}</button>
+          <button type="button" className="btn btn-link" onClick={() => runTest(fresh)}>Verbindung testen</button>
+          {test && <p className={test.startsWith("Verbindung klappt") ? "note-ok" : "alert"}>{test}</p>}
           <ol className="steps">
             <li>Garmin Connect IQ App auf dem Handy öffnen</li>
             <li>Meine Geräte → Fenix → Health Coach → Einstellungen</li>
