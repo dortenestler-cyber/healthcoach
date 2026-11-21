@@ -1,0 +1,108 @@
+name: Uhr-App bauen
+
+# Baut die Uhr-App für die Fenix 9 Pro mit dem Connect IQ SDK.
+# Ergebnis zum Herunterladen unter Actions → dieser Lauf → Artifacts:
+#   HealthCoach.iq      für das Hochladen im Garmin-Entwickler-Dashboard (Beta-App)
+#   HealthCoach-*.prg   zum Kopieren per USB auf die Uhr (Ordner GARMIN/APPS)
+#
+# Secrets (Settings → Secrets and variables → Actions):
+#   GARMIN_BUILD_EMAIL, GARMIN_BUILD_PASSWORD   zweites Garmin-Konto nur zum Herunterladen des SDK
+#   CIQ_DEVELOPER_KEY_B64                       Entwicklerschlüssel (DER, base64), damit Updates gleich signiert sind
+#   WATCH_TOKEN                                 optional: Uhr-Schlüssel, wird nur in die .prg-Dateien eingebaut
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "watch/**"
+      - ".github/workflows/watch-build.yml"
+  pull_request:
+    paths:
+      - "watch/**"
+      - ".github/workflows/watch-build.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: stable
+
+      - name: SDK-Manager installieren
+        run: |
+          go install github.com/lindell/connect-iq-sdk-manager-cli@latest
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: SDK und Geräte herunterladen
+        env:
+          GARMIN_USERNAME: ${{ secrets.GARMIN_BUILD_EMAIL }}
+          GARMIN_EMAIL: ${{ secrets.GARMIN_BUILD_EMAIL }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_BUILD_PASSWORD }}
+        run: |
+          if [ -z "$GARMIN_USERNAME" ] || [ -z "$GARMIN_PASSWORD" ]; then
+            echo "::error::Die Secrets GARMIN_BUILD_EMAIL und GARMIN_BUILD_PASSWORD fehlen."
+            exit 1
+          fi
+          connect-iq-sdk-manager-cli agreement accept
+          connect-iq-sdk-manager-cli login
+          connect-iq-sdk-manager-cli sdk set "^9.0.0" || connect-iq-sdk-manager-cli sdk set "^8.0.0"
+          echo "$(connect-iq-sdk-manager-cli sdk current-path --bin)" >> "$GITHUB_PATH"
+          connect-iq-sdk-manager-cli device download --manifest=watch/manifest.xml
+
+      - name: Entwicklerschlüssel
+        env:
+          KEY_B64: ${{ secrets.CIQ_DEVELOPER_KEY_B64 }}
+        run: |
+          if [ -n "$KEY_B64" ]; then
+            echo "$KEY_B64" | base64 -d > "$RUNNER_TEMP/developer_key.der"
+          else
+            echo "::warning::CIQ_DEVELOPER_KEY_B64 fehlt. Es wird ein neuer Schlüssel erzeugt und als Artifact 'entwicklerschluessel' abgelegt. Inhalt der Datei als Secret CIQ_DEVELOPER_KEY_B64 speichern."
+            openssl genrsa -out "$RUNNER_TEMP/key.pem" 4096
+            openssl pkcs8 -topk8 -inform PEM -outform DER -in "$RUNNER_TEMP/key.pem" -out "$RUNNER_TEMP/developer_key.der" -nocrypt
+            mkdir -p keyout
+            base64 -w0 "$RUNNER_TEMP/developer_key.der" > keyout/CIQ_DEVELOPER_KEY_B64.txt
+          fi
+
+      - name: Paket für den Store bauen (.iq)
+        run: |
+          mkdir -p build
+          monkeyc -f watch/monkey.jungle -e -o build/HealthCoach.iq -y "$RUNNER_TEMP/developer_key.der" -l 0 -w
+
+      - name: Dateien für USB bauen (.prg)
+        env:
+          WATCH_TOKEN: ${{ secrets.WATCH_TOKEN }}
+        run: |
+          # Bei USB-Installation lassen sich Einstellungen nicht übers Handy ändern.
+          # Deshalb kommt der Uhr-Schlüssel hier direkt in die Datei, falls er als Secret hinterlegt ist.
+          if [ -n "$WATCH_TOKEN" ]; then
+            sed -i "s|<property id=\"token\" type=\"string\"></property>|<property id=\"token\" type=\"string\">${WATCH_TOKEN}</property>|" watch/resources/settings/properties.xml
+          fi
+          for dev in $(grep -o 'product id="[^"]*"' watch/manifest.xml | cut -d'"' -f2); do
+            monkeyc -f watch/monkey.jungle -d "$dev" -o "build/HealthCoach-$dev.prg" -y "$RUNNER_TEMP/developer_key.der" -l 0 -w
+          done
+          git checkout -- watch/resources/settings/properties.xml
+
+      - name: Neuen Entwicklerschlüssel ablegen (nur beim ersten Mal)
+        if: ${{ hashFiles('keyout/CIQ_DEVELOPER_KEY_B64.txt') != '' }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: entwicklerschluessel
+          path: keyout/CIQ_DEVELOPER_KEY_B64.txt
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: health-coach-uhr
+          path: |
+            build/*.iq
+            build/*.prg
+          retention-days: 30

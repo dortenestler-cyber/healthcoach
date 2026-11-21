@@ -139,6 +139,9 @@ export default function HeuteView() {
 
 
       <div className="footer-links">
+        <a href="/uhr" className="btn btn-link link-btn">
+          Uhr verbinden
+        </a>
         <button type="button" className="btn btn-link" onClick={changePin}>
           PIN ändern
         </button>

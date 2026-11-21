@@ -32,5 +32,8 @@ jobs:
           for dir in supabase/functions/*/; do
             name=$(basename "$dir")
             echo "Lade $name hoch …"
-            supabase functions deploy "$name" --project-ref "$SUPABASE_PROJECT_REF" --use-api --yes
+            extra=""
+            # Die Uhr meldet sich mit ihrem eigenen Uhr-Schlüssel an, nicht mit einem Supabase-Login
+            if [ "$name" = "watch" ]; then extra="--no-verify-jwt"; fi
+            supabase functions deploy "$name" --project-ref "$SUPABASE_PROJECT_REF" --use-api --yes $extra
           done

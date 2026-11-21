@@ -38,6 +38,14 @@ Garmin schickt etwa eine Woche vor Ablauf des Schlüssels eine Erinnerung. Dann 
 3. Die SQL-Datei `supabase/migrations/20261121110000_phase4b_coach.sql` im SQL-Editor ausführen.
 Der Coach beantwortet höchstens 40 Fragen pro Tag, damit die Kosten überschaubar bleiben.
 
+## Uhr-App (Fenix 9 Pro)
+Der Code liegt in `watch/`, GitHub baut die App unter **Actions → Uhr-App bauen**.
+1. In der App unter **Heute → Uhr verbinden** einen Uhr-Schlüssel erzeugen und kopieren.
+2. GitHub-Secrets anlegen: `GARMIN_BUILD_EMAIL` und `GARMIN_BUILD_PASSWORD` (zweites Garmin-Konto nur zum Bauen), optional `WATCH_TOKEN` (der Uhr-Schlüssel, nur für die USB-Variante).
+3. Beim ersten Lauf erzeugt GitHub einen Entwicklerschlüssel als Artifact `entwicklerschluessel`. Den Inhalt als Secret `CIQ_DEVELOPER_KEY_B64` speichern, damit alle späteren Versionen gleich signiert sind.
+4. Installieren als Beta: `HealthCoach.iq` im Garmin-Entwickler-Dashboard hochladen, den App-Link auf dem Handy öffnen, im Connect IQ Store installieren, dann in den App-Einstellungen den Uhr-Schlüssel einfügen.
+5. Oder per USB: die passende `HealthCoach-<gerät>.prg` in den Ordner `GARMIN/APPS` der Uhr kopieren.
+
 ## Lokal starten
 Voraussetzung: Node.js 20 oder neuer.
 
