@@ -99,6 +99,11 @@ export const SPOTS: Record<string, { label: string; x: number; y: number; sports
     rows: [["Ausfallschritt und Goblet Squat", "Oberkörper-Übungen"], ["Karate: Tritte und tiefe Stände", "Arm-Techniken im hohen Stand"], ["Joggen", "Rad fahren nach Gefühl"]],
     kyu: "Für den 5. Kyu üben: Arm-Techniken aus dem Kihon und die Kata-Abfolge im hohen Stand.",
   },
+  wade: {
+    label: "Wade / Achillessehne", x: 102, y: 189, sports: ["klettern"],
+    rows: [["Joggen, Springen und Sprints", "Rad fahren oder Rudern nach Gefühl"], ["Bouldern", "Pause, vor allem kein Abspringen"], ["Karate: Tritte und Sprünge", "Arm-Techniken im hohen Stand"], ["Ausfallschritt und tiefe Kniebeuge", "Oberkörper-Übungen, Swing nur wenn schmerzfrei"]],
+    kyu: "Für den 5. Kyu üben: Arm-Techniken aus dem Kihon und die Kata-Abfolge im hohen Stand, ohne Sprünge.",
+  },
   fuss: {
     label: "Fuß", x: 103, y: 221, sports: ["klettern"],
     rows: [["Joggen und Springen", "Rad fahren nach Gefühl"], ["Bouldern", "Pause, vor allem kein Abspringen"], ["Karate-Tritte", "Arm-Techniken im Stand"]],
