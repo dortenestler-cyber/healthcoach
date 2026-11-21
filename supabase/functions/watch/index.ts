@@ -42,11 +42,18 @@ type Any = any;
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") return json(405, { error: "Nur POST" });
-    const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
-    if (!token.startsWith("hcw_")) return json(401, { error: "Uhr-Schlüssel fehlt" });
+    // Leerzeichen und Zeilenumbrüche entfernen, Präfix unabhängig von Groß- und Kleinschreibung
+    let token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "").replace(/\s+/g, "");
+    if (!/^hcw_/i.test(token)) return json(401, { error: "Uhr-Schlüssel fehlt" });
+    token = "hcw_" + token.slice(4);
+    // Neue Schlüssel bestehen nur aus Kleinbuchstaben und Ziffern
+    if (/^hcw_[0-9a-f]+$/i.test(token)) token = token.toLowerCase();
 
-    const sb = createClient(Deno.env.get("SUPABASE_URL")!, serviceKey(), { auth: { persistSession: false } });
-    const { data: tok } = await sb.from("watch_tokens").select("id, user_id").eq("token_hash", await sha256(token)).maybeSingle();
+    const key = serviceKey();
+    if (!key) return json(500, { error: "Server: Dienstschlüssel fehlt" });
+    const sb = createClient(Deno.env.get("SUPABASE_URL")!, key, { auth: { persistSession: false } });
+    const { data: tok, error: tokErr } = await sb.from("watch_tokens").select("id, user_id").eq("token_hash", await sha256(token)).maybeSingle();
+    if (tokErr) return json(500, { error: "Server: " + tokErr.message });
     if (!tok) return json(401, { error: "Uhr-Schlüssel ungültig" });
     const uid = (tok as Any).user_id as string;
     await sb.from("watch_tokens").update({ last_used_at: new Date().toISOString() }).eq("id", (tok as Any).id);
