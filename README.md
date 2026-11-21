@@ -2,7 +2,7 @@
 
 Eine persönliche App für Training, Erholung und Perimenopause. Sie verbindet Garmin-Daten von der Fenix 9 Pro mit Tagebuch, Zyklus, Symptomen, Krankheiten, Verletzungen, Medikamenten und einem Coach auf Basis von Claude.
 
-**Stand:** Phase 3a, Gesundheit. Anmeldung mit Passwort und PIN, Tagebuch, Check-in, Hitzewallungen, Garmin-Daten mit Verlauf sowie Medikamente und Supplements, Krankheiten, Verletzungen und Körperwerte.
+**Stand:** Phase 3, Training und Gesundheit. Anmeldung mit Passwort und PIN, Tagebuch, Check-in, Hitzewallungen, Garmin-Daten mit Verlauf, Medikamente, Krankheiten, Verletzungen, Körperwerte, Kalender mit Wochenvorlage, Kettlebell-Plan, Bouldern (Fontainebleau) und Karate-Prüfung.
 
 ## Einrichtung Supabase (einmalig)
 1. Im Supabase-Projekt den **SQL-Editor** öffnen, den Inhalt von `supabase/migrations/20261120120000_phase1_fundament.sql` einfügen und auf **Run** klicken.
