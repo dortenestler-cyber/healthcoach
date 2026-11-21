@@ -18,3 +18,8 @@ supabase/.branches/
 # System
 .DS_Store
 *.log
+
+# Versehentlich übersetzte Dateien: Next würde sie statt der .ts-Dateien laden
+lib/**/*.js
+components/**/*.js
+app/**/*.js
