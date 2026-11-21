@@ -1274,3 +1274,28 @@ button {
   margin-top: 0;
   min-height: 46px;
 }
+
+/* Phase 5: Uhr */
+.token {
+  display: block;
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 13px;
+  word-break: break-all;
+  user-select: all;
+}
+
+.steps {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.link-btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
