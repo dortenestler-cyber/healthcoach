@@ -31,7 +31,7 @@ export type Activity = {
   training_load: number | null;
 };
 
-export type MetricKey = "schlaf" | "hrv" | "ruhepuls" | "bb" | "stress" | "schritte";
+export type MetricKey = "schlaf" | "hrv" | "ruhepuls" | "temperatur" | "bb" | "stress" | "schritte";
 
 // higherIsBetter steuert, ob "unter dem Schnitt" als Hinweis gilt
 export const METRICS: Record<MetricKey, { label: string; value: (d: Daily) => number | null; fmt: (v: number) => string; higherIsBetter: boolean }> = {
@@ -47,6 +47,12 @@ export const METRICS: Record<MetricKey, { label: string; value: (d: Daily) => nu
   },
   hrv: { label: "HRV", value: (d) => d.hrv_last_night, fmt: (v) => `${Math.round(v)} ms`, higherIsBetter: true },
   ruhepuls: { label: "Ruhepuls", value: (d) => d.resting_hr, fmt: (v) => `${Math.round(v)} bpm`, higherIsBetter: false },
+  temperatur: {
+    label: "Temperatur",
+    value: (d) => (typeof d.skin_temp_delta === "number" ? Number(d.skin_temp_delta) : null),
+    fmt: (v) => `${v > 0.04 ? "+" : ""}${v.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} °C`,
+    higherIsBetter: false,
+  },
   bb: { label: "Body Battery", value: (d) => d.bb_max, fmt: (v) => String(Math.round(v)), higherIsBetter: true },
   stress: { label: "Stress", value: (d) => d.stress_avg, fmt: (v) => String(Math.round(v)), higherIsBetter: false },
   schritte: { label: "Schritte", value: (d) => d.steps, fmt: (v) => Math.round(v).toLocaleString("de-DE"), higherIsBetter: true },
