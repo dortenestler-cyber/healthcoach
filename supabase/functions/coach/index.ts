@@ -1,0 +1,113 @@
+// Health Coach · Edge Function "coach"
+// Beantwortet Fragen im Coach-Chat mit der Claude-API.
+// Die App schickt die Frage und eine kompakte Zusammenfassung des Tages, keine Rohdaten.
+//
+// Benötigte Secrets in Supabase (Edge Functions → Secrets):
+//   ANTHROPIC_API_KEY   Schlüssel von console.anthropic.com
+//   COACH_MODEL         optional, Standard: claude-sonnet-5-5
+// Automatisch vorhanden: SUPABASE_URL, SUPABASE_ANON_KEY
+
+import { createClient } from "jsr:@supabase/supabase-js@2";
+
+const DAILY_LIMIT = 40; // Schutz vor hohen Kosten: höchstens 40 Fragen pro Tag
+const HISTORY = 12; // so viele frühere Nachrichten gehen als Gesprächsverlauf mit
+
+const cors = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+const json = (status: number, body: unknown) =>
+  new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
+
+const SYSTEM = `Du bist der Coach in der App „Health Coach“ einer 40-jährigen Frau in der Perimenopause.
+Du kennst ihr Training, ihre Erholung, ihren Zyklus, ihre Symptome und ihre Medikamente aus der Zusammenfassung unten.
+
+Ihre Ziele:
+- Karate: grüner Gürtel, Prüfung zum 5. Kyu im Frühjahr 2027. Montag ist immer Karate.
+- Bouldern: aktuell Fontainebleau 4 bis 5, Ziel 6A.
+- Kettlebell: allgemeiner Kraftaufbau mit Kettlebells von 1 bis 20 kg, auch Übungen mit Körpergewicht.
+- Ausdauer: Joggen, Wandern, Rad fahren, Gehen. Diese Einheiten zeichnet die Garmin-Uhr auf.
+- Perimenopause: Muster erkennen und das Training an Symptome und Erholung anpassen.
+Sie trainiert 3 bis 4 Mal pro Woche.
+
+So antwortest du:
+- Auf Deutsch, klar und knapp, ohne Fachjargon. Fachbegriffe erklärst du beim ersten Mal. Meist 2 bis 6 Sätze oder eine kurze Liste.
+- Immer „Kettlebell“, nie „Glocke“.
+- Du richtest Vorschläge an ihren Zielen aus und berücksichtigst Schlaf, HRV, Body Battery, Zyklusphase, Symptome, Krankheiten und Verletzungen. An schlechten Tagen schlägst du leichtere Varianten vor.
+- Muster benennst du vorsichtig als Zusammenhang, nie als Beweis. Wenn Daten fehlen, sagst du das.
+- Du stellst keine Diagnosen und nennst keine Medikamentendosierungen. Bei Fragen zu Dosierung oder Wechselwirkungen verweist du an Apotheke oder Arztpraxis.
+- Bei Warnzeichen empfiehlst du ärztliche Abklärung: sehr starke oder anhaltende Blutungen, Blutungen nach dem Sex, Brustschmerz, starkes Herzrasen mit Schwindel, anhaltende Niedergeschlagenheit, Atemnot trotz Inhalator (dann Notruf 112), Fieber über mehrere Tage.
+- Du erfindest keine Werte. Was nicht in der Zusammenfassung steht, weißt du nicht.`;
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  try {
+    const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!apiKey) return json(500, { error: "ANTHROPIC_API_KEY fehlt in den Supabase-Secrets." });
+    const model = Deno.env.get("COACH_MODEL") || "claude-sonnet-5-5";
+
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData, error: userError } = await sb.auth.getUser(authHeader.replace(/^Bearer\s+/i, ""));
+    if (userError || !userData.user) return json(401, { error: "Nicht angemeldet." });
+
+    const body = await req.json().catch(() => ({}));
+    const question = String(body?.message ?? "").trim().slice(0, 2000);
+    const context = String(body?.context ?? "").slice(0, 6000);
+    if (!question) return json(400, { error: "Keine Frage erhalten." });
+
+    // Tageslimit
+    const since = new Date();
+    since.setHours(0, 0, 0, 0);
+    const { count } = await sb.from("coach_messages").select("id", { count: "exact", head: true }).eq("role", "user").gte("created_at", since.toISOString());
+    if ((count ?? 0) >= DAILY_LIMIT) return json(429, { error: `Für heute sind ${DAILY_LIMIT} Fragen erreicht. Morgen geht es weiter.` });
+
+    // Bisheriger Verlauf
+    const { data: hist } = await sb.from("coach_messages").select("role, content").order("created_at", { ascending: false }).limit(HISTORY);
+    const messages = ((hist ?? []) as { role: "user" | "assistant"; content: string }[]).reverse();
+    // Die API verlangt, dass das Gespräch mit der Nutzerin beginnt und sich die Rollen abwechseln
+    while (messages.length && messages[0].role !== "user") messages.shift();
+    const merged: { role: "user" | "assistant"; content: string }[] = [];
+    for (const m of [...messages, { role: "user" as const, content: question }]) {
+      const last = merged[merged.length - 1];
+      if (last && last.role === m.role) last.content += "\n\n" + m.content;
+      else merged.push({ ...m });
+    }
+
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+      body: JSON.stringify({
+        model,
+        max_tokens: 900,
+        system: `${SYSTEM}\n\nZusammenfassung von heute (aus der App):\n${context || "Keine Daten mitgeschickt."}`,
+        messages: merged,
+      }),
+    });
+    if (!res.ok) {
+      const t = await res.text();
+      return json(502, { error: `Claude antwortet mit ${res.status}. ${res.status === 401 ? "Ist der ANTHROPIC_API_KEY richtig?" : res.status === 400 && t.includes("credit") ? "Ist noch Guthaben vorhanden?" : ""}`.trim() });
+    }
+    const out = await res.json();
+    const answer = ((out?.content ?? []) as { type: string; text?: string }[])
+      .filter((c) => c.type === "text")
+      .map((c) => c.text)
+      .join("\n")
+      .trim();
+    if (!answer) return json(502, { error: "Claude hat keine Antwort geliefert." });
+
+    const now = Date.now();
+    const { error: insErr } = await sb.from("coach_messages").insert([
+      { role: "user", content: question, created_at: new Date(now).toISOString() },
+      { role: "assistant", content: answer, created_at: new Date(now + 1).toISOString() },
+    ]);
+    if (insErr) return json(500, { error: "Verlauf konnte nicht gespeichert werden: " + insErr.message, answer });
+
+    return json(200, { answer });
+  } catch (e) {
+    return json(500, { error: e instanceof Error ? e.message : String(e) });
+  }
+});
