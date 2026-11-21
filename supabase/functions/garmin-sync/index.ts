@@ -61,6 +61,39 @@ async function garminGet(token: string, path: string): Promise<Any> {
   throw new Error("Garmin hat zu viele Anfragen gemeldet. Bitte später noch einmal.");
 }
 
+// Hauttemperatur: Garmin dokumentiert den Feldnamen der Personal API nicht.
+// Deshalb bekannte Namen zuerst, danach jedes Feld, das nach Hauttemperatur-Abweichung klingt.
+// Werte in Fahrenheit werden in °C umgerechnet. Plausibel sind Abweichungen bis ±5 °C.
+const SKIN_KEYS_C = ["avgSkinTempDeviationC", "avgSkinTempDeviationCelsius", "skinTempDeviationC", "avgSkinTemperatureDeviationC", "skinTempDeltaC"];
+const SKIN_KEYS_F = ["avgSkinTempDeviationF", "avgSkinTempDeviationFahrenheit", "skinTempDeviationF"];
+function findSkinTemp(obj: Any, depth = 0): { value: number; key: string } | null {
+  if (!obj || typeof obj !== "object" || depth > 4) return null;
+  for (const k of SKIN_KEYS_C) if (typeof obj[k] === "number") return { value: obj[k], key: k };
+  for (const k of SKIN_KEYS_F) if (typeof obj[k] === "number") return { value: obj[k] / 1.8, key: k };
+  for (const [k, v] of Object.entries(obj)) {
+    if (typeof v === "number" && /skin.?temp/i.test(k) && /dev|delta|change|diff/i.test(k)) {
+      return { value: /F$|fahrenheit/i.test(k) ? v / 1.8 : v, key: k };
+    }
+  }
+  for (const v of Object.values(obj)) {
+    if (v && typeof v === "object") {
+      const f = findSkinTemp(v, depth + 1);
+      if (f) return f;
+    }
+  }
+  return null;
+}
+const plausibleTemp = (v: number) => Number.isFinite(v) && Math.abs(v) <= 5;
+// Nur für die Fehlersuche: Feldnamen mit „temp“ aus einer Schlafantwort
+function tempKeys(obj: Any, prefix = "", depth = 0, out: string[] = []): string[] {
+  if (!obj || typeof obj !== "object" || depth > 3) return out;
+  for (const [k, v] of Object.entries(obj)) {
+    if (/temp/i.test(k)) out.push(prefix + k);
+    if (v && typeof v === "object" && !Array.isArray(v)) tempKeys(v, prefix + k + ".", depth + 1, out);
+  }
+  return out.slice(0, 10);
+}
+
 const num = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
 const int = (v: unknown): number | null => {
   const n = num(v);
@@ -105,6 +138,8 @@ Deno.serve(async (req) => {
       return daily.get(day)!;
     };
     const activities: Record<string, unknown>[] = [];
+    const skinKeys = new Set<string>();
+    let sleepTempKeys: string[] = [];
 
     for (const w of windows) {
       // Tageszusammenfassung: Ruhepuls, Stress, Body Battery, Schritte, Intensität
@@ -134,6 +169,11 @@ Deno.serve(async (req) => {
         const r = row(day);
         r.sleep_seconds = int(s?.sleepTimeSeconds);
         r.sleep_score = int(s?.sleepScores?.overall?.value);
+        const t = findSkinTemp(s);
+        if (t && plausibleTemp(t.value)) {
+          r.skin_temp_delta = Math.round(t.value * 100) / 100;
+          skinKeys.add(t.key);
+        } else if (!sleepTempKeys.length) sleepTempKeys = tempKeys(s);
       }
 
       // HRV
@@ -174,9 +214,49 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Fallback: einzelne Nächte der letzten 14 Tage abfragen, wenn die Übersicht keine Hauttemperatur hatte.
+    // Fehler hier brechen den Abruf nicht ab.
+    let skinNote = "";
+    const recent = [...daily.values()].filter((r) => r.skin_temp_delta === undefined && String(r.day) >= isoDay(addDays(today, -13)));
+    if (recent.length && !skinKeys.size) {
+      const paths = ["/wellness-service/wellness/dailySleepData?date=", "/sleep-service/sleep/dailySleepData?date="];
+      let path: string | null = null;
+      for (const r of recent.sort((a, b) => String(b.day).localeCompare(String(a.day)))) {
+        const candidates = path ? [path] : paths;
+        let found = false;
+        for (const p of candidates) {
+          try {
+            const detail = await garminGet(token, p + r.day);
+            path = p;
+            found = true;
+            const t = findSkinTemp(detail);
+            if (t && plausibleTemp(t.value)) {
+              r.skin_temp_delta = Math.round(t.value * 100) / 100;
+              skinKeys.add(t.key);
+            } else if (!sleepTempKeys.length) sleepTempKeys = tempKeys(detail);
+            break;
+          } catch {
+            // nächsten Pfad versuchen
+          }
+        }
+        if (!found) {
+          skinNote = "Einzelne Nächte konnten nicht abgefragt werden.";
+          break;
+        }
+      }
+    }
+    const skinTempNights = [...daily.values()].filter((r) => typeof r.skin_temp_delta === "number").length;
+
     const dailyRows = [...daily.values()];
+    let migrationMissing = false;
     if (dailyRows.length) {
-      const { error } = await sb.from("garmin_daily").upsert(dailyRows, { onConflict: "user_id,day" });
+      let { error } = await sb.from("garmin_daily").upsert(dailyRows, { onConflict: "user_id,day" });
+      // Spalte noch nicht angelegt: ohne Hauttemperatur speichern, damit der Abruf weiter funktioniert
+      if (error && /skin_temp_delta/.test(error.message)) {
+        migrationMissing = true;
+        const without = dailyRows.map(({ skin_temp_delta: _drop, ...rest }) => rest);
+        ({ error } = await sb.from("garmin_daily").upsert(without, { onConflict: "user_id,day" }));
+      }
       if (error) throw new Error("Speichern der Tageswerte: " + error.message);
     }
     if (activities.length) {
@@ -184,7 +264,17 @@ Deno.serve(async (req) => {
       if (error) throw new Error("Speichern der Aktivitäten: " + error.message);
     }
 
-    return json(200, { ok: true, days, dailyRows: dailyRows.length, activities: activities.length, syncedAt: new Date().toISOString() });
+    return json(200, {
+      ok: true,
+      days,
+      dailyRows: dailyRows.length,
+      activities: activities.length,
+      skinTempNights: migrationMissing ? 0 : skinTempNights,
+      skinTempKeys: [...skinKeys],
+      sleepTempKeys,
+      skinNote: migrationMissing ? "Die Datenbank-Spalte für die Hauttemperatur fehlt noch." : skinNote,
+      syncedAt: new Date().toISOString(),
+    });
   } catch (e) {
     return json(500, { error: e instanceof Error ? e.message : String(e) });
   }

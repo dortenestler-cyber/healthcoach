@@ -15,6 +15,7 @@ export type Daily = {
   bb_min: number | null;
   steps: number | null;
   intensity_minutes: number | null;
+  skin_temp_delta?: number | null; // Hauttemperatur: Abweichung vom Normalwert in °C
   synced_at: string;
 };
 
@@ -58,7 +59,9 @@ export function stats(values: number[]) {
   return { mean, sd, min: Math.min(...values), max: Math.max(...values) };
 }
 
-export async function syncGarmin(days: number, offset = 0): Promise<{ ok: boolean; error?: string }> {
+export type SyncResult = { ok: boolean; error?: string; skinTempNights?: number; skinNote?: string; sleepTempKeys?: string[] };
+
+export async function syncGarmin(days: number, offset = 0): Promise<SyncResult> {
   const sb = supabase();
   if (!sb) return { ok: false, error: "Supabase ist nicht verbunden." };
   const { data, error } = await sb.functions.invoke("garmin-sync", { body: { days, offset } });
@@ -77,7 +80,7 @@ export async function syncGarmin(days: number, offset = 0): Promise<{ ok: boolea
     return { ok: false, error: detail };
   }
   if (data?.error) return { ok: false, error: data.error };
-  return { ok: true };
+  return { ok: true, skinTempNights: data?.skinTempNights, skinNote: data?.skinNote, sleepTempKeys: data?.sleepTempKeys };
 }
 
 const TYPE_LABELS: Record<string, string> = {
