@@ -64,7 +64,18 @@ class Net {
                 WatchUi.pushView(new InfoView(mAfter), new InfoDelegate(), WatchUi.SLIDE_UP);
             }
         } else {
-            WatchUi.pushView(new InfoView(["FEHLER", Api.errorText(code)]), new InfoDelegate(), WatchUi.SLIDE_UP);
+            var lines = ["FEHLER", Api.errorText(code)];
+            // Grund vom Server anzeigen, falls vorhanden
+            if (data instanceof Dictionary && data["error"] != null) {
+                var msg = data["error"].toString().toUpper();
+                if (msg.length() > 24) {
+                    lines.add(msg.substring(0, 24));
+                    lines.add(msg.substring(24, msg.length() > 48 ? 48 : msg.length()));
+                } else {
+                    lines.add(msg);
+                }
+            }
+            WatchUi.pushView(new InfoView(lines), new InfoDelegate(), WatchUi.SLIDE_UP);
         }
     }
 }

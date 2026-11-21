@@ -13,10 +13,10 @@ async function sha256(text: string): Promise<string> {
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+// Nur Kleinbuchstaben und Ziffern: übersteht automatische Großschreibung beim Einfügen auf dem Handy
 function newToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(24));
-  const b64 = btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  return "hcw_" + b64;
+  return "hcw_" + Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 // Uhr verbinden: eigener Schlüssel für die Fenix, nur der Hash wird gespeichert
