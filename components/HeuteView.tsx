@@ -8,6 +8,7 @@ import PageHead from "@/components/PageHead";
 import { clearPin } from "@/lib/pin";
 import GarminCards from "@/components/GarminCards";
 import HealthToday from "@/components/HealthToday";
+import TodayPlan from "@/components/TodayPlan";
 
 type Checkin = { energy: number | null; sleep: number | null; mood: number | null };
 const empty: Checkin = { energy: null, sleep: null, mood: null };
@@ -84,6 +85,8 @@ export default function HeuteView() {
       <HealthToday />
 
       <GarminCards />
+
+      <TodayPlan />
 
       <section className="card">
         <div className="card-row">
