@@ -17,7 +17,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: supabase/setup-cli@v1
         with:
           version: latest
@@ -32,5 +32,5 @@ jobs:
           for dir in supabase/functions/*/; do
             name=$(basename "$dir")
             echo "Lade $name hoch …"
-            supabase functions deploy "$name" --project-ref "$SUPABASE_PROJECT_REF" --use-api
+            supabase functions deploy "$name" --project-ref "$SUPABASE_PROJECT_REF" --use-api --yes
           done
