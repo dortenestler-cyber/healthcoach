@@ -8,7 +8,17 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const TZ = "Europe/Berlin";
-const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+// CORS, damit die Web-App die Verbindung testen kann
+const cors = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+const json = (status: number, body: unknown) => {
+  // Fehler zusätzlich ins Protokoll schreiben, damit sie in Supabase unter Logs sichtbar sind
+  if (status >= 400) console.error(`watch ${status}: ${JSON.stringify(body)}`);
+  return new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
+};
 
 const localDay = (d = new Date()) => new Intl.DateTimeFormat("sv-SE", { timeZone: TZ }).format(d); // JJJJ-MM-TT
 const localTime = (d = new Date()) => new Intl.DateTimeFormat("de-DE", { timeZone: TZ, hour: "2-digit", minute: "2-digit" }).format(d);
@@ -41,6 +51,7 @@ type Any = any;
 
 Deno.serve(async (req) => {
   try {
+    if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
     if (req.method !== "POST") return json(405, { error: "Nur POST" });
     // Leerzeichen und Zeilenumbrüche entfernen, Präfix unabhängig von Groß- und Kleinschreibung
     let token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "").replace(/\s+/g, "");
@@ -105,7 +116,11 @@ Deno.serve(async (req) => {
       return json(400, { error: "Unbekannte Aktion" });
     }
 
-    return json(200, await today(sb, uid, day));
+    try {
+      return json(200, await today(sb, uid, day));
+    } catch (e) {
+      return json(500, { error: "Übersicht: " + (e instanceof Error ? e.message : String(e)) });
+    }
   } catch (e) {
     return json(500, { error: e instanceof Error ? e.message : String(e) });
   }
