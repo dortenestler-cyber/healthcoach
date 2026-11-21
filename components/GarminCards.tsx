@@ -14,6 +14,7 @@ export default function GarminCards({ onSynced }: { onSynced?: () => void } = {}
   const [rows, setRows] = useState<Daily[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [skinNote, setSkinNote] = useState("");
   const [loaded, setLoaded] = useState(false);
   const autoDone = useRef(false);
 
@@ -38,6 +39,12 @@ export default function GarminCards({ onSynced }: { onSynced?: () => void } = {}
       const res = await syncGarmin(days);
       setBusy(false);
       if (!res.ok) setError("Synchronisieren hat nicht geklappt: " + res.error);
+      else if (typeof res.skinTempNights === "number")
+        setSkinNote(
+          `Hauttemperatur: ${res.skinTempNights} ${res.skinTempNights === 1 ? "Nacht" : "Nächte"} gefunden.` +
+            (res.skinNote ? " " + res.skinNote : "") +
+            (!res.skinTempNights && res.sleepTempKeys?.length ? " Gefundene Felder: " + res.sleepTempKeys.join(", ") : "")
+        );
       await load();
       if (res.ok) onSynced?.();
     },
@@ -97,6 +104,7 @@ export default function GarminCards({ onSynced }: { onSynced?: () => void } = {}
           </button>
         </div>
         {error && <p className="alert alert-inline">{error}</p>}
+        {skinNote && <span className="meta">{skinNote}</span>}
       </section>
       <div className="metric-grid">{SHOWN.map(card)}</div>
     </>
