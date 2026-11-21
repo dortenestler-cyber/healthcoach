@@ -303,3 +303,25 @@ export function phaseInsight(label: string, values: { day: string; value: number
   if (Math.abs(diff) < 0.25 * spread || diff === 0) return `${label}: in Follikel- und Lutealphase etwa gleich.`;
   return `${label} liegt in der Lutealphase im Schnitt ${fmtDiff(Math.abs(diff))} ${diff > 0 ? "höher" : "niedriger"} als in der Follikelphase.`;
 }
+
+// ---------- Zyklus-Ansicht im Verlauf
+
+export type CycleTrace = { start: string; length: number | null; values: (number | null)[] };
+
+// Werte nach Zyklustag: jede Periode startet bei Tag 1. Die letzten Zyklen (bis zu max), der laufende zuletzt (length null).
+// values[0] ist Zyklustag 1.
+export function cycleTraces(values: { day: string; value: number | null }[], diary: Diary[], today: string, max = 6): CycleTrace[] {
+  const starts = periodStarts(diary).filter((s) => s <= today);
+  const byDay = new Map(values.map((v) => [v.day, v.value]));
+  const traces: CycleTrace[] = [];
+  for (let i = 0; i < starts.length; i++) {
+    const start = starts[i];
+    const next = starts[i + 1];
+    const length = next ? daysBetween(start, next) : null;
+    if (length !== null && (length < 15 || length > 60)) continue;
+    const span = length ?? daysBetween(start, today) + 1;
+    if (span > 60) continue;
+    traces.push({ start, length, values: Array.from({ length: span }, (_, k) => byDay.get(addDays(start, k)) ?? null) });
+  }
+  return traces.slice(-max);
+}
