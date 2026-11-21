@@ -7,6 +7,7 @@ import { CHECKIN_LEVELS, CHECKIN_QUESTIONS } from "@/lib/catalog";
 import PageHead from "@/components/PageHead";
 import { clearPin } from "@/lib/pin";
 import GarminCards from "@/components/GarminCards";
+import HealthToday from "@/components/HealthToday";
 
 type Checkin = { energy: number | null; sleep: number | null; mood: number | null };
 const empty: Checkin = { energy: null, sleep: null, mood: null };
@@ -80,6 +81,8 @@ export default function HeuteView() {
       <PageHead title="Heute" sub={longDate()} />
       {error && <p className="alert" role="alert">{error}</p>}
 
+      <HealthToday />
+
       <GarminCards />
 
       <section className="card">
@@ -131,10 +134,6 @@ export default function HeuteView() {
       <section className="card">
         <h2>Tagesziel</h2>
         <p>Kommt in Phase 4. Dafür sammelt die App jetzt ein paar Wochen Garmin-Daten.</p>
-      </section>
-      <section className="card">
-        <h2>Medikamente und Supplements</h2>
-        <p>Kommt in Phase 3.</p>
       </section>
 
       <div className="footer-links">
