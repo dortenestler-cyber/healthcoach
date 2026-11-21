@@ -31,6 +31,7 @@
   --cycle: #b4491f;
   --cycle-bg: #fbe9e2;
   --cycle-fg: #8f3a18;
+  --phase-follikel: #fdf4ef;
 
   /* Menstruation */
   --menses-bg: #f6dada;
@@ -1356,4 +1357,109 @@ button {
   display: inline-flex;
   align-items: center;
   text-decoration: none;
+}
+
+/* Übernahme Schritt 3: Heute mit Readiness */
+.readiness {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stage-bar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stage span {
+  height: 6px;
+  border-radius: 99px;
+  background: var(--recovery-bg);
+}
+
+.stage small {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.stage[data-on="true"] span {
+  background: var(--recovery);
+}
+
+.stage[data-on="true"] small {
+  color: var(--recovery-fg);
+  font-weight: 700;
+}
+
+.suggest {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-radius: var(--radius-tile);
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  background: var(--fill);
+  color: var(--text);
+}
+
+.suggest-cycle {
+  background: var(--cycle-bg);
+  color: var(--cycle-fg);
+}
+
+.suggest-warn {
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+}
+
+.suggest-training {
+  background: var(--training-bg);
+  color: var(--training-fg);
+}
+
+.pill.chip {
+  min-height: 44px;
+  padding: 0 14px;
+}
+
+.pill.chip[aria-pressed="true"] {
+  background: var(--warn-bg);
+  border-color: var(--warn-bg);
+  color: var(--warn-fg);
+  font-weight: 600;
+}
+
+.chart-card {
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.ph-menses { fill: var(--menses-bg); }
+.ph-follikel { fill: var(--phase-follikel); }
+.ph-luteal { fill: var(--cycle-bg); }
+.legend .ph-menses-bg { background: var(--menses-bg); }
+.legend .ph-follikel-bg { background: var(--phase-follikel); border: 1px solid var(--cycle-bg); }
+.legend .ph-luteal-bg { background: var(--cycle-bg); }
+
+.chart-future {
+  fill: var(--card);
+  opacity: 0.55;
+}
+
+.chart-today {
+  stroke: var(--text);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+  vector-effect: non-scaling-stroke;
 }

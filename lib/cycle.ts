@@ -23,9 +23,10 @@ const sd = (v: number[]) => {
 
 export type Phase = "menstruation" | "follikel" | "eisprung" | "luteal-frueh" | "luteal-spaet";
 
-export const PHASES: Record<Phase, { label: string; pattern: string; suggestion: string; rpe: string; hint: string }> = {
+export const PHASES: Record<Phase, { label: string; inPhase: string; pattern: string; suggestion: string; rpe: string; hint: string }> = {
   menstruation: {
     label: "Menstruation",
+    inPhase: "deiner Menstruation",
     pattern: "Müdigkeit und Krämpfe sind möglich, die Körperwerte liegen meist im Normalbereich.",
     suggestion: "Mobility, Spaziergang, lockere Ausdauer, Kraft nach Gefühl",
     rpe: "5–7",
@@ -33,6 +34,7 @@ export const PHASES: Record<Phase, { label: string; pattern: string; suggestion:
   },
   follikel: {
     label: "Follikelphase",
+    inPhase: "deiner Follikelphase",
     pattern: "Oft gute Erholung, die HRV ist eher höher.",
     suggestion: "Aufbau, Kraft mit mehr Volumen, Intervalle",
     rpe: "8–9",
@@ -40,6 +42,7 @@ export const PHASES: Record<Phase, { label: string; pattern: string; suggestion:
   },
   eisprung: {
     label: "Eisprung-Fenster",
+    inPhase: "deinem Eisprung-Fenster",
     pattern: "Hohe Leistung ist möglich, Sehnen und Gelenke sind etwas lockerer.",
     suggestion: "Schwere Sätze oder Bestleistung nur bei guter Readiness",
     rpe: "bis 9,5",
@@ -47,6 +50,7 @@ export const PHASES: Record<Phase, { label: string; pattern: string; suggestion:
   },
   "luteal-frueh": {
     label: "Frühe Lutealphase",
+    inPhase: "deiner frühen Lutealphase",
     pattern: "Temperatur und Ruhepuls leicht höher, die HRV sinkt etwas.",
     suggestion: "Kraft, ruhige Ausdauer",
     rpe: "8–8,5",
@@ -54,6 +58,7 @@ export const PHASES: Record<Phase, { label: string; pattern: string; suggestion:
   },
   "luteal-spaet": {
     label: "Späte Lutealphase",
+    inPhase: "deiner späten Lutealphase",
     pattern: "Schlaf oft unruhiger, HRV niedriger, Nachtschweiß häufiger.",
     suggestion: "Kraft moderater, Technik, Mobility",
     rpe: "7–7,5",
@@ -192,6 +197,13 @@ export function dayRule(day: string, data: Data, injuredSports: string[] = []): 
   const base = { redFlag, infection, rehaSports, throttle, corridorFactor, cycle, readiness, target };
 
   if (redFlag) return { ...base, level: "warnzeichen", title: "Bitte ärztlich abklären", text: redFlag, infection: false, throttle: false, corridorFactor: 1 };
+  if (target.pause)
+    return {
+      ...base,
+      level: "infekt",
+      title: "Pause empfohlen",
+      text: "Du hast eine Krankheit eingetragen. Vorschlag: heute Erholung statt Training. Du entscheidest.",
+    };
   if (infection)
     return {
       ...base,
@@ -220,4 +232,34 @@ export function dayRule(day: string, data: Data, injuredSports: string[] = []): 
     title: p ? `${p.label} (geschätzt)` : "Zyklusphase noch unbekannt",
     text: p ? `Vorschlag: ${p.suggestion}. ${p.hint}` : "Trag deine Periode im Tagebuch ein, dann kann die App die Phase schätzen.",
   };
+}
+
+// ---------- Diagramm-Hilfen
+
+// Phase für jeden Tag (Vergangenheit aus dem Tagebuch, Zukunft fortgeschrieben)
+export function phaseBand(days: string[], diary: Diary[]): (Phase | null)[] {
+  return days.map((d) => cycleToday(d, diary).phase);
+}
+
+// Ein Satz zur HRV heute im Vergleich zu derselben Phase (oder den letzten 30 Tagen)
+export function hrvInsight(day: string, data: Data): string {
+  const today = data.daily.find((r) => r.day === day)?.hrv_last_night ?? null;
+  if (today === null) return "Für heute gibt es noch keinen HRV-Wert.";
+  const phase = cycleToday(day, data.diary).phase;
+  let ref: number[] = [];
+  let where = "der letzten 30 Tage";
+  if (phase) {
+    const same = data.daily.filter((r) => r.day < day && r.hrv_last_night !== null && cycleToday(r.day, data.diary).phase === phase).map((r) => r.hrv_last_night as number);
+    if (same.length >= 5) {
+      ref = same;
+      where = PHASES[phase].inPhase;
+    }
+  }
+  if (!ref.length) ref = data.daily.filter((r) => r.day < day && r.day >= addDays(day, -30) && r.hrv_last_night !== null).map((r) => r.hrv_last_night as number);
+  const m = mean(ref);
+  const d = sd(ref);
+  if (m === null || d === null || ref.length < 5) return `Deine HRV heute: ${Math.round(today)} ms. Für einen Vergleich fehlen noch ein paar Tage.`;
+  const z = d > 0 ? (today - m) / d : 0;
+  if (Math.abs(z) < 0.75) return `Deine HRV liegt im üblichen Bereich ${where}.`;
+  return `Deine HRV liegt ${z > 0 ? "über" : "unter"} dem Üblichen ${where}.`;
 }

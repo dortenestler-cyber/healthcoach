@@ -10,6 +10,14 @@ import GarminCards from "@/components/GarminCards";
 import HealthToday from "@/components/HealthToday";
 import TodayPlan from "@/components/TodayPlan";
 import TargetCard from "@/components/TargetCard";
+import ReadinessCard from "@/components/heute/ReadinessCard";
+import SymptomChips from "@/components/heute/SymptomChips";
+import HrvPhaseChart from "@/components/heute/HrvPhaseChart";
+import { loadInsightData } from "@/lib/insightData";
+import { dayRule } from "@/lib/cycle";
+import { SPOTS } from "@/lib/health";
+import { SPORTS, type Sport } from "@/lib/training";
+import type { Data, Diary } from "@/lib/insights";
 
 type Checkin = { energy: number | null; sleep: number | null; mood: number | null };
 const empty: Checkin = { energy: null, sleep: null, mood: null };
@@ -19,7 +27,49 @@ export default function HeuteView() {
   const [checkinSaved, setCheckinSaved] = useState(false);
   const [flashes, setFlashes] = useState<Date[]>([]);
   const [error, setError] = useState("");
+  const [data, setData] = useState<Data | null>(null);
+  const [rehaSports, setRehaSports] = useState<string[]>([]);
+  const [chipBusy, setChipBusy] = useState(false);
   const today = isoDay();
+
+  const loadData = useCallback(async () => {
+    try {
+      const d = await loadInsightData();
+      if (d) setData(d);
+      const inj = await supabase()?.from("injuries").select("spot").is("ended_on", null);
+      const sports = ((inj?.data ?? []) as { spot: string }[]).flatMap((i) => SPOTS[i.spot]?.sports ?? []);
+      setRehaSports([...new Set(sports)].map((s) => SPORTS[s as Sport]?.label ?? s));
+    } catch (e) {
+      setError("Readiness konnte nicht berechnet werden: " + (e instanceof Error ? e.message : String(e)));
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const todayEntry: Diary = data?.diary.find((d) => d.day === today) ?? { day: today, bleeding: 0, symptoms: {}, influences: [] };
+
+  // Symptom-Chip: an = „mittel“ (2), aus = entfernt. Rest des Tagebuch-Eintrags bleibt erhalten.
+  const toggleSymptom = async (key: string) => {
+    const sb = supabase();
+    if (!sb || !data) return;
+    const symptoms = { ...todayEntry.symptoms };
+    if ((symptoms[key] ?? 0) > 0) delete symptoms[key];
+    else symptoms[key] = 2;
+    const entry: Diary = { ...todayEntry, symptoms };
+    const before = data;
+    setData({ ...data, diary: [...data.diary.filter((d) => d.day !== today), entry].sort((a, b) => a.day.localeCompare(b.day)) });
+    setChipBusy(true);
+    const { error: e } = await sb
+      .from("diary_entries")
+      .upsert({ day: today, bleeding: entry.bleeding, symptoms, influences: entry.influences, updated_at: new Date().toISOString() }, { onConflict: "user_id,day" });
+    setChipBusy(false);
+    if (e) {
+      setData(before);
+      setError("Symptom konnte nicht gespeichert werden: " + e.message);
+    } else setError("");
+  };
 
   const load = useCallback(async () => {
     const sb = supabase();
@@ -83,11 +133,17 @@ export default function HeuteView() {
       <PageHead title="Heute" sub={longDate()} />
       {error && <p className="alert" role="alert">{error}</p>}
 
-      <TargetCard />
+      {data && <ReadinessCard rule={dayRule(today, data, rehaSports)} />}
 
       <HealthToday />
 
-      <GarminCards />
+      <SymptomChips symptoms={todayEntry.symptoms ?? {}} busy={chipBusy || !data} onToggle={toggleSymptom} />
+
+      {data && <HrvPhaseChart data={data} />}
+
+      <GarminCards onSynced={loadData} />
+
+      <TargetCard data={data} />
 
       <TodayPlan />
 
