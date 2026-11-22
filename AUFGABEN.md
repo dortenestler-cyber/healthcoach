@@ -58,6 +58,12 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 - [ ] Auf einer Karte „Mehr dazu im Coach“ tippen: Die Frage steht dann vorbereitet im Coach und geht erst nach „Senden“ raus
 - [ ] Neue Bildschirme nach `docs/prompt-designkonzept.md` bauen lassen (den Prompt an den Anfang einer neuen Sitzung stellen)
 
+### 11. Atemfrequenz und Stress im Tagesverlauf (PR #51)
+Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst du ihn selbst.
+- [ ] PR #51 ansehen und mergen. Danach laufen Migration `20261123090000_atem_stress.sql` und der Upload von `garmin-sync` automatisch
+- [ ] In der App auf Heute **Synchronisieren** tippen. Unter Vitalwerte sollte dann die Atemfrequenz stehen, auf der Stress-Karte die Aufteilung und die längste Phase mit erhöhtem Stress
+- [ ] Steht dort „Stress im Tagesverlauf ist bei Garmin nicht abrufbar“ oder fehlt die Atemfrequenz, Claude Bescheid geben
+
 ## Erledigt
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)
 - [x] PR #34, #35, #36, #37 gemergt (Konzept, `CLAUDE.md`, Fundament, Merge-Regel)
