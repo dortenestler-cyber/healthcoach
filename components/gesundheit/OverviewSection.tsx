@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Row } from "@/components/SettingsView";
 import { useEffect, useState } from "react";
 import { DivergingBars, ValueRing } from "@/components/charts";
 import ExplainCard from "@/components/ui/ExplainCard";
@@ -170,6 +171,11 @@ export default function OverviewSection() {
           <span className="meta">Muster mit Zyklusbezug stehen auf der Seite Zyklus.</span>
         </section>
       )}
+
+      <section className="card settings-card" aria-label="Mehr">
+        <Row label="Werte über die Zeit" note="HRV, Schlaf, Ruhepuls, Stress und mehr" href="/verlauf" />
+        <Row label="Begriffe" note="HRV, Body Battery, Ruhepuls und mehr, kurz erklärt" href="/begriffe" />
+      </section>
     </>
   );
 }

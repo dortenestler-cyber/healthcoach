@@ -107,6 +107,7 @@ export default function CoachView() {
           <p>Solange er aus ist, gehen keine Fragen an Claude und es entstehen keine Kosten.</p>
           <Link href="/einstellungen" className="btn btn-dark">In den Einstellungen einschalten</Link>
         </section>
+        <Link href="/coach/hinweise" className="settings-link">Frühere Hinweise des Coachs ansehen ›</Link>
       </>
     );
   }

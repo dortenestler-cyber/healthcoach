@@ -22,7 +22,8 @@ import PageHead from "@/components/PageHead";
 import PushRows from "@/components/settings/PushRows";
 import { disablePush } from "@/lib/push";
 
-// Einstellungen, gruppiert: Schutz, Coach & Mitteilungen, Aussehen, Daten, Hilfe.
+// Einstellungen: nur, was du einmal einrichtest. Gruppen: Konto & Sicherheit, Darstellung, Funktionen & Gewohnheiten,
+// Geräte, Coach & Mitteilungen, Daten, Hilfe. Auswertungen (Verlauf, Muster) stehen in ihren Bereichen.
 export default function SettingsView() {
   const [email, setEmail] = useState("");
 
@@ -49,35 +50,37 @@ export default function SettingsView() {
     <>
       <PageHead title="Einstellungen" sub={email ? `Angemeldet als ${email}` : "Health Coach"} gear={false} />
 
-      <Group title="Schutz">
+      <Group title="Konto & Sicherheit">
         <FaceIdRow />
         <Row label="PIN ändern" note="Du legst danach eine neue PIN fest." onClick={changePin} />
         <Row label="Automatische Sperre" value={`nach ${Math.round(LOCK_AFTER_MS / 60000)} Min. im Hintergrund`} />
         <Row label="Abmelden" note="PIN und Face ID auf diesem Gerät werden dabei gelöscht." onClick={signOut} />
       </Group>
 
-      <CoachGroup />
-
-      <Group title="Aussehen">
+      <Group title="Darstellung">
         <ThemeRow />
+      </Group>
+
+      <Group title="Funktionen & Gewohnheiten">
         <Row
           label="Funktionen"
           note="Bereiche ein- und ausblenden"
           value={profile ? PROFILES.find((p) => p.key === profile)?.label : "Eigene Auswahl"}
           href="/einstellungen/funktionen"
         />
-      </Group>
-
-      <Group title="Tagebuch">
         <Row label="Gewohnheiten" note="Sauna, Alkohol, eigene · ein- und ausblenden" href="/einstellungen/gewohnheiten" />
       </Group>
 
+      <Group title="Geräte">
+        <Row label="Uhr verbinden" note="Schlüssel für die Fenix anlegen oder löschen." href="/uhr" />
+        <Row label="Einrichtungs-Check" note="Garmin, Coach und letzter Abruf" href="/einstellungen/check" />
+      </Group>
+
+      <CoachGroup />
+
       <Group title="Daten">
         <Row label="Export & Backup" note="Sicherung als JSON, Tabellen als CSV, Wiederherstellen" href="/einstellungen/daten" />
-        <Row label="Einrichtungs-Check" note="Garmin, Coach und letzter Abruf" href="/einstellungen/check" />
         <Row label="Nutzung" note="Welche Bereiche du wie oft öffnest" href="/einstellungen/nutzung" />
-        <Row label="Uhr verbinden" note="Schlüssel für die Fenix anlegen oder löschen." href="/uhr" />
-        <Row label="Verlauf" note="HRV, Schlaf und weitere Werte über die Zeit." href="/verlauf" />
       </Group>
 
       <Group title="Hilfe">
@@ -196,9 +199,7 @@ function CoachGroup() {
         note={costNote || (month ? `${month.answers} ${month.answers === 1 ? "Antwort" : "Antworten"}, Preise laut Anthropic` : undefined)}
         value={month ? usd(month.cost) : "…"}
       />
-      <Row label="Hinweise des Coachs" note="Alle Antworten, auch bereits gesehene" href="/coach/hinweise" />
       <PushRows />
-      {prefs.on && <Row label="Coach öffnen" href="/coach" />}
     </Group>
   );
 }
