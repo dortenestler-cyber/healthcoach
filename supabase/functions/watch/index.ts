@@ -7,6 +7,7 @@
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { asDay, cycleInfo, periodStarts, phaseShort, targetScore } from "./target.ts";
+import { fitnessAge, waistOn } from "./fitness.ts";
 
 const TZ = "Europe/Berlin";
 // CORS, damit die Web-App die Verbindung testen kann
@@ -154,7 +155,7 @@ Deno.serve(async (req) => {
 
 // Alles, was die Uhr für heute braucht, kompakt und in Großbuchstaben für das Datenraster
 async function today(sb: Any, uid: string, day: string) {
-  const [meds, intakes, flashes, checkin, plan, illness, injuries, daily, kbPlan, diary, gcycles] = await Promise.all([
+  const [meds, intakes, flashes, checkin, plan, illness, injuries, daily, kbPlan, diary, gcycles, settings, body, acts, ills] = await Promise.all([
     sb.from("medications").select("id, name, kind, regular, as_needed, times, notes_key").eq("user_id", uid).eq("active", true).order("created_at"),
     sb.from("medication_intakes").select("medication_id, as_needed, slot, day, at").eq("user_id", uid).gte("day", addDays(day, -6)),
     sb.from("hot_flashes").select("id", { count: "exact", head: true }).eq("user_id", uid).gte("at", new Date(Date.now() - 864e5).toISOString()),
@@ -168,6 +169,11 @@ async function today(sb: Any, uid: string, day: string) {
     sb.from("diary_entries").select("day, bleeding, symptoms").eq("user_id", uid).gte("day", addDays(day, -179)).order("day"),
     // Zyklen aus Garmin; die Tabelle gibt es erst nach der SQL aus PR #14, bis dahin wird sie übersprungen
     sb.from("garmin_cycles").select("start_date").eq("user_id", uid).gte("start_date", addDays(day, -179)).lte("start_date", day),
+    // Für das eigene Fitness-Alter: Geburtsjahr, Bauchumfang, Einheiten der letzten 4 Wochen, Krankheiten
+    sb.from("settings").select("data").eq("user_id", uid).maybeSingle(),
+    sb.from("body_measurements").select("day, waist_cm").eq("user_id", uid).gte("day", addDays(day, -179)).order("day"),
+    sb.from("garmin_activities").select("start_local, duration_s, avg_hr").eq("user_id", uid).gte("start_local", addDays(day, -28)),
+    sb.from("illnesses").select("started_on, ended_on").eq("user_id", uid).or(`ended_on.is.null,ended_on.gte.${addDays(day, -28)}`),
   ]);
 
   const ins = (intakes.data ?? []) as Any[];
@@ -231,8 +237,18 @@ async function today(sb: Any, uid: string, day: string) {
   const g = days.find((r) => r.day === day) ?? null;
   // Tagesziel "Belastung heute" 0–100, wie in der App
   const target = targetScore(day, days.map(asDay), di, (checkin.data ?? null) as Any, ill, starts);
-  // Fitness-Alter ändert sich selten: letzter bekannter Wert
-  const fa = [...days].reverse().find((r) => typeof r.fitness_age === "number")?.fitness_age ?? null;
+  // Eigenes Fitness-Alter (HUNT-Modell, wie in der App)
+  const by = (settings.data as Any)?.data?.birthYear;
+  const w = waistOn(((body.data ?? []) as Any[]).map((r) => ({ day: r.day, waist_cm: r.waist_cm === null ? null : Number(r.waist_cm) })), day);
+  const fit = fitnessAge({
+    birthYear: typeof by === "number" ? by : null,
+    waist: w?.value ?? null,
+    days: days.map((r) => ({ day: r.day, resting_hr: r.resting_hr ?? null })),
+    acts: (acts.data ?? []) as Any[],
+    ill: (ills.data ?? []) as Any[],
+    day,
+  });
+  const fa = fit?.fitnessAge ?? null;
 
   return {
     day,
