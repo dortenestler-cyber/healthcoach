@@ -14,6 +14,7 @@
 // Die Funktion läuft ohne JWT-Prüfung am Eingang (siehe Workflow), weil sie Login oder Schlüssel selbst prüft.
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { activityIntervals, computeDay, conversionFactor, FACTOR_START, HR_MAX_START, HR_REST_START, type LoadDay, MIN_COVERAGE, pointsFromSteps, type Sample } from "./alltag.ts";
 
 const GARMIN = "https://personal.connectapi.garmin.com";
 const WINDOW_DAYS = 28; // Garmin erlaubt höchstens 28 Tage pro Abfrage
@@ -221,6 +222,10 @@ Deno.serve(async (req) => {
         r.bb_charged = int(d?.bodyBattery?.chargedValue);
         r.bb_drained = int(d?.bodyBattery?.drainedValue);
         r.steps = int(d?.movement?.steps?.value);
+        // Für die Belastung aus dem Alltag; Garmin benennt die Felder je nach Schnittstelle unterschiedlich
+        r.active_kcal = int(d?.calories?.active?.value ?? d?.calories?.activeValue ?? d?.activeKilocalories);
+        r.active_s = int(d?.movement?.activeSeconds ?? d?.movement?.active?.value ?? d?.activeSeconds);
+        r.highly_active_s = int(d?.movement?.highlyActiveSeconds ?? d?.movement?.highlyActive?.value ?? d?.highlyActiveSeconds);
         const im = d?.intensityMinutes ?? {};
         const mod = num(im?.moderate?.value ?? im?.moderateValue ?? im?.moderate) ?? 0;
         const vig = num(im?.vigorous?.value ?? im?.vigorousValue ?? im?.vigorous) ?? 0;
@@ -349,6 +354,7 @@ Deno.serve(async (req) => {
             avg_hr: int(a?.averageHR),
             max_hr: int(a?.maxHR),
             training_load: num(a?.activityTrainingLoad),
+            steps: int(a?.steps),
             synced_at: new Date().toISOString(),
           });
         }
@@ -406,6 +412,7 @@ Deno.serve(async (req) => {
     let stagesMissing = false;
     let energyMissing = false;
     let stressMissing = false;
+    let alltagMissing = false;
     if (dailyRows.length) {
       // Spalten aus späteren Migrationen: fehlt eine in der Datenbank, ohne sie speichern,
       // damit der Abruf weiter funktioniert. Die App weist dann auf die fehlende Migration hin.
@@ -415,6 +422,7 @@ Deno.serve(async (req) => {
         sleep_: ["sleep_deep_s", "sleep_rem_s", "sleep_light_s", "sleep_awake_s"],
         energie_: ["bb_curve", "sleep_start_min", "sleep_end_min"],
         atem_stress_: ["respiration_avg", "stress_rest_s", "stress_low_s", "stress_medium_s", "stress_high_s", "stress_curve"],
+        alltag_: ["hr_curve", "load_daily_min", "active_kcal", "active_s", "highly_active_s", "steps_outside_acts"],
       };
       const dropped = new Set<string>();
       const strip = () => dailyRows.map((r) => Object.fromEntries(Object.entries(r).filter(([k]) => !dropped.has(k))));
@@ -427,13 +435,33 @@ Deno.serve(async (req) => {
         if (hit[0] === "sleep_") stagesMissing = true;
         if (hit[0] === "energie_") energyMissing = true;
         if (hit[0] === "atem_stress_") stressMissing = true;
+        if (hit[0] === "alltag_") alltagMissing = true;
         ({ error } = await sb.from("garmin_daily").upsert(strip(), { onConflict: "user_id,day" }));
       }
       if (error) throw new Error("Speichern der Tageswerte: " + error.message);
     }
     if (activities.length) {
-      const { error } = await sb.from("garmin_activities").upsert(activities, { onConflict: "user_id,activity_id" });
+      let { error } = await sb.from("garmin_activities").upsert(activities, { onConflict: "user_id,activity_id" });
+      if (error && /steps/.test(error.message)) {
+        // Migration 20261124090000_alltagslast fehlt noch: ohne Schritte speichern
+        alltagMissing = true;
+        ({ error } = await sb.from("garmin_activities").upsert(activities.map(({ steps: _s, ...a }) => a), { onConflict: "user_id,activity_id" }));
+      }
       if (error) throw new Error("Speichern der Aktivitäten: " + error.message);
+    }
+
+    // Belastung aus dem Alltag: Tagespuls in Zonen, getrennt nach Training und Alltag.
+    // Fehler brechen den Abruf nicht ab.
+    let alltagDays = 0;
+    let alltagNote = "";
+    if (!alltagMissing) {
+      try {
+        const res = await syncAlltag(sb, token, userId, [...daily.keys()], offset === 0);
+        alltagDays = res.days;
+        alltagNote = res.note;
+      } catch (e) {
+        alltagNote = "Belastung aus dem Alltag nicht berechnet: " + (e instanceof Error ? e.message : String(e));
+      }
     }
 
     // Zyklus aus Garmin: ohne Zyklus-Tracking in Garmin oder ohne Tabelle bleibt es still beim Tagebuch
@@ -475,6 +503,8 @@ Deno.serve(async (req) => {
       energyNote: energyMissing ? "Die Datenbank-Spalten für die Energie über den Tag fehlen noch." : bbNote,
       stressCurveDays: stressMissing ? 0 : stressCurveDays,
       stressNote: stressMissing ? "Die Datenbank-Spalten für Atemfrequenz und Stress fehlen noch." : stressNote,
+      alltagDays,
+      alltagNote: alltagMissing ? "Die Datenbank-Spalten für die Belastung aus dem Alltag fehlen noch." : alltagNote,
       syncedAt: new Date().toISOString(),
     });
   } catch (e) {
@@ -500,4 +530,208 @@ async function garminCycles(token: string, fromDay: string, toDay: string): Prom
     day = isoDay(addDays(new Date(start + "T12:00:00Z"), -1));
   }
   return [...out].map(([start_date, period_length]) => ({ start_date, period_length }));
+}
+
+// ---------------------------------------------------------------------------------------------
+// Belastung aus dem Alltag (Konzept docs/konzept-korridore-alltagslast.md, Teil B)
+// Pro Tag: Tagespuls abrufen, jede Minute einer Pulszone zuordnen, Minuten in Garmin-Aktivitäten
+// zählen als Training, alle anderen als Alltag (im Alltag nur mit gemessener Bewegung).
+// Die Rohdaten alle 2 Minuten werden nicht gespeichert, nur Zonenminuten und eine Kurve je 15 Minuten.
+// Nachberechnung: bei jedem Abruf bis heute zusätzlich bis zu MAX_LOAD_DAYS Tage der letzten 90 Tage,
+// die noch keine Werte haben. So sind nach wenigen Abrufen (auch Morgen-Abrufen) alle 90 Tage gefüllt.
+
+const LOAD_BACK_DAYS = 90;
+const MAX_LOAD_DAYS = 21;
+const HR_PATHS = ["/wellness-service/wellness/dailyHeartRate?date=", "/wellness-service/wellness/dailyHeartRate/"];
+const STEPS_PATHS = ["/wellness-service/wellness/dailySummaryChart/?date=", "/wellness-service/wellness/dailySummaryChart?date="];
+
+const shiftDay = (day: string, n: number) => isoDay(addDays(new Date(day + "T12:00:00Z"), n));
+
+async function firstPath(token: string, paths: string[], day: string, known: { path: string | null; failed: boolean }): Promise<Any> {
+  if (known.failed) return undefined;
+  const candidates = known.path ? [known.path] : paths;
+  let lastError: unknown = null;
+  for (const p of candidates) {
+    try {
+      const res = await garminGet(token, p + day);
+      known.path = p;
+      return res;
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  if (!known.path) known.failed = true;
+  throw lastError ?? new Error("nicht abrufbar");
+}
+
+async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: string[], backfill: boolean): Promise<{ days: number; note: string }> {
+  const today = localDayMinute(Date.now()).day;
+  const earliest = shiftDay(today, -(LOAD_BACK_DAYS - 1));
+  const days = [...new Set(rangeDays)].filter((d) => d >= earliest && d <= today).sort().reverse().slice(0, MAX_LOAD_DAYS);
+  if (backfill && days.length < MAX_LOAD_DAYS) {
+    const { data: open, error } = await sb
+      .from("garmin_daily")
+      .select("day")
+      .eq("user_id", userId)
+      .gte("day", earliest)
+      .lte("day", today)
+      .is("load_daily_min", null)
+      .order("day", { ascending: false })
+      .limit(MAX_LOAD_DAYS);
+    if (error) throw new Error(error.message);
+    for (const r of (open ?? []) as Any[]) if (days.length < MAX_LOAD_DAYS && !days.includes(r.day)) days.push(r.day);
+  }
+  if (!days.length) return { days: 0, note: "" };
+  days.sort();
+  const first = days[0];
+  const last = days[days.length - 1];
+
+  // Tageswerte (Schritte, Ruhepuls) und Aktivitäten aus der Datenbank, der Abruf oben hat sie schon gespeichert
+  const { data: dRows, error: dErr } = await sb.from("garmin_daily").select("day, steps, resting_hr").eq("user_id", userId).gte("day", first).lte("day", last);
+  if (dErr) throw new Error(dErr.message);
+  const dayRow = new Map<string, Any>(((dRows ?? []) as Any[]).map((r) => [r.day, r]));
+  const { data: aRows, error: aErr } = await sb
+    .from("garmin_activities")
+    .select("activity_id, start_local, duration_s, steps, training_load")
+    .eq("user_id", userId)
+    .gte("start_local", shiftDay(first, -1) + " 00:00:00")
+    .lte("start_local", last + " 23:59:59");
+  if (aErr) throw new Error(aErr.message);
+  const acts = (aRows ?? []) as Any[];
+
+  // Maximalpuls: höchster Wert aus Aktivitäten der letzten 12 Monate, sonst Startwert
+  const { data: maxRows } = await sb
+    .from("garmin_activities")
+    .select("max_hr")
+    .eq("user_id", userId)
+    .gte("start_local", shiftDay(today, -365) + " 00:00:00")
+    .not("max_hr", "is", null)
+    .order("max_hr", { ascending: false })
+    .limit(1);
+  const actMax = Number((maxRows ?? [])[0]?.max_hr) || 0;
+  const hrMax = actMax > HR_MAX_START ? actMax : HR_MAX_START;
+  const hrMaxSource: LoadDay["puls_max_quelle"] = actMax > HR_MAX_START ? "aktivitaeten" : "startwert";
+  const rests = [...dayRow.values()].map((r) => Number(r.resting_hr)).filter((v) => v > 30 && v < 120).sort((a, b) => a - b);
+  const restFallback = rests.length ? rests[Math.floor(rests.length / 2)] : HR_REST_START;
+
+  const hrKnown = { path: null as string | null, failed: false };
+  const stepsKnown = { path: null as string | null, failed: false };
+  const results: { day: string; base: Omit<LoadDay, "faktor" | "faktor_n" | "last_alltag">; curve: (number | null)[] | null; stepsOutside: number | null }[] = [];
+  const actPoints = new Map<number, number>();
+  let note = "";
+
+  for (const day of days) {
+    let hrData: Any;
+    try {
+      hrData = await firstPath(token, HR_PATHS, day, hrKnown);
+    } catch {
+      note = "Der Tagespuls ist bei Garmin nicht abrufbar.";
+      break;
+    }
+    const samples: Sample[] = [];
+    for (const v of (hrData?.heartRateValues ?? []) as Any[]) {
+      if (!Array.isArray(v) || typeof v[0] !== "number" || typeof v[1] !== "number" || v[1] < 30 || v[1] > 230) continue;
+      const lm = localDayMinute(v[0]);
+      if (lm.day === day) samples.push({ minute: lm.minute, hr: v[1] });
+    }
+
+    // Bewegung je Viertelstunde: Schritte aus dem Tagesverlauf, sonst Stresswert „Bewegung“ (-2)
+    const moving = new Set<number>();
+    let bewegung: LoadDay["bewegung"] = "keine";
+    if (samples.length) {
+      try {
+        const chart = await firstPath(token, STEPS_PATHS, day, stepsKnown);
+        for (const c of (Array.isArray(chart) ? chart : chart?.data ?? []) as Any[]) {
+          const t = typeof c?.startGMT === "string" ? Date.parse(c.startGMT.replace(" ", "T").replace(/(\.\d+)?Z?$/, "Z")) : NaN;
+          if (!Number.isFinite(t)) continue;
+          const active = (Number(c?.steps) || 0) > 0 || /^(active|highlyActive)$/i.test(String(c?.primaryActivityLevel ?? ""));
+          const lm = localDayMinute(t);
+          if (lm.day === day && active) moving.add(Math.floor(lm.minute / 15));
+          bewegung = "schritte";
+        }
+      } catch {
+        // kein Schrittverlauf, Stress versuchen
+      }
+      if (bewegung === "keine") {
+        try {
+          const sd = await garminGet(token, `/wellness-service/wellness/dailyStress/${day}`);
+          for (const v of (sd?.stressValuesArray ?? []) as Any[]) {
+            if (!Array.isArray(v) || typeof v[0] !== "number") continue;
+            bewegung = "stress";
+            if (v[1] !== -2) continue;
+            const lm = localDayMinute(v[0]);
+            if (lm.day === day) moving.add(Math.floor(lm.minute / 15));
+          }
+        } catch {
+          // ohne Bewegungsdaten zählt der Alltag erst ab Zone 2
+        }
+      }
+    }
+
+    const dayActs = acts.filter((a) => {
+      const d = String(a.start_local ?? "").slice(0, 10);
+      return d === day || d === shiftDay(day, -1);
+    });
+    const intervals = activityIntervals(day, dayActs);
+    const rest = Number(hrData?.restingHeartRate) || Number(dayRow.get(day)?.resting_hr) || restFallback;
+    const c = computeDay(samples, intervals, rest, hrMax, bewegung === "keine" ? null : (m) => moving.has(Math.floor(m / 15)));
+    for (const [id, p] of c.actPoints) actPoints.set(id, (actPoints.get(id) ?? 0) + p);
+
+    const todays = dayActs.filter((a) => String(a.start_local ?? "").slice(0, 10) === day);
+    const steps = dayRow.get(day)?.steps;
+    const actSteps = todays.reduce((s, a) => s + (Number(a.steps) || 0), 0);
+    const stepsOutside = typeof steps === "number" ? Math.max(0, steps - actSteps) : null;
+    const viaPulse = c.abdeckung >= MIN_COVERAGE;
+    results.push({
+      day,
+      curve: samples.length ? c.curve : null,
+      stepsOutside,
+      base: {
+        v: 1,
+        quelle: viaPulse ? "puls" : "schritte",
+        bewegung,
+        training: c.training,
+        alltag: c.alltag,
+        ohne_bewegung: c.ohne_bewegung,
+        pkt_training: c.pkt_training,
+        pkt_alltag: viaPulse ? c.pkt_alltag : pointsFromSteps(stepsOutside),
+        abdeckung: c.abdeckung,
+        puls_ruhe: rest,
+        puls_max: hrMax,
+        puls_max_quelle: hrMaxSource,
+        last_training: Math.round(todays.reduce((s, a) => s + (Number(a.training_load) || 0), 0) * 10) / 10,
+      },
+    });
+  }
+  if (!results.length) return { days: 0, note };
+
+  // Pulspunkte je Aktivität speichern, dann den persönlichen Faktor aus den letzten 30 Trainings bilden
+  if (actPoints.size) {
+    const { error } = await sb
+      .from("garmin_activities")
+      .upsert([...actPoints].map(([activity_id, p]) => ({ user_id: userId, activity_id, hr_points: Math.round(p * 10) / 10 })), { onConflict: "user_id,activity_id" });
+    if (error) throw new Error("Pulspunkte der Aktivitäten: " + error.message);
+  }
+  const { data: fRows, error: fErr } = await sb
+    .from("garmin_activities")
+    .select("training_load, hr_points")
+    .eq("user_id", userId)
+    .not("hr_points", "is", null)
+    .not("training_load", "is", null)
+    .order("start_local", { ascending: false })
+    .limit(60);
+  if (fErr) throw new Error(fErr.message);
+  const f = conversionFactor((fRows ?? []) as Any[]);
+  const factor = f.faktor ?? FACTOR_START;
+
+  const rows = results.map((r) => ({
+    user_id: userId,
+    day: r.day,
+    hr_curve: r.curve,
+    steps_outside_acts: r.stepsOutside,
+    load_daily_min: { ...r.base, faktor: f.faktor, faktor_n: f.faktor ? f.n : 0, last_alltag: Math.round(r.base.pkt_alltag * factor * 10) / 10 } satisfies LoadDay,
+  }));
+  const { error } = await sb.from("garmin_daily").upsert(rows, { onConflict: "user_id,day" });
+  if (error) throw new Error(error.message);
+  return { days: rows.length, note };
 }
