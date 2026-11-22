@@ -1,5 +1,5 @@
 # Übergabe · Daten (DA)
-Zuletzt aktualisiert: 2026-11-22 19:00 · Sitzung: https://claude.ai/code/session_014pVPWeAWsD5W9zcyCuqTGZ (Einrichtung, noch keine eigene DA-Sitzung)
+Zuletzt aktualisiert: 2026-11-22 · Sitzung: https://claude.ai/code/session_014pVPWdtTj7aEt1xwucQpp1
 
 Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`, `.github/`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
@@ -7,7 +7,7 @@ Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`
 Keine offenen PRs mehr: #45, #47 und #49 sind gemergt, alle 19 Migrationen sind ausgeführt, `garmin-sync` ruft ab jetzt jeden Morgen um 6:15 Uhr ab.
 
 ## In Arbeit
-- Nichts.
+- Zweig `claude/ecstatic-cannon-0strog`: Korridore Teil B Daten (Alltagslast aus dem Tagespuls). Migration, `garmin-sync`, Nachberechnung 90 Tage.
 
 ## Wartet auf
 - Nutzerin: Secrets für Push und Eintrag `push_cron_secret` im Tresor (`AUFGABEN.md` Abschnitt 3 und 4)
