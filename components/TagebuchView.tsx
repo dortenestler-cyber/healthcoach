@@ -10,6 +10,7 @@ import PageHead from "@/components/PageHead";
 import CheckinCard from "@/components/tagebuch/CheckinCard";
 import DayIntakes from "@/components/tagebuch/DayIntakes";
 import FlashCounter from "@/components/tagebuch/FlashCounter";
+import MuscleSection from "@/components/tagebuch/MuscleSection";
 import PeriodBackfill from "@/components/tagebuch/PeriodBackfill";
 import { useFeatures } from "@/lib/prefs";
 
@@ -39,6 +40,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
   const [details, setDetails] = useState<HabitDetails>({});
   const [detailsNote, setDetailsNote] = useState("");
   const [history, setHistory] = useState<Entry[]>([]);
+  const [muscle, setMuscle] = useState<Map<string, number>>(new Map());
   const [saved, setSaved] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState("");
@@ -70,6 +72,20 @@ export default function TagebuchView({ initial }: { initial?: string }) {
   useEffect(() => {
     load();
   }, [load]);
+
+  // Wadenkrämpfe der letzten 4 Wochen für das Raster: stärkste Intensität je Tag
+  const loadMuscle = useCallback(async () => {
+    const sb = supabase();
+    if (!sb || !feat.muskeln) return;
+    const { data } = await sb.from("muscle_events").select("day, intensity").gte("day", isoDay(daysAgo(DAYS - 1)));
+    const m = new Map<string, number>();
+    for (const r of (data ?? []) as { day: string; intensity: number }[]) m.set(r.day, Math.max(m.get(r.day) ?? 0, r.intensity));
+    setMuscle(m);
+  }, [feat.muskeln]);
+
+  useEffect(() => {
+    loadMuscle();
+  }, [loadMuscle]);
 
   const changed = () => {
     setSaved(false);
@@ -110,6 +126,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
   const byDay = new Map(history.map((h) => [h.day, h]));
   const days = Array.from({ length: DAYS }, (_, i) => isoDay(daysAgo(DAYS - 1 - i)));
   const cellColor = (rowKey: string, d: string) => {
+    if (rowKey === "wade") return heat[muscle.get(d) ?? 0];
     const e = d === day ? { day: d, bleeding, symptoms, influences } : byDay.get(d);
     if (!e) return "var(--line-soft)";
     if (rowKey === "blut") return e.bleeding > 0 ? "var(--menses-fg)" : "var(--line-soft)";
@@ -224,12 +241,14 @@ export default function TagebuchView({ initial }: { initial?: string }) {
 
       {feat.perimenopause && <FlashCounter key={"f" + day} day={day} />}
 
+      {feat.muskeln && <MuscleSection key={"m" + day} day={day} onChanged={loadMuscle} />}
+
       <section className="card">
         <div className="card-row">
           <h2>Verlauf, 4 Wochen</h2>
           <span className="meta">{shortDate(daysAgo(DAYS - 1))} bis heute</span>
         </div>
-        {GRID_ROWS.map((r) => (
+        {[...GRID_ROWS, ...(feat.muskeln ? [{ key: "wade", label: "Wade" }] : [])].map((r) => (
           <div key={r.key} className="grid-row">
             <span className="grid-label">{r.label}</span>
             <div className="grid-28" aria-label={r.label + " der letzten 4 Wochen"}>
@@ -245,6 +264,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
           <span><i style={{ background: heat[3] }} />stark</span>
           <span><i style={{ background: "var(--menses-fg)" }} />Periode</span>
         </div>
+        {feat.muskeln && <span className="meta">Wade: leicht Zucken, mittel Krampf, stark starker Krampf</span>}
         {history.length === 0 && <p>Sobald du Einträge machst, füllt sich das Raster.</p>}
       </section>
 

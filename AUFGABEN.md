@@ -7,6 +7,12 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Wadenzucken und Wadenkrämpfe erfassen (PR #49)
+- [ ] PR #49 ansehen und selbst mergen. Er enthält die Migration `supabase/migrations/20261123110000_muskeln.sql` (neue Tabelle `muscle_events`). Dein Merge ist die Freigabe, danach legt GitHub die Tabelle automatisch an (das Secret `SUPABASE_DB_URL` ist eingerichtet)
+- [ ] Magnesium unter **Gesundheit › Medikamente** als Supplement eintragen (falls noch nicht geschehen) und täglich abhaken, damit die spätere Auswertung Tage mit und ohne Einnahme vergleichen kann
+- [ ] Im Tagebuch einen Testeintrag machen und wieder löschen
+- [ ] Unter **Gesundheit › Körper** (Karte Waden) und auf **Zyklus** nachsehen, ob die Karten erscheinen. Muster zeigt die App erst ab 8 Tagen mit Zucken oder Krampf
+
 ### 1. Migrationen automatisch ausführen lassen (PR #48)
 - [x] Datenbank-Passwort bereitlegen: In Supabase unter **Project Settings → Database** steht, wie du es neu setzen kannst, falls du es nicht mehr weißt
 - [x] In Supabase oben auf **Connect** tippen, **Session pooler** wählen und die Verbindungs-Adresse kopieren. Darin `[YOUR-PASSWORD]` durch das Passwort ersetzen

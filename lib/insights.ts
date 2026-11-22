@@ -2,6 +2,7 @@
 // Alles vorsichtig formuliert: Zusammenhänge, keine Beweise, keine Diagnosen.
 
 import type { Activity, Daily } from "@/lib/garmin";
+import { INFLUENCES } from "@/lib/catalog";
 import { illnessRule, type Illness } from "@/lib/health";
 import { sportOfGarmin, type Sport } from "@/lib/training";
 import { baselineFor, type Range } from "@/lib/baseline";
@@ -296,8 +297,8 @@ export function patterns(data: Data): Pattern[] {
   });
 
   // 4. Einflüsse und Nächte
-  const infl = ["alkohol", "koffein", "stress", "sport"];
-  const labels: Record<string, string> = { alkohol: "Alkohol", koffein: "Koffein", stress: "Stress", sport: "Sport" };
+  const infl = INFLUENCES.map((f) => f.key);
+  const labels: Record<string, string> = Object.fromEntries(INFLUENCES.map((f) => [f.key, f.label]));
   const rows: { label: string; with: number; without: number; n: number }[] = [];
   for (const k of infl) {
     const withD = data.diary.filter((d) => d.influences?.includes(k)).map((d) => d.day);
@@ -315,7 +316,7 @@ export function patterns(data: Data): Pattern[] {
     need: "Braucht mindestens 4 Tage mit einem Einfluss im Tagebuch und Schlafdaten in der Nacht danach.",
     text:
       worst && worst.with < worst.without - 2
-        ? `Nach Tagen mit ${worst.label} liegt dein Schlafwert im Schnitt bei ${Math.round(worst.with)} statt ${Math.round(worst.without)} (${pct(worst.with, worst.without)} %).`
+        ? `Nach Tagen mit „${worst.label}“ liegt dein Schlafwert im Schnitt bei ${Math.round(worst.with)} statt ${Math.round(worst.without)} (${pct(worst.with, worst.without)} %).`
         : "Bisher zeigt keine der Gewohnheiten einen deutlichen Unterschied beim Schlaf.",
     bars: rows.map((r) => ({ label: r.label, value: r.with, display: `${Math.round(r.with)} statt ${Math.round(r.without)}`, highlight: r === worst })),
     basis: rows.map((r) => `${r.label} ${r.n}×`).join(", ") || "noch keine",

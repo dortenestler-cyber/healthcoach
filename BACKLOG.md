@@ -21,3 +21,21 @@ Gesammelte Änderungswünsche. Umsetzung erst nach Freigabe, jeweils über eigen
 - [x] **Einrichtungs-Check**: Läuft die Funktion `garmin-sync`, ist `GARMIN_API_KEY` gültig, wann lief der letzte Abruf? Vor Ablauf des Schlüssels warnen.
 - [x] **Nutzungsauswertung**: welche Bereiche genutzt werden, als Grundlage für Änderungen („eins rein, eins raus“).
 - [x] **Offline-Cache (Service Worker)**: App startet auch ohne Netz und zeigt die zuletzt geladenen Daten.
+
+## 22.11.2026 · Wadenzucken, Wadenkrämpfe und Mustererkennung (wartet auf Freigabe)
+Konzept: `docs/konzept-wadenkraempfe.md`
+- [x] **Erfassung** (freigegeben 22.11., Pull Request offen): Zucken und Krämpfe als ein Eintrag mit Intensität (1 Zucken · 2 Krampf · 3 stark), Zeit, Seite, Situation (meist abends). Im Tagebuch, mit Nachtragen für den Vortag. Neue Einflüsse „wenig getrunken“ und „viel geschwitzt“.
+- [ ] **Uhr**: später, wir kommen gesondert darauf zurück.
+- [x] **Muster-Motor** (Teil Krämpfe, 22.11., im selben Pull Request): Krämpfe und Erkrankungen gemeinsam gegen Zyklusphase, Training, Schlaf, Einflüsse und Einnahmen (Magnesium) prüfen.
+- [ ] **Erkrankungen**: Rückblick auf die 7 Tage vor Krankheitsbeginn.
+- [x] **Anzeige Teil 1**: Bereich „Waden“ auf Gesundheit, Zeile und Karte je Phase auf Zyklus, Warnzeichen mit Verweis auf ärztliche Abklärung.
+- [ ] **Anzeige Teil 2**: Hinweise auf Training und Heute, zusammengefasste Zahlen an den Coach (Schritt 4).
+
+## 22.11.2026 · Coach nutzt Muster, Empfehlungen und Besonderheiten (wartet auf Freigabe)
+Konzept: `docs/konzept-ki-coach.md`
+- [ ] **Befunde und Besonderheiten** als feste Regeln in der App, Warnzeichen immer ohne KI.
+- [ ] **Zusammenfassung in Teilen**, Seitenbezug im Chat, „Frag den Coach“ auf den Musterkarten.
+- [ ] **Tageshinweis** auf Heute mit „Warum?“ und Rückmeldung, Tabelle `coach_hints`.
+- [ ] **Wochenrückblick** und **Woche planen** mit „Übernehmen“.
+- [ ] **Erzählen statt tippen** im Tagebuch.
+- [ ] **Selbstversuch**, **Begleitung nach Krankheit**, Push für Besonderheiten, Uhr.

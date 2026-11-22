@@ -10,7 +10,7 @@ const de1 = (v: number) => v.toLocaleString("de-DE", { maximumFractionDigits: 1 
 
 // Seite Zyklus, unterer Teil: Zykluslängen mit Bereich von vor einem Jahr, Hitzewallungen pro Woche, Symptome nach Zyklustag.
 // Ohne Netzwerk. Zusammenhänge, keine Diagnose.
-export default function CycleHistory({ today, diary, flashes, showFlashes }: { today: string; diary: Diary[]; flashes: string[]; showFlashes: boolean }) {
+export default function CycleHistory({ today, diary, flashes, showFlashes, muscle }: { today: string; diary: Diary[]; flashes: string[]; showFlashes: boolean; muscle?: Map<string, number> }) {
   const cl = cycleLengthView(diary, today);
   const last = cl.recent[cl.recent.length - 1];
   const y = cl.yearAgo;
@@ -32,7 +32,7 @@ export default function CycleHistory({ today, diary, flashes, showFlashes }: { t
         ? `Diese Woche etwa so viele Hitzewallungen wie im Schnitt (${de1(avg)}).`
         : `Diese Woche ${now > avg ? "mehr" : "weniger"} Hitzewallungen als im Schnitt der Wochen davor (${de1(avg)}).`;
 
-  const heat = symptomHeat(diary);
+  const heat = symptomHeat(diary, muscle);
   const peak = heat.rows[0];
   let heatSentence = "Das Raster erscheint ab zwei ganzen Zyklen mit Symptomen im Tagebuch.";
   if (peak) {

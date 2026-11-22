@@ -8,6 +8,7 @@ import IllnessSection from "@/components/gesundheit/IllnessSection";
 import InjurySection from "@/components/gesundheit/InjurySection";
 import BodySection from "@/components/gesundheit/BodySection";
 import OverviewSection from "@/components/gesundheit/OverviewSection";
+import WadenSection from "@/components/gesundheit/WadenSection";
 
 const TABS: [string, string][] = [
   ["ueberblick", "Überblick"],
@@ -17,8 +18,8 @@ const TABS: [string, string][] = [
 ];
 
 const TAB_FEATURE: Record<string, Feature> = { med: "medikamente" };
-// Alte Links (?t=krank, ?t=verl) führen in den gemeinsamen Reiter
-const ALIAS: Record<string, string> = { krank: "krankverl", verl: "krankverl" };
+// Alte Links (?t=krank, ?t=verl) führen in den gemeinsamen Reiter, ?t=waden in Körper
+const ALIAS: Record<string, string> = { krank: "krankverl", verl: "krankverl", waden: "koerper" };
 
 export default function GesundheitView({ initial }: { initial: string }) {
   const start = ALIAS[initial] ?? initial;
@@ -48,7 +49,12 @@ export default function GesundheitView({ initial }: { initial: string }) {
           {feat.verletzung && <InjurySection />}
         </>
       )}
-      {shown === "koerper" && <BodySection />}
+      {shown === "koerper" && (
+        <>
+          {feat.muskeln && <WadenSection />}
+          <BodySection />
+        </>
+      )}
     </>
   );
 }
