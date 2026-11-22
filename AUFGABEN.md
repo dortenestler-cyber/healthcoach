@@ -1,7 +1,7 @@
 # Aufgaben für dich
 
 Was du selbst erledigen musst, meist in Supabase oder auf GitHub. Claude trägt hier neue Aufgaben ein, sobald ein Pull Request etwas von dir braucht, und hakt ab, was erledigt ist.
-Projekt in Supabase: `fkvhuxjsdvssmupewwgl` (Region Frankfurt).
+Projekt in Supabase: `fkvhuxjsdvssmupewwgl` (Region EU, Irland `eu-west-1`).
 
 Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests führt GitHub neue Dateien aus `supabase/migrations` in der Datenbank aus (Workflow „Supabase-Migrationen ausführen“). Pull Requests mit Migrationen merged du selbst, dein Merge ist die Freigabe.
 
