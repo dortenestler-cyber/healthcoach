@@ -91,7 +91,7 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 
 ### 14. Belastung aus dem Alltag, Daten (PR #63, DA)
 Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst du ihn selbst. In der App ist noch nichts zu sehen, die Anzeige baut danach die Rolle Oberfläche.
-- [ ] PR #63 mergen. Danach legt GitHub die Spalten an (`20261124090000_alltagslast.sql`) und lädt `garmin-sync` hoch
+- [x] PR #63 gemergt (22. Nov.), Migration `20261124090000_alltagslast.sql` und Upload von `garmin-sync` grün (geprüft von Claude)
 - [ ] In der App auf Heute **Synchronisieren** tippen und Claude (Rolle Daten) Bescheid geben. Claude prüft dann, ob Garmin den Tagespuls liefert und die ersten Tage berechnet sind
 - [ ] Nichts weiter tun: Jeder Abruf füllt bis zu 21 ältere Tage nach, nach etwa einer Woche Morgen-Abrufen sind die letzten 90 Tage berechnet
 
