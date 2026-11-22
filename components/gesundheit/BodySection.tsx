@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, shortDate } from "@/lib/dates";
+import FitnessAgeCard from "@/components/gesundheit/FitnessAgeCard";
 
 type Row = { day: string; weight_kg: number | null; waist_cm: number | null };
 type Mode = "gewicht" | "umfang" | "beide" | "aus";
@@ -47,12 +48,22 @@ export default function BodySection() {
   const sb = supabase();
   if (!sb) return null;
 
-  const changeMode = async (m: Mode) => {
-    setMode(m);
-    const next = { ...settings, body: m };
+  const saveSettings = async (next: Record<string, unknown>) => {
     setSettings(next);
     const { error: e } = await sb.from("settings").upsert({ data: next, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
     if (e) setError("Einstellung konnte nicht gespeichert werden: " + e.message);
+  };
+
+  const changeMode = async (m: Mode) => {
+    setMode(m);
+    await saveSettings({ ...settings, body: m });
+  };
+
+  // Fitness-Alter braucht den Bauchumfang: Karte dafür einblenden und hinscrollen
+  const showWaist = async () => {
+    if (mode === "gewicht") await changeMode("beide");
+    else if (mode === "aus") await changeMode("umfang");
+    setTimeout(() => document.getElementById("bauchumfang")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
   };
 
   return (
@@ -65,6 +76,8 @@ export default function BodySection() {
           </button>
         ))}
       </div>
+
+      <FitnessAgeCard settings={settings} onSettings={saveSettings} onShowWaist={showWaist} />
 
       {mode === "aus" && (
         <section className="card">
@@ -149,7 +162,7 @@ function TrendCard(props: {
   const savedToday = last?.day === isoDay() && value === null;
 
   return (
-    <section className="card">
+    <section className="card" id={field === "waist_cm" ? "bauchumfang" : undefined}>
       <div className="card-row">
         <div className="stack">
           <span className="meta">{label} · Trend über 4 Wochen</span>
