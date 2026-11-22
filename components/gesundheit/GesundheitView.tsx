@@ -7,15 +7,17 @@ import MedsSection from "@/components/gesundheit/MedsSection";
 import IllnessSection from "@/components/gesundheit/IllnessSection";
 import InjurySection from "@/components/gesundheit/InjurySection";
 import BodySection from "@/components/gesundheit/BodySection";
+import WadenSection from "@/components/gesundheit/WadenSection";
 
 const TABS: [string, string][] = [
   ["med", "Medikamente"],
   ["krank", "Krankheit"],
   ["verl", "Verletzung"],
+  ["waden", "Waden"],
   ["koerper", "Körper"],
 ];
 
-const TAB_FEATURE: Record<string, Feature> = {med: "medikamente", krank: "krankheit", verl: "verletzung"};
+const TAB_FEATURE: Record<string, Feature> = {med: "medikamente", krank: "krankheit", verl: "verletzung", waden: "muskeln"};
 
 export default function GesundheitView({ initial }: { initial: string }) {
   const [tab, setTab] = useState(TABS.some(([k]) => k === initial) ? initial : "med");
@@ -24,7 +26,7 @@ export default function GesundheitView({ initial }: { initial: string }) {
   const shown = tabs.some(([k]) => k === tab) ? tab : tabs[0][0];
   return (
     <>
-      <PageHead title="Gesundheit" sub="Medikamente, Krankheiten, Verletzungen, Körper" />
+      <PageHead title="Gesundheit" sub="Medikamente, Krankheiten, Verletzungen, Waden, Körper" />
       <div className="segmented segmented-tabs">
         {tabs.map(([k, l]) => (
           <button key={k} type="button" aria-pressed={shown === k} onClick={() => setTab(k)}>
@@ -36,6 +38,7 @@ export default function GesundheitView({ initial }: { initial: string }) {
       {shown === "krank" && <IllnessSection />}
       {shown === "verl" && <InjurySection />}
       {shown === "koerper" && <BodySection />}
+      {shown === "waden" && <WadenSection />}
     </>
   );
 }

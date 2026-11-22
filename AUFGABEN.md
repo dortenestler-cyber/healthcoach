@@ -12,6 +12,7 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 - [ ] Falls der Workflow noch nicht läuft: den Inhalt der Datei im SQL Editor von Supabase ausführen
 - [ ] Magnesium unter **Gesundheit › Medikamente** als Supplement eintragen (falls noch nicht geschehen) und täglich abhaken, damit die spätere Auswertung Tage mit und ohne Einnahme vergleichen kann
 - [ ] Im Tagebuch einen Testeintrag machen und wieder löschen
+- [ ] Unter **Gesundheit › Waden** und auf **Zyklus** nachsehen, ob die Karten erscheinen. Muster zeigt die App erst ab 8 Tagen mit Zucken oder Krampf
 
 ### 1. Migrationen automatisch ausführen lassen (PR #48)
 - [ ] Datenbank-Passwort bereitlegen: In Supabase unter **Project Settings → Database** steht, wie du es neu setzen kannst, falls du es nicht mehr weißt

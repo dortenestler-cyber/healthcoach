@@ -10,6 +10,7 @@ import { cycleToday, groupOf, PHASES, type PhaseGroup } from "@/lib/cycle";
 import { METRICS, type MetricKey } from "@/lib/garmin";
 import { patterns, type Data, type Diary } from "@/lib/insights";
 import { symptomHeat } from "@/lib/zyklusAuswertung";
+import { MIN_EVENT_DAYS, muscleAnalysis, muscleByPhase, type MusterExtra } from "@/lib/muster";
 import { byCycleDay, CYCLE_METRICS, effectsByPhase, MIN_DAYS, phaseProfile, ringArcs } from "@/lib/zyklusSeite";
 
 const MONTHS = ["Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sep.", "Okt.", "Nov.", "Dez."];
@@ -17,16 +18,18 @@ const date = (iso: string) => `${Number(iso.slice(8, 10))}. ${MONTHS[Number(iso.
 const tone = (k: MetricKey) => (k === "schlaf" ? "sleep" : k === "temperatur" ? "cycle" : k === "bb" ? "training" : "recovery");
 const ms = (v: number) => `${Math.round(v)} ms`;
 
-type Props = { today: string; data: Data; longDiary: Diary[]; flashes: string[]; showFlashes: boolean };
+type Props = { today: string; data: Data; longDiary: Diary[]; flashes: string[]; showFlashes: boolean; extra?: MusterExtra | null };
 
 // Seite Zyklus: dein Zyklus im Mittelpunkt, Muster innerhalb des Zyklus. Ohne Netzwerk, die Daten kommen von ZyklusPage.
-export default function ZyklusView({ today, data, longDiary, flashes, showFlashes }: Props) {
+export default function ZyklusView({ today, data, longDiary, flashes, showFlashes, extra }: Props) {
   const [metric, setMetric] = useState<MetricKey>("hrv");
   const ct = cycleToday(today, longDiary);
   const phase = ct.phase ? PHASES[ct.phase] : null;
   const group = groupOf(ct.phase);
   const profile = ct.phase ? phaseProfile(today, { ...data, diary: longDiary }, ct.phase) : [];
-  const heat = symptomHeat(longDiary);
+  const muscle = new Map<string, number>();
+  for (const m of extra?.muscle ?? []) muscle.set(m.day, Math.max(muscle.get(m.day) ?? 0, m.intensity));
+  const heat = symptomHeat(longDiary, muscle);
   const col = ct.cycleDay !== null ? ct.cycleDay - 1 : null;
   const near = col === null ? [] : heat.rows
     .map((r) => ({ label: r.label, v: Math.max(...[col - 1, col, col + 1].map((i) => r.values[i] ?? 0)) }))
@@ -42,6 +45,22 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
   const waiting = effects.filter((e) => e.follikel === null && e.luteal === null).map((e) => e.label);
   const lutStrongest = [...effects].filter((e) => e.luteal !== null).sort((a, b) => Math.abs(b.luteal as number) - Math.abs(a.luteal as number))[0];
   const more = patterns({ ...data }).filter((p) => p.key !== "zyklus");
+
+  // Wadenzucken und -krämpfe je Phase; Muster ohne Zyklusbezug stehen unten unter „Weitere Muster“
+  const full = { ...data, diary: longDiary };
+  const phaseRows = extra ? muscleByPhase(full, extra, today).filter((r) => r.days > 0) : [];
+  const muscleTotal = muscle.size;
+  const ma = extra && muscleTotal ? muscleAnalysis(full, extra, today) : null;
+  const otherMuscle = ma?.findings.find((f) => f.group !== "zyklus") ?? null;
+  const pct = (r: { days: number; events: number }) => Math.round((r.events / r.days) * 100);
+  const peakPhase = [...phaseRows].sort((a, b) => b.events / b.days - a.events / a.days)[0];
+  const muscleSentence = !ma?.ready
+    ? `Wadenkrämpfe je Phase erscheinen ab ${MIN_EVENT_DAYS} Tagen mit Zucken oder Krampf (bisher ${ma?.eventDays ?? 0}).`
+    : (() => {
+        const z = ma.findings.find((f) => f.group === "zyklus" && f.more);
+        if (z) return z.text;
+        return "Zucken und Krämpfe verteilen sich bisher ohne deutlichen Unterschied über den Zyklus.";
+      })();
 
   let effectSentence = `Unterschiede je Phase erscheinen ab je ${MIN_DAYS} Nächten mit und ohne einen Einfluss in dieser Phase.`;
   if (lutStrongest && Math.abs(lutStrongest.luteal as number) >= 2) {
@@ -146,7 +165,25 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         <Link href={`/verlauf?m=${metric}`} className="settings-link">{m.label} im Verlauf ›</Link>
       </section>
 
-      <CycleHistory today={today} diary={longDiary} flashes={flashes} showFlashes={showFlashes} />
+      <CycleHistory today={today} diary={longDiary} flashes={flashes} showFlashes={showFlashes} muscle={extra ? muscle : undefined} />
+
+      {extra && muscleTotal > 0 && (
+        <section className="card">
+          <span className="meta">Wadenzucken und Krämpfe · je Phase</span>
+          <h2>{muscleSentence}</h2>
+          {phaseRows.map((r) => (
+            <div key={r.group} className="card-row list-line">
+              <div className="stack">
+                <span className="row-strong">{r.label}</span>
+                <span className="meta">an {r.events} von {r.days} Tagen</span>
+              </div>
+              <span className="range-row-value">{pct(r)} %{ma?.ready && r === peakPhase && r.events > 0 ? " · am häufigsten" : ""}</span>
+            </div>
+          ))}
+          <span className="meta">Tage seit deinem ersten Eintrag, Phasen aus dem Tagebuch geschätzt. Ein Zusammenhang, kein Beweis.</span>
+          <Link href="/gesundheit?t=waden" className="settings-link">Alle Muster zu den Waden ›</Link>
+        </section>
+      )}
 
       <section className="card">
         <span className="meta">Was dir guttut · je Phase</span>
@@ -158,7 +195,7 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         <span className="meta">HRV in der Nacht danach, Tage mit Einfluss gegen Tage ohne, jeweils in derselben Phase. Ein Zusammenhang, keine Empfehlung.</span>
       </section>
 
-      {more.length > 0 && (
+      {(more.length > 0 || otherMuscle) && (
         <section className="card">
           <span className="meta">Weitere Muster</span>
           {more.map((p) => (
@@ -168,6 +205,13 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
               {p.ready && <span className="meta">Grundlage: {p.basis}. Ein Zusammenhang, kein Beweis.</span>}
             </div>
           ))}
+          {otherMuscle && (
+            <div className="stack list-line">
+              <span className="row-strong">Wadenkrämpfe</span>
+              <span>{otherMuscle.text}</span>
+              <Link href="/gesundheit?t=waden" className="settings-link">Mehr unter Gesundheit ›</Link>
+            </div>
+          )}
         </section>
       )}
     </>

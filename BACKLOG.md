@@ -26,9 +26,10 @@ Gesammelte Änderungswünsche. Umsetzung erst nach Freigabe, jeweils über eigen
 Konzept: `docs/konzept-wadenkraempfe.md`
 - [x] **Erfassung** (freigegeben 22.11., Pull Request offen): Zucken und Krämpfe als ein Eintrag mit Intensität (1 Zucken · 2 Krampf · 3 stark), Zeit, Seite, Situation (meist abends). Im Tagebuch, mit Nachtragen für den Vortag. Neue Einflüsse „wenig getrunken“ und „viel geschwitzt“.
 - [ ] **Uhr**: später, wir kommen gesondert darauf zurück.
-- [ ] **Muster-Motor**: Krämpfe und Erkrankungen gemeinsam gegen Zyklusphase, Training, Schlaf, Einflüsse und Einnahmen (Magnesium) prüfen.
+- [x] **Muster-Motor** (Teil Krämpfe, 22.11., im selben Pull Request): Krämpfe und Erkrankungen gemeinsam gegen Zyklusphase, Training, Schlaf, Einflüsse und Einnahmen (Magnesium) prüfen.
 - [ ] **Erkrankungen**: Rückblick auf die 7 Tage vor Krankheitsbeginn.
-- [ ] **Anzeige**: Karte „Muskeln“ auf Gesundheit, Zeilen auf Zyklus, Hinweise auf Training und Heute, Warnzeichen mit Verweis auf ärztliche Abklärung.
+- [x] **Anzeige Teil 1**: Bereich „Waden“ auf Gesundheit, Zeile und Karte je Phase auf Zyklus, Warnzeichen mit Verweis auf ärztliche Abklärung.
+- [ ] **Anzeige Teil 2**: Hinweise auf Training und Heute, zusammengefasste Zahlen an den Coach (Schritt 4).
 
 ## 22.11.2026 · Coach nutzt Muster, Empfehlungen und Besonderheiten (wartet auf Freigabe)
 Konzept: `docs/konzept-ki-coach.md`
