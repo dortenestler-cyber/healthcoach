@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Data } from "@/lib/insights";
 import { SPORTS, sportOfGarmin, type Sport } from "@/lib/training";
-import { SPORT_ABBR } from "@/components/training/WeekLoadView";
+import SportIcon from "@/components/ui/SportIcon";
 
 const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 const WD = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
@@ -50,7 +50,7 @@ export default function MonthReviewCard({ today, data }: { today: string; data: 
           return sp ? (
             <span key={day} className={`review-bubble ink-${sp[0]}${day === today ? " review-today" : ""}`} style={{ background: SPORTS[sp[0]].color }} aria-label={`${i + 1}. ${MONTHS[m]}: ${sp.map((s) => SPORTS[s].label).join(", ")}`}>
               <b>{i + 1}</b>
-              <small>{SPORT_ABBR[sp[0]]}{sp.length > 1 ? ` ×${sp.length}` : ""}</small>
+              <small className="review-icon"><SportIcon sport={sp[0]} size={13} />{sp.length > 1 ? `×${sp.length}` : ""}</small>
             </span>
           ) : (
             <span key={day} className={`review-day${day > today ? " review-future" : ""}${day === today ? " review-today-plain" : ""}`}>{i + 1}</span>
@@ -61,7 +61,7 @@ export default function MonthReviewCard({ today, data }: { today: string; data: 
         <div className="pills review-filter" role="group" aria-label="Nach Sportart filtern">
           {sportsInMonth.map((s) => (
             <button key={s} type="button" className="pill pill-sm" aria-pressed={filter === s} onClick={() => setFilter(filter === s ? null : s)}>
-              <i className="review-key" style={{ background: SPORTS[s].color }} />
+              <span className={`review-key ink-${s}`} style={{ background: SPORTS[s].color }}><SportIcon sport={s} size={14} /></span>
               {SPORTS[s].label}
             </button>
           ))}

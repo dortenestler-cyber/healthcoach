@@ -2492,7 +2492,8 @@ body { overflow-x: clip; }
 .review-bubble b { font-size: 12px; font-weight: 800; }
 .review-bubble small { font-size: 9px; font-weight: 700; }
 .review-today { box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--text); }
-.review-key { display: inline-block; width: 10px; height: 10px; border-radius: 5px; margin-right: 6px; vertical-align: -1px; }
+.review-key { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 11px; margin-right: 6px; vertical-align: middle; }
+.review-icon { display: inline-flex; align-items: center; gap: 1px; }
 
 /* Coach (Muster 17) */
 .coach-mark {
@@ -2515,3 +2516,43 @@ body { overflow-x: clip; }
 }
 
 .chat-input textarea.input { resize: none; line-height: 1.4; font-family: inherit; }
+
+/* Sperrbildschirm (Konzept dunkel 2) */
+.pin { position: relative; gap: 0; padding-top: 7vh; }
+.pin-glow {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--brand) 22%, var(--bg)) 0%, var(--bg) 70%);
+}
+.pin-icon { border-radius: 18px; }
+.pin-icon-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .pin-icon-light { display: none; }
+  :root:not([data-theme="light"]) .pin-icon-dark { display: block; }
+}
+:root[data-theme="dark"] .pin-icon-light { display: none; }
+:root[data-theme="dark"] .pin-icon-dark { display: block; }
+.pin-brand { margin-top: 20px; }
+.pin .pin-title { margin-top: 6px; font-size: 28px; font-weight: 700; }
+.pin-sub { margin-top: 6px; font-size: 15px; color: var(--text-2); }
+.pin .pin-dots { margin: 22px 0 4px; gap: 18px; }
+.pin .pin-dot { border-color: var(--line-strong); }
+.pin .pin-dot[data-on="true"] { background: var(--text); border-color: var(--text); }
+.pin .pin-pad { grid-template-columns: repeat(3, 76px); gap: 16px 26px; margin: 8px 0 14px; }
+.pin .pin-key {
+  width: 76px;
+  height: 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-color: var(--fill);
+  background: color-mix(in srgb, var(--card) 85%, transparent);
+}
+.pin .pin-key-ghost { border: 0; background: transparent; }
+.pin-num { font-size: 30px; font-weight: 500; line-height: 1; }
+.pin-letters { height: 11px; font-size: 9px; font-weight: 600; letter-spacing: 0.18em; color: var(--muted); }
+.pin-foot { margin-top: 8px; max-width: 300px; font-size: 12px; color: var(--muted); }
+.review-filter .pill { display: inline-flex; flex-direction: row; align-items: center; gap: 2px; }
