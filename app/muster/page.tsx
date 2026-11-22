@@ -1,8 +1,6 @@
-import type { Metadata } from "next";
-import MusterView from "@/components/MusterView";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Muster · Health Coach" };
-
+// Die Seite Muster heißt jetzt Zyklus. Alte Links und Lesezeichen führen dorthin.
 export default function MusterPage() {
-  return <MusterView />;
+  redirect("/zyklus");
 }

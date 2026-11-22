@@ -13,6 +13,7 @@ import TodayRings from "@/components/heute/TodayRings";
 import HrvCard from "@/components/heute/HrvCard";
 import SleepCard from "@/components/heute/SleepCard";
 import VitalsCard from "@/components/heute/VitalsCard";
+import EnergyCard from "@/components/heute/EnergyCard";
 import { readinessFactors } from "@/lib/today";
 import { loadInsightData } from "@/lib/insightData";
 import { dayRule } from "@/lib/cycle";
@@ -138,6 +139,8 @@ export default function HeuteView() {
       {data && <HrvCard data={data} showPhases={feat.zyklus} />}
 
       {feat.garmin && data && <SleepCard data={data} />}
+
+      {feat.garmin && data && <EnergyCard day={today} data={data} nowMinute={new Date().getHours() * 60 + new Date().getMinutes()} />}
 
       {feat.garmin && <VitalsCard day={today} data={data} onSynced={loadData} />}
 
