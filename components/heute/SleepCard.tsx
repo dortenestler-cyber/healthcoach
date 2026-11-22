@@ -11,6 +11,7 @@ const hShort = (v: number) => {
   return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")}`;
 };
 
+// Ansicht in der Karte „Deine Werte“ auf Heute (ohne eigenen Kartenrahmen).
 // Schlaf: Phasen der letzten Nacht, 7 Nächte mit deinem Bereich und dem Bedarf, Nachtschweiß aus dem Tagebuch markiert
 export default function SleepCard({ data }: { data: Data }) {
   const today = isoDay();
@@ -40,8 +41,8 @@ export default function SleepCard({ data }: { data: Data }) {
     : `${below === 0 ? "Keine Nacht" : below === 1 ? "Eine Nacht" : `${below} Nächte`} unter deinem Bedarf${sweatNights ? `, ${sweatNights === 1 ? "eine" : sweatNights} mit Nachtschweiß` : ""}.`;
 
   return (
-    <Link href="/verlauf?m=schlaf" className="card chart-card">
-      <ValueHeader meta="Schlaf · letzte Nacht ›" sentence={sentence} value={lastH === null ? null : hm(lastH)} fmt={hShort} range={base.range}>
+    <div className="values-pane">
+      <ValueHeader meta="Schlaf · letzte Nacht" sentence={sentence} value={lastH === null ? null : hm(lastH)} fmt={hShort} range={base.range}>
         {stages ? (
           <SleepStagesBar minutes={stages} />
         ) : (
@@ -58,6 +59,7 @@ export default function SleepCard({ data }: { data: Data }) {
           bars={days.map((d) => ({ label: WD[new Date(d + "T12:00:00").getDay()], value: hours(d), today: d === today, marker: sweat.has(d) }))}
         />
       </ValueHeader>
-    </Link>
+      <Link href="/verlauf?m=schlaf" className="settings-link">Schlaf im Verlauf ›</Link>
+    </div>
   );
 }

@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 import { isoDay } from "@/lib/dates";
 import { activityLabel, durationText, type Activity } from "@/lib/garmin";
 import type { Illness, Injury } from "@/lib/health";
 import { ensurePlanned, healthEffect, loadSettings, sportOfGarmin, SPORTS, type Session } from "@/lib/training";
 
-// Heute geplant: Einheiten des Tages mit Hinweis aus Gesundheit und Garmin
-export default function TodayPlan() {
+// Training heute: Einheiten des Tages mit Hinweis aus Gesundheit und Garmin. Teil der Karte „Heute steht an“.
+// children: z. B. die Zeile zur Belastung.
+export default function TodayPlan({ children }: { children?: ReactNode }) {
   const [sessions, setSessions] = useState<Session[] | null>(null);
   const [acts, setActs] = useState<Activity[]>([]);
   const [illness, setIllness] = useState<Illness | null>(null);
@@ -42,9 +43,9 @@ export default function TodayPlan() {
   const open = sessions.filter((s) => s.status !== "ausgelassen");
 
   return (
-    <section className="card">
+    <div className="agenda-part">
       <div className="card-row">
-        <h2>Heute geplant</h2>
+        <h3>Training</h3>
         <Link href="/training" className="link-small">Kalender ›</Link>
       </div>
       {!open.length && !acts.length && <p>Heute ist frei. Gehen oder Mobilität tun trotzdem gut.</p>}
@@ -81,6 +82,7 @@ export default function TodayPlan() {
             <span className="meta">{durationText(a.duration_s)} · Garmin</span>
           </div>
         ))}
-    </section>
+      {children}
+    </div>
   );
 }
