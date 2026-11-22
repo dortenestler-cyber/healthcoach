@@ -14,7 +14,7 @@
 // Die Funktion läuft ohne JWT-Prüfung am Eingang (siehe Workflow), weil sie Login oder Schlüssel selbst prüft.
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { activityIntervals, computeDay, conversionFactor, FACTOR_START, HR_MAX_START, HR_REST_START, type LoadDay, MIN_COVERAGE, pointsFromSteps, type Sample } from "./alltag.ts";
+import { activityIntervals, computeDay, conversionFactor, FACTOR_START, HR_MAX_START, HR_REST_START, LOAD_VERSION, type LoadDay, MIN_COVERAGE, pointsFromSteps, type Sample } from "./alltag.ts";
 
 const GARMIN = "https://personal.connectapi.garmin.com";
 const WINDOW_DAYS = 28; // Garmin erlaubt höchstens 28 Tage pro Abfrage
@@ -208,12 +208,12 @@ Deno.serve(async (req) => {
     let stressNote = "";
     let sleepTempKeys: string[] = [];
     const diag: Diag = {};
+    const stress: StressCache = { known: { path: null, failed: false }, days: new Map() };
 
     for (const w of windows) {
       // Tageszusammenfassung: Ruhepuls, Stress, Body Battery, Schritte, Intensität
       const sums = await garminGet(token, `/usersummary-service/v2/dailysummaries?startDate=${w.s}&endDate=${w.e}`);
       for (const d of (sums?.data ?? sums ?? []) as Any[]) {
-        if (!diag.summary) diag.summary = keyNames(d);
         const day = d?.calendarDate;
         if (!day) continue;
         const r = row(day);
@@ -305,8 +305,7 @@ Deno.serve(async (req) => {
       for (let day = w.s; day <= w.e; day = isoDay(addDays(new Date(day + "T12:00:00"), 1))) {
         if (day < isoDay(addDays(today, -6))) continue;
         try {
-          const sd = await garminGet(token, `/wellness-service/wellness/dailyStress/${day}`);
-          const values = (sd?.stressValuesArray ?? []) as Any[];
+          const values = await stressValues(token, day, stress);
           const curve: (number | null)[] = Array(96).fill(null);
           let any = false;
           for (const v of values) {
@@ -322,8 +321,9 @@ Deno.serve(async (req) => {
             row(day).stress_curve = curve;
             stressCurveDays++;
           }
-        } catch {
+        } catch (e) {
           stressNote = "Stress im Tagesverlauf ist bei Garmin nicht abrufbar.";
+          diag.stress ??= e instanceof Error ? e.message : String(e);
         }
       }
 
@@ -345,7 +345,6 @@ Deno.serve(async (req) => {
           `/activitylist-service/activities/search/activities?startDate=${w.s}&endDate=${w.e}&start=${start}&limit=20&sortOrder=desc&excludeChildren=true`,
         );
         const items = (Array.isArray(list) ? list : []) as Any[];
-        if (!diag.aktivitaet && items[0]) diag.aktivitaet = keyNames(items[0], 1);
         for (const a of items) {
           if (!a?.activityId) continue;
           activities.push({
@@ -461,7 +460,7 @@ Deno.serve(async (req) => {
     let alltagNote = "";
     if (!alltagMissing) {
       try {
-        const res = await syncAlltag(sb, token, userId, [...daily.keys()], offset === 0, diag);
+        const res = await syncAlltag(sb, token, userId, [...daily.keys()], offset === 0, diag, stress);
         alltagDays = res.days;
         alltagNote = res.note;
       } catch (e) {
@@ -548,7 +547,19 @@ async function garminCycles(token: string, fromDay: string, toDay: string): Prom
 const LOAD_BACK_DAYS = 90;
 const MAX_LOAD_DAYS = 21;
 const HR_PATHS = ["/wellness-service/wellness/dailyHeartRate?date=", "/wellness-service/wellness/dailyHeartRate/"];
-const STEPS_PATHS = ["/wellness-service/wellness/dailySummaryChart/?date=", "/wellness-service/wellness/dailySummaryChart?date="];
+// Wie beim Tagespuls zuerst die Form mit ?date= (die funktioniert dort), dann die aus Garmin Connect
+const STRESS_PATHS = ["/wellness-service/wellness/dailyStress?date=", "/wellness-service/wellness/dailyStress/"];
+
+type StressCache = { known: { path: string | null; failed: boolean }; days: Map<string, Any[]> };
+// Stresswerte eines Tages, je Tag nur ein Abruf. Wirft, wenn Garmin den Stressverlauf gar nicht liefert.
+async function stressValues(token: string, day: string, c: StressCache): Promise<Any[]> {
+  if (c.days.has(day)) return c.days.get(day)!;
+  if (c.known.failed) throw new Error("Stressverlauf nicht abrufbar");
+  const sd = await firstPath(token, STRESS_PATHS, day, c.known);
+  const values = (sd?.stressValuesArray ?? []) as Any[];
+  c.days.set(day, values);
+  return values;
+}
 
 const shiftDay = (day: string, n: number) => isoDay(addDays(new Date(day + "T12:00:00Z"), n));
 
@@ -569,22 +580,24 @@ async function firstPath(token: string, paths: string[], day: string, known: { p
   throw lastError ?? new Error("nicht abrufbar");
 }
 
-async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: string[], backfill: boolean, diag: Diag): Promise<{ days: number; note: string }> {
+async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: string[], backfill: boolean, diag: Diag, stress: StressCache): Promise<{ days: number; note: string }> {
   const today = localDayMinute(Date.now()).day;
   const earliest = shiftDay(today, -(LOAD_BACK_DAYS - 1));
   const days = [...new Set(rangeDays)].filter((d) => d >= earliest && d <= today).sort().reverse().slice(0, MAX_LOAD_DAYS);
   if (backfill && days.length < MAX_LOAD_DAYS) {
+    // Tage ohne Werte oder mit älterer Rechenweise (Version) neu berechnen
     const { data: open, error } = await sb
       .from("garmin_daily")
-      .select("day")
+      .select("day, v:load_daily_min->v")
       .eq("user_id", userId)
       .gte("day", earliest)
       .lte("day", today)
-      .is("load_daily_min", null)
-      .order("day", { ascending: false })
-      .limit(MAX_LOAD_DAYS);
+      .order("day", { ascending: false });
     if (error) throw new Error(error.message);
-    for (const r of (open ?? []) as Any[]) if (days.length < MAX_LOAD_DAYS && !days.includes(r.day)) days.push(r.day);
+    for (const r of (open ?? []) as Any[]) {
+      if (days.length >= MAX_LOAD_DAYS) break;
+      if (Number(r.v) !== LOAD_VERSION && !days.includes(r.day)) days.push(r.day);
+    }
   }
   if (!days.length) return { days: 0, note: "" };
   days.sort();
@@ -620,17 +633,6 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
   const restFallback = rests.length ? rests[Math.floor(rests.length / 2)] : HR_REST_START;
 
   const hrKnown = { path: null as string | null, failed: false };
-  const stepsKnown = { path: null as string | null, failed: false };
-  // Schrittverlauf: Garmin Connect fragt mit dem Profilnamen; ohne Namen sind die Pfade unten 404
-  const stepsPaths = [...STEPS_PATHS];
-  try {
-    const prof = await garminGet(token, "/userprofile-service/socialProfile");
-    const dn = typeof prof?.displayName === "string" ? prof.displayName : null;
-    if (dn) stepsPaths.unshift(`/wellness-service/wellness/dailySummaryChart/${encodeURIComponent(dn)}?date=`);
-    diag.profil = dn ? "ok" : "ohne Namen";
-  } catch (e) {
-    diag.profil = e instanceof Error ? e.message : String(e);
-  }
   const results: { day: string; base: Omit<LoadDay, "faktor" | "faktor_n" | "last_alltag">; curve: (number | null)[] | null; stepsOutside: number | null }[] = [];
   const actPoints = new Map<number, number>();
   let note = "";
@@ -650,40 +652,22 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
       if (lm.day === day) samples.push({ minute: lm.minute, hr: v[1] });
     }
 
-    // Bewegung je Viertelstunde: Schritte aus dem Tagesverlauf, sonst Stresswert „Bewegung“ (-2)
+    // Bewegung je Viertelstunde aus dem Stresswert „Bewegung“ (-2). Einen Schrittverlauf liefert die Personal API nicht (404).
+    // Ohne Stressverlauf gilt die Regel der Nutzerin (22.11.): Zone 1 zählt ab 10 Minuten am Stück, Zone 2 und höher immer.
     const moving = new Set<number>();
-    let bewegung: LoadDay["bewegung"] = "keine";
+    let bewegung: LoadDay["bewegung"] = "dauer";
     if (samples.length) {
       try {
-        const chart = await firstPath(token, stepsPaths, day, stepsKnown);
-        for (const c of (Array.isArray(chart) ? chart : chart?.data ?? []) as Any[]) {
-          const t = typeof c?.startGMT === "string" ? Date.parse(c.startGMT.replace(" ", "T").replace(/(\.\d+)?Z?$/, "Z")) : NaN;
-          if (!Number.isFinite(t)) continue;
-          const active = (Number(c?.steps) || 0) > 0 || /^(active|highlyActive)$/i.test(String(c?.primaryActivityLevel ?? ""));
-          const lm = localDayMinute(t);
-          if (lm.day === day && active) moving.add(Math.floor(lm.minute / 15));
-          bewegung = "schritte";
+        const values = await stressValues(token, day, stress);
+        for (const v of values) {
+          if (!Array.isArray(v) || typeof v[0] !== "number") continue;
+          bewegung = "stress";
+          if (v[1] !== -2) continue;
+          const lm = localDayMinute(v[0]);
+          if (lm.day === day) moving.add(Math.floor(lm.minute / 15));
         }
-        diag.schrittverlauf ??= bewegung === "schritte" ? "ok" : "leer: " + keyNames(chart, 0).join(",");
       } catch (e) {
-        // kein Schrittverlauf, Stress versuchen
-        diag.schrittverlauf ??= (e instanceof Error ? e.message : String(e)).replace(/dailySummaryChart\/[^\s?]+/, "dailySummaryChart/<name>");
-      }
-      if (bewegung === "keine") {
-        try {
-          const sd = await garminGet(token, `/wellness-service/wellness/dailyStress/${day}`);
-          for (const v of (sd?.stressValuesArray ?? []) as Any[]) {
-            if (!Array.isArray(v) || typeof v[0] !== "number") continue;
-            bewegung = "stress";
-            if (v[1] !== -2) continue;
-            const lm = localDayMinute(v[0]);
-            if (lm.day === day) moving.add(Math.floor(lm.minute / 15));
-          }
-          diag.stress ??= bewegung === "stress" ? "ok" : "leer: " + keyNames(sd, 0).join(",");
-        } catch (e) {
-          // ohne Bewegungsdaten zählt der Alltag erst ab Zone 2
-          diag.stress ??= e instanceof Error ? e.message : String(e);
-        }
+        diag.stress ??= e instanceof Error ? e.message : String(e);
       }
     }
 
@@ -693,7 +677,7 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
     });
     const intervals = activityIntervals(day, dayActs);
     const rest = Number(hrData?.restingHeartRate) || Number(dayRow.get(day)?.resting_hr) || restFallback;
-    const c = computeDay(samples, intervals, rest, hrMax, bewegung === "keine" ? null : (m) => moving.has(Math.floor(m / 15)));
+    const c = computeDay(samples, intervals, rest, hrMax, bewegung === "stress" ? (m) => moving.has(Math.floor(m / 15)) : null);
     for (const [id, p] of c.actPoints) actPoints.set(id, (actPoints.get(id) ?? 0) + p);
 
     const todays = dayActs.filter((a) => String(a.start_local ?? "").slice(0, 10) === day);
@@ -706,7 +690,7 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
       curve: samples.length ? c.curve : null,
       stepsOutside,
       base: {
-        v: 1,
+        v: LOAD_VERSION,
         quelle: viaPulse ? "puls" : "schritte",
         bewegung,
         training: c.training,
@@ -744,7 +728,7 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
   const factor = f.faktor ?? FACTOR_START;
 
   diag.puls_pfad = hrKnown.path;
-  diag.schritt_pfad = stepsKnown.path ? stepsKnown.path.replace(/dailySummaryChart\/[^?]+/, "dailySummaryChart/<name>") : null;
+  diag.stress_pfad = stress.known.path;
   const newest = results.map((r) => r.day).sort().at(-1);
   const rows = results.map((r) => ({
     user_id: userId,
@@ -753,7 +737,7 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
     steps_outside_acts: r.stepsOutside,
     load_daily_min: {
       ...({ ...r.base, faktor: f.faktor, faktor_n: f.faktor ? f.n : 0, last_alltag: Math.round(r.base.pkt_alltag * factor * 10) / 10 } satisfies LoadDay),
-      // Fehlersuche: nur Feldnamen und Fehlermeldungen von Garmin, keine Werte, nur am neuesten Tag
+      // Fehlersuche: nur Pfade und Fehlermeldungen von Garmin, keine Werte, nur am neuesten Tag
       ...(r.day === newest ? { diag } : {}),
     },
   }));
@@ -762,15 +746,5 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
   return { days: rows.length, note };
 }
 
-// Fehlersuche für die nicht dokumentierten Felder der Garmin Personal API: nur Feldnamen, nie Werte
-type Diag = { summary?: string[]; aktivitaet?: string[]; schrittverlauf?: string; stress?: string; puls_pfad?: string | null; profil?: string; schritt_pfad?: string | null };
-function keyNames(obj: Any, depth = 1, prefix = ""): string[] {
-  if (Array.isArray(obj)) return obj.length ? keyNames(obj[0], depth, prefix + "[]") : [prefix + "[] leer"];
-  if (!obj || typeof obj !== "object") return prefix ? [prefix] : [];
-  const out: string[] = [];
-  for (const [k, v] of Object.entries(obj)) {
-    if (depth > 0 && v && typeof v === "object" && !Array.isArray(v)) out.push(...keyNames(v, depth - 1, prefix + k + "."));
-    else out.push(prefix + k);
-  }
-  return out.slice(0, 120);
-}
+// Fehlersuche für die nicht dokumentierten Pfade der Garmin Personal API: nur Pfade und Fehlermeldungen, nie Werte
+type Diag = { stress?: string; puls_pfad?: string | null; stress_pfad?: string | null };

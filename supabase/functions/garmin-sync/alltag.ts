@@ -37,13 +37,19 @@ export function activityIntervals(day: string, acts: { activity_id: number; star
 
 export type Sample = { minute: number; hr: number }; // Minute seit Mitternacht (Ortszeit), Puls
 
+// Version 2 (22.11.): Regel „Zone 1 ab 10 Minuten am Stück“. Tage mit älterer Version rechnet garmin-sync neu.
+export const LOAD_VERSION = 2;
+export const ZONE1_MIN_RUN = 10; // Minuten am Stück, ab denen lockere Bewegung im Alltag zählt
+
 export type LoadDay = {
-  v: 1;
+  v: 2;
   quelle: "puls" | "schritte";
-  bewegung: "schritte" | "stress" | "keine"; // woran Bewegung im Alltag erkannt wurde
+  // woran Bewegung im Alltag erkannt wurde: "stress" = Stresswert „Bewegung“ von Garmin,
+  // "dauer" = kein Stressverlauf, Zone 1 zählt ab 10 Minuten am Stück, Zone 2 und höher immer
+  bewegung: "stress" | "dauer";
   training: number[]; // Minuten je Zone 0–5 während Garmin-Aktivitäten
   alltag: number[]; // Minuten je Zone 0–5 außerhalb, nur mit Bewegung
-  ohne_bewegung: number; // Minuten ab Zone 1 ohne Bewegung (z. B. Stress), zählen nicht
+  ohne_bewegung: number; // Minuten ab Zone 1, die nicht zählen (ohne Bewegung oder Zone 1 kürzer als 10 Minuten)
   pkt_training: number; // Pulspunkte = Minuten × Zonengewicht
   pkt_alltag: number;
   abdeckung: number; // Minuten mit Pulsdaten
@@ -58,8 +64,9 @@ export type LoadDay = {
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
 
-// Zonenminuten eines Tages. move(minute) sagt, ob in diesem Abschnitt Bewegung gemessen wurde;
-// ohne Bewegungsdaten (null) zählt der Alltag erst ab Zone 2.
+// Zonenminuten eines Tages. move(minute) sagt, ob in diesem Abschnitt Bewegung gemessen wurde.
+// Ohne Bewegungsdaten (null): Zone 2 und höher zählt immer, Zone 1 nur in Abschnitten,
+// in denen der Puls mindestens 10 Minuten am Stück über der Ruhezone liegt (Lücken bis 5 Minuten zählen mit).
 export function computeDay(
   samples: Sample[],
   acts: Interval[],
@@ -75,6 +82,20 @@ export function computeDay(
   const sums = Array(96).fill(0);
   const counts = Array(96).fill(0);
   const s = [...samples].sort((a, b) => a.minute - b.minute);
+  // Abschnitte mit Puls über der Ruhezone (außerhalb von Aktivitäten zählen sie nur ab 10 Minuten)
+  const longRun = new Array<boolean>(s.length).fill(false);
+  for (let i = 0; i < s.length; ) {
+    if (zoneOf(s[i].hr, rest, max) === 0) {
+      i++;
+      continue;
+    }
+    let j = i;
+    while (j + 1 < s.length && zoneOf(s[j + 1].hr, rest, max) >= 1 && s[j + 1].minute - s[j].minute <= 5) j++;
+    const next = j + 1 < s.length ? s[j + 1].minute : s[j].minute + 2;
+    const len = Math.min(next, s[j].minute + 5) - s[i].minute;
+    if (len >= ZONE1_MIN_RUN) for (let k = i; k <= j; k++) longRun[k] = true;
+    i = j + 1;
+  }
   for (let i = 0; i < s.length; i++) {
     const { minute, hr } = s[i];
     if (minute < 0 || minute >= 1440) continue;
@@ -92,7 +113,7 @@ export function computeDay(
       if (act.id !== undefined) actPoints.set(act.id, (actPoints.get(act.id) ?? 0) + dur * z);
     } else if (z === 0) {
       alltag[0] += dur;
-    } else if (move ? move(minute) : z >= 2) {
+    } else if (move ? move(minute) : z >= 2 || longRun[i]) {
       alltag[z] += dur;
     } else {
       alltag[0] += dur;

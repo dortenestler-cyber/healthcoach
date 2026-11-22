@@ -3,16 +3,18 @@
 // Konzept: docs/konzept-korridore-alltagslast.md, Teil B. Ab Migration 20261124090000_alltagslast.
 
 export type LoadDay = {
-  v: 1;
+  /** 1: erste Fassung (Alltag ab Zone 2) · 2: ab 22.11., Zone 1 zählt ab 10 Minuten am Stück */
+  v: 1 | 2;
   /** "puls": aus dem Tagespuls · "schritte": Uhr kaum getragen, Alltag geschätzt aus Schritten */
   quelle: "puls" | "schritte";
-  /** woran Bewegung im Alltag erkannt wurde; "keine": Alltag zählt erst ab Zone 2 */
-  bewegung: "schritte" | "stress" | "keine";
+  /** woran Bewegung im Alltag erkannt wurde: "stress" = Stresswert „Bewegung“ von Garmin,
+   *  "dauer" = Zone 1 zählt ab 10 Minuten am Stück, Zone 2 und höher immer (ältere Werte: "keine", "schritte") */
+  bewegung: "stress" | "dauer" | "keine" | "schritte";
   /** Minuten je Zone 0–5 während Garmin-Aktivitäten */
   training: number[];
-  /** Minuten je Zone 0–5 außerhalb von Aktivitäten (ab Zone 1 nur mit Bewegung) */
+  /** Minuten je Zone 0–5 außerhalb von Aktivitäten, die zählen (ab Zone 1, Regel siehe bewegung) */
   alltag: number[];
-  /** Minuten ab Zone 1 ohne Bewegung (z. B. Stress), zählen nicht zur Belastung */
+  /** Minuten ab Zone 1, die nicht zur Belastung zählen (ohne Bewegung oder Zone 1 kürzer als 10 Minuten) */
   ohne_bewegung: number;
   /** Pulspunkte = Minuten × Zonengewicht (Zone 1 = 1 … Zone 5 = 5) */
   pkt_training: number;
@@ -45,7 +47,7 @@ export const LOAD_ZONES = [
 export function readLoadDay(v: unknown): LoadDay | null {
   if (!v || typeof v !== "object") return null;
   const o = v as Partial<LoadDay>;
-  if (o.v !== 1 || !Array.isArray(o.training) || !Array.isArray(o.alltag)) return null;
+  if ((o.v !== 1 && o.v !== 2) || !Array.isArray(o.training) || !Array.isArray(o.alltag)) return null;
   return o as LoadDay;
 }
 
