@@ -9,7 +9,7 @@ Freigegeben am 22.11.2026 mit diesen Entscheidungen:
 ## Stand
 
 - [x] 1 Heute (13 → 5 Karten, Fotos in `docs/bilder/aufraeumen/`)
-- [ ] 2 Training
+- [x] 2 Training (Reiter oben, neuer Reiter Auswertung mit Tagesziel)
 - [ ] 3 Einstellungen
 - [ ] 4 Tagebuch und Zyklus
 

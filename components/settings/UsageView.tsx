@@ -14,7 +14,6 @@ const NAMES: Record<string, string> = {
   "/coach": "Coach",
   "/coach/hinweise": "Hinweise des Coachs",
   "/verlauf": "Verlauf",
-  "/tagesziel": "Tagesziel",
   "/uhr": "Uhr verbinden",
   "/begriffe": "Begriffe",
   "/einstellungen": "Einstellungen",

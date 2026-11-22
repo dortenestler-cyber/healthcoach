@@ -27,7 +27,7 @@ export default function TodayRings({ day, data, rule, showLoad }: { day: string;
           <ValueRing tone="recovery" value={r.value / 10} center={rule.level === "warnzeichen" ? "–" : de1(r.value)} caption={r.label} label={`Readiness ${de1(r.value)} von 10, ${r.label}`} />
         </div>
         {showLoad && (
-          <Link href="/tagesziel" className="ring-cell">
+          <Link href="/training?t=auswertung" className="ring-cell">
             <ValueRing tone="training" value={load / 100} target={t.pause ? null : { lo: t.lo / 100, hi: t.hi / 100 }} center={`${load} %`} caption="Belastung" label={`Belastung ${load} Prozent, Ziel ${t.lo} bis ${t.hi} Prozent`} />
           </Link>
         )}

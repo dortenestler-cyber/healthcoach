@@ -105,7 +105,7 @@ export const FEATURES: { key: Feature; label: string; note: string }[] = [
   { key: "bouldern", label: "Bouldern", note: "Bereich unter Training" },
   { key: "karate", label: "Karate", note: "Bereich unter Training" },
   { key: "garmin", label: "Garmin-Karten", note: "Schlaf und Vitalwerte auf Heute" },
-  { key: "tagesziel", label: "Tagesziel", note: "Belastungsring und Ziel auf Heute" },
+  { key: "tagesziel", label: "Tagesziel", note: "Belastungsring auf Heute, Tagesziel unter Training › Auswertung" },
   { key: "tagesplan", label: "Tagesplan", note: "Plan für heute auf Heute" },
 ];
 
