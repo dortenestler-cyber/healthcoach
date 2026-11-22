@@ -1,0 +1,52 @@
+name: Daten prüfen
+
+# Liest nur, ändert nichts. Gibt Zählwerte aus, keine Gesundheitswerte:
+# Wie viele Tage haben Werte in den neuen Spalten, wann lief der letzte Abruf.
+# Start von Hand: Actions → „Daten prüfen“ → Run workflow.
+# Voraussetzung: GitHub-Secret SUPABASE_DB_URL (wie bei den Migrationen).
+
+on:
+  workflow_dispatch:
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Zählwerte abfragen
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error::Das Secret SUPABASE_DB_URL fehlt."
+            exit 1
+          fi
+          q() { psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -P pager=off -c "set transaction read only; $1"; }
+          echo "== Letzte Abrufe (Tageswerte) =="
+          q "select max(synced_at) as letzter_abruf, count(*) as tage_gesamt from public.garmin_daily;"
+          echo "== Alltagslast, letzte 90 Tage =="
+          q "select
+               count(*) as tage,
+               count(*) filter (where load_daily_min is not null) as berechnet,
+               count(*) filter (where load_daily_min->>'quelle' = 'puls') as aus_puls,
+               count(*) filter (where load_daily_min->>'quelle' = 'schritte') as aus_schritten,
+               count(*) filter (where load_daily_min->>'bewegung' = 'schritte') as bewegung_schritte,
+               count(*) filter (where load_daily_min->>'bewegung' = 'stress') as bewegung_stress,
+               count(*) filter (where load_daily_min->>'bewegung' = 'keine') as bewegung_keine,
+               count(*) filter (where hr_curve is not null) as pulskurve,
+               count(*) filter (where steps_outside_acts is not null) as schritte_ausserhalb,
+               count(*) filter (where active_s is not null) as aktive_zeit,
+               count(*) filter (where active_kcal is not null) as aktive_kcal,
+               min(day) filter (where load_daily_min is not null) as erster_tag,
+               max(day) filter (where load_daily_min is not null) as letzter_tag
+             from public.garmin_daily where day >= current_date - 89;"
+          echo "== Umrechnungsfaktor und Pulsquelle (neuester berechneter Tag) =="
+          q "select day, load_daily_min->>'faktor' as faktor, load_daily_min->>'faktor_n' as trainings,
+               load_daily_min->>'puls_max_quelle' as maxpuls_quelle, load_daily_min->>'abdeckung' as minuten_mit_puls
+             from public.garmin_daily where load_daily_min is not null order by day desc limit 1;"
+          echo "== Aktivitäten, letzte 90 Tage =="
+          q "select count(*) as aktivitaeten,
+               count(*) filter (where hr_points is not null) as mit_pulspunkten,
+               count(*) filter (where steps is not null) as mit_schritten
+             from public.garmin_activities where start_local >= current_date - 89;"
+          echo "== Morgen-Abrufe (letzte 5) =="
+          q "select at, ok, left(message, 200) as meldung from public.garmin_sync_runs order by at desc limit 5;"
