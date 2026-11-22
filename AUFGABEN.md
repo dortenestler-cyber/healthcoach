@@ -96,7 +96,7 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 - [x] PR #68 gemergt und synchronisiert. Ergebnis: 39 Tage berechnet. Schrittverlauf und Stress je Tag gibt es bei Garmin unter dieser Adresse nicht (404), eine aktive Zeit liefert Garmin nicht
 - [x] PR #69 gemergt und synchronisiert. Ergebnis: 57 Tage berechnet, aktive Kalorien kommen an. Den Schrittverlauf gibt Garmin auch mit Profilnamen nicht heraus, Bewegung im Alltag erkennt die App also nur am Puls
 - [x] Entschieden (22. Nov.): Zone 1 zählt ab 10 Minuten am Stück, Readiness der Uhr wie in der App, Stresskurve reparieren
-- [ ] PR #70 mergen (ändert `garmin-sync` und `watch`). Danach **Synchronisieren** und Claude Bescheid geben. Die 57 schon berechneten Tage werden nach und nach mit der neuen Regel neu gerechnet
+- [x] PR #70 gemergt und synchronisiert (22. Nov.), Upload grün. 21 Tage schon mit der neuen Regel berechnet, die übrigen 36 folgen mit den nächsten Abrufen. Die Stresskurve gibt Garmin auch unter der zweiten Adresse nicht heraus (404)
 - [ ] Danach auf der Uhr nachsehen, ob die Readiness zur App passt (Zahl auf Heute)
 - [ ] Nichts weiter tun: Jeder Abruf füllt bis zu 21 ältere Tage nach, nach etwa einer Woche Morgen-Abrufen sind die letzten 90 Tage berechnet
 
