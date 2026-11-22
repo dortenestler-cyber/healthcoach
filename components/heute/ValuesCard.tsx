@@ -11,7 +11,7 @@ import { clock, isoDay } from "@/lib/dates";
 import { supabase } from "@/lib/supabase";
 import { syncGarmin } from "@/lib/garmin";
 import type { Data } from "@/lib/insights";
-import { vitalRows } from "@/lib/today";
+import { offStreaks, vitalRows } from "@/lib/today";
 
 const AUTO_SYNC_AFTER_MS = 2 * 60 * 60 * 1000;
 
@@ -75,6 +75,8 @@ export default function ValuesCard({ day, data, showPhases, onSynced }: { day: s
   }, [data, lastSync, sync]);
 
   const rows = data ? vitalRows(day, data) : [];
+  const streaks = data ? offStreaks(day, data) : [];
+  const longHigh = streaks.some((s) => (s.key === "ruhepuls" || s.key === "temperatur") && s.days >= 5);
   const count = countInRange(rows.map((r) => ({ value: r.value, range: r.base.active })));
   const sentence = !data
     ? "Lädt …"
@@ -90,6 +92,12 @@ export default function ValuesCard({ day, data, showPhases, onSynced }: { day: s
         <div className="stack">
           <span className="eyebrow">Deine Werte · Garmin{lastSync ? " · " + clock(new Date(lastSync)) : ""}</span>
           <h2>{sentence}</h2>
+          {streaks.map((s) => (
+            <Link key={s.key} href={`/verlauf?m=${s.key}`} className="row-link streak-line">
+              {s.label} seit {s.days} Tagen {s.side} deinem Bereich ›
+            </Link>
+          ))}
+          {longHigh && <span className="meta">Hält das an oder fühlst du dich krank, lass es ärztlich abklären.</span>}
         </div>
         <button type="button" className="btn btn-quiet" disabled={busy} onClick={() => sync(3)}>
           {busy ? "Läuft …" : "Synchronisieren"}

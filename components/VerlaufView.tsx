@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay } from "@/lib/dates";
-import { METRICS, syncGarmin, type Activity, type Daily, type MetricKey } from "@/lib/garmin";
+import { METRICS, OPTIONAL_METRICS, syncGarmin, type Activity, type Daily, type MetricKey } from "@/lib/garmin";
 import { sickDays } from "@/lib/baseline";
 import { DEFAULT_HABITS, loadHabits, type Habit } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
@@ -80,7 +80,7 @@ export default function VerlaufView({ initial }: { initial: string }) {
       {error && <p className="alert" role="alert">{error}</p>}
 
       <div className="pills scroll">
-        {(Object.keys(METRICS) as MetricKey[]).filter((k) => k !== "atem" || metric === "atem" || rows.some((r) => typeof r.respiration_avg === "number")).map((k) => (
+        {(Object.keys(METRICS) as MetricKey[]).filter((k) => !OPTIONAL_METRICS.includes(k) || metric === k || rows.some((r) => METRICS[k].value(r) !== null)).map((k) => (
           <button key={k} type="button" className="pill" aria-pressed={metric === k} onClick={() => setMetric(k)}>
             {METRICS[k].label}
           </button>

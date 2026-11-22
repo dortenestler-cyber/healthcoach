@@ -11,10 +11,12 @@ import type { Diary } from "@/lib/insights";
 import { axisLabels, buildPoints, spanDays, spanOf, summarize, type Span } from "@/lib/verlauf";
 
 export const HISTORY = 180; // Phasenvergleich: immer die letzten 6 Monate
-const tone = (k: MetricKey) => (k === "schlaf" ? "sleep" : k === "temperatur" ? "cycle" : k === "stress" ? "stress" : k === "schritte" || k === "bb" ? "training" : "recovery");
+const SLEEP: MetricKey[] = ["schlaf", "tiefschlaf", "rem", "einschlafen"];
+const TRAINING: MetricKey[] = ["schritte", "bb", "bb_aufgeladen", "belastung", "alltagsschritte"];
+const tone = (k: MetricKey) => (SLEEP.includes(k) ? "sleep" : k === "temperatur" ? "cycle" : k === "stress" || k === "stress_hoch" ? "stress" : TRAINING.includes(k) ? "training" : "recovery");
 
 const KORRIDOR_DAYS = 181; // Abschnitt „Dein Bereich“: letztes Halbjahr
-const NIGHT: MetricKey[] = ["schlaf", "hrv", "ruhepuls", "atem", "temperatur", "bb"]; // Werte der Nacht, dem Aufwachtag zugeordnet
+const NIGHT: MetricKey[] = ["schlaf", "hrv", "ruhepuls", "atem", "temperatur", "bb", "tiefschlaf", "rem", "einschlafen", "bb_aufgeladen"]; // Werte der Nacht, dem Aufwachtag zugeordnet
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");
   d.setDate(d.getDate() + n);

@@ -2,7 +2,8 @@
 // Reine Berechnungen ohne Netzwerk. Alle Bereiche kommen aus lib/baseline.ts (30 Tage, mittlere Hälfte).
 // Die Regeln für den Schlafbedarf sind Startwerte zum Kalibrieren, keine medizinische Empfehlung.
 
-import { baselineFor, metricBaseline, middleHalf, type Baseline, type Range } from "@/lib/baseline";
+import { baselineFor, metricBaseline, metricRangeSeries, middleHalf, seriesOf, type Baseline, type Range } from "@/lib/baseline";
+import { badStreak } from "@/lib/korridor";
 import { METRICS, type Activity, type Daily, type MetricKey } from "@/lib/garmin";
 import { loadPercent, type Data } from "@/lib/insights";
 import { readLoadDay } from "@/lib/alltagslast";
@@ -140,4 +141,25 @@ export function targetText(t: { pause: boolean; lo: number; hi: number }, load: 
   if (load < t.lo) return `Noch ${t.lo - load} % bis zum Zielbereich. Eine Einheit wie geplant bringt dich hinein.`;
   if (load <= t.hi) return "Du bist im Zielbereich. Ab jetzt nur noch locker, etwa Gehen.";
   return "Über dem Ziel. Plane morgen eher leicht.";
+}
+
+// ---------- Werte, die seit Tagen auf der ungünstigen Seite ihres Bereichs liegen (Heute)
+
+export type OffStreak = { key: MetricKey; label: string; days: number; side: "über" | "unter" };
+
+const STREAK_MIN = 3;
+
+// Je Wert: seit wie vielen Tagen mit Wert er auf der ungünstigen Seite liegt (gemessen am Bereich, der an dem Tag galt)
+export function offStreaks(day: string, data: Data, keys: MetricKey[] = ["hrv", "ruhepuls", "schlaf", "temperatur", "atem", "stress"]): OffStreak[] {
+  const ctx = { diary: data.diary, sick: data.sick };
+  const days = Array.from({ length: 14 }, (_, i) => addDays(day, i - 13));
+  const out: OffStreak[] = [];
+  for (const key of keys) {
+    const m = METRICS[key];
+    if (!data.daily.some((d) => d.day === day && m.value(d) !== null)) continue; // nur mit Wert von heute
+    const bands = metricRangeSeries(key, data.daily, ctx, days);
+    const n = badStreak(seriesOf(key, data.daily), new Map(days.map((d, i) => [d, bands[i]])), day, m.higherIsBetter);
+    if (n >= STREAK_MIN) out.push({ key, label: key === "temperatur" ? "Hauttemperatur" : m.label, days: n, side: m.higherIsBetter ? "unter" : "über" });
+  }
+  return out.sort((a, b) => b.days - a.days);
 }

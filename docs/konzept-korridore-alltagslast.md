@@ -1,6 +1,6 @@
 # Konzept: Lebendige Korridore und Belastung aus dem Alltag
 
-Stand: 22.11.2026 · Status: **Freigegeben (22.11.)** · Schritt 1 umgesetzt (PR #60) · Schritt 2 B Daten gemergt (PR #63) · Schritt 3 B Anzeige umgesetzt
+Stand: 22.11.2026 · Status: **Freigegeben (22.11.)** · Schritt 1 umgesetzt (PR #60) · Schritt 2 B Daten gemergt (PR #63) · Schritt 3 B Anzeige gemergt (PR #65) · Schritt 4 A3 und A4 umgesetzt
 
 Zwei Wünsche der Nutzerin:
 1. Die persönlichen Korridore (in der App „dein Bereich“) sollen mehr Inhalt bekommen und dynamischer werden.
@@ -134,7 +134,7 @@ Nach der Umstellung liegen Werte höher als bisher. Damit der Korridor nicht spr
 1. ✅ **A1 + A2** (nur `lib/` und Oberfläche, keine Migration): wandernder Korridor, Phasen-Bereiche, kranke Tage raus, Abschnitt „Dein Bereich“. Verletzungen nehmen wir nicht heraus: sie dauern oft Wochen bei normalen Werten.
 2. ✅ **B Daten** (PR #63): Migration und `garmin-sync` (braucht deine Freigabe, du mergst selbst). Aufbau der Werte: `lib/alltagslast.ts`.
 3. ✅ **B Anzeige**: Ring, Karten, Wochenlast mit Alltag. Umschalter „Mit Alltag · Nur Training“ oben auf Training, gilt für Status, Lastkurve und Wochenlast.
-4. **A3**: Korridore für weitere Werte, inklusive Tagesbelastung.
+4. ✅ **A3** und **A4**: Korridore für weitere Werte, inklusive Tagesbelastung.
 
 ---
 

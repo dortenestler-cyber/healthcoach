@@ -1,6 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabase";
+import { readLoadDay } from "@/lib/alltagslast";
 
 export type Daily = {
   day: string;
@@ -13,6 +14,7 @@ export type Daily = {
   stress_avg: number | null;
   bb_max: number | null;
   bb_min: number | null;
+  bb_charged?: number | null; // Body Battery über Nacht aufgeladen
   steps: number | null;
   intensity_minutes: number | null;
   skin_temp_delta?: number | null; // Hauttemperatur: Abweichung vom Normalwert in °C
@@ -54,7 +56,19 @@ export type Activity = {
   training_load: number | null;
 };
 
-export type MetricKey = "schlaf" | "hrv" | "ruhepuls" | "atem" | "temperatur" | "bb" | "stress" | "schritte";
+export type MetricKey = "schlaf" | "hrv" | "ruhepuls" | "atem" | "temperatur" | "bb" | "stress" | "schritte" | "tiefschlaf" | "rem" | "einschlafen" | "bb_aufgeladen" | "stress_hoch" | "belastung" | "alltagsschritte";
+
+function minutes(v: number): string {
+  const m = Math.round(v);
+  return m >= 60 ? `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, "0")}` : `${m} min`;
+}
+
+// Belastung in % (150 Garmin-Last = 100 %) aus Training und Alltag des Tages
+function dayLoadPct(d: Daily): number | null {
+  const ld = readLoadDay(d.load_daily_min);
+  if (!ld) return null;
+  return Math.min(100, ((ld.last_training ?? 0) + Math.max(0, ld.last_alltag ?? 0)) / 1.5);
+}
 
 // higherIsBetter steuert, ob "unter dem Schnitt" als Hinweis gilt
 export const METRICS: Record<MetricKey, { label: string; value: (d: Daily) => number | null; fmt: (v: number) => string; higherIsBetter: boolean }> = {
@@ -85,7 +99,28 @@ export const METRICS: Record<MetricKey, { label: string; value: (d: Daily) => nu
   bb: { label: "Body Battery", value: (d) => d.bb_max, fmt: (v) => String(Math.round(v)), higherIsBetter: true },
   stress: { label: "Stress", value: (d) => d.stress_avg, fmt: (v) => String(Math.round(v)), higherIsBetter: false },
   schritte: { label: "Schritte", value: (d) => d.steps, fmt: (v) => Math.round(v).toLocaleString("de-DE"), higherIsBetter: true },
+  // Weitere Korridore (Konzept Korridore und Alltagslast, A3)
+  tiefschlaf: { label: "Tiefschlaf", value: (d) => (d.sleep_deep_s ? d.sleep_deep_s / 60 : null), fmt: minutes, higherIsBetter: true },
+  rem: { label: "REM-Schlaf", value: (d) => (d.sleep_rem_s ? d.sleep_rem_s / 60 : null), fmt: minutes, higherIsBetter: true },
+  // Einschlafen als Minuten ab Mittag des Vortags gedacht: 23:30 = 1410, 0:30 = 1470, damit Mitternacht keinen Sprung macht
+  einschlafen: {
+    label: "Einschlafen",
+    value: (d) => (typeof d.sleep_start_min === "number" ? (d.sleep_start_min < 12 * 60 ? d.sleep_start_min + 1440 : d.sleep_start_min) : null),
+    fmt: (v) => {
+      const m = Math.round(v) % 1440;
+      return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")} Uhr`;
+    },
+    higherIsBetter: false,
+  },
+  bb_aufgeladen: { label: "Body Battery aufgeladen", value: (d) => d.bb_charged ?? null, fmt: (v) => `+${Math.round(v)}`, higherIsBetter: true },
+  stress_hoch: { label: "Hoher Stress", value: (d) => (typeof d.stress_high_s === "number" ? d.stress_high_s / 60 : null), fmt: minutes, higherIsBetter: false },
+  // Tagesbelastung aus Training und Alltag, nur an Tagen mit Alltagsdaten (lib/alltagslast.ts)
+  belastung: { label: "Belastung", value: (d) => dayLoadPct(d), fmt: (v) => `${Math.round(v)} %`, higherIsBetter: true },
+  alltagsschritte: { label: "Schritte im Alltag", value: (d) => d.steps_outside_acts ?? null, fmt: (v) => Math.round(v).toLocaleString("de-DE"), higherIsBetter: true },
 };
+
+// Werte, die nur angezeigt werden, wenn es dafür Daten gibt (Auswahl im Verlauf)
+export const OPTIONAL_METRICS: MetricKey[] = ["atem", "tiefschlaf", "rem", "einschlafen", "bb_aufgeladen", "stress_hoch", "belastung", "alltagsschritte"];
 
 export function stats(values: number[]) {
   if (!values.length) return null;

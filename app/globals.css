@@ -2669,3 +2669,6 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
 .legend .legend-training { background: var(--training); }
 .legend .legend-alltag { background: var(--training-alltag); }
 .load-split { color: var(--text-2); }
+
+/* Heute: Wert seit Tagen außerhalb des Bereichs */
+.streak-line { display: block; min-height: 44px; padding: 10px 0; color: var(--warn, var(--text)); font-weight: 600; }

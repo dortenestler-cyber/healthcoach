@@ -4,11 +4,11 @@ Zuletzt aktualisiert: 2026-11-22 · Sitzung: https://claude.ai/code/session_014p
 Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/design-*`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
 ## Stand in einem Satz
-Korridore Schritt 3 (Alltagslast in der Anzeige) ist fertig, PR offen. Danach A3 (weitere Korridore) und A4 (Hinweis auf Heute).
+Korridore sind komplett: Schritt 4 (A3 weitere Korridore, A4 Hinweis auf Heute) im PR, danach bleibt nichts offen aus dem Konzept.
 
 ## In Arbeit
-- Korridore Schritt 3, Zweig `claude/confident-fermat-wy3iur`: `dayLoad` in `lib/insights.ts` (Training + Alltag, Rückfall auf alte Rechnung ohne `load_daily_min`), `loadByDay(acts, daily)` in `lib/today.ts`, `weekLoad`/`loadRatio` mit `alltag`. Ring auf Heute und Halbbogen geteilt (Training kräftig, Alltag `--training-alltag`), Belastungskarte mit Kachel „Alltag in Bewegung“, Wochenlast mit geteilten Säulen, Umschalter „Mit Alltag · Nur Training“ auf Training (nur sichtbar, wenn es Alltagsdaten gibt). Begriff „Belastung aus dem Alltag“.
-  Nächster Schritt: A3, neue Korridore (Tagesbelastung, Alltagsschritte, Tief- und REM-Schlaf, Schlafbeginn, Body Battery aufgeladen, hoher Stress). Danach A4 mit `badStreak` aus `lib/korridor.ts`.
+- Korridore Schritt 4, Zweig `claude/confident-fermat-wy3iur`: neue Werte in `METRICS` (`tiefschlaf`, `rem`, `einschlafen`, `bb_aufgeladen`, `stress_hoch`, `belastung`, `alltagsschritte`), im Verlauf nur sichtbar mit Daten (`OPTIONAL_METRICS`). Heute: `offStreaks` in `lib/today.ts`, Zeile „X seit n Tagen über/unter deinem Bereich“ in „Deine Werte“, ab 5 Tagen Ruhepuls oder Temperatur der Hinweis auf ärztliche Abklärung.
+  Nächster Schritt: nichts aus dem Konzept offen. Rückmeldung der Nutzerin abwarten.
 
 ## Wartet auf
 - Nutzerin: Rückmeldung zu Heute, Zyklus und Training im Design „dunkel 2“ (`AUFGABEN.md` Abschnitt 10)
@@ -24,7 +24,7 @@ Korridore Schritt 3 (Alltagslast in der Anzeige) ist fertig, PR offen. Danach A3
 - Keine festen Farbwerte in Komponenten, nur Variablen aus `app/globals.css`.
 
 ## Erledigt seit letzter Übergabe
-- Korridore Schritt 3: Alltagslast in der Anzeige (PR folgt)
+- PR #65 gemergt: Korridore Schritt 3, Alltagslast in der Anzeige
 - Aufräumen abgeschlossen (`docs/aufraeumen-vorschlag.md`): PR #62 Tagebuch und Zyklus (Hitzewallungen neben Symptomen, Verlauf 4 Wochen eingeklappt, Perioden nachtragen auf Zyklus).
 - Aufräumen 1–3 gemergt: PR #56 Heute (5 Karten, Check-in ins Tagebuch), #57 Training (Reiter Auswertung, `/tagesziel` leitet weiter), #59 Einstellungen (nur Einrichtung)
 - PR #60 gemergt: Korridore Schritt 1
