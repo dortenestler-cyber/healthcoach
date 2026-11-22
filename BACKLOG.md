@@ -28,3 +28,12 @@ Konzept: `docs/konzept-wadenkraempfe.md`
 - [ ] **Muster-Motor**: Krämpfe und Erkrankungen gemeinsam gegen Zyklusphase, Training, Schlaf, Einflüsse und Einnahmen prüfen.
 - [ ] **Erkrankungen**: Rückblick auf die 7 Tage vor Krankheitsbeginn.
 - [ ] **Anzeige**: Karte „Muskeln“ auf Gesundheit, Zeilen auf Zyklus, Hinweise auf Training und Heute, Warnzeichen mit Verweis auf ärztliche Abklärung.
+
+## 22.11.2026 · Coach nutzt Muster, Empfehlungen und Besonderheiten (wartet auf Freigabe)
+Konzept: `docs/konzept-ki-coach.md`
+- [ ] **Befunde und Besonderheiten** als feste Regeln in der App, Warnzeichen immer ohne KI.
+- [ ] **Zusammenfassung in Teilen**, Seitenbezug im Chat, „Frag den Coach“ auf den Musterkarten.
+- [ ] **Tageshinweis** auf Heute mit „Warum?“ und Rückmeldung, Tabelle `coach_hints`.
+- [ ] **Wochenrückblick** und **Woche planen** mit „Übernehmen“.
+- [ ] **Erzählen statt tippen** im Tagebuch.
+- [ ] **Selbstversuch**, **Begleitung nach Krankheit**, Push für Besonderheiten, Uhr.
