@@ -6,6 +6,7 @@ Health Coach bringt Training, Erholung, Zyklus, Perimenopause-Symptome, Krankhei
 - Änderungswünsche erst sammeln und erst nach Freigabe umsetzen. Bugs sofort beheben.
 - Vor einem Umbau kurz beschreiben, wie du es lösen würdest.
 - Änderungen immer über einen eigenen Zweig und einen Pull Request, nie direkt auf `main`.
+- Eigene Pull Requests selbst mergen, wenn `tsc` und `npm run build` fehlerfrei sind und es keine Konflikte gibt. Bei Änderungen an der Datenbank (Migrationen) oder an Supabase-Funktionen auf Freigabe warten.
 - Antworten und Texte in der App auf Deutsch, klar und knapp, ohne Fachjargon.
 - Beispieldaten immer als solche kennzeichnen.
 
