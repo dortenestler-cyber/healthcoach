@@ -20,7 +20,7 @@ Migrationen und Edge Functions laufen nach jedem Merge auf `main` automatisch ü
 
 ## Technik
 - **Web-App** mit [Next.js](https://nextjs.org), lässt sich wie eine App auf den Startbildschirm legen
-- **Supabase** (ab Phase 1): Datenbank, Login und Hintergrundfunktionen, Region EU (Frankfurt)
+- **Supabase** (ab Phase 1): Datenbank, Login und Hintergrundfunktionen, Region EU (Irland, `eu-west-1`)
 - **Garmin Personal API** (ab Phase 2): holt die eigenen Garmin-Daten ab
 - **Claude-API** (ab Phase 4): Coach und Auswertungen, nur über das Backend
 - **Connect IQ** (ab Phase 5): Zifferblatt und Uhr-App für die Fenix 9 Pro

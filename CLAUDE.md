@@ -53,7 +53,7 @@ Zwei Claude-Instanzen arbeiten parallel, Regeln in `docs/konzept-zwei-instanzen.
 - Gewicht nur als Trend, ohne Zielgewicht und ohne Abnehm-Funktion.
 
 ## Daten und Schlüssel
-- Supabase in der Region EU (Frankfurt), Zugriffsschutz pro Konto (Row Level Security) auf jeder Tabelle.
+- Supabase in der Region EU (Irland, `eu-west-1`), Zugriffsschutz pro Konto (Row Level Security) auf jeder Tabelle.
 - Geheime Schlüssel (Claude-API, Garmin, Service-Role) nur in den Supabase-Secrets, nie im Repo und nie im Browser.
 - An die Claude-API geht nur, was eine Antwort wirklich braucht.
 
