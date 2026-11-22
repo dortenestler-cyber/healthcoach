@@ -21,6 +21,10 @@ export type Daily = {
   sleep_rem_s?: number | null;
   sleep_light_s?: number | null;
   sleep_awake_s?: number | null;
+  // Energie über den Tag (ab Migration 20261122170000_energie_tag)
+  bb_curve?: (number | null)[] | null; // 96 Werte, alle 15 Minuten ab Mitternacht
+  sleep_start_min?: number | null; // Einschlafen, Minuten seit Mitternacht (oft am Vortag)
+  sleep_end_min?: number | null; // Aufwachen
   synced_at: string;
 };
 
@@ -70,7 +74,7 @@ export function stats(values: number[]) {
   return { mean, sd, min: Math.min(...values), max: Math.max(...values) };
 }
 
-export type SyncResult = { ok: boolean; error?: string; skinTempNights?: number; skinNote?: string; sleepTempKeys?: string[]; sleepStagesNote?: string };
+export type SyncResult = { ok: boolean; error?: string; skinTempNights?: number; skinNote?: string; sleepTempKeys?: string[]; sleepStagesNote?: string; energyNote?: string };
 
 export async function syncGarmin(days: number, offset = 0): Promise<SyncResult> {
   const sb = supabase();
@@ -91,7 +95,7 @@ export async function syncGarmin(days: number, offset = 0): Promise<SyncResult> 
     return { ok: false, error: detail };
   }
   if (data?.error) return { ok: false, error: data.error };
-  return { ok: true, skinTempNights: data?.skinTempNights, skinNote: data?.skinNote, sleepTempKeys: data?.sleepTempKeys, sleepStagesNote: data?.sleepStagesNote };
+  return { ok: true, skinTempNights: data?.skinTempNights, skinNote: data?.skinNote, sleepTempKeys: data?.sleepTempKeys, sleepStagesNote: data?.sleepStagesNote, energyNote: data?.energyNote };
 }
 
 const TYPE_LABELS: Record<string, string> = {
