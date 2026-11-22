@@ -100,6 +100,15 @@ export function nextPeriodWindow(diary: Diary[], day: string): PeriodWindow | nu
   return { earliest: addDays(last, Math.min(...lens)), latest: addDays(last, Math.max(...lens)), basis: lens.length };
 }
 
+// Nächste Periode als Spanne in Tagen ab heute, z. B. „in etwa 10–12 Tagen“
+export function windowText(w: PeriodWindow, day: string): string {
+  const a = daysBetween(day, w.earliest);
+  const b = daysBetween(day, w.latest);
+  if (b < 0) return "Nächste Periode ist überfällig (Fenster vorbei)";
+  if (a <= 0) return b === 0 ? "Nächste Periode ist ab heute fällig" : `Nächste Periode ist fällig, Fenster noch ${b} ${b === 1 ? "Tag" : "Tage"}`;
+  return a === b ? `Nächste Periode in etwa ${a} ${a === 1 ? "Tag" : "Tagen"}` : `Nächste Periode in etwa ${a}–${b} Tagen`;
+}
+
 export type CycleToday = { cycleDay: number | null; length: number; phase: Phase | null; window: PeriodWindow | null; cycles: number };
 
 export function cycleToday(day: string, diary: Diary[]): CycleToday {

@@ -20,8 +20,11 @@ Health Coach bringt Training, Erholung, Zyklus, Perimenopause-Symptome, Krankhei
 - Hell bleibt wählbar (Einstellungen › Darstellung): weiße Karten auf `#F2F2F7` wie Apple Health.
 - Ringe für Schlaf, Readiness und Belastung gehören zum Stil. Ein Ring steht nie ohne Zahl und Wort.
 - Farben haben eine feste Bedeutung und stehen nie allein, immer mit Text. Keine Ampelfarben für die Erholung.
-  Dunkel: Erholung/Readiness Sage `#52B788` · Zyklus/Perimenopause Terracotta `#E8845A` · Menstruation `#F28B8B` auf `#3B1E22` · Training/Garmin Slate-Blau `#7C9AE0` · Symptome/Warnung Amber `#F0A24A` · Mobility Violett `#A98BE0` · Schlaf neutral `#E5E7EB`.
-  Hell: Sage `#2D6A4F` · Terracotta `#B4491F` · Menstruation `#7F1D1D` auf `#F6DADA` · Slate-Blau `#3B5998` · Amber `#B45309` · Violett `#6D4AA8`.
+  Dunkel: Erholung/Readiness Sage `#52B788` · Zyklus/Perimenopause Terracotta `#E8845A` · Menstruation `#F28B8B` auf `#3B1E22` · Training/Garmin Slate-Blau `#7C9AE0` · Symptome/Warnung Amber `#F0A24A` · Mobility Violett `#A98BE0` · Stress Türkis `#45C4C0` (höher = heller, nie roter) · Schlaf neutral `#E5E7EB`.
+  Hell: Sage `#2D6A4F` · Terracotta `#B4491F` · Menstruation `#7F1D1D` auf `#F6DADA` · Slate-Blau `#3B5998` · Amber `#B45309` · Violett `#6D4AA8` · Türkis `#0E7470`.
+- Seitenkopf mit Farbverlauf in der Bereichsfarbe (`PageHead tone`): Heute Sage, Zyklus Terracotta, Training Slate-Blau, Gesundheit Graphit. Tagebuch ohne.
+- Sportfarben bleiben in der Familie Slate-Blau, Ausdauer sehr hell. Türkis gehört nur zu Stress.
+- Konzept „dunkel 2“ mit Vorlagen: `docs/design-konzept-dunkel.md`, `docs/bilder/vorlagen/`. Vor jedem Umbau eines Bildschirms den Prompt in `docs/prompt-designkonzept.md` befolgen.
 - Hauptbutton, aktive Auswahl und Links: hell auf dunkel (`#F2F4F7`), im hellen Design `#1C1C1E`.
 - Beere `#A3234F` ist nur noch Markenfarbe: App-Symbol und Coach-Knopf.
 - Jedes Diagramm bekommt eine Überschrift mit einem Satz, der das Ergebnis nennt.

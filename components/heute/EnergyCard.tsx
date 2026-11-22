@@ -1,7 +1,7 @@
 import Link from "next/link";
 import EnergyChart from "@/components/heute/EnergyChart";
 import type { Data } from "@/lib/insights";
-import { energyDay } from "@/lib/energie";
+import { energyDay, usualRhythm } from "@/lib/energie";
 
 // Energie über den Tag: Satz, aktuelle Body Battery, Diagramm. Ohne Netzwerk.
 export default function EnergyCard({ day, data, nowMinute }: { day: string; data: Data; nowMinute: number }) {
@@ -21,13 +21,21 @@ export default function EnergyCard({ day, data, nowMinute }: { day: string; data
     if (at22 !== null) sentence += ` Hochgerechnet bist du um 22 Uhr bei etwa ${Math.round(at22)}.`;
   }
 
+  const rhythm = usualRhythm(e.usual);
+
   return (
     <Link href="/verlauf?m=bb" className="card chart-card">
-      <span className="meta">Energie über den Tag · Body Battery ›</span>
+      <span className="eyebrow">Energie über den Tag · Body Battery ›</span>
       <h2>{sentence}</h2>
       <p className="value-big">{now ?? "–"}</p>
       <p className="value-range">{usualNow !== null ? `Üblich um diese Zeit: ${Math.round(usualNow)} · aus ${e.usualDays} Tagen` : "Dein üblicher Tag: Median der letzten 30 Tage"}</p>
       {hasCurves && <EnergyChart e={e} label={`Body Battery heute${now !== null ? `, jetzt ${now}` : ""}${usualNow !== null ? `, üblich ${Math.round(usualNow)}` : ""}${at22 !== null ? `, um 22 Uhr etwa ${Math.round(at22)}` : ""}`} />}
+      {rhythm && (
+        <p className="rhythm-line">
+          Am meisten Energie hast du meist zwischen <strong>{rhythm.peak[0]} und {rhythm.peak[1]} Uhr</strong>
+          {rhythm.drain ? <>, am stärksten sinkt sie zwischen <strong>{rhythm.drain[0]} und {rhythm.drain[1]} Uhr</strong></> : null}.
+        </p>
+      )}
       <span className="meta">Die Hochrechnung folgt deinem üblichen Verlauf ab jetzt. Ein Richtwert, keine Vorhersage.</span>
     </Link>
   );
