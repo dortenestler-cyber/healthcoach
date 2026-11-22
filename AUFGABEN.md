@@ -7,11 +7,11 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
-### 1. Migrationen automatisch ausführen lassen (PR #47)
+### 1. Migrationen automatisch ausführen lassen (PR #48)
 - [ ] Datenbank-Passwort bereitlegen: In Supabase unter **Project Settings → Database** steht, wie du es neu setzen kannst, falls du es nicht mehr weißt
 - [ ] In Supabase oben auf **Connect** tippen, **Session pooler** wählen und die Verbindungs-Adresse kopieren. Darin `[YOUR-PASSWORD]` durch das Passwort ersetzen
 - [ ] Auf GitHub unter **Settings → Secrets and variables → Actions** das Secret `SUPABASE_DB_URL` mit dieser Adresse anlegen
-- [ ] PR #47 ansehen und mergen. Danach läuft der Workflow „Supabase-Migrationen ausführen“ zum ersten Mal. Er führt alle Migrationen einmal aus, auch die alten. Das schadet nicht, weil jede mehrfach laufen darf. Damit sind auch `coach_kosten`, `push`, `schlafphasen` und `energie_tag` erledigt
+- [ ] PR #48 ansehen und mergen. Danach läuft der Workflow „Supabase-Migrationen ausführen“ zum ersten Mal. Er führt alle Migrationen einmal aus, auch die alten. Das schadet nicht, weil jede mehrfach laufen darf. Damit sind auch `coach_kosten`, `push`, `schlafphasen` und `energie_tag` erledigt
 - [ ] Claude Bescheid geben, dann prüft Claude, ob der Lauf grün ist
 
 ### 2. Funktionen hochladen
