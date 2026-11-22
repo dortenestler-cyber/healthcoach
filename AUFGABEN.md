@@ -53,6 +53,11 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 ### 9. Aufräumen
 - [ ] Auf GitHub den Zweig `heute-neu` löschen (versehentlich angelegt, gleicher Inhalt wie PR #38)
 
+### 10. Neues Design „dunkel 2“ (PR #50)
+- [ ] Heute, Zyklus und Training in der App ansehen und sagen, was anders sein soll
+- [ ] Auf einer Karte „Mehr dazu im Coach“ tippen: Die Frage steht dann vorbereitet im Coach und geht erst nach „Senden“ raus
+- [ ] Neue Bildschirme nach `docs/prompt-designkonzept.md` bauen lassen (den Prompt an den Anfang einer neuen Sitzung stellen)
+
 ## Erledigt
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)
 - [x] PR #34, #35, #36, #37 gemergt (Konzept, `CLAUDE.md`, Fundament, Merge-Regel)

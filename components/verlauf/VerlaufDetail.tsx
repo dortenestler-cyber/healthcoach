@@ -8,7 +8,7 @@ import type { Diary } from "@/lib/insights";
 import { axisLabels, buildPoints, spanDays, spanOf, summarize, type Span } from "@/lib/verlauf";
 
 export const HISTORY = 180; // Phasenvergleich: immer die letzten 6 Monate
-const tone = (k: MetricKey) => (k === "schlaf" ? "sleep" : k === "temperatur" ? "cycle" : k === "schritte" || k === "bb" || k === "stress" ? "training" : "recovery");
+const tone = (k: MetricKey) => (k === "schlaf" ? "sleep" : k === "temperatur" ? "cycle" : k === "stress" ? "stress" : k === "schritte" || k === "bb" ? "training" : "recovery");
 
 // Karten der Detailansicht: Satz, Zahl, Bereich, Grafik · Highlights · Vergleich nach Zyklusphase. Ohne Netzwerk.
 export default function VerlaufDetail({ metric, span, rows, diary }: { metric: MetricKey; span: Span; rows: Daily[]; diary: Diary[] }) {

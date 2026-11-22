@@ -24,7 +24,7 @@ export default function GesundheitView({ initial }: { initial: string }) {
   const shown = tabs.some(([k]) => k === tab) ? tab : tabs[0][0];
   return (
     <>
-      <PageHead title="Gesundheit" sub="Medikamente, Krankheiten, Verletzungen, Körper" />
+      <PageHead title="Gesundheit" sub="Medikamente, Krankheiten, Verletzungen, Körper" tone="gesundheit" />
       <div className="segmented segmented-tabs">
         {tabs.map(([k, l]) => (
           <button key={k} type="button" aria-pressed={shown === k} onClick={() => setTab(k)}>

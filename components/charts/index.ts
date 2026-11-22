@@ -8,3 +8,4 @@ export { default as Heatmap, type HeatRow } from "@/components/charts/Heatmap";
 export { default as ValueRing } from "@/components/charts/ValueRing";
 export { default as ValueHeader } from "@/components/charts/ValueHeader";
 export { default as DivergingBars, type DivRow } from "@/components/charts/DivergingBars";
+export { default as HalfGauge } from "@/components/charts/HalfGauge";

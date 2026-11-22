@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ValueRing } from "@/components/charts";
 import type { DayRule } from "@/lib/cycle";
 import { loadPercent, type Data } from "@/lib/insights";
-import { hm, sleepAchieved, sleepNeed, targetText } from "@/lib/today";
+import { hm, sleepAchieved, sleepNeed } from "@/lib/today";
 
 const de1 = (v: number) => v.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
@@ -18,7 +18,7 @@ export default function TodayRings({ day, data, rule, showLoad }: { day: string;
 
   return (
     <section className="card">
-      <span className="meta">Heute im Überblick</span>
+      <span className="eyebrow">Heute im Überblick</span>
       <div className="ring-row">
         <Link href="/verlauf?m=schlaf" className="ring-cell">
           <ValueRing tone="sleep" value={slept.ratio ?? 0} center={sleepPct === null ? "–" : `${sleepPct} %`} caption="Schlaf" label={sleepPct === null ? "Schlaf: noch kein Wert für letzte Nacht" : `Schlaf ${sleepPct} Prozent vom Bedarf`} />
@@ -33,20 +33,16 @@ export default function TodayRings({ day, data, rule, showLoad }: { day: string;
         )}
       </div>
 
-      {showLoad && (
-        <div className="today-line">
-          <span className="row-strong">Belastungsziel {t.pause ? "Pause" : `${t.lo}–${t.hi} %`}</span>
-          <span>{targetText(t, load)}</span>
-        </div>
-      )}
-
       <div className="today-line">
         <span className="row-strong">Schlafbedarf heute Nacht etwa {hm(need.hours)}</span>
         <span>
           {slept.hours === null ? "Für letzte Nacht gibt es noch keinen Schlafwert." : `Letzte Nacht ${hm(slept.hours)}, das sind ${sleepPct} % vom Bedarf.`}
         </span>
+        <span className={need.debtH >= 0.25 ? "debt-line" : undefined}>
+          {!need.baseFromData ? "Schlafschuld zählt ab 14 Nächten mit Schlafwerten." : need.debtH < 0.25 ? "Diese Woche keine Schlafschuld." : `Diese Woche etwa ${hm(need.debtH)} unter deinem Grundbedarf.`}
+        </span>
         <details className="derive">
-          <summary>So ist der Bedarf gerechnet</summary>
+          <summary>Was deinen Schlafbedarf beeinflusst</summary>
           <ul>
             <li>
               Grundbedarf {hm(need.baseH)} {need.baseFromData ? "(dein üblicher Schlaf der letzten 30 Nächte)" : "(Startwert, eigener Wert ab 14 Nächten)"}
