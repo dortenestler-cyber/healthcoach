@@ -40,7 +40,7 @@ Konzept: `docs/konzept-ki-coach.md`
 - [ ] **Erzählen statt tippen** im Tagebuch.
 - [ ] **Selbstversuch**, **Begleitung nach Krankheit**, Push für Besonderheiten, Uhr.
 
-## 22.11.2026 · Lebendige Korridore und Belastung aus dem Alltag (Konzept, wartet auf Freigabe)
+## 22.11.2026 · Lebendige Korridore und Belastung aus dem Alltag (Konzept, Fragen beantwortet, wartet auf Freigabe zur Umsetzung)
 Konzept: `docs/konzept-korridore-alltagslast.md`
 - [ ] **Wandernder Korridor** im Verlauf, Bereiche je Zyklusphase, kranke Tage zählen nicht.
 - [ ] **Abschnitt „Dein Bereich“** je Wert: so oft im Bereich, Serie, Erholungszeit, Verschiebung, was davor war.

@@ -1,6 +1,6 @@
 # Konzept: Lebendige Korridore und Belastung aus dem Alltag
 
-Stand: 22.11.2026 · Status: **Entwurf, wartet auf Freigabe**
+Stand: 22.11.2026 · Status: **Fragen beantwortet (22.11.), wartet auf Freigabe zur Umsetzung**
 
 Zwei Wünsche der Nutzerin:
 1. Die persönlichen Korridore (in der App „dein Bereich“) sollen mehr Inhalt bekommen und dynamischer werden.
@@ -99,9 +99,8 @@ Ruhepuls kommt aus Garmin, Maximalpuls aus den Aktivitäten (höchster Wert der 
 ### Wo es zu sehen ist
 - **Ring Belastung auf Heute**: ein Bogen, innen zwei Anteile in Slate-Blau, Training kräftig, Alltag hell (Ausdauer-Ton aus der Familie). Darunter in Worten: „62 % · davon Alltag 24 %“.
 - **Karte Belastung heute** (`LoadCard`): neue Kachel „Alltag“ mit Minuten in Bewegung und Schritten außerhalb von Training. Satz wie „Heute kam ein Drittel deiner Belastung aus dem Alltag.“
-- **Training › Wochenlast, Belastungsverhältnis, Last und Korridor**: rechnen mit der vollen Tageslast. Umschalter „Nur Training“ für den Vergleich mit Garmin. Säulen je Tag zweiteilig (Training · Alltag).
+- **Training › Wochenlast, Belastungsverhältnis, Last und Korridor**: rechnen standardmäßig mit der vollen Tageslast. Umschalter „Nur Training“ für den Vergleich mit Garmin. Säulen je Tag zweiteilig (Training · Alltag).
 - **Belastungsziel und Schlafbedarf**: nutzen die volle Tageslast. Ein langer Gartentag erhöht also den Schlafbedarf.
-- **Tagebuch, optional**: Tippfeld „Körperlich anstrengender Tag“ (z. B. Umzug, Garten), falls die Uhr nicht getragen wurde. Erhöht die Schätzung, nur wenn keine Pulsdaten da sind.
 - **Coach**: bekommt Training und Alltag getrennt als zwei Zahlen.
 
 ### Übergang
@@ -139,10 +138,10 @@ Nach der Umstellung liegen Werte höher als bisher. Damit der Korridor nicht spr
 
 ---
 
-## Offene Fragen an dich
-1. **Alltag im Belastungsring**: als Teil des einen Rings (Training kräftig, Alltag hell) oder als eigener kleiner Wert daneben?
-2. **Wochenlast und Belastungsverhältnis**: standardmäßig mit Alltag rechnen (Vorschlag) oder standardmäßig nur Training wie Garmin?
-3. **Phasen-Bereiche**: für alle vier Phasen (Vorschlag) oder weiter nur Luteal gegen Rest?
-4. **Kranke Tage aus dem Bereich nehmen**: einverstanden?
-5. **Tippfeld „anstrengender Tag“** im Tagebuch: gewünscht oder weglassen?
-6. Welche der neuen Korridore aus A3 sind dir am wichtigsten?
+## Entscheidungen (22.11.2026)
+1. Alltag ist **Teil des Belastungsrings**: ein Ring, Training kräftig, Alltag hell.
+2. Wochenlast und Belastungsverhältnis rechnen **standardmäßig mit Alltag**, Umschalter „Nur Training“.
+3. Eigene Korridore für **alle vier Zyklusphasen**.
+4. **Kranke Tage** (und 3 Tage danach) zählen nicht zum Korridor.
+5. **Kein Tippfeld** „anstrengender Tag“ im Tagebuch.
+6. **Alle** neuen Korridore aus A3 kommen.
