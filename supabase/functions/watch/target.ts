@@ -19,10 +19,6 @@ const addDays = (iso: string, n: number) => {
 };
 const between = (a: string, b: string) => Math.round((new Date(b + "T12:00:00Z").getTime() - new Date(a + "T12:00:00Z").getTime()) / DAY_MS);
 const mean = (v: number[]) => (v.length ? v.reduce((a, b) => a + b, 0) / v.length : null);
-const sd = (v: number[]) => {
-  const m = mean(v);
-  return m === null || v.length < 2 ? null : Math.sqrt(v.reduce((a, b) => a + (b - m) ** 2, 0) / v.length);
-};
 
 // Periodenbeginne aus dem Tagebuch, ergänzt um Garmin-Zyklen ohne eigenen Eintrag in der Nähe (±3 Tage)
 export function periodStarts(diary: DiaryRow[], garmin: string[]): string[] {
@@ -88,28 +84,51 @@ function cycleBeforeDiff(daily: Map<string, Day>, starts: string[]): { ready: bo
   return { ready, beforeDiff: before !== null && rest ? ((before - rest) / rest) * 100 : null };
 }
 
-function zEffect(v: number | null, hist: number[], higherIsBetter: boolean, weight: number): number {
-  if (v === null) return 0;
-  const m = mean(hist);
-  const s = sd(hist);
-  if (m === null || s === null || s === 0 || hist.length < 7) return 0;
-  const z = (v - m) / s;
-  const bad = higherIsBetter ? -z : z;
-  if (bad > 1.5) return -weight;
-  if (bad > 0.75) return -Math.round(weight / 2);
-  if (bad < -1) return Math.round(weight / 4);
+// Persönlicher Bereich wie lib/baseline.ts: 30 Tage ohne heute, mittlere Hälfte, ab 14 Tagen.
+// In der Lutealphase für HRV und Ruhepuls der Bereich aus Luteal-Tagen der letzten 120 Tage.
+type Range = { lo: number; hi: number; median: number };
+const quantile = (v: number[], q: number) => {
+  const pos = (v.length - 1) * q;
+  const i = Math.floor(pos);
+  return i + 1 < v.length ? v[i] + (pos - i) * (v[i + 1] - v[i]) : v[i];
+};
+function middleHalf(values: number[]): Range | null {
+  const v = values.filter((x) => Number.isFinite(x)).sort((a, b) => a - b);
+  return v.length < 14 ? null : { lo: quantile(v, 0.25), hi: quantile(v, 0.75), median: quantile(v, 0.5) };
+}
+function isLuteal(day: string, starts: string[]): boolean {
+  const c = cycleInfo(day, starts);
+  const p = phaseShort(c.cycleDay, c.length);
+  return p === "LUT1" || p === "LUT2";
+}
+function rangeFor(daily: Day[], day: string, f: (r: Day) => number | null, starts: string[], cycleSensitive: boolean): Range | null {
+  const vals = (from: string, keep: (d: string) => boolean) => daily.filter((r) => r.day >= from && r.day < day && keep(r.day)).map(f).filter((v): v is number => v !== null);
+  if (cycleSensitive && isLuteal(day, starts)) {
+    const lut = middleHalf(vals(addDays(day, -120), (d) => isLuteal(d, starts)));
+    if (lut) return lut;
+  }
+  return middleHalf(vals(addDays(day, -30), () => true));
+}
+// Abstand außerhalb des Bereichs in Bereichsbreiten: ab 0,6 voller Abzug, darunter halber, deutlich besser kleiner Bonus
+function rangeEffect(v: number | null, range: Range | null, higherIsBetter: boolean, weight: number): number {
+  if (v === null || !range) return 0;
+  const width = range.hi - range.lo || Math.max(1, Math.abs(range.median) * 0.05);
+  const below = v < range.lo ? (range.lo - v) / width : 0;
+  const above = v > range.hi ? (v - range.hi) / width : 0;
+  const bad = higherIsBetter ? below - above : above - below;
+  if (bad > 0.6) return -weight;
+  if (bad > 0) return -Math.round(weight / 2);
+  if (bad < -0.5) return Math.round(weight / 4);
   return 0;
 }
 
 // Tagesziel 0–100 wie computeTarget in der App
 export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checkin: Checkin, illness: Illness, starts: string[]): { score: number; pause: boolean } {
-  const hist = daily.filter((r) => r.day < day && r.day >= addDays(day, -30));
   const today = daily.find((r) => r.day === day) ?? null;
-  const num = (f: (r: Day) => number | null) => hist.map(f).filter((v): v is number => v !== null);
   let eff = 0;
-  eff += zEffect(today?.sleep_score ?? null, num((r) => r.sleep_score), true, 10);
-  eff += zEffect(today?.hrv_last_night ?? null, num((r) => r.hrv_last_night), true, 12);
-  eff += zEffect(today?.resting_hr ?? null, num((r) => r.resting_hr), false, 8);
+  eff += rangeEffect(today?.sleep_score ?? null, rangeFor(daily, day, (r) => r.sleep_score, starts, false), true, 10);
+  eff += rangeEffect(today?.hrv_last_night ?? null, rangeFor(daily, day, (r) => r.hrv_last_night, starts, true), true, 12);
+  eff += rangeEffect(today?.resting_hr ?? null, rangeFor(daily, day, (r) => r.resting_hr, starts, true), false, 8);
   if (today?.bb_max !== null && today?.bb_max !== undefined) {
     const bb = today.bb_max;
     eff += bb < 30 ? -15 : bb < 50 ? -8 : bb >= 75 ? 3 : 0;

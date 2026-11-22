@@ -37,7 +37,7 @@ export default function ReadinessCard({ rule, factors }: { rule: DayRule; factor
       <p className="value-big">
         {num(value)} <span className="value-unit">von 10 · {label}</span>
       </p>
-      {!rule.target.enoughData && <span className="meta">Wird genauer, sobald 7 Tage Garmin-Daten da sind.</span>}
+      {!rule.target.enoughData && <span className="meta">Wird genauer, sobald 14 Tage Garmin-Daten da sind.</span>}
 
       <div className="stage-bar" aria-hidden="true">
         {STAGE_ORDER.map((s) => (
