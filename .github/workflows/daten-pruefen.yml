@@ -20,7 +20,7 @@ jobs:
             echo "::error::Das Secret SUPABASE_DB_URL fehlt."
             exit 1
           fi
-          q() { psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 --set=default_transaction_read_only=on -P pager=off -c "set transaction read only; $1"; }
+          q() { psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -P pager=off -c "set transaction read only; $1"; }
           echo "== Letzte Abrufe (Tageswerte) =="
           q "select max(synced_at) as letzter_abruf, count(*) as tage_gesamt from public.garmin_daily;"
           echo "== Alltagslast, letzte 90 Tage =="
