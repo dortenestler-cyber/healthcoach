@@ -4,18 +4,36 @@ import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 import { clearPin, LOCK_AFTER_MS } from "@/lib/pin";
+import { disableFaceId, enableFaceId, faceIdAvailable, faceIdOn } from "@/lib/faceid";
 import { getTheme, setTheme, THEME_OPTIONS, type Theme } from "@/lib/theme";
 import PageHead from "@/components/PageHead";
 
 // Einstellungen, gruppiert: Schutz, Coach & Mitteilungen, Aussehen, Daten, Hilfe.
-// Weitere Schalter (Face ID, Coach-Limit …) kommen schrittweise aus dem Backlog dazu.
+// Weitere Schalter (Coach-Limit …) kommen schrittweise aus dem Backlog dazu.
 export default function SettingsView() {
   const [email, setEmail] = useState("");
   const [theme, setThemeState] = useState<Theme>("auto");
+  const [faceIdOk, setFaceIdOk] = useState<boolean | null>(null);
+  const [faceId, setFaceId] = useState(false);
+  const [faceIdMsg, setFaceIdMsg] = useState("");
 
   useEffect(() => {
     setThemeState(getTheme());
+    setFaceId(faceIdOn());
+    faceIdAvailable().then(setFaceIdOk);
   }, []);
+
+  const toggleFaceId = async () => {
+    setFaceIdMsg("");
+    if (faceId) {
+      disableFaceId();
+      setFaceId(false);
+    } else if (await enableFaceId()) {
+      setFaceId(true);
+    } else {
+      setFaceIdMsg("Face ID konnte nicht eingerichtet werden. Die PIN funktioniert weiter.");
+    }
+  };
 
   const chooseTheme = (t: Theme) => {
     setTheme(t);
@@ -41,7 +59,22 @@ export default function SettingsView() {
       <PageHead title="Einstellungen" sub={email ? `Angemeldet als ${email}` : "Health Coach"} gear={false} />
 
       <Group title="Schutz">
-        <Row label="PIN ändern" note="Du legst danach eine neue PIN fest." onClick={changePin} />
+        {faceIdOk !== null && (
+          <div className="settings-row">
+            <span className="stack">
+              <span className="row-label" id="faceid-label">Face ID</span>
+              <span className="meta">
+                {faceIdMsg || (faceIdOk ? "Entsperren ohne PIN. Die PIN bleibt als Rückfall." : "Auf diesem Gerät nicht verfügbar.")}
+              </span>
+            </span>
+            {faceIdOk && (
+              <button type="button" role="switch" aria-checked={faceId} aria-labelledby="faceid-label" className="switch" onClick={toggleFaceId}>
+                <span className="switch-knob" />
+              </button>
+            )}
+          </div>
+        )}
+        <Row label="PIN ändern" note={faceId ? "Du legst danach eine neue PIN fest. Face ID schaltest du danach neu ein." : "Du legst danach eine neue PIN fest."} onClick={changePin} />
         <Row label="Automatische Sperre" value={`nach ${Math.round(LOCK_AFTER_MS / 60000)} Min. im Hintergrund`} />
         <Row label="Abmelden" note="Die PIN auf diesem Gerät wird dabei gelöscht." onClick={signOut} />
       </Group>

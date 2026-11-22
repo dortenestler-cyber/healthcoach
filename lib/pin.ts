@@ -64,6 +64,7 @@ export function clearPin(): void {
   try {
     localStorage.removeItem(KEY);
     localStorage.removeItem(FAIL_KEY);
+    localStorage.removeItem("hc_faceid");
     sessionStorage.removeItem(UNLOCK_KEY);
   } catch {
     // nichts zu tun

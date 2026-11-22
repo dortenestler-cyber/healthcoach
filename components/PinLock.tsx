@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
+import { faceIdOn, unlockWithFaceId } from "@/lib/faceid";
 import { checkPin, clearPin, fails, hasPin, isUnlocked, lock, markUnlocked, MAX_FAILS, setPin, LOCK_AFTER_MS } from "@/lib/pin";
 
 type Mode = "laden" | "festlegen" | "bestaetigen" | "eingeben" | "offen";
@@ -14,6 +15,23 @@ export default function PinLock({ children }: { children: ReactNode }) {
   const [first, setFirst] = useState("");
   const [msg, setMsg] = useState("");
   const hiddenAt = useRef<number | null>(null);
+  const [faceId, setFaceId] = useState(false);
+
+  // Face ID zuerst anbieten; klappt es nicht, bleibt die PIN
+  const tryFaceId = async () => {
+    if (await unlockWithFaceId()) {
+      setDigits("");
+      setMsg("");
+      setMode("offen");
+    }
+  };
+
+  useEffect(() => {
+    if (mode !== "eingeben") return;
+    const on = faceIdOn();
+    setFaceId(on);
+    if (on) tryFaceId();
+  }, [mode]);
 
   useEffect(() => {
     setMode(!hasPin() ? "festlegen" : isUnlocked() ? "offen" : "eingeben");
@@ -116,6 +134,9 @@ export default function PinLock({ children }: { children: ReactNode }) {
         <button type="button" className="pin-key" onClick={() => press("0")}>0</button>
         <button type="button" className="pin-key pin-key-ghost" aria-label="Löschen" onClick={() => setDigits(digits.slice(0, -1))}>⌫</button>
       </div>
+      {mode === "eingeben" && faceId && (
+        <button type="button" className="btn btn-soft pin-faceid" onClick={tryFaceId}>Mit Face ID entsperren</button>
+      )}
       {mode === "eingeben" && (
         <button type="button" className="btn btn-link" onClick={signOut}>PIN vergessen? Mit Passwort anmelden</button>
       )}
