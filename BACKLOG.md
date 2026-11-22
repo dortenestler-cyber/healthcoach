@@ -24,8 +24,9 @@ Gesammelte Änderungswünsche. Umsetzung erst nach Freigabe, jeweils über eigen
 
 ## 22.11.2026 · Wadenzucken, Wadenkrämpfe und Mustererkennung (wartet auf Freigabe)
 Konzept: `docs/konzept-wadenkraempfe.md`
-- [ ] **Erfassung**: Zucken und Krämpfe als einzelne Einträge (Zeit, Stärke, Seite, Situation), im Tagebuch, im Morgen-Check-in und später an der Uhr.
-- [ ] **Muster-Motor**: Krämpfe und Erkrankungen gemeinsam gegen Zyklusphase, Training, Schlaf, Einflüsse und Einnahmen prüfen.
+- [ ] **Erfassung**: Zucken und Krämpfe als ein Eintrag mit Intensität (1 Zucken · 2 Krampf · 3 stark), Zeit, Seite, Situation (meist abends). Im Tagebuch, mit Nachtragen für den Vortag. Neue Einflüsse „wenig getrunken“ und „viel geschwitzt“.
+- [ ] **Uhr**: später, wir kommen gesondert darauf zurück.
+- [ ] **Muster-Motor**: Krämpfe und Erkrankungen gemeinsam gegen Zyklusphase, Training, Schlaf, Einflüsse und Einnahmen (Magnesium) prüfen.
 - [ ] **Erkrankungen**: Rückblick auf die 7 Tage vor Krankheitsbeginn.
 - [ ] **Anzeige**: Karte „Muskeln“ auf Gesundheit, Zeilen auf Zyklus, Hinweise auf Training und Heute, Warnzeichen mit Verweis auf ärztliche Abklärung.
 
