@@ -35,14 +35,22 @@ In Supabase unter **Edge Functions → Secrets** anlegen:
 
 ### 6. Seite Zyklus und Energie über den Tag (PR #43, enthält PR #42)
 - [ ] `supabase/migrations/20261122170000_energie_tag.sql` ausführen: Spalten für den Body-Battery-Verlauf und die Schlafzeiten
-- [ ] PR #43 ansehen und mergen (Claude merged ihn nicht selbst, weil er die Datenbank und `garmin-sync` ändert). PR #42 gilt damit automatisch als gemergt
-- [ ] Nach dem Merge prüfen, dass **Actions → Supabase-Funktionen hochladen** grün ist
+- [x] PR #42 und #43 gemergt
+- [x] Upload von `garmin-sync` nach dem Merge ist grün (geprüft von Claude)
 - [ ] In der App auf Heute **Synchronisieren** tippen. Die Karte „Energie über den Tag“ steht jetzt auf Heute. Steht dort „Body Battery im Tagesverlauf ist bei Garmin nicht abrufbar“, Claude Bescheid geben
 - [ ] Die neue Seite **Zyklus** in der Navigation ansehen und sagen, was fehlt oder anders sein soll
 
-### 7. Aufräumen
+### 7. Readiness nach dem persönlichen Bereich (PR #45)
+- [ ] PR #45 ansehen und mergen (Claude merged ihn nicht selbst, weil er die Uhr-Funktion `watch` ändert). Keine Migration nötig
+- [ ] Ein paar Tage beobachten, ob die Readiness-Stufe zu deinem Gefühl passt, und Claude Rückmeldung geben
+
+### 8. Früheres nachtragen
+- [ ] Im Tagebuch unten unter **Vergangene Perioden nachtragen** deine früheren Perioden eintragen (die Zyklus-Seite verlinkt dorthin). Je mehr, desto genauer werden Phasen und Vergleiche
+
+### 9. Aufräumen
 - [ ] Auf GitHub den Zweig `heute-neu` löschen (versehentlich angelegt, gleicher Inhalt wie PR #38)
 
 ## Erledigt
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)
 - [x] PR #34, #35, #36, #37 gemergt (Konzept, `CLAUDE.md`, Fundament, Merge-Regel)
+- [x] PR #38 bis #44 gemergt (Heute, Verlauf, Training, Gesundheit, Zyklus, Einnahmen, Nachtragen)

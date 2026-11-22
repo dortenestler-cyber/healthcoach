@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { DayBars, Heatmap, LineBand, ValueHeader } from "@/components/charts";
 import type { Diary } from "@/lib/insights";
 import { avgBefore, cycleLengthView, flashesPerWeek, symptomHeat } from "@/lib/zyklusAuswertung";
@@ -58,6 +59,7 @@ export default function CycleHistory({ today, diary, flashes, showFlashes }: { t
           )}
         </ValueHeader>
         {y && <span className="meta">Band: mittlere Hälfte der Zykluslängen von vor einem Jahr ({cl.yearAgoN} Zyklen). Kürzere oder unregelmäßige Zyklen sind in der Perimenopause häufig. Sehr starke oder lange Blutungen bitte ärztlich abklären lassen.</span>}
+        <Link href="/tagebuch#perioden" className="settings-link">Vergangene Perioden nachtragen ›</Link>
       </section>
 
       {showFlashes && (

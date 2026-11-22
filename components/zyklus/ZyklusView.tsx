@@ -77,6 +77,7 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
             <span className="meta">{phase ? "geschätzt" : "Trag deine Periode im Tagebuch ein, dann schätzt die App die Phase."}</span>
             {ct.window && <span className="meta">Nächste Periode etwa {date(ct.window.earliest)} bis {date(ct.window.latest)}</span>}
             {!ct.window && ct.cycleDay !== null && <span className="meta">Periodenfenster ab 2 Zyklen</span>}
+            {(!phase || !ct.window) && <Link href="/tagebuch#perioden" className="settings-link">Perioden nachtragen ›</Link>}
           </div>
         </div>
         <div className="legend">
