@@ -21,3 +21,10 @@ Gesammelte Änderungswünsche. Umsetzung erst nach Freigabe, jeweils über eigen
 - [x] **Einrichtungs-Check**: Läuft die Funktion `garmin-sync`, ist `GARMIN_API_KEY` gültig, wann lief der letzte Abruf? Vor Ablauf des Schlüssels warnen.
 - [x] **Nutzungsauswertung**: welche Bereiche genutzt werden, als Grundlage für Änderungen („eins rein, eins raus“).
 - [x] **Offline-Cache (Service Worker)**: App startet auch ohne Netz und zeigt die zuletzt geladenen Daten.
+
+## 22.11.2026 · Wadenzucken, Wadenkrämpfe und Mustererkennung (wartet auf Freigabe)
+Konzept: `docs/konzept-wadenkraempfe.md`
+- [ ] **Erfassung**: Zucken und Krämpfe als einzelne Einträge (Zeit, Stärke, Seite, Situation), im Tagebuch, im Morgen-Check-in und später an der Uhr.
+- [ ] **Muster-Motor**: Krämpfe und Erkrankungen gemeinsam gegen Zyklusphase, Training, Schlaf, Einflüsse und Einnahmen prüfen.
+- [ ] **Erkrankungen**: Rückblick auf die 7 Tage vor Krankheitsbeginn.
+- [ ] **Anzeige**: Karte „Muskeln“ auf Gesundheit, Zeilen auf Zyklus, Hinweise auf Training und Heute, Warnzeichen mit Verweis auf ärztliche Abklärung.
