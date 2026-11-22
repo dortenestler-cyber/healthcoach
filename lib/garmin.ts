@@ -32,6 +32,13 @@ export type Daily = {
   stress_medium_s?: number | null; // mittel (51–75)
   stress_high_s?: number | null; // hoch (76–100)
   stress_curve?: (number | null)[] | null; // 96 Werte, alle 15 Minuten ab Mitternacht
+  // Belastung aus dem Alltag (ab Migration 20261124090000_alltagslast, Aufbau in lib/alltagslast.ts)
+  load_daily_min?: unknown;
+  hr_curve?: (number | null)[] | null; // Puls alle 15 Minuten
+  steps_outside_acts?: number | null; // Schritte außerhalb von Garmin-Aktivitäten
+  active_s?: number | null;
+  highly_active_s?: number | null;
+  active_kcal?: number | null;
   synced_at: string;
 };
 

@@ -5,6 +5,7 @@ import type { Activity, Daily } from "@/lib/garmin";
 import { INFLUENCES } from "@/lib/catalog";
 import { illnessRule, type Illness } from "@/lib/health";
 import { sportOfGarmin, type Sport } from "@/lib/training";
+import { alltagMinutes, readLoadDay } from "@/lib/alltagslast";
 import { baselineFor, RANGE_PHASE_NAMES, type Baseline, type Range } from "@/lib/baseline";
 
 export type Diary = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[]; fromGarmin?: boolean; garminOnly?: boolean };
@@ -35,12 +36,45 @@ const sd = (v: number[]) => {
 
 // ---------- Belastung
 
-// 100 % entspricht grob einem harten Trainingstag: 60 Intensitätsminuten oder 150 Trainingsbelastung
-export function loadPercent(day: string, daily: Daily[], acts: Activity[]): number {
+export const FULL_DAY_LOAD = 150; // 100 % entspricht grob einem harten Trainingstag: 150 Garmin-Last
+
+export type DayLoad = {
+  training: number; // Garmin-Last der Trainings
+  alltag: number; // Alltag in derselben Einheit (0 ohne Daten)
+  pct: number; // Belastung gesamt, 0–100
+  pctTraining: number; // davon Training
+  pctAlltag: number; // davon Alltag
+  quelle: "puls" | "schritte" | null; // null: Tag ohne Alltagsdaten (alte Berechnung)
+  alltagMin: number | null; // Minuten in Bewegung im Alltag
+  steps: number | null; // Schritte außerhalb von Trainings
+};
+
+// Belastung eines Tages aus Training und Alltag (Konzept Korridore und Alltagslast, Teil B).
+// Gibt es für den Tag keine Alltagsdaten, gilt die alte Rechnung: 60 Intensitätsminuten oder 150 Trainingslast = 100 %.
+export function dayLoad(day: string, daily: Daily[], acts: Activity[]): DayLoad {
   const d = daily.find((r) => r.day === day);
-  const im = d?.intensity_minutes ?? 0;
   const tl = acts.filter((a) => (a.start_local ?? "").slice(0, 10) === day).reduce((s, a) => s + (a.training_load ?? 0), 0);
-  return Math.round(Math.min(100, Math.max((im / 60) * 100, (tl / 150) * 100)));
+  const ld = readLoadDay(d?.load_daily_min);
+  const pctOf = (v: number) => (v / FULL_DAY_LOAD) * 100;
+  if (!ld) {
+    const im = d?.intensity_minutes ?? 0;
+    const pct = Math.round(Math.min(100, Math.max((im / 60) * 100, pctOf(tl))));
+    return { training: tl, alltag: 0, pct, pctTraining: pct, pctAlltag: 0, quelle: null, alltagMin: null, steps: d?.steps_outside_acts ?? null };
+  }
+  const training = tl || ld.last_training || 0;
+  const alltag = Math.max(0, ld.last_alltag ?? 0);
+  const pct = Math.round(Math.min(100, pctOf(training + alltag)));
+  const pctTraining = Math.min(pct, Math.round(pctOf(training)));
+  return { training, alltag, pct, pctTraining, pctAlltag: pct - pctTraining, quelle: ld.quelle, alltagMin: alltagMinutes(ld), steps: d?.steps_outside_acts ?? null };
+}
+
+export function loadPercent(day: string, daily: Daily[], acts: Activity[]): number {
+  return dayLoad(day, daily, acts).pct;
+}
+
+// Erster Tag mit Alltagsdaten (für den einmaligen Hinweis, dass Werte jetzt höher liegen)
+export function firstAlltagDay(daily: Daily[]): string | null {
+  return daily.filter((d) => readLoadDay(d.load_daily_min)).map((d) => d.day).sort()[0] ?? null;
 }
 
 // ---------- Zyklus

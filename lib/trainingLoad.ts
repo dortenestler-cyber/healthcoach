@@ -1,4 +1,5 @@
 // Training: Wochenlast mit Zielkorridor, Belastungsverhältnis und Intensitätsminuten.
+// Standard: Last aus Training und Alltag. alltag = false: nur Training, wie bei Garmin.
 // Reine Berechnungen ohne Netzwerk. Grenzen sind Startwerte, keine Aussage zum Verletzungsrisiko.
 
 import type { Data } from "@/lib/insights";
@@ -18,19 +19,20 @@ const sumRange = (m: Map<string, number>, from: string, n: number) => Array.from
 const firstDay = (m: Map<string, number>) => [...m.keys()].sort()[0] ?? null;
 
 export type WeekLoad = {
-  days: { day: string; load: number | null }[]; // Montag bis Sonntag, kommende Tage null
+  days: { day: string; load: number | null; training: number | null }[]; // Montag bis Sonntag, kommende Tage null; training: Anteil Training
   sum: number;
   corridor: { lo: number; hi: number } | null; // aus den 4 Wochen davor, null bei zu wenig Daten
   avg4: number | null;
 };
 
 // Last dieser Woche (Montag bis heute) und Zielkorridor: 80–130 % des Schnitts der 4 Wochen davor
-export function weekLoad(today: string, data: Data): WeekLoad {
-  const m = loadByDay(data.acts);
+export function weekLoad(today: string, data: Data, alltag = true): WeekLoad {
+  const m = loadByDay(data.acts, alltag ? data.daily : undefined);
+  const t = loadByDay(data.acts);
   const mon = mondayOf(today);
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = addDays(mon, i);
-    return { day: d, load: d > today ? null : Math.round(m.get(d) ?? 0) };
+    return { day: d, load: d > today ? null : Math.round(m.get(d) ?? 0), training: d > today ? null : Math.round(Math.min(m.get(d) ?? 0, t.get(d) ?? 0)) };
   });
   const sum = days.reduce((a, d) => a + (d.load ?? 0), 0);
   const first = firstDay(m);
@@ -41,8 +43,8 @@ export function weekLoad(today: string, data: Data): WeekLoad {
 }
 
 // Belastungsverhältnis: Last der letzten 7 Tage ÷ Wochenschnitt der letzten 28 Tage
-export function loadRatio(today: string, data: Data): { ratio: number | null; acute: number; chronic: number | null } {
-  const m = loadByDay(data.acts);
+export function loadRatio(today: string, data: Data, alltag = true): { ratio: number | null; acute: number; chronic: number | null } {
+  const m = loadByDay(data.acts, alltag ? data.daily : undefined);
   const acute = sumRange(m, addDays(today, -6), 7);
   const first = firstDay(m);
   if (first === null || first > addDays(today, -27)) return { ratio: null, acute, chronic: null };

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import HealthToday from "@/components/HealthToday";
 import TodayPlan from "@/components/TodayPlan";
 import type { DayRule } from "@/lib/cycle";
-import { loadPercent, type Data } from "@/lib/insights";
+import { dayLoad, type Data } from "@/lib/insights";
 import { supabase } from "@/lib/supabase";
 
 // „Heute steht an“: alles, was heute zu tun ist, in einer Karte.
@@ -23,12 +23,14 @@ export default function TodayAgenda({ day, data, rule, showPlan, showLoad }: { d
   }, [day]);
 
   const t = rule?.target;
-  const load = data ? loadPercent(day, data.daily, data.acts) : null;
+  const dl = data ? dayLoad(day, data.daily, data.acts) : null;
+  const load = dl?.pct ?? null;
   const loadLine =
     showLoad && t && load !== null ? (
       <div className="card-row list-line">
         <span>
           Belastung <strong>{load} %</strong>
+          {dl?.pctAlltag ? `, davon Alltag ${dl.pctAlltag} %` : ""}
           {t.pause ? " · heute Pause" : ` · ${load < t.lo ? "unter dem" : load <= t.hi ? "im" : "über dem"} Ziel von ${t.lo}–${t.hi} %`}
         </span>
         <Link href="/training?t=auswertung" className="link-small">Tagesziel ›</Link>

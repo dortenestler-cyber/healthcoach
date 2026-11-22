@@ -15,8 +15,8 @@ export function statusWord(r: number): string {
 
 // Status (Konzept dunkel 2, Muster 13): Statuswort, Ring mit der Last der letzten 7 Tage, „Was das heißt“.
 // Darunter Belastungsverhältnis (7 Tage ÷ Wochenschnitt 28 Tage) und Intensitätsminuten gegen 150 (WHO). Ohne Netzwerk.
-export default function RatioCard({ today, data }: { today: string; data: Data }) {
-  const r = loadRatio(today, data);
+export default function RatioCard({ today, data, alltag = true }: { today: string; data: Data; alltag?: boolean }) {
+  const r = loadRatio(today, data, alltag);
   const im = weekIntensity(today, data);
   const pct = Math.min(100, Math.round((im / WHO_MINUTES) * 100));
   const chronic = r.chronic ?? 0;
@@ -66,7 +66,7 @@ export default function RatioCard({ today, data }: { today: string; data: Data }
               label={`Belastungsverhältnis ${de2(r.ratio)}, Bereich ${de1(RATIO_LO)} bis ${de1(RATIO_HI)}`}
               zones={[{ to: RATIO_LO, label: "Abbau" }, { to: RATIO_HI, label: "Aufbau", target: true }, { to: SCALE_MAX, label: "schneller Anstieg" }]}
             />
-            <span className="meta">Last 7 Tage {Math.round(r.acute)} ÷ Wochenschnitt der letzten 4 Wochen {Math.round(chronic)}</span>
+            <span className="meta">Last 7 Tage {Math.round(r.acute)} ÷ Wochenschnitt der letzten 4 Wochen {Math.round(chronic)}{alltag ? ", mit Alltag" : ", nur Training"}</span>
           </div>
           <ExplainCard tone="training" question={`Mein Belastungsverhältnis ist ${de2(r.ratio)} (${statusWord(r.ratio)}). Wie plane ich die nächsten Tage?`}>
             Status <strong>{statusWord(r.ratio)}</strong>: {ratioText(r.ratio)}

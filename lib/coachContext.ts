@@ -3,7 +3,7 @@
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay } from "@/lib/dates";
 import { loadInsightData } from "@/lib/insightData";
-import { computeTarget, cycleInfo, loadPercent, patterns } from "@/lib/insights";
+import { computeTarget, cycleInfo, dayLoad, patterns } from "@/lib/insights";
 import { cycleToday, PHASES } from "@/lib/cycle";
 import { METRICS, stats } from "@/lib/garmin";
 import { SPOTS, type Injury, type Medication } from "@/lib/health";
@@ -19,7 +19,7 @@ export async function buildCoachContext(): Promise<string> {
   const lines: string[] = [`Datum: ${day}`];
 
   const t = computeTarget(day, data);
-  lines.push(`Tagesziel: ${t.pause ? "Pause" : `${t.label} ${t.lo}–${t.hi} %`}, Belastung bisher ${loadPercent(day, data.daily, data.acts)} %.`);
+  lines.push(`Tagesziel: ${t.pause ? "Pause" : `${t.label} ${t.lo}–${t.hi} %`}, Belastung bisher ${(() => { const dl = dayLoad(day, data.daily, data.acts); return `${dl.pct} % (Training ${dl.pctTraining} %, Alltag ${dl.pctAlltag} %)`; })()}.`);
   for (const f of t.factors) lines.push(`- ${f.name}${f.value ? " " + f.value : ""}: ${f.note} (${f.effect >= 0 ? "+" : ""}${f.effect})`);
 
   // Garmin: letzte 7 Tage gegen 30 Tage

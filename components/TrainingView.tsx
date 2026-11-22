@@ -11,7 +11,7 @@ import HabitCard from "@/components/training/HabitCard";
 import MonthReviewCard from "@/components/training/MonthReviewCard";
 import { isoDay } from "@/lib/dates";
 import { loadInsightData } from "@/lib/insightData";
-import type { Data } from "@/lib/insights";
+import { firstAlltagDay, type Data } from "@/lib/insights";
 import CalendarSection from "@/components/training/CalendarSection";
 import KettlebellSection from "@/components/training/KettlebellSection";
 import ClimbSection from "@/components/training/ClimbSection";
@@ -40,6 +40,25 @@ export default function TrainingView({ initial }: { initial: string }) {
   const shown = tabs.some(([k]) => k === tab) ? tab : tabs[0][0];
   const [data, setData] = useState<Data | null>(null);
   const [error, setError] = useState("");
+  // Last mit Alltag (Standard) oder nur Training wie bei Garmin; merkt sich die Wahl auf diesem Gerät
+  const [alltag, setAlltagState] = useState(true);
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("hc-last-alltag") === "0") setAlltagState(false);
+    } catch {
+      // ohne Speicher bleibt der Standard
+    }
+  }, []);
+  const setAlltag = (v: boolean) => {
+    setAlltagState(v);
+    try {
+      localStorage.setItem("hc-last-alltag", v ? "1" : "0");
+    } catch {
+      // egal
+    }
+  };
+  const hasAlltag = !!data && firstAlltagDay(data.daily) !== null;
+  const withAlltag = hasAlltag && alltag;
 
   useEffect(() => {
     loadInsightData()
@@ -51,7 +70,17 @@ export default function TrainingView({ initial }: { initial: string }) {
     <>
       <PageHead title="Training" sub="Karate, Bouldern, Kettlebell und Ausdauer" tone="training" />
       {error && <p className="alert" role="alert">{error}</p>}
-      {data && <RatioCard today={isoDay()} data={data} />}
+      {hasAlltag && (
+        <div className="segmented" role="group" aria-label="Welche Last zählt">
+          <button type="button" aria-pressed={alltag} onClick={() => setAlltag(true)}>
+            Mit Alltag
+          </button>
+          <button type="button" aria-pressed={!alltag} onClick={() => setAlltag(false)}>
+            Nur Training
+          </button>
+        </div>
+      )}
+      {data && <RatioCard today={isoDay()} data={data} alltag={withAlltag} />}
       <div className="segmented segmented-tabs training-tabs" role="group" aria-label="Bereich">
         {tabs.map(([k, l]) => (
           <button key={k} type="button" aria-pressed={shown === k} onClick={() => setTab(k)}>
@@ -63,8 +92,8 @@ export default function TrainingView({ initial }: { initial: string }) {
       {shown === "auswertung" && (
         <>
           {feat.tagesziel && data && <TargetSection data={data} />}
-          {data && <LoadTrendCard today={isoDay()} data={data} />}
-          <WeekLoadCard data={data} />
+          {data && <LoadTrendCard today={isoDay()} data={data} alltag={withAlltag} />}
+          <WeekLoadCard data={data} alltag={withAlltag} />
           {data && <HabitCard today={isoDay()} data={data} />}
           {data && <MonthReviewCard today={isoDay()} data={data} />}
         </>

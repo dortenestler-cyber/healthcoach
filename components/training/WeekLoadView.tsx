@@ -9,8 +9,9 @@ const WD = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."];
 const n0 = (v: number) => String(Math.round(v));
 
 // Wochenlast: Satz, Zahl, Korridor, dann Zonen-Skala für die Woche und Säulen je Tag. Ohne Netzwerk.
-export default function WeekLoadView({ today, data, planned, done, labels }: { today: string; data: Data; planned: number; done: number; labels: string[] }) {
-  const w = weekLoad(today, data);
+export default function WeekLoadView({ today, data, planned, done, labels, alltag = true }: { today: string; data: Data; planned: number; done: number; labels: string[]; alltag?: boolean }) {
+  const w = weekLoad(today, data, alltag);
+  const split = alltag && w.days.some((d) => (d.load ?? 0) > (d.training ?? 0));
   const c = w.corridor;
   const sentence = !c
     ? "Dein Zielkorridor entsteht nach 4 Wochen mit Garmin-Aktivitäten."
@@ -47,9 +48,15 @@ export default function WeekLoadView({ today, data, planned, done, labels }: { t
         <DayBars
           tone="training"
           fmt={n0}
-          label={`Trainingslast je Tag: ${w.days.map((d, i) => `${labels[i]} ${d.load ?? "noch offen"}`).join(", ")}`}
-          bars={w.days.map((d, i) => ({ label: labels[i], value: d.load, today: d.day === today }))}
+          label={`${alltag ? "Last je Tag aus Training und Alltag" : "Trainingslast je Tag"}: ${w.days.map((d, i) => `${labels[i]} ${d.load === null ? "noch offen" : split ? `${d.load}, davon Alltag ${d.load - (d.training ?? 0)}` : d.load}`).join(", ")}`}
+          bars={w.days.map((d, i) => ({ label: labels[i], value: d.load, today: d.day === today, part: split ? d.training : null }))}
         />
+        {split && (
+          <div className="legend cb-training">
+            <span><i className="legend-training" />Training</span>
+            <span><i className="legend-alltag" />Alltag</span>
+          </div>
+        )}
       </ValueHeader>
       {contrib.length > 0 && (
         <div className="contrib">
@@ -84,7 +91,7 @@ export default function WeekLoadView({ today, data, planned, done, labels }: { t
           <span className="metric-value">{w.days.filter((d) => (d.load ?? 0) > 0).length}</span>
         </div>
       </div>
-      <span className="meta">Trainingslast aus Garmin. Korridor 80–130 % deiner üblichen Woche, ein Richtwert.</span>
+      <span className="meta">{alltag ? "Last aus Garmin-Trainings und Bewegung im Alltag (aus deinem Puls)." : "Nur Trainingslast aus Garmin."} Korridor 80–130 % deiner üblichen Woche, ein Richtwert.</span>
     </section>
   );
 }

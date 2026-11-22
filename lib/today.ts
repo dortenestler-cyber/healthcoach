@@ -5,6 +5,7 @@
 import { baselineFor, metricBaseline, middleHalf, type Baseline, type Range } from "@/lib/baseline";
 import { METRICS, type Activity, type Daily, type MetricKey } from "@/lib/garmin";
 import { loadPercent, type Data } from "@/lib/insights";
+import { readLoadDay } from "@/lib/alltagslast";
 
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");
@@ -66,12 +67,18 @@ export function sleepAchieved(day: string, data: Data): { hours: number | null; 
 
 // ---------- Last der letzten 7 Tage
 
-// Trainingslast pro Tag aus den Garmin-Aktivitäten
-export function loadByDay(acts: Activity[]): Map<string, number> {
+// Last pro Tag: Trainingslast der Garmin-Aktivitäten, mit daily zusätzlich die Last aus dem Alltag (gleiche Einheit)
+export function loadByDay(acts: Activity[], daily?: Daily[]): Map<string, number> {
   const m = new Map<string, number>();
   for (const a of acts) {
     const d = (a.start_local ?? "").slice(0, 10);
     if (d) m.set(d, (m.get(d) ?? 0) + (a.training_load ?? 0));
+  }
+  for (const r of daily ?? []) {
+    const ld = readLoadDay(r.load_daily_min);
+    if (!ld) continue;
+    if (!m.has(r.day) && ld.last_training) m.set(r.day, ld.last_training);
+    if (ld.last_alltag) m.set(r.day, (m.get(r.day) ?? 0) + ld.last_alltag);
   }
   return m;
 }
@@ -80,8 +87,8 @@ const sum7 = (m: Map<string, number>, day: string) => Array.from({ length: 7 }, 
 
 // Summe der letzten 7 Tage bis einschließlich heute, Bereich aus den 7-Tage-Summen der 30 Tage davor
 export function load7(day: string, data: Data): { value: number | null; range: Range | null } {
-  if (!data.acts.length) return { value: null, range: null };
-  const m = loadByDay(data.acts);
+  const m = loadByDay(data.acts, data.daily);
+  if (!m.size) return { value: null, range: null };
   const first = [...m.keys()].sort()[0];
   const sums: number[] = [];
   for (let i = 1; i <= 30; i++) {

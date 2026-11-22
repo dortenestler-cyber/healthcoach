@@ -64,6 +64,7 @@
 
   /* Zielbereich Training (Fläche hinter Säulen und Skalen) */
   --training-zone: #c9d5ee;
+  --training-alltag: #8ea4d6; /* Belastung aus dem Alltag: heller als Training */
 
   /* Schlaf: neutral, keine eigene Bedeutungsfarbe */
   --sleep: #48505a;
@@ -136,6 +137,8 @@
     --training-bg: #1b2438;
     --training-fg: #afc2ee;
     --training-zone: #3b5998;
+  --training-alltag: #c3d1f2;
+    --training-alltag: #c3d1f2;
     --warn: #f0a24a;
     --warn-bg: #3a2a12;
     --warn-mid: #6a4412;
@@ -2659,3 +2662,10 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
 .korridor-lines { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
 .korridor-lines li { color: var(--text-2); line-height: 1.4; padding-left: 14px; position: relative; }
 .korridor-lines li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 6px; height: 6px; border-radius: 50%; background: var(--text-2); }
+
+/* Belastung: Training kräftig, Alltag heller (Ring, Halbbogen, Tagessäulen, Legende) */
+.cb-ring-value-alltag { stroke: var(--training-alltag); }
+.cb-bar-alltag { fill: var(--training-alltag); opacity: 0.9; }
+.legend .legend-training { background: var(--training); }
+.legend .legend-alltag { background: var(--training-alltag); }
+.load-split { color: var(--text-2); }

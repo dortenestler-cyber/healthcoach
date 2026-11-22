@@ -44,6 +44,6 @@ Konzept: `docs/konzept-ki-coach.md`
 Konzept: `docs/konzept-korridore-alltagslast.md`
 - [x] **Wandernder Korridor** im Verlauf, Bereiche je Zyklusphase, kranke Tage zählen nicht.
 - [x] **Abschnitt „Dein Bereich“** je Wert: so oft im Bereich, Serie, Erholungszeit, Verschiebung, was davor war.
-- [ ] **Tagesbelastung aus Training und Alltag** über den Tagespuls (Migration und `garmin-sync`).
-- [ ] **Anzeige** Ring, Belastung heute und Wochenlast mit Anteil Alltag.
+- [x] **Tagesbelastung aus Training und Alltag** über den Tagespuls (Migration und `garmin-sync`).
+- [x] **Anzeige** Ring, Belastung heute und Wochenlast mit Anteil Alltag.
 - [ ] **Weitere Korridore**: Tagesbelastung, Alltagsschritte, Tief- und REM-Schlaf, Schlafbeginn, Body Battery aufgeladen, hoher Stress.

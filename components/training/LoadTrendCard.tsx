@@ -25,10 +25,10 @@ const PAD_B = 22;
 
 // Last und Korridor über die Zeit (Konzept dunkel 2, Muster 12): Last der letzten 7 Tage je Tag als Linie,
 // der Korridor (80–130 % des Wochenschnitts der 4 Wochen davor) als Band. Zeitraum 1M · 3M · 6M.
-export default function LoadTrendCard({ today, data }: { today: string; data: Data }) {
+export default function LoadTrendCard({ today, data, alltag = true }: { today: string; data: Data; alltag?: boolean }) {
   const [span, setSpan] = useState<(typeof SPANS)[number]["key"]>("1M");
   const n = SPANS.find((s) => s.key === span)!.days;
-  const m = loadByDay(data.acts);
+  const m = loadByDay(data.acts, alltag ? data.daily : undefined);
   const sumBack = (day: string, len: number) => Array.from({ length: len }, (_, i) => m.get(addDays(day, -i)) ?? 0).reduce((a, b) => a + b, 0);
   const first = [...m.keys()].sort()[0] ?? null;
   const days = Array.from({ length: n }, (_, i) => addDays(today, i - n + 1));
@@ -85,7 +85,7 @@ export default function LoadTrendCard({ today, data }: { today: string; data: Da
         <text x={x(n - 1)} y={H - 4} textAnchor="end" className="cb-tick cb-tick-strong">heute</text>
       </svg>
       <div className="legend cb-training">
-        <span><i className="cb-key-line" />Last der letzten 7 Tage</span>
+        <span><i className="cb-key-line" />Last der letzten 7 Tage{alltag ? " mit Alltag" : ", nur Training"}</span>
         <span><i className="cb-key-zone" />Korridor aus den 4 Wochen davor</span>
       </div>
     </section>

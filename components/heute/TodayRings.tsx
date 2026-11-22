@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ValueRing } from "@/components/charts";
 import type { DayRule } from "@/lib/cycle";
-import { loadPercent, type Data } from "@/lib/insights";
+import { dayLoad, type Data } from "@/lib/insights";
 import { hm, sleepAchieved, sleepNeed } from "@/lib/today";
 
 const de1 = (v: number) => v.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -12,7 +12,8 @@ export default function TodayRings({ day, data, rule, showLoad }: { day: string;
   const slept = sleepAchieved(day, data);
   const need = sleepNeed(day, data.daily, data.acts);
   const t = rule.target;
-  const load = loadPercent(day, data.daily, data.acts);
+  const dl = dayLoad(day, data.daily, data.acts);
+  const load = dl.pct;
   const r = rule.readiness;
   const sleepPct = slept.ratio === null ? null : Math.round(slept.ratio * 100);
 
@@ -28,11 +29,16 @@ export default function TodayRings({ day, data, rule, showLoad }: { day: string;
         </div>
         {showLoad && (
           <Link href="/training?t=auswertung" className="ring-cell">
-            <ValueRing tone="training" value={load / 100} target={t.pause ? null : { lo: t.lo / 100, hi: t.hi / 100 }} center={`${load} %`} caption="Belastung" label={`Belastung ${load} Prozent, Ziel ${t.lo} bis ${t.hi} Prozent`} />
+            <ValueRing tone="training" value={load / 100} split={dl.quelle ? dl.pctTraining / 100 : null} target={t.pause ? null : { lo: t.lo / 100, hi: t.hi / 100 }} center={`${load} %`} caption="Belastung" label={`Belastung ${load} Prozent${dl.pctAlltag ? `, davon Alltag ${dl.pctAlltag} Prozent` : ""}, Ziel ${t.lo} bis ${t.hi} Prozent`} />
           </Link>
         )}
       </div>
 
+      {showLoad && dl.quelle && (
+        <p className="load-split meta">
+          Belastung {load} % · davon Alltag {dl.pctAlltag} %{dl.quelle === "schritte" ? " (geschätzt aus Schritten)" : ""}
+        </p>
+      )}
       <div className="today-line">
         <span className="row-strong">Schlafbedarf heute Nacht etwa {hm(need.hours)}</span>
         <span>
