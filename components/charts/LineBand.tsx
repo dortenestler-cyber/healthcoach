@@ -17,6 +17,7 @@ type Props = {
   todayIndex?: number;
   zeroLine?: boolean; // Nulllinie, z. B. für die Temperatur-Abweichung
   xLabels?: { index: number; text: string }[];
+  markers?: boolean[]; // Markierung oben am Tag, z. B. Nachtschweiß (Legende steht in der Karte)
   height?: number;
 };
 
@@ -25,7 +26,7 @@ const PAD_R = 52; // Platz für die Zahl am letzten Punkt
 const PAD_T = 14;
 const PAD_B = 22;
 
-export default function LineBand({ values, fmt, label, tone = "recovery", band, lutealBand, phases, futureFrom, todayIndex, zeroLine, xLabels = [], height = 170 }: Props) {
+export default function LineBand({ values, fmt, label, tone = "recovery", band, lutealBand, phases, futureFrom, todayIndex, zeroLine, xLabels = [], markers, height = 170 }: Props) {
   const n = Math.max(values.length, 1);
   const ext = extent(values, band ? [band.lo, band.hi] : [], lutealBand ? [lutealBand.lo, lutealBand.hi] : [], zeroLine ? [0] : []);
   const ticks = ext ? niceTicks(ext[0], ext[1]) : [];
@@ -59,6 +60,7 @@ export default function LineBand({ values, fmt, label, tone = "recovery", band, 
       {segments(pts).map((s, i) => (
         <polyline key={i} points={s} className="cb-line" />
       ))}
+      {markers?.map((m, i) => (m ? <circle key={`m${i}`} cx={x(i)} cy={PAD_T - 8} r={3} className="cb-marker" /> : null))}
       {last !== undefined && lastV !== null && (
         <g>
           <circle cx={x(last)} cy={y(lastV)} r={4.5} className="cb-dot" />
