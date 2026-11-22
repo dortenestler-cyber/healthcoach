@@ -4,20 +4,20 @@ Zuletzt aktualisiert: 2026-11-22 · Sitzung: https://claude.ai/code/session_014p
 Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`, `.github/`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
 ## Stand in einem Satz
-Alltagslast läuft: 57 Tage berechnet, Faktor aus 28 Trainings, aktive kcal kommen. Schrittverlauf gibt es nicht, Alltag zählt ab Zone 2. Wartet auf Entscheidung der Nutzerin zu Zone 1.
+PR #70 wartet auf den Merge: Alltagslast Version 2 (Zone 1 ab 10 Minuten am Stück), Stressverlauf über `dailyStress?date=`, Readiness der Uhr wie in der App.
 
 ## In Arbeit
 - PR #63 (gemergt): Migration `20261124090000_alltagslast.sql`, `garmin-sync` mit Tagespuls, Zonen, Training/Alltag, Umrechnungsfaktor, Nachberechnung 90 Tage (bis zu 21 Tage je Abruf). Rechenteil in `supabase/functions/garmin-sync/alltag.ts`, Aufbau für die App in `lib/alltagslast.ts`.
   Ergebnis erster Abruf („Daten prüfen“, 22.11. 19:55): 21 von 70 Tagen berechnet, alle aus Puls, Faktor 0,62 aus 6 Trainings, Maximalpuls aus Aktivitäten. Aber `bewegung` überall „keine“ (Schrittverlauf und Stress liefern nichts), `active_s`/`active_kcal` leer, `garmin_activities.steps` leer.
 - PR #68 (gemergt): Fehlersuche in `load_daily_min.diag` (nur Feldnamen und Fehlermeldungen). Ergebnis 22.11. 20:00: `dailySummaryChart?date=` und `dailyStress/{Tag}` → 404. Tageszusammenfassung hat `calories.burnedActive`, aber keine aktive Zeit (`active_s`, `highly_active_s` bleiben leer). Aktivitäten im Abrufzeitraum hatten keine Liste, Feldname für Schritte je Aktivität noch offen (vielleicht nur Klettern/Kraft ohne Schritte).
 - PR #69 (gemergt): aktive kcal aus `calories.burnedActive` (kommt an). `/userprofile-service/socialProfile` → 404, also kein Profilname, kein Schrittverlauf. Bewegung im Alltag nur über den Puls erkennbar.
-  Nächster Schritt: Entscheidung der Nutzerin (Zone 1 ab 10 Minuten am Stück zählen oder bei Zone 2 bleiben). Im selben PR: `diag`, Profilabruf, `STEPS_PATHS` und den Stress-Versuch für Bewegung aus `garmin-sync` entfernen (unnötige Abrufe), `bewegung` dann immer „keine“ bzw. neuer Wert für die Regel.
-- Hinweis zu `AUFGABEN.md` Abschnitt 11: Stress im Tagesverlauf (`dailyStress/{Tag}`) antwortet mit 404, die Stresskurve kommt also nicht an. Der Profilname ist nicht abrufbar (404), dieser Weg fällt aus.
-- Danach: Readiness der Uhr (`supabase/functions/watch/target.ts`) an die App angleichen (Bereiche je Zyklusphase, Schlaf zyklusabhängig, kranke Tage raus), Wunsch der Oberfläche. Noch nicht begonnen.
+- PR #70: Rechenweise Version 2 (`LOAD_VERSION` in `alltag.ts`): ohne Stressverlauf zählt Zone 1 ab 10 Minuten am Stück (`bewegung: "dauer"`), mit Stressverlauf nur Minuten mit Stresswert −2 (`"stress"`). Ältere Tage (v1) rechnet jeder Abruf nach (bis 21). Stress über `STRESS_PATHS` (zuerst `?date=`), gemeinsamer Zwischenspeicher für Stresskurve und Alltag. Schrittverlauf, Profil und Feldnamen-Suche entfernt; `diag` enthält nur noch `puls_pfad`, `stress_pfad`, `stress`.
+  Uhr: `watch/target.ts` rechnet Bereiche wie `lib/baseline.ts` (30 Tage ab 7/stabil 14, je Phase 150 Tage ab 10, kranke Tage + 3 raus, Schlaf zyklusabhängig). Krankheiten werden dafür 180 Tage geladen.
+  Nächster Schritt nach Merge und Abruf: „Daten prüfen“ starten. Ist `stress_pfad` gesetzt und `stresskurve` > 0, kommt die Stresskurve; sonst Stress als nicht abrufbar festhalten. `version_2` sollte steigen. Danach `diag` ganz entfernen.
+- Stresskurve (`AUFGABEN.md` Abschnitt 11): `dailyStress/{Tag}` antwortet mit 404. PR #70 versucht `dailyStress?date=`.
 
 ## Wartet auf
-- Nutzerin: Entscheidung Zone 1 im Alltag (`AUFGABEN.md` Abschnitt 14)
-- Nutzerin: ob die Readiness der Uhr an die App angeglichen werden soll (gefragt am 22.11.)
+- Nutzerin: Merge von PR #70, dann Synchronisieren und Bescheid geben (`AUFGABEN.md` Abschnitt 14)
 - Nutzerin: Secrets für Push und Eintrag `push_cron_secret` im Tresor (`AUFGABEN.md` Abschnitt 3 und 4)
 - Nutzerin: Rückmeldung, ob der Morgen-Abruf um 6:15 Uhr geklappt hat (`AUFGABEN.md` Abschnitt 9). Wenn nicht: Tabelle `garmin_sync_runs` und Zeitplan in `pg_cron` prüfen
 - Nutzerin: Rückmeldung, ob Atemfrequenz und Stress im Tagesverlauf ankommen (`AUFGABEN.md` Abschnitt 11)
@@ -27,6 +27,7 @@ Alltagslast läuft: 57 Tage berechnet, Faktor aus 28 Trainings, aktive kcal komm
 - Oberfläche: `lib/insights.ts` `loadPercent` und `lib/today.ts` `loadByDay` sind deine (Teil B Anzeige), ich ändere sie nicht.
 
 ## Fallstricke
+- `watch/target.ts` ist ein Nachbau von `lib/insights.ts` `computeTarget` und `lib/baseline.ts`. Ändert die Oberfläche dort etwas, muss die Uhr nachziehen (Bitte in „Für die andere Rolle“).
 - Datenbank lesen ohne eigenen Zugang: Ablauf „Daten prüfen“ (`.github/workflows/daten-pruefen.yml`, PR #66) von Hand starten, er gibt nur Zählwerte aus. Abfragen dort ergänzen, nie Gesundheitswerte ausgeben.
 - PRs mit Migrationen oder Änderungen an Supabase-Funktionen nie selbst mergen.
 - Neue Migrationen brauchen einen Zeitstempel nach `20261124090000` (die letzte). Vor dem Anlegen `ls supabase/migrations | tail -1` prüfen.
