@@ -73,7 +73,7 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 - [x] Neues App-Symbol (Zen-Ring, dunkel) freigegeben
 - [ ] Nach dem Merge die App vom Startbildschirm löschen und über Safari neu hinzufügen, damit iOS das neue Symbol übernimmt
 
-### 13. Zwei Claude-Instanzen (PR folgt, Konzept `docs/konzept-zwei-instanzen.md`)
+### 13. Zwei Claude-Instanzen (PR #54, Konzept `docs/konzept-zwei-instanzen.md`)
 - [ ] Neue Sitzungen mit diesem Satz starten: „Du bist die Rolle **Oberfläche** (oder **Daten**) im Projekt Health Coach. Folge `docs/konzept-zwei-instanzen.md`, Abschnitt 6 „Start“.“
 - [ ] Pro Rolle nur eine Sitzung gleichzeitig laufen lassen
 - [ ] PR #14 schließen (ersetzt durch PR #47)
