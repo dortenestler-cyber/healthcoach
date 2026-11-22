@@ -2654,3 +2654,8 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
 /* Training: fünf Reiter passen ohne Wischen auf 390 px */
 .segmented-tabs.training-tabs { display: flex; overflow: visible; }
 .segmented-tabs.training-tabs button { flex: 1 1 auto; min-width: 0; padding: 0 4px; font-size: 12px; white-space: nowrap; }
+
+/* Abschnitt „Dein Bereich“ in der Detailansicht */
+.korridor-lines { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.korridor-lines li { color: var(--text-2); line-height: 1.4; padding-left: 14px; position: relative; }
+.korridor-lines li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 6px; height: 6px; border-radius: 50%; background: var(--text-2); }

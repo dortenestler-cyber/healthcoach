@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay } from "@/lib/dates";
-import { METRICS, syncGarmin, type Daily, type MetricKey } from "@/lib/garmin";
+import { METRICS, syncGarmin, type Activity, type Daily, type MetricKey } from "@/lib/garmin";
+import { sickDays } from "@/lib/baseline";
+import { DEFAULT_HABITS, loadHabits, type Habit } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
 import VerlaufDetail, { HISTORY } from "@/components/verlauf/VerlaufDetail";
 import { SPANS, spanOf, type Span } from "@/lib/verlauf";
@@ -18,6 +20,9 @@ export default function VerlaufView({ initial }: { initial: string }) {
   const [span, setSpan] = useState<Span>("M");
   const [rows, setRows] = useState<Daily[]>([]);
   const [diary, setDiary] = useState<Diary[]>([]);
+  const [acts, setActs] = useState<Activity[]>([]);
+  const [sick, setSick] = useState<Set<string>>(new Set());
+  const [habits, setHabits] = useState<Habit[]>(DEFAULT_HABITS);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -27,16 +32,22 @@ export default function VerlaufView({ initial }: { initial: string }) {
     if (!sb) return;
     const from = isoDay(daysAgo(need - 1));
     const diaryFrom = isoDay(daysAgo(need + 60));
-    const [g, d, gc] = await Promise.all([
+    const [g, d, gc, a, il, hb] = await Promise.all([
       sb.from("garmin_daily").select("*").gte("day", from).order("day"),
       sb.from("diary_entries").select("day, bleeding, symptoms, influences").gte("day", diaryFrom).order("day"),
       loadGarminCycles(sb, diaryFrom),
+      sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load").gte("start_local", from),
+      sb.from("illnesses").select("started_on, ended_on").or(`ended_on.is.null,ended_on.gte.${from}`),
+      loadHabits(sb),
     ]);
     if (g.error) {
       setError("Verlauf konnte nicht geladen werden: " + g.error.message);
       return;
     }
     setRows((g.data ?? []) as Daily[]);
+    setActs((a.data ?? []) as Activity[]);
+    setSick(sickDays((il.data ?? []) as { started_on: string; ended_on: string | null }[], isoDay()));
+    setHabits(hb);
     setDiary(mergeGarminCycles(((d.data ?? []) as Diary[]).map((e) => ({ ...e, symptoms: e.symptoms ?? {}, influences: e.influences ?? [] })), gc));
   }, [need]);
 
@@ -84,7 +95,7 @@ export default function VerlaufView({ initial }: { initial: string }) {
         ))}
       </div>
 
-      <VerlaufDetail metric={metric} span={span} rows={rows} diary={diary} />
+      <VerlaufDetail metric={metric} span={span} rows={rows} diary={diary} acts={acts} sick={sick} habits={habits} />
 
       {missingHistory && (
         <section className="card">

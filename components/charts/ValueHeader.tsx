@@ -9,18 +9,19 @@ type Props = {
   value: string | null; // große Zahl mit Einheit
   fmt?: (v: number) => string;
   range?: Range | null;
-  luteal?: Range | null; // in der Lutealphase: eigener Bereich, beide werden genannt
+  phase?: Range | null; // Bereich der heutigen Zyklusphase: beide Bereiche werden genannt
+  phaseName?: string; // z. B. „Lutealphase“
   children?: ReactNode;
 };
 
-export default function ValueHeader({ meta, sentence, value, fmt = (v) => String(Math.round(v)), range, luteal, children }: Props) {
+export default function ValueHeader({ meta, sentence, value, fmt = (v) => String(Math.round(v)), range, phase, phaseName = "Phase", children }: Props) {
   const rangeText =
     range === undefined
       ? null
-      : luteal
-        ? `Bereich Lutealphase ${fmt(luteal.lo)}–${fmt(luteal.hi)} · 30 Tage ${range ? `${fmt(range.lo)}–${fmt(range.hi)}` : "–"}`
+      : phase
+        ? `Bereich ${phaseName} ${fmt(phase.lo)}–${fmt(phase.hi)}${phase.stable ? "" : " (vorläufig)"} · 30 Tage ${range ? `${fmt(range.lo)}–${fmt(range.hi)}` : "–"}`
         : range
-          ? `Dein Bereich ${fmt(range.lo)}–${fmt(range.hi)}`
+          ? `Dein Bereich ${fmt(range.lo)}–${fmt(range.hi)}${range.stable ? "" : " · vorläufig"}`
           : NO_RANGE_TEXT;
   return (
     <>

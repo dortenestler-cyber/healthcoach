@@ -23,7 +23,7 @@ export default function SleepCard({ data }: { data: Data }) {
     return s ? s / 3600 : null;
   };
   const need = sleepNeed(isoDay(daysAgo(1)), data.daily, data.acts); // Bedarf, der für letzte Nacht galt
-  const base = metricBaseline("schlaf", data.daily, data.diary, today);
+  const base = metricBaseline("schlaf", data.daily, { diary: data.diary, sick: data.sick }, today);
   const last = byDay.get(today);
   const lastH = hours(today);
   const stages = last && (last.sleep_deep_s || last.sleep_rem_s || last.sleep_light_s)

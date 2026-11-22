@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { RangeRow, ValueRing } from "@/components/charts";
 import ExplainCard from "@/components/ui/ExplainCard";
-import { countInRange, positionIn } from "@/lib/baseline";
+import { countInRange, positionIn, RANGE_PHASE_NAMES } from "@/lib/baseline";
 import { PHASES, STAGES, windowText, type DayRule, type Stage } from "@/lib/cycle";
 import { isoDay } from "@/lib/dates";
 import type { Row } from "@/lib/today";
@@ -80,7 +80,7 @@ export default function ReadinessCard({ rule, factors }: { rule: DayRule; factor
         <summary>Faktoren und Erklärung</summary>
         <div className="factor-list factor-box">
           {factors.map((f) => {
-            const row = <RangeRow label={f.label} value={f.value} fmt={f.fmt} range={f.base.range} luteal={f.base.luteal} tone="recovery" />;
+            const row = <RangeRow label={f.label} value={f.value} fmt={f.fmt} range={f.base.range} phase={f.base.phase} phaseName={f.base.phaseKey ? RANGE_PHASE_NAMES[f.base.phaseKey] : undefined} tone="recovery" />;
             return f.href ? (
               <Link key={f.key} href={f.href} className="row-link">
                 {row}

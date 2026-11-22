@@ -1,28 +1,77 @@
+import { useMemo, useState } from "react";
 import { LineBand, RangeRow, SleepStagesBar, ValueHeader } from "@/components/charts";
 import PhaseCompare from "@/components/verlauf/PhaseCompare";
-import { metricBaseline } from "@/lib/baseline";
+import { CYCLE_SENSITIVE, metricBaseline, metricRangeSeries, phaseRange, RANGE_PHASE_NAMES, seriesOf, type Range } from "@/lib/baseline";
+import { korridorLines } from "@/lib/korridor";
+import { labelOf, type Habit } from "@/lib/habits";
 import { cycleLengths, cycleToday, groupOf, phaseInsight, phaseMeans } from "@/lib/cycle";
 import { daysAgo, isoDay } from "@/lib/dates";
-import { METRICS, type Daily, type MetricKey } from "@/lib/garmin";
+import { METRICS, type Activity, type Daily, type MetricKey } from "@/lib/garmin";
 import type { Diary } from "@/lib/insights";
 import { axisLabels, buildPoints, spanDays, spanOf, summarize, type Span } from "@/lib/verlauf";
 
 export const HISTORY = 180; // Phasenvergleich: immer die letzten 6 Monate
 const tone = (k: MetricKey) => (k === "schlaf" ? "sleep" : k === "temperatur" ? "cycle" : k === "stress" ? "stress" : k === "schritte" || k === "bb" ? "training" : "recovery");
 
-// Karten der Detailansicht: Satz, Zahl, Bereich, Grafik · Highlights · Vergleich nach Zyklusphase. Ohne Netzwerk.
-export default function VerlaufDetail({ metric, span, rows, diary }: { metric: MetricKey; span: Span; rows: Daily[]; diary: Diary[] }) {
+const KORRIDOR_DAYS = 181; // Abschnitt „Dein Bereich“: letztes Halbjahr
+const NIGHT: MetricKey[] = ["schlaf", "hrv", "ruhepuls", "atem", "temperatur", "bb"]; // Werte der Nacht, dem Aufwachtag zugeordnet
+const addDays = (iso: string, n: number) => {
+  const d = new Date(iso + "T12:00:00");
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+const avgRange = (rs: Range[]): Range | null =>
+  rs.length ? { lo: rs.reduce((a, r) => a + r.lo, 0) / rs.length, hi: rs.reduce((a, r) => a + r.hi, 0) / rs.length, median: rs.reduce((a, r) => a + r.median, 0) / rs.length, n: rs.length, stable: rs.every((r) => r.stable) } : null;
+
+type Props = { metric: MetricKey; span: Span; rows: Daily[]; diary: Diary[]; acts: Activity[]; sick: Set<string>; habits: Habit[] };
+
+// Karten der Detailansicht: Satz, Zahl, Bereich, Grafik · Dein Bereich · Highlights · Vergleich nach Zyklusphase. Ohne Netzwerk.
+// Der Bereich wandert im Diagramm mit: je Tag der Bereich, der damals galt (je Zyklusphase, ohne Krankheitstage).
+export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, habits }: Props) {
   const today = isoDay();
+  const [bandMode, setBandMode] = useState<"zeit" | "heute">("zeit");
+  const ctx = useMemo(() => ({ diary, sick }), [diary, sick]);
   const m = METRICS[metric];
   const byDay = new Map(rows.map((r) => [r.day, r]));
   const value = (d: string) => {
     const r = byDay.get(d);
     return r ? m.value(r) : null;
   };
-  const base = metricBaseline(metric, rows, diary, today);
+  const base = metricBaseline(metric, rows, ctx, today);
+  const phaseName = base.phase && base.phaseKey ? RANGE_PHASE_NAMES[base.phaseKey] : undefined;
   const points = buildPoints(span, today, value);
   const weekly = spanOf(span).weekly;
   const days = spanDays(span, today);
+
+  // Wandernder Korridor: Bereich je Tag für den Zeitraum und das letzte Halbjahr
+  const bandMap = useMemo(() => {
+    const n = Math.max(spanOf(span).days, KORRIDOR_DAYS);
+    const list = Array.from({ length: n }, (_, i) => addDays(today, i - n + 1));
+    const rs = metricRangeSeries(metric, rows, ctx, list);
+    return new Map(list.map((d, i) => [d, rs[i]]));
+  }, [metric, rows, ctx, span, today]);
+  const pointBands = points.map((p) => {
+    if (!weekly) return bandMap.get(p.day) ?? null;
+    const week = Array.from({ length: 7 }, (_, i) => bandMap.get(addDays(p.day, i))).filter((r): r is Range => !!r);
+    return avgRange(week);
+  });
+  const lines = useMemo(
+    () =>
+      korridorLines({
+        series: seriesOf(metric, rows),
+        bands: bandMap,
+        today,
+        higherIsBetter: METRICS[metric].higherIsBetter,
+        fmt: METRICS[metric].fmt,
+        diary,
+        daily: rows,
+        acts,
+        sick,
+        nightValue: NIGHT.includes(metric),
+        habitLabel: (k) => labelOf(habits, k),
+      }),
+    [metric, rows, bandMap, today, diary, acts, sick, habits],
+  );
   const sweat = new Set(diary.filter((e) => (e.symptoms?.nacht ?? 0) > 0).map((e) => e.day));
   const sweatNights = days.filter((d) => sweat.has(d)).length;
   // Hauttemperatur: Nächte nach der Sauna markieren (Garmin ordnet die Nacht dem Aufwachtag zu)
@@ -34,9 +83,8 @@ export default function VerlaufDetail({ metric, span, rows, diary }: { metric: M
   };
   const saunaNight = (d: string) => saunaDays.has(dayBefore(d));
   const saunaNights = days.filter(saunaNight).length;
-  // In der Lutealphase zählen Luteal-Tage gegen den Luteal-Bereich, alle anderen gegen den 30-Tage-Bereich
-  const isLuteal = (d: string) => groupOf(cycleToday(d, diary).phase) === "luteal";
-  const rangeFor = (d: string) => (base.luteal && isLuteal(d) ? base.luteal : base.range);
+  // Jeder Tag zählt gegen den Bereich, der an diesem Tag galt
+  const rangeFor = (d: string) => bandMap.get(d) ?? null;
   const sum = summarize(span, points, base.active, rangeFor, m.fmt, m.label, metric === "schlaf" ? sweatNights : 0);
   const phases = weekly || span === "T" ? undefined : points.map((p) => groupOf(cycleToday(p.day, diary).phase));
   const hasPhase = !!phases?.some(Boolean);
@@ -47,6 +95,11 @@ export default function VerlaufDetail({ metric, span, rows, diary }: { metric: M
   const cycles = cycleLengths(diary).length;
   const pm = phaseMeans(series, diary);
   const phaseSentence = phaseInsight(m.label, series, diary, (v) => m.fmt(v).replace(/^\+/, ""));
+  const tomorrow = addDays(today, 1);
+  const phaseRanges = CYCLE_SENSITIVE.includes(metric)
+    ? { menstruation: phaseRange(seriesOf(metric, rows), ctx, "menstruation", tomorrow), follikel: phaseRange(seriesOf(metric, rows), ctx, "follikel", tomorrow), luteal: phaseRange(seriesOf(metric, rows), ctx, "luteal", tomorrow) }
+    : undefined;
+  const moving = bandMode === "zeit" && pointBands.some(Boolean);
 
   const last = byDay.get(today);
   const stages =
@@ -63,11 +116,12 @@ export default function VerlaufDetail({ metric, span, rows, diary }: { metric: M
           value={sum.big ? `${sum.big}` : null}
           fmt={m.fmt}
           range={base.range}
-          luteal={base.luteal}
+          phase={base.phase}
+          phaseName={phaseName}
         >
           {span === "T" ? (
             <>
-              <RangeRow label={m.label} value={value(today)} fmt={m.fmt} range={base.range} luteal={base.luteal} tone={tone(metric)} />
+              <RangeRow label={m.label} value={value(today)} fmt={m.fmt} range={base.range} phase={base.phase} phaseName={phaseName} tone={tone(metric)} />
               {stages && <SleepStagesBar minutes={stages} />}
             </>
           ) : (
@@ -75,9 +129,10 @@ export default function VerlaufDetail({ metric, span, rows, diary }: { metric: M
               values={points.map((p) => p.value)}
               fmt={m.fmt}
               tone={tone(metric)}
-              label={`${m.label}, ${spanOf(span).name}${weekly ? " als Wochenmittel" : ""}, mit deinem Bereich`}
+              label={`${m.label}, ${spanOf(span).name}${weekly ? " als Wochenmittel" : ""}, mit deinem Bereich${moving ? ", wie er jeweils galt" : ""}`}
               band={base.range}
-              lutealBand={weekly ? null : base.luteal}
+              phaseBand={weekly ? null : base.phase}
+              bands={moving ? pointBands : undefined}
               phases={hasPhase ? phases : undefined}
               zeroLine={metric === "temperatur"}
               markers={metric === "schlaf" && !weekly ? points.map((p) => sweat.has(p.day)) : metric === "temperatur" && !weekly && saunaNights > 0 ? points.map((p) => saunaNight(p.day)) : undefined}
@@ -86,8 +141,14 @@ export default function VerlaufDetail({ metric, span, rows, diary }: { metric: M
           )}
         </ValueHeader>
         <div className={`legend cb-${tone(metric)}`}>
-          {base.range && <span><i className="legend-band" />Dein Bereich (30 Tage, mittlere Hälfte)</span>}
-          {base.luteal && !weekly && <span><i className="legend-luteal" />Bereich Lutealphase</span>}
+          {moving ? (
+            <span><i className="legend-band" />Dein Bereich, wie er jeweils galt</span>
+          ) : (
+            <>
+              {base.range && <span><i className="legend-band" />Dein Bereich (30 Tage, mittlere Hälfte)</span>}
+              {base.phase && !weekly && <span><i className="legend-luteal" />Bereich {phaseName}</span>}
+            </>
+          )}
           {hasPhase && (
             <>
               <span><i className="ph-menses-bg" />Menstruation</span>
@@ -99,9 +160,41 @@ export default function VerlaufDetail({ metric, span, rows, diary }: { metric: M
           {metric === "schlaf" && !weekly && sweatNights > 0 && <span><i className="legend-sweat" />Nachtschweiß</span>}
           {metric === "temperatur" && !weekly && saunaNights > 0 && <span><i className="legend-sweat" />Nacht nach der Sauna</span>}
         </div>
+        {span !== "T" && pointBands.some(Boolean) && (
+          <div className="segmented" role="group" aria-label="Bereich im Diagramm">
+            <button type="button" aria-pressed={bandMode === "zeit"} onClick={() => setBandMode("zeit")}>
+              Bereich über die Zeit
+            </button>
+            <button type="button" aria-pressed={bandMode === "heute"} onClick={() => setBandMode("heute")}>
+              Bereich heute
+            </button>
+          </div>
+        )}
         {metric === "temperatur" && !rows.some((r) => typeof r.skin_temp_delta === "number") && (
           <p>Noch keine Hauttemperatur. Sie kommt mit dem nächsten Garmin-Abruf, wenn deine Uhr sie nachts misst.</p>
         )}
+      </section>
+
+      <section className="card">
+        <span className="meta">Dein Bereich · {m.label}</span>
+        {lines.length ? (
+          <>
+            <h2>{lines[0].text}</h2>
+            {lines.length > 1 && (
+              <ul className="korridor-lines">
+                {lines.slice(1).map((l) => (
+                  <li key={l.key}>{l.text}</li>
+                ))}
+              </ul>
+            )}
+          </>
+        ) : (
+          <h2>Für mehr zu deinem Bereich fehlen noch Tage mit Werten.</h2>
+        )}
+        <span className="meta">
+          Bereich: mittlere Hälfte deiner letzten 30 Tage{CYCLE_SENSITIVE.includes(metric) ? ", bei genug Tagen je Zyklusphase aus derselben Phase früherer Zyklen" : ""}. Krankheitstage und die 3 Tage danach zählen nicht mit.
+          {base.active && !base.active.stable ? " Noch vorläufig, stabil ab 14 Tagen." : ""}
+        </span>
       </section>
 
       {sum.highlights.length > 0 && (
@@ -123,9 +216,9 @@ export default function VerlaufDetail({ metric, span, rows, diary }: { metric: M
         {cycles >= 2 ? (
           <>
             <h2>{phaseSentence ?? `${m.label}: noch zu wenige Tage je Phase für einen Vergleich.`}</h2>
-            <PhaseCompare means={pm} range={base.range} fmt={m.fmt} label={m.label} tone={tone(metric)} />
+            <PhaseCompare means={pm} range={base.range} ranges={phaseRanges} fmt={m.fmt} label={m.label} tone={tone(metric)} />
             <span className="meta">
-              {cycles} Zyklen. Mindestens 3 Tage je Phase, sonst steht ein Strich. Phasen sind geschätzt. Ein Zusammenhang, keine Diagnose.
+              {cycles} Zyklen. Mindestens 3 Tage je Phase, sonst steht ein Strich.{phaseRanges && Object.values(phaseRanges).some(Boolean) ? " Band = dein Bereich in dieser Phase." : ""} Phasen sind geschätzt. Ein Zusammenhang, keine Diagnose.
             </span>
           </>
         ) : (
