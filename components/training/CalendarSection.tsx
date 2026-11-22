@@ -115,6 +115,8 @@ export default function CalendarSection({ data }: { data: Data | null }) {
     }
     return dots.slice(0, 4);
   };
+  // Symptome aus dem Tagebuch: ein Amber-Punkt am Tag, wenn mindestens ein Symptom eingetragen ist
+  const symptomDays = new Set((data?.diary ?? []).filter((d) => Object.values(d.symptoms ?? {}).some((v) => v > 0)).map((d) => d.day));
 
   const today = isoDay();
   const showPhase = filter !== "training" && !!data;
@@ -197,7 +199,7 @@ export default function CalendarSection({ data }: { data: Data | null }) {
                 data-phase={showPhase ? band(phaseOf(day)) : undefined}
                 data-future={day > today}
                 onClick={() => setSelected(day)}
-                aria-label={longDate(fromIso(day)) + (showPhase && phaseOf(day) ? ", " + PHASES[phaseOf(day)!].label + " geschätzt" : "")}
+                aria-label={longDate(fromIso(day)) + (showPhase && phaseOf(day) ? ", " + PHASES[phaseOf(day)!].label + " geschätzt" : "") + (showPhase && symptomDays.has(day) ? ", Symptome eingetragen" : "")}
               >
                 <span className="cal-num">{Number(day.slice(8, 10))}</span>
                 <span className="cal-dots">
@@ -205,6 +207,7 @@ export default function CalendarSection({ data }: { data: Data | null }) {
                     dotsFor(day).map((d) => (
                       <i key={d.key} style={{ borderColor: d.color, background: d.filled ? d.color : "transparent" }} />
                     ))}
+                  {showPhase && symptomDays.has(day) && <i className="cal-dot-symptom" />}
                 </span>
               </button>
             ) : (
@@ -227,6 +230,7 @@ export default function CalendarSection({ data }: { data: Data | null }) {
               <span><i className="ph-follikel-bg" />Follikel</span>
               <span><i className="ph-luteal-bg" />Luteal</span>
               <span><i className="legend-period" />Periode eingetragen</span>
+              <span><i className="cal-dot-symptom legend-dot" />Symptome</span>
               <span>Phasen geschätzt, kommende Tage heller</span>
             </>
           )}

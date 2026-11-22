@@ -55,6 +55,13 @@
   /* Zyklusphasen als Fläche hinter Diagrammen */
   --phase-luteal: #fbe9e2;
 
+  /* Sportarten (Familie Training, Ausdauer Petrol), immer mit Text */
+  --sport-karate: #2b4378;
+  --sport-kettlebell: #3b5998;
+  --sport-klettern: #7c93c9;
+  --sport-ausdauer: #0e7490;
+  --sport-sonstiges: #8a8a8f;
+
   /* Zielbereich Training (Fläche hinter Säulen und Skalen) */
   --training-zone: #c9d5ee;
 
@@ -114,6 +121,11 @@
     --warn-fg: #f6c98e;
     --mobility: #a98be0;
     --sleep: #e5e7eb;
+    --sport-karate: #a9bdf0;
+    --sport-kettlebell: #7c9ae0;
+    --sport-klettern: #5b78c4;
+    --sport-ausdauer: #3fb4c9;
+    --sport-sonstiges: #9aa3ae;
     --spot-bg: rgba(21, 24, 29, 0.9);
     --future-veil: rgba(11, 13, 16, 0.5);
     color-scheme: dark;
@@ -152,6 +164,11 @@
   --warn-fg: #f6c98e;
   --mobility: #a98be0;
   --sleep: #e5e7eb;
+  --sport-karate: #a9bdf0;
+  --sport-kettlebell: #7c9ae0;
+  --sport-klettern: #5b78c4;
+  --sport-ausdauer: #3fb4c9;
+  --sport-sonstiges: #9aa3ae;
   --spot-bg: rgba(21, 24, 29, 0.9);
   --future-veil: rgba(11, 13, 16, 0.5);
   color-scheme: dark;
@@ -2079,3 +2096,25 @@ a.btn {
 
 .highlight-value { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
 .legend .legend-band { background: var(--c, var(--text-2)); opacity: 0.3; }
+
+/* Training (Konzept PR 4): Fortschritt Intensitätsminuten */
+.progress {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--fill);
+  overflow: hidden;
+  margin: 4px 0;
+}
+
+.progress > span {
+  display: block;
+  height: 100%;
+  background: var(--training);
+  border-radius: 999px;
+}
+.cal-dots .cal-dot-symptom,
+.legend .cal-dot-symptom { background: var(--warn); border-color: var(--warn); border-radius: 50%; }
+.legend .legend-dot { width: 8px; height: 8px; }
+.segmented-tabs { display: flex; overflow-x: auto; scrollbar-width: none; }
+.segmented-tabs::-webkit-scrollbar { display: none; }
+.segmented-tabs button { flex: 1 0 auto; min-height: 44px; padding: 0 12px; }

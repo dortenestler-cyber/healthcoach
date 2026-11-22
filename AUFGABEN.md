@@ -14,7 +14,7 @@ So führst du eine Migration aus: In Supabase links **SQL Editor** öffnen, den 
 ### 2. Funktionen hochladen
 Der automatische Upload nach PR #33 ist gescheitert (GitHub hatte zu viele Anfragen). Das ist inzwischen behoben, muss aber einmal von Hand angestoßen werden:
 - [x] Upload angestoßen (Claude, 22. Nov.). Nach dem Merge von PR #38 lief er ohnehin noch einmal.
-- [ ] Auf GitHub unter **Actions → Supabase-Funktionen hochladen** prüfen, dass der letzte Lauf grün ist. Wenn nicht, Claude Bescheid geben.
+- [x] Beide Läufe sind grün (geprüft von Claude): `coach`, `garmin-sync`, `push` und `watch` sind aktuell.
 
 ### 3. Secrets für Push-Mitteilungen
 In Supabase unter **Edge Functions → Secrets** anlegen:
@@ -30,7 +30,7 @@ In Supabase unter **Edge Functions → Secrets** anlegen:
 ### 5. Heute im neuen Design (PR #38)
 - [x] PR #38 ansehen und mergen
 - [ ] `supabase/migrations/20261122150000_schlafphasen.sql` ausführen: Spalten für die Schlafphasen
-- [ ] Nach dem Merge prüfen, dass **Actions → Supabase-Funktionen hochladen** grün ist (lädt `garmin-sync` neu hoch)
+- [x] Upload von `garmin-sync` nach dem Merge ist grün
 - [ ] In der App auf Heute **Synchronisieren** tippen. Die Schlafkarte sollte dann Tief, REM, Leicht und Wach zeigen. Wenn nicht, Claude Bescheid geben
 
 ### 6. Aufräumen

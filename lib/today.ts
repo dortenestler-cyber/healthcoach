@@ -66,7 +66,7 @@ export function sleepAchieved(day: string, data: Data): { hours: number | null; 
 // ---------- Last der letzten 7 Tage
 
 // Trainingslast pro Tag aus den Garmin-Aktivitäten
-function loadByDay(acts: Activity[]): Map<string, number> {
+export function loadByDay(acts: Activity[]): Map<string, number> {
   const m = new Map<string, number>();
   for (const a of acts) {
     const d = (a.start_local ?? "").slice(0, 10);
