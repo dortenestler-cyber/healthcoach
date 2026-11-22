@@ -7,8 +7,8 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
-### Wadenzucken und Wadenkrämpfe erfassen (Schritt 1)
-- [ ] Pull Request „Wadenzucken und Wadenkrämpfe im Tagebuch“ ansehen und selbst mergen. Er enthält die Migration `supabase/migrations/20261122190000_muskeln.sql` (neue Tabelle `muscle_events`). Dein Merge ist die Freigabe, danach legt GitHub die Tabelle automatisch an. Voraussetzung ist das Secret `SUPABASE_DB_URL` aus Punkt 1
+### Wadenzucken und Wadenkrämpfe erfassen (PR #49)
+- [ ] PR #49 ansehen und selbst mergen. Er enthält die Migration `supabase/migrations/20261122190000_muskeln.sql` (neue Tabelle `muscle_events`). Dein Merge ist die Freigabe, danach legt GitHub die Tabelle automatisch an. Voraussetzung ist das Secret `SUPABASE_DB_URL` aus Punkt 1
 - [ ] Falls der Workflow noch nicht läuft: den Inhalt der Datei im SQL Editor von Supabase ausführen
 - [ ] Magnesium unter **Gesundheit › Medikamente** als Supplement eintragen (falls noch nicht geschehen) und täglich abhaken, damit die spätere Auswertung Tage mit und ohne Einnahme vergleichen kann
 - [ ] Im Tagebuch einen Testeintrag machen und wieder löschen
