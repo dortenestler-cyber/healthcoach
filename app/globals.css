@@ -18,6 +18,10 @@
   /* Hauptbutton, aktive Auswahl, Links */
   --primary: #1c1c1e;
   --on-primary: #ffffff;
+  --on-warn: #ffffff;
+  --spot-bg: rgba(255, 255, 255, 0.9);
+  --overlay-soft: rgba(255, 255, 255, 0.5);
+  --segment-on: var(--card);
 
   /* Marke: nur App-Symbol und Coach-Knopf */
   --brand: #a3234f;
@@ -60,6 +64,86 @@
   --radius-tile: 18px;
   --radius-control: 12px;
   --tabbar-h: 72px;
+}
+
+
+/* Dunkle Darstellung: automatisch nach Gerät oder fest gewählt in den Einstellungen */
+:root {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #111113;
+  --card: #1c1c1e;
+  --fill: #2c2c2e;
+  --line: #38383a;
+  --line-soft: #2c2c2e;
+  --line-strong: #545458;
+  --text: #f2f2f7;
+  --text-2: #d1d1d6;
+  --muted: #a1a1a6;
+  --primary: #f2f2f7;
+  --on-primary: #1c1c1e;
+  --on-warn: #1c1c1e;
+  --spot-bg: rgba(28, 28, 30, 0.9);
+  --overlay-soft: rgba(17, 17, 19, 0.45);
+  --segment-on: #48484a;
+  --recovery: #6fcf97;
+  --recovery-bg: #173326;
+  --recovery-fg: #9ad9b4;
+  --cycle: #e8805a;
+  --cycle-bg: #3a2116;
+  --cycle-fg: #f2a88a;
+  --phase-follikel: #2a1d17;
+  --menses-bg: #4a1c1c;
+  --menses-fg: #f6c4c4;
+  --training: #8ea8e0;
+  --training-bg: #1f2a44;
+  --training-fg: #b5c6ef;
+  --warn: #e39a3b;
+  --warn-bg: #3b2a10;
+  --warn-mid: #7a5418;
+  --warn-fg: #f5cf94;
+  --mobility: #b39ae6;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111113;
+    --card: #1c1c1e;
+    --fill: #2c2c2e;
+    --line: #38383a;
+    --line-soft: #2c2c2e;
+    --line-strong: #545458;
+    --text: #f2f2f7;
+    --text-2: #d1d1d6;
+    --muted: #a1a1a6;
+    --primary: #f2f2f7;
+    --on-primary: #1c1c1e;
+    --on-warn: #1c1c1e;
+    --spot-bg: rgba(28, 28, 30, 0.9);
+    --overlay-soft: rgba(17, 17, 19, 0.45);
+  --segment-on: #48484a;
+    --recovery: #6fcf97;
+    --recovery-bg: #173326;
+    --recovery-fg: #9ad9b4;
+    --cycle: #e8805a;
+    --cycle-bg: #3a2116;
+    --cycle-fg: #f2a88a;
+    --phase-follikel: #2a1d17;
+    --menses-bg: #4a1c1c;
+    --menses-fg: #f6c4c4;
+    --training: #8ea8e0;
+    --training-bg: #1f2a44;
+    --training-fg: #b5c6ef;
+    --warn: #e39a3b;
+    --warn-bg: #3b2a10;
+    --warn-mid: #7a5418;
+    --warn-fg: #f5cf94;
+    --mobility: #b39ae6;
+    color-scheme: dark;
+  }
 }
 
 * {
@@ -308,13 +392,13 @@ button {
 .pill[aria-pressed="true"] {
   background: var(--text);
   border-color: var(--text);
-  color: #ffffff;
+  color: var(--on-primary);
 }
 
 /* Symptom-Stärke: leicht, mittel, stark (Amber) */
 .pill.level-1 { background: var(--warn-bg); border-color: var(--warn-bg); color: var(--warn-fg); }
 .pill.level-2 { background: var(--warn-mid); border-color: var(--warn-mid); color: var(--warn-fg); }
-.pill.level-3 { background: var(--warn); border-color: var(--warn); color: #ffffff; }
+.pill.level-3 { background: var(--warn); border-color: var(--warn); color: var(--on-warn); }
 
 .grid-5 {
   display: grid;
@@ -339,7 +423,7 @@ button {
 
 .btn-primary {
   background: var(--primary);
-  color: #ffffff;
+  color: var(--on-primary);
   width: 100%;
   margin-top: 14px;
   min-height: 48px;
@@ -347,7 +431,7 @@ button {
 
 .btn-dark {
   background: var(--text);
-  color: #ffffff;
+  color: var(--on-primary);
   margin-top: 4px;
 }
 
@@ -656,7 +740,7 @@ button {
 }
 
 .segmented button[aria-pressed="true"] {
-  background: var(--card);
+  background: var(--segment-on);
   font-weight: 600;
 }
 
@@ -903,7 +987,7 @@ button {
   height: 30px;
   border-radius: 50%;
   border: 2px solid var(--muted);
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--spot-bg);
   padding: 0;
   cursor: pointer;
 }
@@ -1189,7 +1273,7 @@ button {
 .check[aria-pressed="true"] .check-box {
   background: var(--ok-fg);
   border-color: var(--ok-fg);
-  color: #ffffff;
+  color: var(--on-primary);
 }
 
 .center-link {
@@ -1307,7 +1391,7 @@ button {
 .bubble-user {
   align-self: flex-end;
   background: var(--text);
-  color: #ffffff;
+  color: var(--on-primary);
   border-bottom-right-radius: 6px;
 }
 
@@ -1475,7 +1559,7 @@ button {
 
 /* Kommende Tage sind nur geschätzt: heller */
 .cal-cell[data-future="true"][data-phase] {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5));
+  background-image: linear-gradient(var(--overlay-soft), var(--overlay-soft));
 }
 
 .week-bars {
@@ -1575,6 +1659,7 @@ button {
   font-family: inherit;
   text-align: left;
   color: var(--text);
+  font-weight: 400;
   text-decoration: none;
 }
 
@@ -1607,4 +1692,16 @@ button.settings-row {
   font-size: 13px;
   line-height: 1.5;
   color: var(--text-2);
+}
+
+/* Einstellungen: Auswahl Darstellung */
+.settings-choice {
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-choice .segmented button {
+  min-height: 44px;
 }

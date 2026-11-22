@@ -4,12 +4,23 @@ import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 import { clearPin, LOCK_AFTER_MS } from "@/lib/pin";
+import { getTheme, setTheme, THEME_OPTIONS, type Theme } from "@/lib/theme";
 import PageHead from "@/components/PageHead";
 
 // Einstellungen, gruppiert: Schutz, Coach & Mitteilungen, Aussehen, Daten, Hilfe.
-// Weitere Schalter (Face ID, Darstellung, Coach-Limit …) kommen schrittweise aus dem Backlog dazu.
+// Weitere Schalter (Face ID, Coach-Limit …) kommen schrittweise aus dem Backlog dazu.
 export default function SettingsView() {
   const [email, setEmail] = useState("");
+  const [theme, setThemeState] = useState<Theme>("auto");
+
+  useEffect(() => {
+    setThemeState(getTheme());
+  }, []);
+
+  const chooseTheme = (t: Theme) => {
+    setTheme(t);
+    setThemeState(t);
+  };
 
   useEffect(() => {
     supabase()?.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
@@ -40,7 +51,19 @@ export default function SettingsView() {
       </Group>
 
       <Group title="Aussehen">
-        <Row label="Darstellung" value="Hell" />
+        <div className="settings-choice">
+          <span className="stack">
+            <span className="row-label">Darstellung</span>
+            <span className="meta">Automatisch folgt der Einstellung deines iPhones.</span>
+          </span>
+          <div className="segmented segmented-3" role="group" aria-label="Darstellung">
+            {THEME_OPTIONS.map(([k, l]) => (
+              <button key={k} type="button" aria-pressed={theme === k} onClick={() => chooseTheme(k)}>
+                {l}
+              </button>
+            ))}
+          </div>
+        </div>
       </Group>
 
       <Group title="Daten">

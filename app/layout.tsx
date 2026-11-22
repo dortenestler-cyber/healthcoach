@@ -3,6 +3,10 @@ import { Inter } from "next/font/google";
 import AuthGate from "@/components/AuthGate";
 import "./globals.css";
 
+// Setzt die gewählte Darstellung vor dem ersten Zeichnen, damit nichts aufblitzt
+const THEME_SCRIPT =
+  "try{var t=localStorage.getItem('hc_theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}";
+
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
@@ -32,7 +36,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={inter.variable}>
+    <html lang="de" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body>
         <main className="shell">
           <AuthGate>{children}</AuthGate>

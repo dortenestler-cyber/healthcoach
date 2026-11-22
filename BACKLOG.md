@@ -7,7 +7,7 @@ Gesammelte Änderungswünsche. Umsetzung erst nach Freigabe, jeweils über eigen
 ### Sofort möglich
 - [x] **Einstellungsseite** mit Gruppen: Schutz, Coach & Mitteilungen, Aussehen, Daten, Hilfe. Erreichbar über ein Zahnrad im Seitenkopf, die Tab-Leiste bleibt unverändert.
 - [ ] **Face ID zusätzlich zur PIN**: in den Einstellungen ein- und ausschaltbar, die PIN bleibt als Rückfall.
-- [ ] **Darstellung**: Automatisch, Hell oder Dunkel. Dunkle Werte als Variablen in `app/globals.css`.
+- [x] **Darstellung**: Automatisch, Hell oder Dunkel. Dunkle Werte als Variablen in `app/globals.css`.
 - [ ] **Funktionen ein- und ausblenden**, mit Profilen (zum Beispiel Einfach, Standard, Alles), etwa für Zyklus, Perimenopause und Medikamente.
 - [ ] **Begriffe**: kurze Erklärungen zu HRV, Body Battery, Ruhepuls, Schlafphasen und Trainingslast, ohne Fachjargon.
 
