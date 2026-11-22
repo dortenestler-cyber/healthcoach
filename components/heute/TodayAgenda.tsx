@@ -31,7 +31,7 @@ export default function TodayAgenda({ day, data, rule, showPlan, showLoad }: { d
           Belastung <strong>{load} %</strong>
           {t.pause ? " · heute Pause" : ` · ${load < t.lo ? "unter dem" : load <= t.hi ? "im" : "über dem"} Ziel von ${t.lo}–${t.hi} %`}
         </span>
-        <Link href="/tagesziel" className="link-small">Tagesziel ›</Link>
+        <Link href="/training?t=auswertung" className="link-small">Tagesziel ›</Link>
       </div>
     ) : null;
 

@@ -2650,3 +2650,7 @@ body { overflow-x: clip; }
 a.agenda-part { color: var(--text); text-decoration: none; }
 .values-pane { display: flex; flex-direction: column; gap: 10px; }
 details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
+
+/* Training: fünf Reiter passen ohne Wischen auf 390 px */
+.segmented-tabs.training-tabs { display: flex; overflow: visible; }
+.segmented-tabs.training-tabs button { flex: 1 1 auto; min-width: 0; padding: 0 4px; font-size: 12px; white-space: nowrap; }

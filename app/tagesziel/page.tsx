@@ -1,8 +1,6 @@
-import type { Metadata } from "next";
-import TargetView from "@/components/TargetView";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Tagesziel · Health Coach" };
-
+// Das Tagesziel steht jetzt unter Training › Auswertung.
 export default function TageszielPage() {
-  return <TargetView />;
+  redirect("/training?t=auswertung");
 }
