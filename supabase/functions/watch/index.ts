@@ -6,7 +6,7 @@
 // Aktionen (POST, JSON): today, flash, intake, checkin, kbsets
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { asDay, cycleInfo, periodStarts, phaseShort, targetScore } from "./target.ts";
+import { asDay, cycleInfo, periodStarts, phaseShort, sickDays, targetScore } from "./target.ts";
 import { fitnessAge, waistOn } from "./fitness.ts";
 
 const TZ = "Europe/Berlin";
@@ -173,7 +173,8 @@ async function today(sb: Any, uid: string, day: string) {
     sb.from("settings").select("data").eq("user_id", uid).maybeSingle(),
     sb.from("body_measurements").select("day, waist_cm").eq("user_id", uid).gte("day", addDays(day, -179)).order("day"),
     sb.from("garmin_activities").select("start_local, duration_s, avg_hr").eq("user_id", uid).gte("start_local", addDays(day, -28)),
-    sb.from("illnesses").select("started_on, ended_on").eq("user_id", uid).or(`ended_on.is.null,ended_on.gte.${addDays(day, -28)}`),
+    // Krankheiten: für das Fitness-Alter (4 Wochen) und damit kranke Tage nicht in die Bereiche der Readiness zählen (150 Tage)
+    sb.from("illnesses").select("started_on, ended_on").eq("user_id", uid).or(`ended_on.is.null,ended_on.gte.${addDays(day, -179)}`),
   ]);
 
   const ins = (intakes.data ?? []) as Any[];
@@ -236,7 +237,7 @@ async function today(sb: Any, uid: string, day: string) {
   const days = (daily.data ?? []) as Any[];
   const g = days.find((r) => r.day === day) ?? null;
   // Tagesziel "Belastung heute" 0–100, wie in der App
-  const target = targetScore(day, days.map(asDay), di, (checkin.data ?? null) as Any, ill, starts);
+  const target = targetScore(day, days.map(asDay), di, (checkin.data ?? null) as Any, ill, starts, sickDays((ills.data ?? []) as Any[], day));
   // Eigenes Fitness-Alter (HUNT-Modell, wie in der App)
   const by = (settings.data as Any)?.data?.birthYear;
   const w = waistOn(((body.data ?? []) as Any[]).map((r) => ({ day: r.day, waist_cm: r.waist_cm === null ? null : Number(r.waist_cm) })), day);
