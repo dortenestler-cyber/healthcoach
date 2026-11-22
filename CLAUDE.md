@@ -34,7 +34,7 @@ Health Coach bringt Training, Erholung, Zyklus, Perimenopause-Symptome, Krankhei
 - Die Seite Zyklus stellt den Zyklus in den Mittelpunkt: Ring mit Phasen, was in der heutigen Phase üblich ist, Werte und Symptome nach Zyklustag, Gewohnheiten je Phase. „Energie über den Tag“ steht auf Heute.
 - Gesundheit hat die Reiter Überblick · Medikamente · Krank & verletzt · Körper. Der Überblick zeigt heute auf einen Blick, was dir guttut, Gewohnheiten im Monat und die Muster ohne Zyklusbezug („Weitere Muster“).
 - Gewohnheiten (früher „Einflüsse“) werden im Tagebuch per Tipp erfasst, Details nur wo nötig (Sauna: Gänge, Wann, Kältebecken). Liste und eigene Gewohnheiten unter Einstellungen › Gewohnheiten. Jede Gewohnheit hat eine Detailseite unter Gesundheit.
-- App-Symbol: Tagesziel-Ring, hell (`public/icons/icon.svg`) und dunkel (`public/icons/icon-dark.svg`).
+- App-Symbol: Zen-Ring (Ensō), mit dem Pinsel gezeichnet, Beere `#E0527F` auf Anthrazit. Gleich im hellen und dunklen Design (`public/icons/icon.svg`, `public/icons/icon-dark.svg`, PNG-Größen daneben).
 
 ## Gesundheit und Sicherheit
 - Keine Diagnosen, keine Dosierungsvorschläge. Mengen von Medikamenten trägt die Nutzerin selbst ein.

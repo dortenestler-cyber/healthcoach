@@ -70,7 +70,8 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 - [ ] Im Tagebuch bei der nächsten Sauna „Sauna“ antippen und Gänge, Wann und Kältebecken wählen
 - [ ] Unter Einstellungen › Gewohnheiten die Liste prüfen und bei Bedarf eigene Gewohnheiten anlegen
 - [ ] Nach ein paar Wochen unter Gesundheit › Überblick › Sauna ansehen (Vergleiche erscheinen ab je 5 Nächten mit und ohne)
-- [ ] Entwurf für das neue App-Symbol (Zen-Ring) ansehen und freigeben oder Änderungen nennen
+- [x] Neues App-Symbol (Zen-Ring, dunkel) freigegeben
+- [ ] Nach dem Merge die App vom Startbildschirm löschen und über Safari neu hinzufügen, damit iOS das neue Symbol übernimmt
 
 ## Erledigt
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)
