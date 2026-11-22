@@ -5,7 +5,7 @@ name: Supabase-Migrationen ausführen
 # Pull Requests mit Migrationen merged die Nutzerin selbst. Ihr Merge ist die Freigabe.
 #
 # Voraussetzung: GitHub-Secret SUPABASE_DB_URL (Settings → Secrets and variables → Actions).
-# Wert: in Supabase oben „Connect“ → „Session pooler“ → Verbindungs-Adresse kopieren
+# Wert: in Supabase oben „Connect“ → „Direct“ → Verbindungsart „Session pooler“ → Adresse kopieren
 # und [YOUR-PASSWORD] durch das Datenbank-Passwort ersetzen.
 
 on:
