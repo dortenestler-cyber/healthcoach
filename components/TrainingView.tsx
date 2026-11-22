@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import PageHead from "@/components/PageHead";
+import { useFeatures, type Feature } from "@/lib/prefs";
 import WeekLoadCard from "@/components/training/WeekLoadCard";
 import { loadInsightData } from "@/lib/insightData";
 import type { Data } from "@/lib/insights";
@@ -18,8 +19,13 @@ const TABS: [string, string][] = [
 ];
 
 // Training: Kalender und die drei Sportarten mit eigenen Zielen
+const TAB_FEATURE: Record<string, Feature> = {kettlebell: "kettlebell", klettern: "bouldern", karate: "karate"};
+
 export default function TrainingView({ initial }: { initial: string }) {
   const [tab, setTab] = useState(TABS.some(([k]) => k === initial) ? initial : "kalender");
+  const feat = useFeatures();
+  const tabs = TABS.filter(([k]) => !TAB_FEATURE[k] || feat[TAB_FEATURE[k]]);
+  const shown = tabs.some(([k]) => k === tab) ? tab : tabs[0][0];
   const [data, setData] = useState<Data | null>(null);
   const [error, setError] = useState("");
 
@@ -35,16 +41,16 @@ export default function TrainingView({ initial }: { initial: string }) {
       {error && <p className="alert" role="alert">{error}</p>}
       <WeekLoadCard data={data} />
       <div className="segmented">
-        {TABS.map(([k, l]) => (
-          <button key={k} type="button" aria-pressed={tab === k} onClick={() => setTab(k)}>
+        {tabs.map(([k, l]) => (
+          <button key={k} type="button" aria-pressed={shown === k} onClick={() => setTab(k)}>
             {l}
           </button>
         ))}
       </div>
-      {tab === "kalender" && <CalendarSection data={data} />}
-      {tab === "kettlebell" && <KettlebellSection />}
-      {tab === "klettern" && <ClimbSection />}
-      {tab === "karate" && <KarateSection />}
+      {shown === "kalender" && <CalendarSection data={data} />}
+      {shown === "kettlebell" && <KettlebellSection />}
+      {shown === "klettern" && <ClimbSection />}
+      {shown === "karate" && <KarateSection />}
     </>
   );
 }

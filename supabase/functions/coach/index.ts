@@ -9,7 +9,16 @@
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const DAILY_LIMIT = 40; // Schutz vor hohen Kosten: höchstens 40 Fragen pro Tag
+const DAILY_LIMIT = 40; // Schutz vor hohen Kosten: höchstens 40 Fragen pro Tag (die App kann weniger wählen)
+
+// Preise in US-Dollar pro Million Token (Eingabe, Ausgabe), Stand November 2026.
+// Unbekanntes Modell: Preise von Sonnet als Schätzung.
+const PRICES: Record<string, [number, number]> = {
+  "claude-sonnet-5-5": [2, 10],
+  "claude-sonnet-5": [2, 10],
+  "claude-opus-5-5": [4, 20],
+  "claude-haiku-5-5": [0.1, 0.5],
+};
 const HISTORY = 12; // so viele frühere Nachrichten gehen als Gesprächsverlauf mit
 
 const cors = {
@@ -55,6 +64,8 @@ Deno.serve(async (req) => {
     if (userError || !userData.user) return json(401, { error: "Nicht angemeldet." });
 
     const body = await req.json().catch(() => ({}));
+    // Einrichtungs-Check: Schlüssel vorhanden, Modell nennen, keine Anfrage an Claude
+    if (body?.check) return json(200, { ok: true, model });
     const question = String(body?.message ?? "").trim().slice(0, 2000);
     const context = String(body?.context ?? "").slice(0, 6000);
     if (!question) return json(400, { error: "Keine Frage erhalten." });
@@ -63,7 +74,9 @@ Deno.serve(async (req) => {
     const since = new Date();
     since.setHours(0, 0, 0, 0);
     const { count } = await sb.from("coach_messages").select("id", { count: "exact", head: true }).eq("role", "user").gte("created_at", since.toISOString());
-    if ((count ?? 0) >= DAILY_LIMIT) return json(429, { error: `Für heute sind ${DAILY_LIMIT} Fragen erreicht. Morgen geht es weiter.` });
+    const wanted = Number(body?.limit);
+    const limit = Number.isFinite(wanted) && wanted > 0 ? Math.min(Math.round(wanted), DAILY_LIMIT) : DAILY_LIMIT;
+    if ((count ?? 0) >= limit) return json(429, { error: `Für heute sind ${limit} Fragen erreicht. Morgen geht es weiter. Das Limit stellst du in den Einstellungen ein.` });
 
     // Bisheriger Verlauf
     const { data: hist } = await sb.from("coach_messages").select("role, content").order("created_at", { ascending: false }).limit(HISTORY);
@@ -99,14 +112,24 @@ Deno.serve(async (req) => {
       .trim();
     if (!answer) return json(502, { error: "Claude hat keine Antwort geliefert." });
 
+    const inTok = Number(out?.usage?.input_tokens ?? 0);
+    const outTok = Number(out?.usage?.output_tokens ?? 0);
+    const [pIn, pOut] = PRICES[model] ?? PRICES["claude-sonnet-5-5"];
+    const cost = (inTok * pIn + outTok * pOut) / 1_000_000;
+
     const now = Date.now();
-    const { error: insErr } = await sb.from("coach_messages").insert([
+    const rows = [
       { role: "user", content: question, created_at: new Date(now).toISOString() },
-      { role: "assistant", content: answer, created_at: new Date(now + 1).toISOString() },
-    ]);
+      { role: "assistant", content: answer, created_at: new Date(now + 1).toISOString(), input_tokens: inTok, output_tokens: outTok, cost_usd: cost },
+    ];
+    let { error: insErr } = await sb.from("coach_messages").insert(rows);
+    // Migration „coach_kosten“ noch nicht ausgeführt: ohne Kostenspalten speichern
+    if (insErr && /input_tokens|output_tokens|cost_usd/.test(insErr.message)) {
+      ({ error: insErr } = await sb.from("coach_messages").insert(rows.map(({ role, content, created_at }) => ({ role, content, created_at }))));
+    }
     if (insErr) return json(500, { error: "Verlauf konnte nicht gespeichert werden: " + insErr.message, answer });
 
-    return json(200, { answer });
+    return json(200, { answer, used_today: (count ?? 0) + 1, limit, cost_usd: cost });
   } catch (e) {
     return json(500, { error: e instanceof Error ? e.message : String(e) });
   }

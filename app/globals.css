@@ -60,6 +60,86 @@
   --radius-tile: 18px;
   --radius-control: 12px;
   --tabbar-h: 72px;
+
+  /* Kleine Hilfsflächen */
+  --spot-bg: rgba(255, 255, 255, 0.9);
+  --future-veil: rgba(255, 255, 255, 0.5);
+
+  color-scheme: light;
+}
+
+/* Dunkle Darstellung: gleiche Bedeutung der Farben, nur aufgehellt für dunklen Grund.
+   Gilt bei „Automatisch“ nach Systemeinstellung, bei „Dunkel“ immer. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111113;
+    --card: #1c1c1e;
+    --fill: #2c2c2e;
+    --line: #38383a;
+    --line-soft: #2a2a2c;
+    --line-strong: #545458;
+    --text: #f2f2f7;
+    --text-2: #d1d1d6;
+    --muted: #a1a1a6;
+    --primary: #f2f2f7;
+    --on-primary: #1c1c1e;
+    --brand: #c2406c;
+    --recovery: #6fc49a;
+    --recovery-bg: #17352a;
+    --recovery-fg: #9fdcbb;
+    --cycle: #e9875f;
+    --cycle-bg: #3d2217;
+    --cycle-fg: #f3b496;
+    --phase-follikel: #2b1f19;
+    --menses-bg: #4a1c1c;
+    --menses-fg: #f6c4c4;
+    --training: #8aa6e0;
+    --training-bg: #1c2640;
+    --training-fg: #b8cbf2;
+    --warn: #e0912f;
+    --warn-bg: #3b2a10;
+    --warn-mid: #8a5a17;
+    --warn-fg: #f5cd8f;
+    --mobility: #b69ae6;
+    --spot-bg: rgba(28, 28, 30, 0.9);
+    --future-veil: rgba(17, 17, 19, 0.5);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #111113;
+  --card: #1c1c1e;
+  --fill: #2c2c2e;
+  --line: #38383a;
+  --line-soft: #2a2a2c;
+  --line-strong: #545458;
+  --text: #f2f2f7;
+  --text-2: #d1d1d6;
+  --muted: #a1a1a6;
+  --primary: #f2f2f7;
+  --on-primary: #1c1c1e;
+  --brand: #c2406c;
+  --recovery: #6fc49a;
+  --recovery-bg: #17352a;
+  --recovery-fg: #9fdcbb;
+  --cycle: #e9875f;
+  --cycle-bg: #3d2217;
+  --cycle-fg: #f3b496;
+  --phase-follikel: #2b1f19;
+  --menses-bg: #4a1c1c;
+  --menses-fg: #f6c4c4;
+  --training: #8aa6e0;
+  --training-bg: #1c2640;
+  --training-fg: #b8cbf2;
+  --warn: #e0912f;
+  --warn-bg: #3b2a10;
+  --warn-mid: #8a5a17;
+  --warn-fg: #f5cd8f;
+  --mobility: #b69ae6;
+  --spot-bg: rgba(28, 28, 30, 0.9);
+  --future-veil: rgba(17, 17, 19, 0.5);
+  color-scheme: dark;
 }
 
 * {
@@ -308,7 +388,7 @@ button {
 .pill[aria-pressed="true"] {
   background: var(--text);
   border-color: var(--text);
-  color: #ffffff;
+  color: var(--on-primary);
 }
 
 /* Symptom-Stärke: leicht, mittel, stark (Amber) */
@@ -339,7 +419,7 @@ button {
 
 .btn-primary {
   background: var(--primary);
-  color: #ffffff;
+  color: var(--on-primary);
   width: 100%;
   margin-top: 14px;
   min-height: 48px;
@@ -347,7 +427,7 @@ button {
 
 .btn-dark {
   background: var(--text);
-  color: #ffffff;
+  color: var(--on-primary);
   margin-top: 4px;
 }
 
@@ -903,7 +983,7 @@ button {
   height: 30px;
   border-radius: 50%;
   border: 2px solid var(--muted);
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--spot-bg);
   padding: 0;
   cursor: pointer;
 }
@@ -1189,7 +1269,7 @@ button {
 .check[aria-pressed="true"] .check-box {
   background: var(--ok-fg);
   border-color: var(--ok-fg);
-  color: #ffffff;
+  color: var(--on-primary);
 }
 
 .center-link {
@@ -1307,7 +1387,7 @@ button {
 .bubble-user {
   align-self: flex-end;
   background: var(--text);
-  color: #ffffff;
+  color: var(--on-primary);
   border-bottom-right-radius: 6px;
 }
 
@@ -1475,7 +1555,7 @@ button {
 
 /* Kommende Tage sind nur geschätzt: heller */
 .cal-cell[data-future="true"][data-phase] {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5));
+  background-image: linear-gradient(var(--future-veil), var(--future-veil));
 }
 
 .week-bars {
@@ -1658,4 +1738,119 @@ button.settings-row {
   text-decoration: underline;
   cursor: pointer;
   min-height: 44px;
+}
+
+/* Einstellungen: Schalter, Profile, Daten */
+.switch {
+  flex: none;
+  position: relative;
+  width: 51px;
+  height: 31px;
+  border-radius: 999px;
+  background: var(--line-strong);
+  transition: background 0.15s;
+}
+
+.switch[data-on="true"] {
+  background: var(--recovery);
+}
+
+.switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s;
+}
+
+.switch[data-on="true"] .switch-knob {
+  transform: translateX(20px);
+}
+
+.settings-row:disabled {
+  opacity: 0.55;
+}
+
+.settings-row .pills {
+  flex: none;
+  flex-wrap: nowrap;
+}
+
+.settings-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.hint-text {
+  white-space: pre-wrap;
+}
+
+.pin-face {
+  margin-top: 8px;
+}
+
+a.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.usage-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--fill);
+  overflow: hidden;
+}
+
+.usage-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--text);
+}
+
+.check-status {
+  flex: none;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.check-status[data-state="ok"] { background: var(--recovery-bg); color: var(--recovery-fg); }
+.check-status[data-state="warn"] { background: var(--warn-bg); color: var(--warn-fg); }
+.check-status[data-state="wait"] { background: var(--fill); color: var(--muted); }
+
+.settings-select {
+  flex: 1;
+  margin: 0;
+  min-height: 44px;
+}
+
+.offline-note {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-control);
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+  font-size: 13px;
+  line-height: 1.4;
 }
