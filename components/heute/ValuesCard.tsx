@@ -6,7 +6,7 @@ import { RangeRow } from "@/components/charts";
 import HrvCard from "@/components/heute/HrvCard";
 import SleepCard from "@/components/heute/SleepCard";
 import StressCard from "@/components/heute/StressCard";
-import { countInRange } from "@/lib/baseline";
+import { countInRange, RANGE_PHASE_NAMES } from "@/lib/baseline";
 import { clock, isoDay } from "@/lib/dates";
 import { supabase } from "@/lib/supabase";
 import { syncGarmin } from "@/lib/garmin";
@@ -115,10 +115,10 @@ export default function ValuesCard({ day, data, showPhases, onSynced }: { day: s
         <div className="factor-list">
           {rows.map((r) => (
             <Link key={r.key} href={r.href ?? "/verlauf"} className="row-link">
-              <RangeRow label={r.label} value={r.value} fmt={r.fmt} range={r.base.range} luteal={r.base.luteal} tone="neutral" />
+              <RangeRow label={r.label} value={r.value} fmt={r.fmt} range={r.base.range} phase={r.base.phase} phaseName={r.base.phaseKey ? RANGE_PHASE_NAMES[r.base.phaseKey] : undefined} tone="neutral" />
             </Link>
           ))}
-          <span className="meta factor-foot">Punkt = heute, Band = deine letzten 30 Tage. Tippen öffnet den Verlauf.</span>
+          <span className="meta factor-foot">Punkt = heute, Band = deine letzten 30 Tage, bei zyklusabhängigen Werten deine Zyklusphase. Tippen öffnet den Verlauf.</span>
         </div>
       )}
       {data && view === "schlaf" && <SleepCard data={data} />}

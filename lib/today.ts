@@ -35,8 +35,9 @@ export type SleepNeed = {
 // Zuschlag nach Belastung am Tag: 20 Minuten nach einer harten Einheit, 10 nach einer mittleren.
 export function sleepNeed(day: string, daily: Daily[], acts: Activity[]): SleepNeed {
   const byDay = new Map(daily.map((d) => [d.day, d]));
-  const range = baselineFor(daily.map((d) => ({ day: d.day, value: sleepHours(d) })), addDays(day, 1), [], false).range;
-  const baseH = range ? range.median : DEFAULT_NEED_H;
+  const range = baselineFor(daily.map((d) => ({ day: d.day, value: sleepHours(d) })), addDays(day, 1), { diary: [] }, false).range;
+  const stable = range?.stable ? range : null; // erst ab 14 Nächten eigener Grundbedarf
+  const baseH = stable ? stable.median : DEFAULT_NEED_H;
   let debtH = 0;
   for (let i = 0; i < 7; i++) {
     const h = sleepHours(byDay.get(addDays(day, -i)));
@@ -45,7 +46,7 @@ export function sleepNeed(day: string, daily: Daily[], acts: Activity[]): SleepN
   const debtAddMin = Math.min(DEBT_CAP_MIN, Math.round((debtH * 60) / 7));
   const load = loadPercent(day, daily, acts);
   const loadAddMin = load >= HARD_DAY_PCT ? 20 : load >= MID_DAY_PCT ? 10 : 0;
-  return { hours: baseH + (debtAddMin + loadAddMin) / 60, baseH, baseFromData: !!range, debtH, debtAddMin, loadAddMin };
+  return { hours: baseH + (debtAddMin + loadAddMin) / 60, baseH, baseFromData: !!stable, debtH, debtAddMin, loadAddMin };
 }
 
 // Dauer wie „7 h 55“
@@ -100,10 +101,10 @@ const today = (key: MetricKey, day: string, daily: Daily[]) => {
 };
 
 function metricRow(key: MetricKey, day: string, data: Data, label = METRICS[key].label): Row {
-  return { key, label, value: today(key, day, data.daily), fmt: METRICS[key].fmt, base: metricBaseline(key, data.daily, data.diary, day), href: `/verlauf?m=${key}` };
+  return { key, label, value: today(key, day, data.daily), fmt: METRICS[key].fmt, base: metricBaseline(key, data.daily, { diary: data.diary, sick: data.sick }, day), href: `/verlauf?m=${key}` };
 }
 
-const plain = (range: Range | null): Baseline => ({ range, luteal: null, inLuteal: false, active: range });
+const plain = (range: Range | null): Baseline => ({ range, phase: null, phaseKey: null, active: range });
 
 // HRV, Ruhepuls, Schlaf und Last: was in die Readiness einfließt
 export function readinessFactors(day: string, data: Data): Row[] {

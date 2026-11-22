@@ -5,7 +5,7 @@ import type { Activity, Daily } from "@/lib/garmin";
 import { INFLUENCES } from "@/lib/catalog";
 import { illnessRule, type Illness } from "@/lib/health";
 import { sportOfGarmin, type Sport } from "@/lib/training";
-import { baselineFor, type Range } from "@/lib/baseline";
+import { baselineFor, RANGE_PHASE_NAMES, type Baseline, type Range } from "@/lib/baseline";
 
 export type Diary = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[]; fromGarmin?: boolean; garminOnly?: boolean };
 // fromGarmin: Blutung an diesem Tag stammt aus Garmin · garminOnly: kein eigener Tagebucheintrag an diesem Tag
@@ -19,6 +19,7 @@ export type Data = {
   checkins: Checkin[];
   hubs: Hub[]; // Bedarfs-Einnahmen
   illness: Illness | null;
+  sick?: Set<string>; // Krankheitstage und 3 Tage danach: zählen nicht zum persönlichen Bereich
 };
 
 const addDays = (iso: string, n: number) => {
@@ -81,9 +82,10 @@ const BANDS = [
 // Ein Faktor der Readiness: heutiger Wert gegen den persönlichen Bereich (30 Tage ohne heute, mittlere Hälfte, ab 14 Tagen).
 // In der Lutealphase gilt für HRV und Ruhepuls der Luteal-Bereich (lib/baseline.ts).
 // Abstand außerhalb des Bereichs in Bereichsbreiten: ab 0,6 voller Abzug, darunter halber Abzug, deutlich besser ein kleiner Bonus.
-function rangeFactor(name: string, v: number | null, range: Range | null, luteal: boolean, fmt: (x: number) => string, higherIsBetter: boolean, weight: number, unit = ""): Factor | null {
+function rangeFactor(name: string, v: number | null, range: Range | null, phaseName: string | null, fmt: (x: number) => string, higherIsBetter: boolean, weight: number, unit = ""): Factor | null {
   if (v === null) return null;
-  if (!range) return { name, value: fmt(v) + unit, note: "Dein Bereich entsteht ab 14 Tagen", effect: 0 };
+  if (!range) return { name, value: fmt(v) + unit, note: "Dein Bereich entsteht ab 7 Tagen", effect: 0 };
+  if (!range.stable) return { name, value: fmt(v) + unit, note: `Dein Bereich ist noch vorläufig (${range.n} Tage), er zählt ab 14 Tagen`, effect: 0 };
   const width = range.hi - range.lo || Math.max(1, Math.abs(range.median) * 0.05);
   const below = v < range.lo ? (range.lo - v) / width : 0;
   const above = v > range.hi ? (v - range.hi) / width : 0;
@@ -92,7 +94,7 @@ function rangeFactor(name: string, v: number | null, range: Range | null, luteal
   if (bad > 0.6) effect = -weight;
   else if (bad > 0) effect = -Math.round(weight / 2);
   else if (bad < -0.5) effect = Math.round(weight / 4);
-  const where = `${luteal ? "Bereich Lutealphase" : "dein Bereich"} ${fmt(range.lo)}–${fmt(range.hi)}${unit}`;
+  const where = `${phaseName ? `Bereich ${phaseName}` : "dein Bereich"} ${fmt(range.lo)}–${fmt(range.hi)}${unit}`;
   const note = !below && !above ? `im Bereich (${where})` : `${above ? "über" : "unter"} dem Bereich (${where})`;
   return { name, value: fmt(v) + unit, note, effect };
 }
@@ -104,14 +106,15 @@ export function computeTarget(day: string, data: Data): Target {
   const num = (f: (r: Daily) => number | null) => hist.map(f).filter((v): v is number => v !== null);
 
   const push = (f: Factor | null) => f && factors.push(f);
-  const base = (f: (r: Daily) => number | null, cycleSensitive: boolean) => baselineFor(data.daily.map((r) => ({ day: r.day, value: f(r) })), day, data.diary, cycleSensitive);
+  const base = (f: (r: Daily) => number | null, cycleSensitive: boolean) => baselineFor(data.daily.map((r) => ({ day: r.day, value: f(r) })), day, { diary: data.diary, sick: data.sick }, cycleSensitive);
+  const phaseName = (b: Baseline) => (b.phase && b.phaseKey ? RANGE_PHASE_NAMES[b.phaseKey] : null);
   const r0 = (x: number) => String(Math.round(x));
-  const sl = base((r) => r.sleep_score, false);
+  const sl = base((r) => r.sleep_score, true);
   const hv = base((r) => r.hrv_last_night, true);
   const rh = base((r) => r.resting_hr, true);
-  push(rangeFactor("Schlaf", today?.sleep_score ?? null, sl.active, false, r0, true, 10, " Punkte"));
-  push(rangeFactor("HRV", today?.hrv_last_night ?? null, hv.active, !!hv.luteal, r0, true, 12, " ms"));
-  push(rangeFactor("Ruhepuls", today?.resting_hr ?? null, rh.active, !!rh.luteal, r0, false, 8, " bpm"));
+  push(rangeFactor("Schlaf", today?.sleep_score ?? null, sl.active, phaseName(sl), r0, true, 10, " Punkte"));
+  push(rangeFactor("HRV", today?.hrv_last_night ?? null, hv.active, phaseName(hv), r0, true, 12, " ms"));
+  push(rangeFactor("Ruhepuls", today?.resting_hr ?? null, rh.active, phaseName(rh), r0, false, 8, " bpm"));
   if (today?.bb_max !== null && today?.bb_max !== undefined) {
     const bb = today.bb_max;
     factors.push({ name: "Body Battery", value: String(bb), note: bb < 30 ? "sehr niedrig" : bb < 50 ? "niedrig" : bb >= 75 ? "gut aufgeladen" : "mittel", effect: bb < 30 ? -15 : bb < 50 ? -8 : bb >= 75 ? 3 : 0 });

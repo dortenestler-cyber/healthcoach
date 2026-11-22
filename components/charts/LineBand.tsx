@@ -1,4 +1,5 @@
 // Linie mit Band: Verlauf eines Werts, persönlicher Bereich als Band, Zyklusphasen getönt.
+// Das Band ist entweder fest (Bereich heute) oder wandert mit (bands: Bereich, wie er an jedem Tag galt).
 // Festes Seitenverhältnis, 2–3 beschriftete Hilfslinien (Zahl links über der Linie), letzter Wert als Zahl am Punkt.
 
 import type { Range } from "@/lib/baseline";
@@ -11,7 +12,8 @@ type Props = {
   label: string; // Beschreibung für Vorlesehilfen
   tone?: Tone;
   band?: Range | null; // 30-Tage-Bereich
-  lutealBand?: Range | null; // eigener Bereich der Lutealphase, gestrichelt
+  phaseBand?: Range | null; // Bereich der heutigen Zyklusphase, gestrichelt
+  bands?: (Range | null)[]; // wandernder Bereich, ein Eintrag je Wert; ersetzt band und phaseBand
   phases?: (PhaseGroup | null)[]; // Hintergrund je Tag
   futureFrom?: number; // ab diesem Index geschätzt (heller)
   todayIndex?: number;
@@ -26,9 +28,35 @@ const PAD_R = 52; // Platz für die Zahl am letzten Punkt
 const PAD_T = 14;
 const PAD_B = 22;
 
-export default function LineBand({ values, fmt, label, tone = "recovery", band, lutealBand, phases, futureFrom, todayIndex, zeroLine, xLabels = [], markers, height = 170 }: Props) {
+// Zusammenhängende Abschnitte mit Bereich, damit Lücken frei bleiben
+function bandRuns(bands: (Range | null)[]): { i: number; r: Range }[][] {
+  const runs: { i: number; r: Range }[][] = [];
+  let cur: { i: number; r: Range }[] = [];
+  bands.forEach((r, i) => {
+    if (r) cur.push({ i, r });
+    else if (cur.length) {
+      runs.push(cur);
+      cur = [];
+    }
+  });
+  if (cur.length) runs.push(cur);
+  return runs;
+}
+
+// Fläche als Treppe: jeder Tag bekommt seine volle Breite
+function bandPath(run: { i: number; r: Range }[], x0: number, step: number, y: (v: number) => number): string {
+  const top = run.flatMap(({ i, r }) => [`${x0 + i * step},${y(r.hi)}`, `${x0 + (i + 1) * step},${y(r.hi)}`]);
+  const bottom = [...run].reverse().flatMap(({ i, r }) => [`${x0 + (i + 1) * step},${y(r.lo)}`, `${x0 + i * step},${y(r.lo)}`]);
+  return `M${[...top, ...bottom].join("L")}Z`;
+}
+
+export default function LineBand({ values, fmt, label, tone = "recovery", band, phaseBand, bands, phases, futureFrom, todayIndex, zeroLine, xLabels = [], markers, height = 170 }: Props) {
   const n = Math.max(values.length, 1);
-  const ext = extent(values, band ? [band.lo, band.hi] : [], lutealBand ? [lutealBand.lo, lutealBand.hi] : [], zeroLine ? [0] : []);
+  const moving = bands?.some(Boolean) ? bands : undefined;
+  const fixed = moving ? null : band;
+  const fixedPhase = moving ? null : phaseBand;
+  const bandVals = moving ? moving.flatMap((b) => (b ? [b.lo, b.hi] : [])) : [];
+  const ext = extent(values, fixed ? [fixed.lo, fixed.hi] : [], fixedPhase ? [fixedPhase.lo, fixedPhase.hi] : [], bandVals, zeroLine ? [0] : []);
   const ticks = ext ? niceTicks(ext[0], ext[1]) : [];
   const d0 = ticks[0] ?? 0;
   const d1 = ticks[ticks.length - 1] ?? 1;
@@ -45,8 +73,11 @@ export default function LineBand({ values, fmt, label, tone = "recovery", band, 
   return (
     <svg className={`cb cb-${tone}`} viewBox={`0 0 ${W} ${height}`} role="img" aria-label={label}>
       {phases?.map((p, i) => (p ? <rect key={i} x={x0 + i * step} y={PAD_T - 6} width={step + 0.3} height={height - PAD_B - PAD_T + 6} className={`cb-ph-${p}`} /> : null))}
-      {band && <rect x={x0} width={x1 - x0} y={y(band.hi)} height={Math.max(1, y(band.lo) - y(band.hi))} className="cb-band" />}
-      {lutealBand && <rect x={x0} width={x1 - x0} y={y(lutealBand.hi)} height={Math.max(1, y(lutealBand.lo) - y(lutealBand.hi))} className="cb-band-luteal" />}
+      {fixed && <rect x={x0} width={x1 - x0} y={y(fixed.hi)} height={Math.max(1, y(fixed.lo) - y(fixed.hi))} className="cb-band" />}
+      {fixedPhase && <rect x={x0} width={x1 - x0} y={y(fixedPhase.hi)} height={Math.max(1, y(fixedPhase.lo) - y(fixedPhase.hi))} className="cb-band-luteal" />}
+      {moving && bandRuns(moving).map((run, i) => (
+        <path key={`b${i}`} d={bandPath(run, x0, step, y)} className="cb-band" />
+      ))}
       {ticks.map((t) => (
         <g key={t}>
           <line x1={x0} x2={x1} y1={y(t)} y2={y(t)} className={zeroLine && t === 0 ? "cb-zero" : "cb-grid"} />
