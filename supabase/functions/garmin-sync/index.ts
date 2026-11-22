@@ -225,7 +225,9 @@ Deno.serve(async (req) => {
         r.bb_drained = int(d?.bodyBattery?.drainedValue);
         r.steps = int(d?.movement?.steps?.value);
         // Für die Belastung aus dem Alltag; Garmin benennt die Felder je nach Schnittstelle unterschiedlich
-        r.active_kcal = int(d?.calories?.active?.value ?? d?.calories?.activeValue ?? d?.activeKilocalories);
+        // Personal API: calories.burnedActive (Zahl oder { value }). Eine aktive Zeit liefert sie nicht.
+        const kcal = d?.calories?.burnedActive;
+        r.active_kcal = int(typeof kcal === "object" && kcal ? kcal.value : kcal);
         r.active_s = int(d?.movement?.activeSeconds ?? d?.movement?.active?.value ?? d?.activeSeconds);
         r.highly_active_s = int(d?.movement?.highlyActiveSeconds ?? d?.movement?.highlyActive?.value ?? d?.highlyActiveSeconds);
         const im = d?.intensityMinutes ?? {};
@@ -619,6 +621,16 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
 
   const hrKnown = { path: null as string | null, failed: false };
   const stepsKnown = { path: null as string | null, failed: false };
+  // Schrittverlauf: Garmin Connect fragt mit dem Profilnamen; ohne Namen sind die Pfade unten 404
+  const stepsPaths = [...STEPS_PATHS];
+  try {
+    const prof = await garminGet(token, "/userprofile-service/socialProfile");
+    const dn = typeof prof?.displayName === "string" ? prof.displayName : null;
+    if (dn) stepsPaths.unshift(`/wellness-service/wellness/dailySummaryChart/${encodeURIComponent(dn)}?date=`);
+    diag.profil = dn ? "ok" : "ohne Namen";
+  } catch (e) {
+    diag.profil = e instanceof Error ? e.message : String(e);
+  }
   const results: { day: string; base: Omit<LoadDay, "faktor" | "faktor_n" | "last_alltag">; curve: (number | null)[] | null; stepsOutside: number | null }[] = [];
   const actPoints = new Map<number, number>();
   let note = "";
@@ -643,7 +655,7 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
     let bewegung: LoadDay["bewegung"] = "keine";
     if (samples.length) {
       try {
-        const chart = await firstPath(token, STEPS_PATHS, day, stepsKnown);
+        const chart = await firstPath(token, stepsPaths, day, stepsKnown);
         for (const c of (Array.isArray(chart) ? chart : chart?.data ?? []) as Any[]) {
           const t = typeof c?.startGMT === "string" ? Date.parse(c.startGMT.replace(" ", "T").replace(/(\.\d+)?Z?$/, "Z")) : NaN;
           if (!Number.isFinite(t)) continue;
@@ -655,7 +667,7 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
         diag.schrittverlauf ??= bewegung === "schritte" ? "ok" : "leer: " + keyNames(chart, 0).join(",");
       } catch (e) {
         // kein Schrittverlauf, Stress versuchen
-        diag.schrittverlauf ??= e instanceof Error ? e.message : String(e);
+        diag.schrittverlauf ??= (e instanceof Error ? e.message : String(e)).replace(/dailySummaryChart\/[^\s?]+/, "dailySummaryChart/<name>");
       }
       if (bewegung === "keine") {
         try {
@@ -732,6 +744,7 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
   const factor = f.faktor ?? FACTOR_START;
 
   diag.puls_pfad = hrKnown.path;
+  diag.schritt_pfad = stepsKnown.path ? stepsKnown.path.replace(/dailySummaryChart\/[^?]+/, "dailySummaryChart/<name>") : null;
   const newest = results.map((r) => r.day).sort().at(-1);
   const rows = results.map((r) => ({
     user_id: userId,
@@ -750,7 +763,7 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
 }
 
 // Fehlersuche für die nicht dokumentierten Felder der Garmin Personal API: nur Feldnamen, nie Werte
-type Diag = { summary?: string[]; aktivitaet?: string[]; schrittverlauf?: string; stress?: string; puls_pfad?: string | null };
+type Diag = { summary?: string[]; aktivitaet?: string[]; schrittverlauf?: string; stress?: string; puls_pfad?: string | null; profil?: string; schritt_pfad?: string | null };
 function keyNames(obj: Any, depth = 1, prefix = ""): string[] {
   if (Array.isArray(obj)) return obj.length ? keyNames(obj[0], depth, prefix + "[]") : [prefix + "[] leer"];
   if (!obj || typeof obj !== "object") return prefix ? [prefix] : [];
