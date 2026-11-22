@@ -9,7 +9,7 @@ import { loadInsightData } from "@/lib/insightData";
 import { SPOTS, type Injury } from "@/lib/health";
 import Ring from "@/components/Ring";
 import PageHead from "@/components/PageHead";
-import { targetText } from "@/components/TargetCard";
+import { targetText } from "@/lib/today";
 
 // Tagesziel im Detail: Faktoren, Empfehlung je Sportart, 14 Tage Ziel und Ist
 export default function TargetView() {

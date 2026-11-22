@@ -1,12 +1,16 @@
+import Link from "next/link";
+import { RangeRow } from "@/components/charts";
+import { countInRange } from "@/lib/baseline";
 import { PHASES, STAGES, type DayRule, type Stage } from "@/lib/cycle";
+import type { Row } from "@/lib/today";
 
 const STAGE_ORDER: Stage[] = ["erholen", "behutsam", "bereit", "volle-kraft"];
 
 const num = (v: number) => v.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const date = (iso: string) => new Date(iso + "T12:00:00").toLocaleDateString("de-DE", { day: "numeric", month: "short" });
 
-// Readiness 0–10 mit Ring, Vier-Stufen-Leiste und Vorschlag nach der Regelreihenfolge
-export default function ReadinessCard({ rule }: { rule: DayRule }) {
+// Readiness 0–10 mit Stufenleiste, Vorschlag nach der Regelreihenfolge und vier Beitragsfaktoren (HRV, Ruhepuls, Schlaf, Last)
+export default function ReadinessCard({ rule, factors }: { rule: DayRule; factors: Row[] }) {
   // Warnzeichen: nur der ärztliche Hinweis, sonst nichts
   if (rule.level === "warnzeichen") {
     return (
@@ -21,28 +25,19 @@ export default function ReadinessCard({ rule }: { rule: DayRule }) {
   }
 
   const { value, stage, label } = rule.readiness;
-  const r = 42;
-  const c = 2 * Math.PI * r;
   const tone = rule.level === "phase" ? (rule.cycle.phase ? "suggest-cycle" : "") : rule.level === "reha" ? "suggest-training" : "suggest-warn";
   const phase = rule.cycle.phase ? PHASES[rule.cycle.phase].label : null;
+  const count = countInRange(factors.map((f) => ({ value: f.value, range: f.base.active })));
+  const sentence = count.total ? `${count.inRange} von ${count.total} Faktoren in deinem Bereich.` : "Deine Bereiche entstehen ab 14 Tagen Daten.";
 
   return (
     <section className="card">
-      <div className="readiness">
-        <svg width="112" height="112" viewBox="0 0 100 100" role="img" aria-label={`Readiness ${num(value)} von 10, Stufe ${label}`}>
-          <g transform="rotate(-90 50 50)" fill="none" strokeWidth="9">
-            <circle cx="50" cy="50" r={r} stroke="var(--recovery-bg)" />
-            <circle cx="50" cy="50" r={r} stroke="var(--recovery)" strokeLinecap="round" strokeDasharray={`${(Math.max(0.2, value) / 10) * c} ${c}`} />
-          </g>
-          <text x="50" y="54" textAnchor="middle" fontSize="24" fontWeight="700" fill="var(--text)">{num(value)}</text>
-          <text x="50" y="68" textAnchor="middle" fontSize="8" fill="var(--muted)">von 10</text>
-        </svg>
-        <div className="stack">
-          <span className="meta">Readiness heute</span>
-          <span className="target-label">{label}</span>
-          {!rule.target.enoughData && <span className="meta">Wird genauer, sobald 7 Tage Garmin-Daten da sind.</span>}
-        </div>
-      </div>
+      <span className="meta">Readiness heute</span>
+      <h2>{sentence}</h2>
+      <p className="value-big">
+        {num(value)} <span className="value-unit">von 10 · {label}</span>
+      </p>
+      {!rule.target.enoughData && <span className="meta">Wird genauer, sobald 7 Tage Garmin-Daten da sind.</span>}
 
       <div className="stage-bar" aria-hidden="true">
         {STAGE_ORDER.map((s) => (
@@ -56,6 +51,19 @@ export default function ReadinessCard({ rule }: { rule: DayRule }) {
       <div className={"suggest " + tone}>
         <span className="row-strong">{rule.title}</span>
         <span>{rule.text}</span>
+      </div>
+
+      <div className="factor-list">
+        {factors.map((f) => {
+          const row = <RangeRow label={f.label} value={f.value} fmt={f.fmt} range={f.base.range} luteal={f.base.luteal} tone="recovery" />;
+          return f.href ? (
+            <Link key={f.key} href={f.href} className="row-link">
+              {row}
+            </Link>
+          ) : (
+            <div key={f.key}>{row}</div>
+          );
+        })}
       </div>
 
       <span className="meta">

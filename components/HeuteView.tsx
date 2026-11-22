@@ -5,13 +5,15 @@ import { supabase } from "@/lib/supabase";
 import { clock, isoDay, longDate, startOfToday } from "@/lib/dates";
 import { CHECKIN_LEVELS, CHECKIN_QUESTIONS } from "@/lib/catalog";
 import PageHead from "@/components/PageHead";
-import GarminCards from "@/components/GarminCards";
 import HealthToday from "@/components/HealthToday";
 import TodayPlan from "@/components/TodayPlan";
-import TargetCard from "@/components/TargetCard";
 import ReadinessCard from "@/components/heute/ReadinessCard";
 import SymptomChips from "@/components/heute/SymptomChips";
-import HrvPhaseChart from "@/components/heute/HrvPhaseChart";
+import TodayRings from "@/components/heute/TodayRings";
+import HrvCard from "@/components/heute/HrvCard";
+import SleepCard from "@/components/heute/SleepCard";
+import VitalsCard from "@/components/heute/VitalsCard";
+import { readinessFactors } from "@/lib/today";
 import { loadInsightData } from "@/lib/insightData";
 import { dayRule } from "@/lib/cycle";
 import { SPOTS } from "@/lib/health";
@@ -117,6 +119,7 @@ export default function HeuteView() {
     }
   };
 
+  const rule = data ? dayRule(today, data, rehaSports) : null;
   const complete = CHECKIN_QUESTIONS.every((q) => checkin[q.key] !== null);
 
   return (
@@ -124,17 +127,19 @@ export default function HeuteView() {
       <PageHead title="Heute" sub={longDate()} />
       {error && <p className="alert" role="alert">{error}</p>}
 
-      {data && <ReadinessCard rule={dayRule(today, data, rehaSports)} />}
+      {data && rule && <TodayRings day={today} data={data} rule={rule} showLoad={feat.tagesziel} />}
+
+      {data && rule && <ReadinessCard rule={rule} factors={readinessFactors(today, data)} />}
 
       <HealthToday />
 
       {feat.perimenopause && <SymptomChips symptoms={todayEntry.symptoms ?? {}} busy={chipBusy || !data} onToggle={toggleSymptom} />}
 
-      {feat.zyklus && data && <HrvPhaseChart data={data} />}
+      {data && <HrvCard data={data} showPhases={feat.zyklus} />}
 
-      {feat.garmin && <GarminCards onSynced={loadData} />}
+      {feat.garmin && data && <SleepCard data={data} />}
 
-      {feat.tagesziel && <TargetCard data={data} />}
+      {feat.garmin && <VitalsCard day={today} data={data} onSynced={loadData} />}
 
       {feat.tagesplan && <TodayPlan />}
 
