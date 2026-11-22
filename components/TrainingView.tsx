@@ -5,6 +5,9 @@ import PageHead from "@/components/PageHead";
 import { useFeatures, type Feature } from "@/lib/prefs";
 import WeekLoadCard from "@/components/training/WeekLoadCard";
 import RatioCard from "@/components/training/RatioCard";
+import LoadTrendCard from "@/components/training/LoadTrendCard";
+import HabitCard from "@/components/training/HabitCard";
+import MonthReviewCard from "@/components/training/MonthReviewCard";
 import { isoDay } from "@/lib/dates";
 import { loadInsightData } from "@/lib/insightData";
 import type { Data } from "@/lib/insights";
@@ -39,10 +42,13 @@ export default function TrainingView({ initial }: { initial: string }) {
 
   return (
     <>
-      <PageHead title="Training" sub="Karate, Bouldern, Kettlebell und Ausdauer" />
+      <PageHead title="Training" sub="Karate, Bouldern, Kettlebell und Ausdauer" tone="training" />
       {error && <p className="alert" role="alert">{error}</p>}
-      <WeekLoadCard data={data} />
       {data && <RatioCard today={isoDay()} data={data} />}
+      {data && <LoadTrendCard today={isoDay()} data={data} />}
+      <WeekLoadCard data={data} />
+      {data && <HabitCard today={isoDay()} data={data} />}
+      {data && <MonthReviewCard today={isoDay()} data={data} />}
       <div className="segmented">
         {tabs.map(([k, l]) => (
           <button key={k} type="button" aria-pressed={shown === k} onClick={() => setTab(k)}>

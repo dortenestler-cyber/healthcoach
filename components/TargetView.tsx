@@ -42,7 +42,7 @@ export default function TargetView() {
   return (
     <>
       <Link href="/" className="back-link">‹ Heute</Link>
-      <PageHead title="Tagesziel" sub={longDate()} />
+      <PageHead title="Tagesziel" sub={longDate()} tone="training" />
       {error && <p className="alert">{error}</p>}
       {t && (
         <>

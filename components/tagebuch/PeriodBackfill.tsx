@@ -105,7 +105,7 @@ export default function PeriodBackfill({ onChanged }: { onChanged: () => void })
   };
 
   return (
-    <section className="card">
+    <section className="card" id="perioden">
       <h2>Vergangene Perioden nachtragen</h2>
       <p>Für den Zyklus zählt der erste Tag mit mindestens leichter Blutung. Je mehr Perioden eingetragen sind, desto genauer werden Phasen, Zykluslänge und Vergleiche.</p>
       <label className="field">

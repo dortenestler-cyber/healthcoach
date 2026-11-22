@@ -5,6 +5,8 @@ Eine persönliche App für Training, Erholung und Perimenopause. Sie verbindet G
 **Stand:** Phase 4, Auswertung und Coach. Alles aus Phase 1 bis 3 plus Tagesziel-Ring, Muster und Coach-Chat mit Claude.
 
 ## Einrichtung Supabase (einmalig)
+Migrationen und Edge Functions laufen nach jedem Merge auf `main` automatisch über GitHub Actions. Dafür braucht GitHub die Secrets `SUPABASE_DB_URL` (Session-Pooler-Adresse mit Passwort) und `SUPABASE_ACCESS_TOKEN`. Die Schritte zum SQL-Editor unten gelten nur, wenn du ohne GitHub einrichtest.
+
 1. Im Supabase-Projekt den **SQL-Editor** öffnen, den Inhalt von `supabase/migrations/20261120120000_phase1_fundament.sql` einfügen und auf **Run** klicken.
 2. Unter **Authentication → URL Configuration** als **Site URL** die Adresse der App eintragen (zum Beispiel `https://healthcoach-xi.vercel.app`). Dorthin führt der Bestätigungslink nach dem Anlegen des Kontos.
 3. In der App **Konto anlegen** wählen, E-Mail bestätigen und anmelden. Danach unter **Authentication → Sign In / Providers** die Option **Allow new users to sign up** ausschalten. Dann kann sich niemand sonst ein Konto anlegen.

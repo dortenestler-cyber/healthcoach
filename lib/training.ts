@@ -6,7 +6,7 @@ import { illnessRule, SPOTS, type Illness, type Injury } from "@/lib/health";
 
 export type Sport = "karate" | "kettlebell" | "klettern" | "ausdauer" | "sonstiges";
 
-// Sportfarben: Familie Training (Slate-Blau), Ausdauer Petrol. Werte in app/globals.css (hell und dunkel). Immer mit Text-Label.
+// Sportfarben: alle aus der Familie Training (Slate-Blau), Ausdauer sehr hell (Türkis gehört zu Stress). Werte in app/globals.css (hell und dunkel). Immer mit Text-Label.
 export const SPORTS: Record<Sport, { label: string; color: string }> = {
   karate: { label: "Karate", color: "var(--sport-karate)" },
   kettlebell: { label: "Kettlebell", color: "var(--sport-kettlebell)" },

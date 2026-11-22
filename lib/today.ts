@@ -116,10 +116,11 @@ export function readinessFactors(day: string, data: Data): Row[] {
   ];
 }
 
-// Vitalwerte der letzten Nacht. Hauttemperatur nur, wenn es Werte gibt.
+// Vitalwerte der letzten Nacht. Atemfrequenz und Hauttemperatur nur, wenn es Werte gibt.
 export function vitalRows(day: string, data: Data): Row[] {
   const keys: MetricKey[] = ["hrv", "ruhepuls", "bb", "stress"];
   if (data.daily.some((d) => typeof d.skin_temp_delta === "number")) keys.splice(2, 0, "temperatur");
+  if (data.daily.some((d) => typeof d.respiration_avg === "number")) keys.splice(2, 0, "atem");
   return keys.map((k) => metricRow(k, day, data, k === "temperatur" ? "Hauttemperatur" : undefined));
 }
 

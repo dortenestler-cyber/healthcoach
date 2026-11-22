@@ -115,3 +115,71 @@ Auf Wunsch der Nutzerin heißt der vierte Reiter jetzt **Zyklus** (`/zyklus`, `/
 4. Zykluslängen, Hitzewallungen pro Woche, Symptome nach Zyklustag (vorher Reiter unter Gesundheit).
 5. Was dir guttut je Phase: HRV der Folgenacht, Follikel- und Lutealphase getrennt, ab je 5 Nächten.
 6. Weitere Muster ohne Zyklusbezug unten. „Energie über den Tag“ steht auf Heute.
+
+## Konzept dunkel 2 (22.11.2026, umgesetzt)
+
+Auf Grundlage von 16 Vorlagen aus Whoop, Bevel und Sonar (`docs/bilder/vorlagen/`). Übernommen werden Aufbau, Reihenfolge, Proportionen und Diagrammformen, nie Markennamen, Logos oder Texte. Prompt zur Einhaltung: `docs/prompt-designkonzept.md`. Bildschirmfotos mit Beispieldaten: `docs/bilder/konzept-dunkel-2/`.
+
+### Muster und wo sie stehen
+
+| # | Muster | Vorlage | In der App |
+| --- | --- | --- | --- |
+| 1 | Großer Ring mit Zahl und Wort, darunter Einflussfaktoren gegen die letzten 30 Tage | 06 | Heute › Readiness (`ReadinessCard`) |
+| 2 | Halbbogen mit Zielbereich, Zahl, Wort, „Stand“, zwei Kacheln | 07, 01 | Heute › Belastung (`LoadCard`, `HalfGauge`) |
+| 3 | Erklärkarte mit Verlaufsrand, Zahlen fett, „Mehr dazu im Coach →“ | 01, 06, 07 | unter Readiness, Belastung, Stress, Status, Zyklus (`ExplainCard`) |
+| 4 | Ring links, Kennzahlen rechts | 10 | Heute › Stress (`StressCard`) |
+| 5 | Ziel-Ringe in einer Reihe | 09 | Heute oben (`TodayRings`) |
+| 6 | Tagesverlauf mit Schlaf als Fläche und Training als Band | 01, 15 | Heute › Energie über den Tag |
+| 7 | Aufteilung in Balken mit % und Dauer | 15 | Heute › Stress (sobald Garmin den Tagesverlauf liefert) |
+| 8 | Zyklus-Ring mit vier Phasenbögen, Symbol je Phase, Karte „Du bist hier“ | 16 | Zyklus oben (`CycleRing`) |
+| 9 | Monatskalender mit Phasen als Bändern, geschätzte Tage gestrichelt, Punkt für Symptome | 02 | Zyklus (`CycleCalendar`) |
+| 10 | Seitenkopf mit Farbverlauf in der Bereichsfarbe | 02, 07 | Heute, Zyklus, Training, Tagesziel, Gesundheit (`PageHead tone`) |
+| 11 | Balken um den Nullpunkt auf schraffierter Spur, „Neu“, Anzahl Nächte | 03 | Zyklus › Was dir guttut (`DivergingBars`) |
+| 12 | Lastkurve mit Korridor, 1M · 3M · 6M | 08, 13 | Training (`LoadTrendCard`) |
+| 13 | Statuswort groß, Ring, „Was das heißt“ | 13 | Training (`RatioCard`) |
+| 14 | Liste „Was beitrug“ mit +Last je Einheit | 13 | Training › Wochenlast (`WeekLoadView`) |
+| 15 | Raster mit einem Feld je Tag, Serie und Bestwert | 12 | Training (`HabitCard`) |
+| 16 | Monatsrückblick mit Sport-Blasen, Anzahl, Vergleich zum Vormonat, Filter | 14 | Training (`MonthReviewCard`) |
+| 17 | Coach-Chat, Antworten mit eigenen Daten | 04 | Coach (Frage aus Karten vorbelegt) |
+| 18 | Großbuchstaben-Titel mit Sperrung | alle | `.eyebrow` |
+
+### Neue Inhalte
+
+- **Atemfrequenz** als Vitalwert mit 30-Tage-Bereich, sobald Garmin sie liefert.
+- **Stress-Tagesrückblick:** meiste Zeit in welchem Bereich, längste Phase mit erhöhtem Stress (ab 51) mit Uhrzeit und Dauer. Ohne Tagesverlauf: Vergleich mit dem üblichen Wochentag.
+- **Schlafschuld als Satz:** „Diese Woche etwa 1 h 27 unter deinem Grundbedarf.“
+- **Periodenfenster als Spanne:** „Nächste Periode in etwa 10–12 Tagen“.
+- **Coach-Einstieg aus jeder Karte:** öffnet den Coach mit einer passenden Frage. Gesendet wird erst nach dem Tippen auf Senden.
+- **Tagesrhythmus:** wann die Energie meist am höchsten ist und wann sie am stärksten sinkt (2-Stunden-Fenster aus dem üblichen Tag).
+
+### Farben
+
+- **Stress Türkis:** dunkel `#45C4C0` (Fläche `#12302F`, Text `#9FE3E0`), hell `#0E7470` (Fläche `#DDF2F1`, Text `#0B5A57`). Stufen niedrig · mittel · hoch dunkel `#2F6E6C` · `#3C9E9A` · `#6FD8D4`. Höher = heller, nie roter. Ruhe neutral.
+- **Ausdauer** (Sportfarbe) ist jetzt sehr helles Slate-Blau `#D3DDF7` (hell `#1E2F57`), damit sie nicht mit Stress verwechselt wird.
+- **Kopf-Verlauf:** Heute Sage, Zyklus Terracotta, Training Slate-Blau, Gesundheit Graphit. Tagebuch ohne Verlauf.
+- Zyklusphasen im Kalender: Menstruation `--menses-bg`, Follikel `--fill`, Eisprung Terracotta 35 %, Luteal `--cycle-bg`. Jede Phase mit Wort in der Legende.
+
+### Nicht übernommen
+
+Biologisches Alter und Alterungstempo (05), empfohlene Schlafens- und Aufstehzeit (11), Kalorienziele, „Top 41 %“ und andere Vergleiche mit anderen, Blutzucker, Hormon-Versprechen zur Phase, Neon-Leuchten, Ampel-Verläufe.
+
+### Ergänzung 23.11.2026: Gesundheit, Gewohnheiten, Sperrbildschirm
+
+- **Gesundheit** mit den Reitern Überblick · Medikamente · Krank & verletzt · Körper. Der Überblick zeigt:
+  - heute auf einen Blick: Einnahmen als Ring, Krankheit, Verletzung
+  - „Was dir guttut“: HRV der Nacht danach je Gewohnheit, über alle Tage
+  - Gewohnheiten im Monat mit den letzten 4 Wochen
+  - „Weitere Muster“ (vorher auf der Seite Zyklus)
+- **Gewohnheiten** statt „Einflüsse“:
+  - Erfassen im Tagebuch per Tipp. Sauna mit freiwilligen Details: Gänge, Wann, Kältebecken.
+  - Liste, Reihenfolge und eigene Gewohnheiten unter Einstellungen › Gewohnheiten.
+  - Nicht als Knopf auf Heute.
+- **Detailseite je Gewohnheit** (`/gesundheit/gewohnheit?k=sauna`):
+  - Wie oft, mit Raster der letzten 13 Wochen
+  - Die Nacht danach mit und ohne: HRV, Ruhepuls, Tiefschlaf, Hauttemperatur, Nachtschweiß
+  - Je Zyklusphase, dazu Hitzewallungen am Tag danach
+  - Hauttemperatur mit markierten Nächten nach der Gewohnheit
+  - Nächte nach der Sauna sind auch im Verlauf der Hauttemperatur markiert.
+- **Sperrbildschirm**: nur der Zen-Ring ohne Kachel (`public/icons/enso.svg`), Gruß nach Tageszeit, Ziffernfeld wie beim iPhone mit Buchstaben, Face ID im Ziffernfeld. Nie ein Gesundheitswert.
+- **Icons** statt Kürzeln für Sportarten. Coach-Symbol: Sprechblase mit Pulslinie.
+- **App-Symbol Zen-Ring** (Ensō, mit dem Pinsel gezeichnet, trockene Pinselspuren, ausfaserndes Ende): dunkle Variante freigegeben, Beere auf Anthrazit, für hell und dunkel gleich.
