@@ -5,6 +5,8 @@ import { isoDay } from "@/lib/dates";
 import { cycleInfo, patterns, type Data } from "@/lib/insights";
 import { loadInsightData } from "@/lib/insightData";
 import PageHead from "@/components/PageHead";
+import EnergyCard from "@/components/muster/EnergyCard";
+import EffectsCard from "@/components/muster/EffectsCard";
 
 // Muster aus Training, Erholung, Zyklus, Symptomen und Medikamenten
 export default function MusterView() {
@@ -26,9 +28,11 @@ export default function MusterView() {
     <>
       <PageHead title="Muster" sub={cyc?.cycleDay ? `Zyklustag ${cyc.cycleDay} · Zyklus etwa ${cyc.length} Tage` : "Training, Erholung und Zyklus zusammen"} />
       {error && <p className="alert">{error}</p>}
+      {data && <EnergyCard day={isoDay()} data={data} nowMinute={new Date().getHours() * 60 + new Date().getMinutes()} />}
+      {data && <EffectsCard data={data} />}
       {data && !ready.length && (
         <section className="card">
-          <h2>Noch zu wenige Daten</h2>
+          <h2>Weitere Muster brauchen noch Daten</h2>
           <p>Muster erscheinen, sobald genug Tage zusammenkommen. Führe weiter Tagebuch und Check-in, dann füllt sich diese Seite nach und nach.</p>
         </section>
       )}

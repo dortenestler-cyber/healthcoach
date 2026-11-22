@@ -33,7 +33,13 @@ In Supabase unter **Edge Functions → Secrets** anlegen:
 - [x] Upload von `garmin-sync` nach dem Merge ist grün
 - [ ] In der App auf Heute **Synchronisieren** tippen. Die Schlafkarte sollte dann Tief, REM, Leicht und Wach zeigen. Wenn nicht, Claude Bescheid geben
 
-### 6. Aufräumen
+### 6. Muster: Energie über den Tag (PR #42)
+- [ ] PR #42 ansehen und mergen (Claude merged ihn nicht selbst, weil er die Datenbank und `garmin-sync` ändert)
+- [ ] `supabase/migrations/20261122170000_energie_tag.sql` ausführen: Spalten für den Body-Battery-Verlauf und die Schlafzeiten
+- [ ] Nach dem Merge prüfen, dass **Actions → Supabase-Funktionen hochladen** grün ist
+- [ ] In der App auf Heute **Synchronisieren** tippen, dann unter **Muster** nachsehen. Steht dort „Body Battery im Tagesverlauf ist bei Garmin nicht abrufbar“, Claude Bescheid geben (dann braucht es einen anderen Abrufweg)
+
+### 7. Aufräumen
 - [ ] Auf GitHub den Zweig `heute-neu` löschen (versehentlich angelegt, gleicher Inhalt wie PR #38)
 
 ## Erledigt

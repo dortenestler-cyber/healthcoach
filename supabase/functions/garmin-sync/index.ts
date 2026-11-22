@@ -95,6 +95,16 @@ function tempKeys(obj: Any, prefix = "", depth = 0, out: string[] = []): string[
   return out.slice(0, 10);
 }
 
+// Ortszeit für den Tagesverlauf: Minuten seit Mitternacht in Europe/Berlin
+const TZ = "Europe/Berlin";
+const localParts = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+function localDayMinute(ms: number): { day: string; minute: number } {
+  const p = Object.fromEntries(localParts.formatToParts(new Date(ms)).map((x) => [x.type, x.value]));
+  return { day: `${p.year}-${p.month}-${p.day}`, minute: Number(p.hour) * 60 + Number(p.minute) };
+}
+// Garmin liefert lokale Zeitstempel als Millisekunden „wie UTC“: Minuten seit Mitternacht direkt ablesen
+const localStampMinute = (v: unknown): number | null => (typeof v === "number" && v > 1e11 ? new Date(v).getUTCHours() * 60 + new Date(v).getUTCMinutes() : null);
+
 const num = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
 const int = (v: unknown): number | null => {
   const n = num(v);
@@ -152,6 +162,8 @@ Deno.serve(async (req) => {
     };
     const activities: Record<string, unknown>[] = [];
     const skinKeys = new Set<string>();
+    let bbCurveDays = 0;
+    let bbNote = "";
     let sleepTempKeys: string[] = [];
 
     for (const w of windows) {
@@ -187,11 +199,44 @@ Deno.serve(async (req) => {
         r.sleep_rem_s = int(s?.remSleepSeconds ?? s?.remSleepInSeconds ?? s?.remSleepDurationInSeconds);
         r.sleep_light_s = int(s?.lightSleepSeconds ?? s?.lightSleepDurationInSeconds);
         r.sleep_awake_s = int(s?.awakeSleepSeconds ?? s?.awakeDurationInSeconds);
+        r.sleep_start_min = localStampMinute(s?.sleepStartTimestampLocal);
+        r.sleep_end_min = localStampMinute(s?.sleepEndTimestampLocal);
         const t = findSkinTemp(s);
         if (t && plausibleTemp(t.value)) {
           r.skin_temp_delta = Math.round(t.value * 100) / 100;
           skinKeys.add(t.key);
         } else if (!sleepTempKeys.length) sleepTempKeys = tempKeys(s);
+      }
+
+      // Body Battery im Tagesverlauf (für „Energie über den Tag“). Garmin dokumentiert den Pfad der Personal API nicht;
+      // es wird der Pfad aus Garmin Connect versucht. Fehler brechen den Abruf nicht ab.
+      try {
+        const bb = await garminGet(token, `/wellness-service/wellness/bodyBattery/reports/daily?startDate=${w.s}&endDate=${w.e}`);
+        for (const d of (Array.isArray(bb) ? bb : bb?.data ?? []) as Any[]) {
+          const values = (d?.bodyBatteryValuesArray ?? []) as Any[];
+          const curves = new Map<string, (number | null)[]>();
+          for (const v of values) {
+            if (!Array.isArray(v) || typeof v[0] !== "number") continue;
+            const level = typeof v[1] === "number" ? v[1] : typeof v[2] === "number" ? v[2] : null;
+            if (level === null || level < 0 || level > 100) continue;
+            const { day, minute } = localDayMinute(v[0]);
+            if (!curves.has(day)) curves.set(day, Array(96).fill(null));
+            curves.get(day)![Math.floor(minute / 15)] = Math.round(level);
+          }
+          // Mehrere Einträge können denselben Tag betreffen: ergänzen statt überschreiben
+          for (const [day, curve] of curves) {
+            if (day < w.s || day > w.e) continue;
+            const r = row(day);
+            const merged = (Array.isArray(r.bb_curve) ? r.bb_curve : Array(96).fill(null)) as (number | null)[];
+            curve.forEach((v, i) => {
+              if (v !== null) merged[i] = v;
+            });
+            r.bb_curve = merged;
+          }
+          if (curves.size) bbCurveDays += curves.size;
+        }
+      } catch {
+        bbNote = "Body Battery im Tagesverlauf ist bei Garmin nicht abrufbar.";
       }
 
       // HRV
@@ -252,7 +297,7 @@ Deno.serve(async (req) => {
       const paths = ["/wellness-service/wellness/dailySleepData?date=", "/sleep-service/sleep/dailySleepData?date="];
       let path: string | null = null;
       for (const r of recent.sort((a, b) => String(b.day).localeCompare(String(a.day)))) {
-        const candidates = path ? [path] : paths;
+        const candidates: string[] = path ? [path] : paths;
         let found = false;
         for (const p of candidates) {
           try {
@@ -280,6 +325,7 @@ Deno.serve(async (req) => {
     const dailyRows = [...daily.values()];
     let migrationMissing = false;
     let stagesMissing = false;
+    let energyMissing = false;
     if (dailyRows.length) {
       // Spalten aus späteren Migrationen: fehlt eine in der Datenbank, ohne sie speichern,
       // damit der Abruf weiter funktioniert. Die App weist dann auf die fehlende Migration hin.
@@ -287,16 +333,18 @@ Deno.serve(async (req) => {
         skin_temp_delta: ["skin_temp_delta"],
         fitness_age: ["fitness_age"],
         sleep_: ["sleep_deep_s", "sleep_rem_s", "sleep_light_s", "sleep_awake_s"],
+        energie_: ["bb_curve", "sleep_start_min", "sleep_end_min"],
       };
       const dropped = new Set<string>();
       const strip = () => dailyRows.map((r) => Object.fromEntries(Object.entries(r).filter(([k]) => !dropped.has(k))));
       let { error } = await sb.from("garmin_daily").upsert(dailyRows, { onConflict: "user_id,day" });
-      for (let tries = 0; error && tries < 3; tries++) {
+      for (let tries = 0; error && tries < 4; tries++) {
         const hit = Object.entries(optional).find(([, cols]) => cols.some((c) => error!.message.includes(c)) && !cols.every((c) => dropped.has(c)));
         if (!hit) break;
         hit[1].forEach((c) => dropped.add(c));
         if (hit[0] === "skin_temp_delta") migrationMissing = true;
         if (hit[0] === "sleep_") stagesMissing = true;
+        if (hit[0] === "energie_") energyMissing = true;
         ({ error } = await sb.from("garmin_daily").upsert(strip(), { onConflict: "user_id,day" }));
       }
       if (error) throw new Error("Speichern der Tageswerte: " + error.message);
@@ -316,6 +364,8 @@ Deno.serve(async (req) => {
       sleepTempKeys,
       skinNote: migrationMissing ? "Die Datenbank-Spalte für die Hauttemperatur fehlt noch." : skinNote,
       sleepStagesNote: stagesMissing ? "Die Datenbank-Spalten für die Schlafphasen fehlen noch." : "",
+      bbCurveDays: energyMissing ? 0 : bbCurveDays,
+      energyNote: energyMissing ? "Die Datenbank-Spalten für die Energie über den Tag fehlen noch." : bbNote,
       syncedAt: new Date().toISOString(),
     });
   } catch (e) {

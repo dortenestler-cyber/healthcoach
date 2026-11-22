@@ -2118,3 +2118,15 @@ a.btn {
 .segmented-tabs { display: flex; overflow-x: auto; scrollbar-width: none; }
 .segmented-tabs::-webkit-scrollbar { display: none; }
 .segmented-tabs button { flex: 1 0 auto; min-height: 44px; padding: 0 12px; }
+
+/* Muster (Konzept PR 5): Energie über den Tag, Was dir guttut */
+.cb-line-usual { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-linejoin: round; }
+.cb-line-projection { stroke-dasharray: 4 4; opacity: 0.8; }
+.cb-sleep-area { fill: var(--fill); opacity: 0.8; }
+.cb-training-area { fill: var(--training-zone); opacity: 0.45; }
+.cb-bar-pos { fill: var(--c, var(--recovery)); }
+.cb-bar-neg { fill: var(--line-strong); }
+.cb-key-line { background: var(--c, var(--recovery)); height: 3px !important; border-radius: 2px !important; }
+.cb-key-projection { background: transparent; border-top: 2px dashed var(--c, var(--recovery)); height: 0 !important; border-radius: 0 !important; }
+.cb-key-usual { background: var(--muted); height: 2px !important; }
+.cb-key-sleep-area { background: var(--fill); }
