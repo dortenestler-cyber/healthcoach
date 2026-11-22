@@ -10,6 +10,7 @@ const FUTURE = 7;
 const ms = (v: number) => `${Math.round(v)} ms`;
 
 // HRV der letzten 4 Wochen: dein Bereich als Band, in der Lutealphase zusätzlich der Luteal-Bereich, Phasen getönt.
+// Ansicht in der Karte „Deine Werte“ auf Heute (ohne eigenen Kartenrahmen).
 export default function HrvCard({ data, showPhases }: { data: Data; showPhases: boolean }) {
   const today = isoDay();
   const days = Array.from({ length: PAST + (showPhases ? FUTURE : 0) }, (_, i) => isoDay(daysAgo(PAST - 1 - i)));
@@ -30,8 +31,8 @@ export default function HrvCard({ data, showPhases }: { data: Data; showPhases: 
   }
 
   return (
-    <Link href="/verlauf?m=hrv" className="card chart-card">
-      <ValueHeader meta="HRV · letzte Nacht ›" sentence={sentence} value={value === null ? null : ms(value)} fmt={ms} range={base.range} luteal={base.luteal}>
+    <div className="values-pane">
+      <ValueHeader meta="HRV · letzte Nacht" sentence={sentence} value={value === null ? null : ms(value)} fmt={ms} range={base.range} luteal={base.luteal}>
         <LineBand
           values={values}
           fmt={ms}
@@ -55,6 +56,7 @@ export default function HrvCard({ data, showPhases }: { data: Data; showPhases: 
       ) : (
         showPhases && <span className="meta">Trag deine Periode im Tagebuch ein, dann erscheinen die Phasen im Hintergrund.</span>
       )}
-    </Link>
+      <Link href="/verlauf?m=hrv" className="settings-link">HRV im Verlauf ›</Link>
+    </div>
   );
 }

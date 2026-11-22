@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay } from "@/lib/dates";
 import { illnessRule, SPOTS, usualRange, weeklyCounts, weekStart, type Illness, type Injury, type Intake, type Medication } from "@/lib/health";
 import { addAsNeeded } from "@/lib/intakes";
 import IntakeChecklist from "@/components/IntakeChecklist";
 
-// Heute: Hinweise bei Krankheit oder Verletzung und die Einnahmen des Tages
-export default function HealthToday() {
+// Heute steht an: Hinweise bei Krankheit oder Verletzung, dann children (Training), dann die Einnahmen des Tages
+// und der Einstieg „Krank oder verletzt?“. Rendert Abschnitte innerhalb der Karte, keine eigenen Karten.
+export default function HealthToday({ children }: { children?: ReactNode }) {
   const [meds, setMeds] = useState<Medication[]>([]);
   const [today, setToday] = useState<Intake[]>([]);
   const [hubs, setHubs] = useState<{ at: string }[]>([]);
@@ -65,22 +66,24 @@ export default function HealthToday() {
   return (
     <>
       {illness && rule && (
-        <Link href="/gesundheit?t=krank" className="banner">
+        <Link href="/gesundheit?t=krankverl" className="banner">
           <span className="row-strong">{illness.label} · Stärke {illness.severity} ›</span>
           <span>Training {rule.title}. {rule.text}</span>
         </Link>
       )}
       {injuries.map((i) => (
-        <Link key={i.id} href="/gesundheit?t=verl" className="banner">
+        <Link key={i.id} href="/gesundheit?t=krankverl" className="banner">
           <span className="row-strong">Verletzung: {SPOTS[i.spot]?.label ?? i.spot} ›</span>
           <span>{SPOTS[i.spot]?.sports.includes("klettern") ? "Klettern ist pausiert, Übungen werden ersetzt." : "Übungen werden ersetzt, Training geht angepasst weiter."}</span>
         </Link>
       ))}
 
+      {children}
+
       {(hasRegular || neededMeds.length > 0) && (
-        <section className="card">
+        <div className="agenda-part">
           <div className="card-row">
-            <h2>Medikamente und Supplements</h2>
+            <h3>Medikamente und Supplements</h3>
             <Link href="/gesundheit?t=med" className="link-small">Worauf achten ›</Link>
           </div>
           {error && <p className="alert alert-inline">{error}</p>}
@@ -108,28 +111,26 @@ export default function HealthToday() {
               Diese Woche brauchst du mehr Bedarfs-Hübe als sonst ({week} statt {range.lo} bis {range.hi}). Bitte ärztlich abklären. Atemnot trotz Inhalator ist ein Notfall: 112.
             </p>
           )}
-        </section>
+        </div>
       )}
 
       {meds.length === 0 && !error && (
-        <section className="card">
+        <div className="agenda-part">
           <div className="card-row">
-            <h2>Medikamente und Supplements</h2>
+            <h3>Medikamente und Supplements</h3>
             <Link href="/gesundheit?t=med" className="link-small">Anlegen ›</Link>
           </div>
-          <p>Leg unter Gesundheit deine Mittel an, dann kannst du sie hier abhaken.</p>
-        </section>
+          <span className="meta">Leg unter Gesundheit deine Mittel an, dann kannst du sie hier abhaken.</span>
+        </div>
       )}
 
-      <section className="card card-tight">
-        <div className="card-row">
-          <span className="row-label">Krank oder verletzt?</span>
-          <div className="pills">
-            <Link href="/gesundheit?t=krank" className="pill pill-sm pill-link">Krankheit</Link>
-            <Link href="/gesundheit?t=verl" className="pill pill-sm pill-link">Verletzung</Link>
-          </div>
+      <div className="agenda-part card-row">
+        <span className="row-label">Krank oder verletzt?</span>
+        <div className="pills">
+          <Link href="/gesundheit?t=krankverl" className="pill pill-sm pill-link">Krankheit</Link>
+          <Link href="/gesundheit?t=krankverl" className="pill pill-sm pill-link">Verletzung</Link>
         </div>
-      </section>
+      </div>
     </>
   );
 }

@@ -7,17 +7,13 @@ import { duration, stressDay, stressSentence } from "@/lib/stress";
 const DE_DAY = (iso: string) => new Date(iso + "T12:00:00").toLocaleDateString("de-DE", { weekday: "short" });
 
 // Stress heute: Ring links, Kennzahlen rechts, darunter die Aufteilung (Konzept dunkel 2, Muster 4 und 7).
-// Farbe Türkis, höher = kräftiger, nie ohne Zahl und Wort.
+// Farbe Türkis, höher = kräftiger, nie ohne Zahl und Wort. Ansicht in der Karte „Deine Werte“ auf Heute.
 export default function StressCard({ day, data }: { day: string; data: Data }) {
   const s = stressDay(day, data.daily);
   const sentence = stressSentence(s);
 
   return (
-    <section className="card">
-      <div className="card-row">
-        <span className="eyebrow">Stress · Garmin</span>
-        <Link href="/verlauf?m=stress" className="settings-link">Verlauf ›</Link>
-      </div>
+    <div className="values-pane">
       <div className="ring-stats">
         <ValueRing tone="stress" size={112} value={(s.value ?? 0) / 100} center={s.value === null ? "–" : String(s.value)} caption={s.word ?? "kein Wert"} label={s.value === null ? "Stress: noch kein Wert" : `Stress ${s.value} von 100, ${s.word}`} />
         <div className="stat-lines">
@@ -56,6 +52,7 @@ export default function StressCard({ day, data }: { day: string; data: Data }) {
         {sentence}
       </ExplainCard>
       {!s.split && s.value !== null && <span className="meta">Aufteilung und längste Phase erscheinen, sobald Garmin den Tagesverlauf liefert.</span>}
-    </section>
+      <Link href="/verlauf?m=stress" className="settings-link">Stress im Verlauf ›</Link>
+    </div>
   );
 }

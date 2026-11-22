@@ -11,6 +11,7 @@ export const TABLES: { name: string; label: string; key: string }[] = [
   { name: "diary_entries", label: "Tagebuch", key: "user_id,day" },
   { name: "checkins", label: "Check-ins", key: "user_id,day" },
   { name: "hot_flashes", label: "Hitzewallungen", key: "id" },
+  { name: "muscle_events", label: "Wadenzucken und -krämpfe", key: "id" },
   { name: "garmin_daily", label: "Garmin Tageswerte", key: "user_id,day" },
   { name: "garmin_activities", label: "Garmin Aktivitäten", key: "user_id,activity_id" },
   { name: "medications", label: "Medikamente", key: "id" },

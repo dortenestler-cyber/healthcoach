@@ -83,6 +83,7 @@ export const useTheme = () => usePref<Theme>(getTheme, "auto");
 export type Feature =
   | "zyklus"
   | "perimenopause"
+  | "muskeln"
   | "medikamente"
   | "krankheit"
   | "verletzung"
@@ -96,6 +97,7 @@ export type Feature =
 export const FEATURES: { key: Feature; label: string; note: string }[] = [
   { key: "zyklus", label: "Zyklus", note: "Zyklusphasen im HRV-Verlauf auf Heute" },
   { key: "perimenopause", label: "Perimenopause", note: "Symptome und Hitzewallungen auf Heute" },
+  { key: "muskeln", label: "Wadenkrämpfe", note: "Zucken und Krämpfe im Tagebuch" },
   { key: "medikamente", label: "Medikamente", note: "Bereich unter Gesundheit" },
   { key: "krankheit", label: "Krankheit", note: "Bereich unter Gesundheit" },
   { key: "verletzung", label: "Verletzung", note: "Bereich unter Gesundheit" },
@@ -114,7 +116,7 @@ export const PROFILES: { key: Profile; label: string; note: string; on: Feature[
     key: "standard",
     label: "Standard",
     note: "Dazu Zyklus, Perimenopause, Medikamente und Sportarten",
-    on: ["zyklus", "perimenopause", "medikamente", "krankheit", "verletzung", "kettlebell", "bouldern", "karate", "garmin", "tagesziel"],
+    on: ["zyklus", "perimenopause", "muskeln", "medikamente", "krankheit", "verletzung", "kettlebell", "bouldern", "karate", "garmin", "tagesziel"],
   },
   { key: "alles", label: "Alles", note: "Alle Bereiche", on: FEATURES.map((f) => f.key) },
 ];

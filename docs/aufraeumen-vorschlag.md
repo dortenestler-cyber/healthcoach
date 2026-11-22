@@ -1,7 +1,17 @@
 # Aufräumen · Bestandsaufnahme und Vorschlag
 
 Ergebnis von Schritt 1 und 2 aus `docs/prompt-aufraeumen.md` (Stand 22.11.2026).
-Noch nichts umgesetzt. Umsetzung erst nach Freigabe.
+Freigegeben am 22.11.2026 mit diesen Entscheidungen:
+1. Check-in, Symptome und Hitzewallungen werden nur noch im Tagebuch eingetragen. Heute zeigt einen offenen Check-in als Hinweis mit Link.
+2. Der Verlauf bleibt eine eigene Detailseite.
+3. Reihenfolge: 1 Heute · 2 Training · 3 Einstellungen · 4 Tagebuch und Zyklus.
+
+## Stand
+
+- [x] 1 Heute (13 → 5 Karten, Fotos in `docs/bilder/aufraeumen/`)
+- [ ] 2 Training
+- [ ] 3 Einstellungen
+- [ ] 4 Tagebuch und Zyklus
 
 ## Schritt 1 · Bestandsaufnahme
 
@@ -52,17 +62,18 @@ Grundsatz: **Tagebuch ist das Zuhause für alles, was du einträgst** (auch für
 ### Neue Gliederung
 
 ```text
-Heute (6 Karten)
+Heute (5 Karten, umgesetzt)
 ├─ 1 Ringe: Schlaf · Readiness · Belastung                    unverändert
-├─ 2 Readiness mit Faktoren                                    Faktoren eingeklappt („Mehr anzeigen“)
-├─ 3 Heute steht an                                            NEU gebündelt aus:
-│     Krank/verletzt-Hinweis · Heute geplant · Tagesziel kurz · offene Medikamente
-├─ 4 Schnell eintragen                                         NEU gebündelt aus:
-│     Morgen-Check-in · Symptome · Hitzewallung +  → „Alles im Tagebuch ›“
-├─ 5 Deine Werte: Kacheln HRV · Schlaf · Stress · Vitalwerte   aus 4 Karten → 1, Tipp öffnet Verlauf
-└─ 6 Energie über den Tag                                      bleibt (CLAUDE.md)
+├─ 2 Readiness                                                 Faktoren und Erklärung eingeklappt
+├─ 3 Heute steht an                                            gebündelt aus:
+│     Krank/verletzt-Hinweis · Training heute + Belastung kurz · Medikamente ·
+│     „Krank oder verletzt?“ · Hinweis „Morgen-Check-in noch offen ›“
+├─ 4 Deine Werte: Übersicht · Schlaf · HRV · Stress            aus 4 Karten → 1 mit Umschalter
+└─ 5 Energie über den Tag                                      bleibt (CLAUDE.md)
+   (ausführliche Belastungskarte → Seite Tagesziel)
 
 Tagebuch
+├─ Morgen-Check-in                                             NEU hier (vorher auf Heute)
 ├─ Blutung
 ├─ Symptome + Hitzewallungen                                   zusammen (gleiches Thema)
 ├─ Gewohnheiten
@@ -97,9 +108,10 @@ Einstellungen (nur Einrichtung)
 
 | Vorher | Nachher | Grund | Was du sparst |
 | --- | --- | --- | --- |
-| Heute: 13 Karten | 6 Karten | Heute soll auf einen Blick lesbar sein | ca. zwei Drittel weniger Scrollen |
-| Check-in fast ganz unten | in „Schnell eintragen“ an Platz 4 | morgens die erste Handlung | Suchen entfällt |
-| HRV, Schlaf, Stress, Vitalwerte als 4 Karten | 4 Kacheln in einer Karte | gleiche Art Inhalt | 3 Karten weniger |
+| Heute: 13 Karten | 5 Karten | Heute soll auf einen Blick lesbar sein | ca. zwei Drittel weniger Scrollen |
+| Check-in fast ganz unten auf Heute | oben im Tagebuch, auf Heute nur ein Hinweis, solange er offen ist | alles Eintragen an einem Ort | Suchen entfällt |
+| Symptome und Hitzewallungen auf Heute und im Tagebuch | nur im Tagebuch | eine Stelle zum Eintragen | – |
+| HRV, Schlaf, Stress, Vitalwerte als 4 Karten | eine Karte „Deine Werte“ mit Umschalter | gleiche Art Inhalt | 3 Karten weniger |
 | Krank/verletzt, Heute geplant, Medikamente, Tagesziel verstreut | „Heute steht an“ | alles, was heute zu tun ist, an einer Stelle | – |
 | `/tagesziel` eigene Seite | Training › Auswertung, alte Adresse leitet weiter | gehört zur Trainingsbelastung | klarer Ort |
 | Training: 5 Auswertungskarten vor den Reitern | Reiter oben, Auswertung als eigener Reiter | Kalender sofort erreichbar | ca. 4 Bildschirmhöhen Scrollen |
@@ -113,9 +125,3 @@ Einstellungen (nur Einrichtung)
 - Farben, Ringe, Seitenköpfe, Begriffe
 - Seite Zyklus (außer „Periode nachtragen“) und die Reiter von Gesundheit
 - Keine Funktion fällt weg, keine Änderung an Datenbank oder Supabase-Funktionen
-
-### Fragen an dich vor der Freigabe
-
-1. **Schnell eintragen auf Heute:** behalten wie vorgeschlagen, oder Check-in, Symptome und Hitzewallungen ganz ins Tagebuch?
-2. **Verlauf:** als Detailseite lassen (Vorschlag) oder als fünften Reiter „Werte“ unter Gesundheit? Das zweite ändert CLAUDE.md.
-3. **Reihenfolge der Pull Requests:** Vorschlag 1 Heute · 2 Training · 3 Einstellungen · 4 Tagebuch und Zyklus.

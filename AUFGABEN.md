@@ -1,11 +1,17 @@
 # Aufgaben für dich
 
 Was du selbst erledigen musst, meist in Supabase oder auf GitHub. Claude trägt hier neue Aufgaben ein, sobald ein Pull Request etwas von dir braucht, und hakt ab, was erledigt ist.
-Projekt in Supabase: `fkvhuxjsdvssmupewwgl` (Region Frankfurt).
+Projekt in Supabase: `fkvhuxjsdvssmupewwgl` (Region EU, Irland `eu-west-1`).
 
 Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests führt GitHub neue Dateien aus `supabase/migrations` in der Datenbank aus (Workflow „Supabase-Migrationen ausführen“). Pull Requests mit Migrationen merged du selbst, dein Merge ist die Freigabe.
 
 ## Jetzt
+
+### Wadenzucken und Wadenkrämpfe erfassen (PR #49)
+- [x] PR #49 gemergt (22. Nov.), Migration grün (geprüft von Claude). Er enthält die Migration `supabase/migrations/20261123110000_muskeln.sql` (neue Tabelle `muscle_events`). Dein Merge ist die Freigabe, danach legt GitHub die Tabelle automatisch an (das Secret `SUPABASE_DB_URL` ist eingerichtet)
+- [ ] Magnesium unter **Gesundheit › Medikamente** als Supplement eintragen (falls noch nicht geschehen) und täglich abhaken, damit die spätere Auswertung Tage mit und ohne Einnahme vergleichen kann
+- [ ] Im Tagebuch einen Testeintrag machen und wieder löschen
+- [ ] Unter **Gesundheit › Körper** (Karte Waden) und auf **Zyklus** nachsehen, ob die Karten erscheinen. Muster zeigt die App erst ab 8 Tagen mit Zucken oder Krampf
 
 ### 1. Migrationen automatisch ausführen lassen (PR #48)
 - [x] Datenbank-Passwort bereitlegen: In Supabase unter **Project Settings → Database** steht, wie du es neu setzen kannst, falls du es nicht mehr weißt
@@ -44,7 +50,7 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 - [ ] Die neue Seite **Zyklus** in der Navigation ansehen und sagen, was fehlt oder anders sein soll
 
 ### 7. Readiness nach dem persönlichen Bereich (PR #45)
-- [ ] PR #45 ansehen und mergen (Claude merged ihn nicht selbst, weil er die Uhr-Funktion `watch` ändert). Keine Migration nötig
+- [x] PR #45 gemergt (22. Nov.), Upload der Funktionen grün (Claude merged ihn nicht selbst, weil er die Uhr-Funktion `watch` ändert). Keine Migration nötig
 - [ ] Ein paar Tage beobachten, ob die Readiness-Stufe zu deinem Gefühl passt, und Claude Rückmeldung geben
 
 ### 8. Früheres nachtragen
@@ -77,6 +83,11 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 - [ ] Nach ein paar Wochen unter Gesundheit › Überblick › Sauna ansehen (Vergleiche erscheinen ab je 5 Nächten mit und ohne)
 - [x] Neues App-Symbol (Zen-Ring, dunkel) freigegeben
 - [ ] Nach dem Merge die App vom Startbildschirm löschen und über Safari neu hinzufügen, damit iOS das neue Symbol übernimmt
+
+### 13. Zwei Claude-Instanzen (PR #54, Konzept `docs/konzept-zwei-instanzen.md`)
+- [ ] Neue Sitzungen mit diesem Satz starten: „Du bist die Rolle **Oberfläche** (oder **Daten**) im Projekt Health Coach. Folge `docs/konzept-zwei-instanzen.md`, Abschnitt 6 „Start“.“
+- [ ] Pro Rolle nur eine Sitzung gleichzeitig laufen lassen
+- [ ] PR #14 schließen (ersetzt durch PR #47)
 
 ## Erledigt
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)

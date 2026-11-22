@@ -6,6 +6,7 @@ import { SYMPTOMS } from "@/lib/catalog";
 import { periodStarts, type Diary } from "@/lib/insights";
 
 const DAY_MS = 864e5;
+const MUSCLE_KEY = "_wade";
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");
   d.setDate(d.getDate() + n);
@@ -52,7 +53,8 @@ export const avgBefore = (w: { count: number }[]) => mean(w.slice(0, -1).map((x)
 
 // Symptome je Zyklustag über die letzten 4 abgeschlossenen Zyklen: Anteil der Zyklen mit Symptom an diesem Tag.
 // Zeilen: die bis zu 5 häufigsten Symptome. Spalten: Zyklustag 1 bis zur längsten Länge (höchstens 35).
-export function symptomHeat(diary: Diary[]): { rows: { label: string; values: (number | null)[] }[]; columns: string[]; n: number } {
+// muscle: stärkste Intensität von Wadenzucken und -krämpfen je Tag, erscheint als eigene Zeile „Wadenkrämpfe“.
+export function symptomHeat(diary: Diary[], muscle?: Map<string, number>): { rows: { label: string; values: (number | null)[] }[]; columns: string[]; n: number } {
   const recent = cycles(diary).slice(-4);
   if (recent.length < 2) return { rows: [], columns: [], n: recent.length };
   const byDay = new Map(diary.map((d) => [d.day, d]));
@@ -61,7 +63,8 @@ export function symptomHeat(diary: Diary[]): { rows: { label: string; values: (n
   const counts = new Map<string, number[]>();
   for (const c of recent) {
     for (let i = 0; i < c.length && i < len; i++) {
-      const s = byDay.get(addDays(c.start, i))?.symptoms ?? {};
+      const day = addDays(c.start, i);
+      const s: Record<string, number> = { ...(byDay.get(day)?.symptoms ?? {}), ...(muscle?.get(day) ? { [MUSCLE_KEY]: muscle.get(day)! } : {}) };
       for (const [k, v] of Object.entries(s)) {
         if (!v) continue;
         if (!counts.has(k)) counts.set(k, Array(len).fill(0));
@@ -72,8 +75,10 @@ export function symptomHeat(diary: Diary[]): { rows: { label: string; values: (n
   }
   // Wie viele Zyklen reichen bis zu diesem Tag? Kürzere Zyklen zählen für späte Tage nicht mit.
   const reach = Array.from({ length: len }, (_, i) => recent.filter((c) => c.length > i).length);
-  const top = [...totals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([k]) => k);
-  const label = (k: string) => SYMPTOMS.find((s) => s.key === k)?.label ?? k;
+  let top = [...totals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([k]) => k);
+  // Wadenkrämpfe immer zeigen, sobald es Einträge gibt
+  if (totals.has(MUSCLE_KEY) && !top.includes(MUSCLE_KEY)) top = [...top.slice(0, 4), MUSCLE_KEY];
+  const label = (k: string) => (k === MUSCLE_KEY ? "Wadenkrämpfe" : SYMPTOMS.find((s) => s.key === k)?.label ?? k);
   return {
     rows: top.map((k) => ({ label: label(k), values: counts.get(k)!.map((c, i) => (reach[i] ? c / reach[i] : null)) })),
     columns: Array.from({ length: len }, (_, i) => String(i + 1)),

@@ -1,14 +1,12 @@
-import Link from "next/link";
 import { HalfGauge } from "@/components/charts";
 import ExplainCard from "@/components/ui/ExplainCard";
-import type { DayRule } from "@/lib/cycle";
 import { clock } from "@/lib/dates";
-import { loadPercent, type Data } from "@/lib/insights";
+import { loadPercent, type Data, type Target } from "@/lib/insights";
 import { targetText } from "@/lib/today";
 
-// Belastung heute als Halbbogen mit Zielbereich, zwei Kacheln und Erklärkarte (Konzept dunkel 2, Muster 2 und 3)
-export default function LoadCard({ day, data, rule }: { day: string; data: Data; rule: DayRule }) {
-  const t = rule.target;
+// Belastung heute als Halbbogen mit Zielbereich, zwei Kacheln und Erklärkarte (Konzept dunkel 2, Muster 2 und 3).
+// Steht auf der Seite Tagesziel; auf Heute gibt es nur die Kurzzeile in „Heute steht an“.
+export default function LoadCard({ day, data, target: t }: { day: string; data: Data; target: Target }) {
   const load = loadPercent(day, data.daily, data.acts);
   const today = data.daily.find((d) => d.day === day);
   const synced = data.daily.reduce((m, r) => Math.max(m, new Date(r.synced_at).getTime()), 0);
@@ -17,10 +15,7 @@ export default function LoadCard({ day, data, rule }: { day: string; data: Data;
 
   return (
     <section className="card">
-      <div className="card-row">
-        <span className="eyebrow">Belastung</span>
-        <Link href="/tagesziel" className="settings-link">Tagesziel ›</Link>
-      </div>
+      <span className="eyebrow">Belastung heute</span>
       <div className="gauge-wrap">
         <HalfGauge
           tone="training"

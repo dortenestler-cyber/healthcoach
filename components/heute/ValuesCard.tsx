@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RangeRow } from "@/components/charts";
+import HrvCard from "@/components/heute/HrvCard";
+import SleepCard from "@/components/heute/SleepCard";
+import StressCard from "@/components/heute/StressCard";
 import { countInRange } from "@/lib/baseline";
 import { clock, isoDay } from "@/lib/dates";
 import { supabase } from "@/lib/supabase";
@@ -12,8 +15,18 @@ import { vitalRows } from "@/lib/today";
 
 const AUTO_SYNC_AFTER_MS = 2 * 60 * 60 * 1000;
 
-// Vitalwerte der letzten Nacht, jeder mit deinem Bereich. Dazu Garmin synchronisieren (automatisch nach 2 Stunden).
-export default function VitalsCard({ day, data, onSynced }: { day: string; data: Data | null; onSynced: () => void }) {
+type View = "werte" | "schlaf" | "hrv" | "stress";
+const VIEWS: [View, string][] = [
+  ["werte", "Übersicht"],
+  ["schlaf", "Schlaf"],
+  ["hrv", "HRV"],
+  ["stress", "Stress"],
+];
+
+// „Deine Werte“: Vitalwerte der letzten Nacht mit deinem Bereich, dazu Schlaf, HRV und Stress als Ansichten in einer Karte.
+// Garmin synchronisieren (automatisch nach 2 Stunden).
+export default function ValuesCard({ day, data, showPhases, onSynced }: { day: string; data: Data | null; showPhases: boolean; onSynced: () => void }) {
+  const [view, setView] = useState<View>("werte");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [note, setNote] = useState("");
@@ -75,7 +88,7 @@ export default function VitalsCard({ day, data, onSynced }: { day: string; data:
     <section className="card">
       <div className="card-row">
         <div className="stack">
-          <span className="meta">Vitalwerte · Garmin{lastSync ? " · " + clock(new Date(lastSync)) : ""}</span>
+          <span className="eyebrow">Deine Werte · Garmin{lastSync ? " · " + clock(new Date(lastSync)) : ""}</span>
           <h2>{sentence}</h2>
         </div>
         <button type="button" className="btn btn-quiet" disabled={busy} onClick={() => sync(3)}>
@@ -89,13 +102,28 @@ export default function VitalsCard({ day, data, onSynced }: { day: string; data:
       )}
       {error && <p className="alert alert-inline">{error}</p>}
       {note && <span className="meta">{note}</span>}
-      <div className="factor-list">
-        {rows.map((r) => (
-          <Link key={r.key} href={r.href ?? "/verlauf"} className="row-link">
-            <RangeRow label={r.label} value={r.value} fmt={r.fmt} range={r.base.range} luteal={r.base.luteal} tone="neutral" />
-          </Link>
+
+      <div className="segmented segmented-tabs segmented-4" role="group" aria-label="Ansicht">
+        {VIEWS.map(([k, l]) => (
+          <button key={k} type="button" aria-pressed={view === k} onClick={() => setView(k)}>
+            {l}
+          </button>
         ))}
       </div>
+
+      {view === "werte" && (
+        <div className="factor-list">
+          {rows.map((r) => (
+            <Link key={r.key} href={r.href ?? "/verlauf"} className="row-link">
+              <RangeRow label={r.label} value={r.value} fmt={r.fmt} range={r.base.range} luteal={r.base.luteal} tone="neutral" />
+            </Link>
+          ))}
+          <span className="meta factor-foot">Punkt = heute, Band = deine letzten 30 Tage. Tippen öffnet den Verlauf.</span>
+        </div>
+      )}
+      {data && view === "schlaf" && <SleepCard data={data} />}
+      {data && view === "hrv" && <HrvCard data={data} showPhases={showPhases} />}
+      {data && view === "stress" && <StressCard day={day} data={data} />}
     </section>
   );
 }
