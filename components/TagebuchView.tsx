@@ -11,7 +11,6 @@ import CheckinCard from "@/components/tagebuch/CheckinCard";
 import DayIntakes from "@/components/tagebuch/DayIntakes";
 import FlashCounter from "@/components/tagebuch/FlashCounter";
 import MuscleSection from "@/components/tagebuch/MuscleSection";
-import PeriodBackfill from "@/components/tagebuch/PeriodBackfill";
 import { useFeatures } from "@/lib/prefs";
 
 type Entry = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[] };
@@ -26,8 +25,8 @@ const shift = (iso: string, n: number) => {
   return d.toISOString().slice(0, 10);
 };
 
-// Tagebuch für heute oder einen vergangenen Tag: Check-in, Blutung, Symptome, Gewohnheiten, Einnahmen, Hitzewallungen.
-// Hier wird alles eingetragen; Heute zeigt nur, was offen ist.
+// Tagebuch für heute oder einen vergangenen Tag: Check-in, Blutung, Symptome mit Hitzewallungen, Gewohnheiten, Einnahmen.
+// Hier wird alles eingetragen; Heute zeigt nur, was offen ist. Vergangene Perioden trägst du auf der Seite Zyklus nach.
 // Dazu vergangene Perioden schnell nachtragen.
 export default function TagebuchView({ initial }: { initial?: string }) {
   const today = isoDay();
@@ -150,7 +149,10 @@ export default function TagebuchView({ initial }: { initial?: string }) {
       <CheckinCard key={"c" + day} day={day} isToday={day === today} />
 
       <section className="card">
-        <h2>Blutung</h2>
+        <div className="card-row">
+          <h2>Blutung</h2>
+          {feat.zyklus && <Link href="/zyklus#perioden" className="settings-link">Frühere nachtragen ›</Link>}
+        </div>
         <div className="grid-5">
           {BLEEDING.map((l, i) => (
             <button key={l} type="button" className="pill pill-box" aria-pressed={bleeding === i} onClick={() => { setBleeding(i); changed(); }}>
@@ -181,6 +183,8 @@ export default function TagebuchView({ initial }: { initial?: string }) {
           })}
         </div>
       </section>
+
+      {feat.perimenopause && <FlashCounter key={"f" + day} day={day} />}
 
       <section className="card">
         <div className="card-row">
@@ -239,36 +243,31 @@ export default function TagebuchView({ initial }: { initial?: string }) {
 
       <DayIntakes key={"i" + day} day={day} />
 
-      {feat.perimenopause && <FlashCounter key={"f" + day} day={day} />}
-
       {feat.muskeln && <MuscleSection key={"m" + day} day={day} onChanged={loadMuscle} />}
 
       <section className="card">
-        <div className="card-row">
-          <h2>Verlauf, 4 Wochen</h2>
-          <span className="meta">{shortDate(daysAgo(DAYS - 1))} bis heute</span>
-        </div>
-        {[...GRID_ROWS, ...(feat.muskeln ? [{ key: "wade", label: "Wade" }] : [])].map((r) => (
-          <div key={r.key} className="grid-row">
-            <span className="grid-label">{r.label}</span>
-            <div className="grid-28" aria-label={r.label + " der letzten 4 Wochen"}>
-              {days.map((d) => (
-                <span key={d} className="grid-cell" data-selected={d === day} style={{ background: cellColor(r.key, d) }} />
-              ))}
+        <details className="derive">
+        <summary>Verlauf, 4 Wochen · {shortDate(daysAgo(DAYS - 1))} bis heute</summary>
+          {[...GRID_ROWS, ...(feat.muskeln ? [{ key: "wade", label: "Wade" }] : [])].map((r) => (
+            <div key={r.key} className="grid-row">
+              <span className="grid-label">{r.label}</span>
+              <div className="grid-28" aria-label={r.label + " der letzten 4 Wochen"}>
+                {days.map((d) => (
+                  <span key={d} className="grid-cell" data-selected={d === day} style={{ background: cellColor(r.key, d) }} />
+                ))}
+              </div>
             </div>
+          ))}
+          <div className="legend">
+            <span><i style={{ background: heat[1] }} />leicht</span>
+            <span><i style={{ background: heat[2] }} />mittel</span>
+            <span><i style={{ background: heat[3] }} />stark</span>
+            <span><i style={{ background: "var(--menses-fg)" }} />Periode</span>
           </div>
-        ))}
-        <div className="legend">
-          <span><i style={{ background: heat[1] }} />leicht</span>
-          <span><i style={{ background: heat[2] }} />mittel</span>
-          <span><i style={{ background: heat[3] }} />stark</span>
-          <span><i style={{ background: "var(--menses-fg)" }} />Periode</span>
-        </div>
-        {feat.muskeln && <span className="meta">Wade: leicht Zucken, mittel Krampf, stark starker Krampf</span>}
-        {history.length === 0 && <p>Sobald du Einträge machst, füllt sich das Raster.</p>}
+          {feat.muskeln && <span className="meta">Wade: leicht Zucken, mittel Krampf, stark starker Krampf</span>}
+          {history.length === 0 && <p>Sobald du Einträge machst, füllt sich das Raster.</p>}
+        </details>
       </section>
-
-      {feat.zyklus && <PeriodBackfill onChanged={load} />}
     </>
   );
 }

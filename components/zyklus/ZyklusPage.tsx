@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import PageHead from "@/components/PageHead";
 import ZyklusView from "@/components/zyklus/ZyklusView";
+import PeriodBackfill from "@/components/zyklus/PeriodBackfill";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay } from "@/lib/dates";
 import { loadInsightData, loadMusterExtra } from "@/lib/insightData";
@@ -11,7 +12,8 @@ import type { Data, Diary } from "@/lib/insights";
 import { useFeatures } from "@/lib/prefs";
 import { loadGarminCycles, mergeGarminCycles } from "@/lib/garminZyklus";
 
-// Lädt die Daten für die Seite Zyklus: 6 Monate Werte, zwei Jahre Tagebuch, 12 Wochen Hitzewallungen
+// Lädt die Daten für die Seite Zyklus: 6 Monate Werte, zwei Jahre Tagebuch, 12 Wochen Hitzewallungen.
+// Unten: vergangene Perioden nachtragen (früher im Tagebuch).
 export default function ZyklusPage() {
   const [data, setData] = useState<Data | null>(null);
   const [longDiary, setLongDiary] = useState<Diary[] | null>(null);
@@ -20,7 +22,7 @@ export default function ZyklusPage() {
   const [error, setError] = useState("");
   const feat = useFeatures();
 
-  useEffect(() => {
+  const load = useCallback(() => {
     const sb = supabase();
     if (!sb) return;
     Promise.all([
@@ -40,12 +42,22 @@ export default function ZyklusPage() {
       .catch((e) => setError("Daten konnten nicht geladen werden: " + (e instanceof Error ? e.message : String(e))));
   }, []);
 
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // Link aus dem Tagebuch (/zyklus#perioden): erst nach dem Laden hinscrollen, sonst verschiebt der Ring die Stelle
+  useEffect(() => {
+    if (data && longDiary && window.location.hash === "#perioden") document.getElementById("perioden")?.scrollIntoView();
+  }, [data, longDiary]);
+
   return (
     <>
       <PageHead title="Zyklus" sub="Dein Zyklus und was sich darin wiederholt" tone="zyklus" />
       {error && <p className="alert" role="alert">{error}</p>}
       {!error && (!data || !longDiary) && <p className="hint">Lädt …</p>}
       {data && longDiary && <ZyklusView today={isoDay()} data={data} longDiary={longDiary} flashes={flashes} showFlashes={feat.perimenopause} extra={feat.muskeln ? extra : null} />}
+      {feat.zyklus && <PeriodBackfill onChanged={load} />}
     </>
   );
 }
