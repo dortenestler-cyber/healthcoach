@@ -2635,3 +2635,18 @@ body { overflow-x: clip; }
 .segmented-tabs.segmented-4 { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); overflow: visible; }
 .segmented-tabs.segmented-4 button { padding: 4px 4px; font-size: 13px; line-height: 1.2; white-space: normal; }
 .card-row .settings-link { white-space: nowrap; }
+
+/* Heute: Abschnitte in einer Karte („Heute steht an“) und Ansichten in „Deine Werte“ */
+.agenda-part {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 12px;
+  margin-top: 4px;
+  border-top: 1px solid var(--line-soft);
+}
+.agenda-part.card-row { flex-direction: row; min-height: 44px; }
+.agenda-part h3 { margin: 0; font-size: 15px; font-weight: 600; color: var(--text); }
+a.agenda-part { color: var(--text); text-decoration: none; }
+.values-pane { display: flex; flex-direction: column; gap: 10px; }
+details.derive[open] { display: flex; flex-direction: column; gap: 8px; }

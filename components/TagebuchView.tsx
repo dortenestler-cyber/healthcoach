@@ -7,6 +7,7 @@ import { daysAgo, isoDay, longDate, shortDate } from "@/lib/dates";
 import { BLEEDING, GRID_ROWS, LEVELS, SYMPTOMS } from "@/lib/catalog";
 import { DEFAULT_HABITS, loadHabits, SAUNA_GAENGE, SAUNA_WANN, WANN_LABEL, type Habit, type HabitDetails, type SaunaDetails } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
+import CheckinCard from "@/components/tagebuch/CheckinCard";
 import DayIntakes from "@/components/tagebuch/DayIntakes";
 import FlashCounter from "@/components/tagebuch/FlashCounter";
 import PeriodBackfill from "@/components/tagebuch/PeriodBackfill";
@@ -24,7 +25,8 @@ const shift = (iso: string, n: number) => {
   return d.toISOString().slice(0, 10);
 };
 
-// Tagebuch für heute oder einen vergangenen Tag: Blutung, Symptome, Einflüsse, Einnahmen, Hitzewallungen.
+// Tagebuch für heute oder einen vergangenen Tag: Check-in, Blutung, Symptome, Gewohnheiten, Einnahmen, Hitzewallungen.
+// Hier wird alles eingetragen; Heute zeigt nur, was offen ist.
 // Dazu vergangene Perioden schnell nachtragen.
 export default function TagebuchView({ initial }: { initial?: string }) {
   const today = isoDay();
@@ -127,6 +129,8 @@ export default function TagebuchView({ initial }: { initial?: string }) {
       {day !== today && (
         <button type="button" className="btn btn-link btn-44" onClick={() => go(today)}>Zurück zu heute</button>
       )}
+
+      <CheckinCard key={"c" + day} day={day} isToday={day === today} />
 
       <section className="card">
         <h2>Blutung</h2>

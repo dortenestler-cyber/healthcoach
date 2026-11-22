@@ -76,25 +76,28 @@ export default function ReadinessCard({ rule, factors }: { rule: DayRule; factor
         <span>{rule.text}</span>
       </div>
 
-      <div className="factor-list factor-box">
-        {factors.map((f) => {
-          const row = <RangeRow label={f.label} value={f.value} fmt={f.fmt} range={f.base.range} luteal={f.base.luteal} tone="recovery" />;
-          return f.href ? (
-            <Link key={f.key} href={f.href} className="row-link">
-              {row}
-            </Link>
-          ) : (
-            <div key={f.key}>{row}</div>
-          );
-        })}
-        <span className="meta factor-foot">Punkt = heute, Band = deine letzten 30 Tage{rule.cycle.phase && rule.cycle.phase.startsWith("luteal") ? " (in der Lutealphase: deine früheren Lutealphasen)" : ""}</span>
-      </div>
+      <details className="derive">
+        <summary>Faktoren und Erklärung</summary>
+        <div className="factor-list factor-box">
+          {factors.map((f) => {
+            const row = <RangeRow label={f.label} value={f.value} fmt={f.fmt} range={f.base.range} luteal={f.base.luteal} tone="recovery" />;
+            return f.href ? (
+              <Link key={f.key} href={f.href} className="row-link">
+                {row}
+              </Link>
+            ) : (
+              <div key={f.key}>{row}</div>
+            );
+          })}
+          <span className="meta factor-foot">Punkt = heute, Band = deine letzten 30 Tage{rule.cycle.phase && rule.cycle.phase.startsWith("luteal") ? " (in der Lutealphase: deine früheren Lutealphasen)" : ""}</span>
+        </div>
 
-      {reason && (
-        <ExplainCard tone="recovery" question={`Warum ist meine Readiness heute ${num(value)} von 10 („${label}“)?`}>
-          {reason}
-        </ExplainCard>
-      )}
+        {reason && (
+          <ExplainCard tone="recovery" question={`Warum ist meine Readiness heute ${num(value)} von 10 („${label}“)?`}>
+            {reason}
+          </ExplainCard>
+        )}
+      </details>
 
       <span className="meta">
         {rule.cycle.cycleDay !== null ? `Zyklustag ${rule.cycle.cycleDay}${phase ? " · " + phase + " (geschätzt)" : ""}` : "Zyklus: noch keine Periode im Tagebuch"}

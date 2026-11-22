@@ -7,9 +7,8 @@ import { daysAgo, isoDay, longDate, shortDate } from "@/lib/dates";
 import { computeTarget, loadPercent, sportAdvice, type Data, type Target } from "@/lib/insights";
 import { loadInsightData } from "@/lib/insightData";
 import { SPOTS, type Injury } from "@/lib/health";
-import Ring from "@/components/Ring";
+import LoadCard from "@/components/heute/LoadCard";
 import PageHead from "@/components/PageHead";
-import { targetText } from "@/lib/today";
 
 // Tagesziel im Detail: Faktoren, Empfehlung je Sportart, 14 Tage Ziel und Ist
 export default function TargetView() {
@@ -46,12 +45,7 @@ export default function TargetView() {
       {error && <p className="alert">{error}</p>}
       {t && (
         <>
-          <section className="card center-card">
-            <Ring load={load} lo={t.lo} hi={t.hi} size={170} />
-            <span className="target-label">{t.pause ? "Pause" : `${t.label}, ${t.lo}–${t.hi} %`}</span>
-            <span className="target-text">{targetText(t, load)}</span>
-            <span className="meta">100 % entsprechen etwa einem harten Trainingstag (60 Intensitätsminuten).</span>
-          </section>
+          {data && <LoadCard day={day} data={data} target={t} />}
 
           <section className="card">
             <div className="card-row">
@@ -68,6 +62,7 @@ export default function TargetView() {
               </div>
             ))}
             {!t.factors.length && <p>Noch keine Daten für heute. Synchronisiere Garmin auf der Seite Heute.</p>}
+            <span className="meta">{t.pause ? "Heute Pause." : `Stufe heute: ${t.label}, ${t.lo}–${t.hi} %.`} 100 % entsprechen etwa einem harten Trainingstag (60 Intensitätsminuten).</span>
             <span className="meta">Ausgangswert 80 Punkte. Ab 85 hart möglich, ab 65 moderat, ab 45 leicht, darunter Erholung.</span>
           </section>
 
