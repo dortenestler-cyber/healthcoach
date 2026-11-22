@@ -10,7 +10,7 @@ Freigegeben am 22.11.2026 mit diesen Entscheidungen:
 
 - [x] 1 Heute (13 → 5 Karten, Fotos in `docs/bilder/aufraeumen/`)
 - [x] 2 Training (Reiter oben, neuer Reiter Auswertung mit Tagesziel)
-- [ ] 3 Einstellungen
+- [x] 3 Einstellungen (nur Einrichtung, Verlauf und Begriffe zusätzlich unter Gesundheit)
 - [ ] 4 Tagebuch und Zyklus
 
 ## Schritt 1 · Bestandsaufnahme
