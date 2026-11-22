@@ -3,7 +3,7 @@
 // Feste Dateien von Next.js (/_next/static): aus dem Cache, weil sich ihr Name bei jeder Änderung ändert.
 // Funktionen (Coach, Garmin-Abruf, Uhr) und alles außer GET werden nie zwischengespeichert.
 
-const VERSION = "hc-v1";
+const VERSION = "hc-v2";
 const PAGES = VERSION + "-seiten";
 const STATIC = VERSION + "-dateien";
 const DATA = "hc-daten"; // wird beim Abmelden geleert
@@ -75,4 +75,38 @@ self.addEventListener("fetch", (e) => {
   if (url.hostname.endsWith(".supabase.co") && url.pathname.startsWith("/rest/v1/")) {
     e.respondWith(networkFirst(req, DATA));
   }
+});
+
+// Push-Mitteilungen (Erinnerung an den Check-in, Testmitteilung)
+self.addEventListener("push", (e) => {
+  let d = {};
+  try {
+    d = e.data ? e.data.json() : {};
+  } catch {
+    d = { body: e.data ? e.data.text() : "" };
+  }
+  e.waitUntil(
+    self.registration.showNotification(d.title || "Health Coach", {
+      body: d.body || "",
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      data: { url: d.url || "/" },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || "/";
+  e.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      for (const c of list) {
+        if ("focus" in c) {
+          c.navigate(url);
+          return c.focus();
+        }
+      }
+      return self.clients.openWindow(url);
+    })
+  );
 });

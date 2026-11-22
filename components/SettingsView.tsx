@@ -19,6 +19,8 @@ import {
 } from "@/lib/prefs";
 import { startOfToday } from "@/lib/dates";
 import PageHead from "@/components/PageHead";
+import PushRows from "@/components/settings/PushRows";
+import { disablePush } from "@/lib/push";
 
 // Einstellungen, gruppiert: Schutz, Coach & Mitteilungen, Aussehen, Daten, Hilfe.
 export default function SettingsView() {
@@ -36,6 +38,7 @@ export default function SettingsView() {
   const signOut = async () => {
     clearPin();
     disableFaceId();
+    await disablePush().catch(() => undefined);
     await supabase()?.auth.signOut();
   };
 
@@ -190,6 +193,7 @@ function CoachGroup() {
         value={month ? usd(month.cost) : "…"}
       />
       <Row label="Hinweise des Coachs" note="Alle Antworten, auch bereits gesehene" href="/coach/hinweise" />
+      <PushRows />
       {prefs.on && <Row label="Coach öffnen" href="/coach" />}
     </Group>
   );

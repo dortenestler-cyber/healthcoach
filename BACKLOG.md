@@ -14,7 +14,7 @@ Gesammelte Änderungswünsche. Umsetzung erst nach Freigabe, jeweils über eigen
 ### Ab Phase 4 (Coach)
 - [x] **Coach-Einstellungen**: an oder aus, Tageslimit für Fragen, Kosten pro Monat sichtbar.
 - [x] **Hinweise des Coachs**: Liste der Hinweise, auch bereits gesehene erneut anzeigen.
-- [ ] **Mitteilungen (Push)**: zum Beispiel als Erinnerung an den Check-in am Morgen, an- und abschaltbar.
+- [x] **Mitteilungen (Push)**: zum Beispiel als Erinnerung an den Check-in am Morgen, an- und abschaltbar.
 
 ### Daten und Pflege
 - [x] **Export & Backup**: alle eigenen Daten als Sicherung (JSON) und als CSV herunterladen und wiederherstellen.
