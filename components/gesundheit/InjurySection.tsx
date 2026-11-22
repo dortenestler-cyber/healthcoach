@@ -179,7 +179,7 @@ export default function InjurySection() {
         </section>
       )}
 
-      <span className="hint">Bitte ärztlich abklären: starke Schwellung, Taubheit, Fehlstellung oder Schmerz, der nach einer Woche nicht nachlässt.</span>
+      <span className="hint">Bitte ärztlich abklären: starke Schwellung, Taubheit, Fehlstellung, ein plötzlicher Schmerz wie ein Schlag an der Ferse oder Schmerz, der nach einer Woche nicht nachlässt.</span>
     </>
   );
 }
