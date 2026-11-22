@@ -68,6 +68,10 @@ export default function SettingsView() {
         />
       </Group>
 
+      <Group title="Tagebuch">
+        <Row label="Gewohnheiten" note="Sauna, Alkohol, eigene · ein- und ausblenden" href="/einstellungen/gewohnheiten" />
+      </Group>
+
       <Group title="Daten">
         <Row label="Export & Backup" note="Sicherung als JSON, Tabellen als CSV, Wiederherstellen" href="/einstellungen/daten" />
         <Row label="Einrichtungs-Check" note="Garmin, Coach und letzter Abruf" href="/einstellungen/check" />

@@ -31,8 +31,10 @@ Health Coach bringt Training, Erholung, Zyklus, Perimenopause-Symptome, Krankhei
 - Farben und Abstände kommen aus den Variablen in `app/globals.css`, keine festen Farbwerte in Komponenten.
 - Tap-Ziele mindestens 44 px, Kontrast mindestens AA.
 - Navigation: Heute, Tagebuch, Training, Zyklus, Gesundheit. Der Coach ist ein schwebender Knopf auf jeder Seite.
-- Die Seite Zyklus stellt den Zyklus in den Mittelpunkt: Ring mit Phasen, was in der heutigen Phase üblich ist, Werte und Symptome nach Zyklustag, Einflüsse je Phase. Muster ohne Zyklusbezug stehen dort unten unter „Weitere Muster“, „Energie über den Tag“ steht auf Heute.
-- App-Symbol: Tagesziel-Ring, hell (`public/icons/icon.svg`) und dunkel (`public/icons/icon-dark.svg`).
+- Die Seite Zyklus stellt den Zyklus in den Mittelpunkt: Ring mit Phasen, was in der heutigen Phase üblich ist, Werte und Symptome nach Zyklustag, Gewohnheiten je Phase. „Energie über den Tag“ steht auf Heute.
+- Gesundheit hat die Reiter Überblick · Medikamente · Krank & verletzt · Körper. Der Überblick zeigt heute auf einen Blick, was dir guttut, Gewohnheiten im Monat und die Muster ohne Zyklusbezug („Weitere Muster“).
+- Gewohnheiten (früher „Einflüsse“) werden im Tagebuch per Tipp erfasst, Details nur wo nötig (Sauna: Gänge, Wann, Kältebecken). Liste und eigene Gewohnheiten unter Einstellungen › Gewohnheiten. Jede Gewohnheit hat eine Detailseite unter Gesundheit.
+- App-Symbol: Zen-Ring (Ensō), mit dem Pinsel gezeichnet, Beere `#E0527F` auf Anthrazit. Gleich im hellen und dunklen Design (`public/icons/icon.svg`, `public/icons/icon-dark.svg`, PNG-Größen daneben).
 
 ## Gesundheit und Sicherheit
 - Keine Diagnosen, keine Dosierungsvorschläge. Mengen von Medikamenten trägt die Nutzerin selbst ein.

@@ -2223,8 +2223,8 @@ body { overflow-x: clip; }
   left: 50%;
   width: 100vw;
   transform: translateX(-50%);
-  top: calc(-1 * (env(safe-area-inset-top) + 32px));
-  height: 440px;
+  top: calc(-1 * (env(safe-area-inset-top) + 32px) - 120px);
+  height: 560px;
   pointer-events: none;
   background: linear-gradient(180deg, var(--glow, transparent) 0%, transparent 100%);
 }
@@ -2492,7 +2492,8 @@ body { overflow-x: clip; }
 .review-bubble b { font-size: 12px; font-weight: 800; }
 .review-bubble small { font-size: 9px; font-weight: 700; }
 .review-today { box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--text); }
-.review-key { display: inline-block; width: 10px; height: 10px; border-radius: 5px; margin-right: 6px; vertical-align: -1px; }
+.review-key { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 11px; margin-right: 6px; vertical-align: middle; }
+.review-icon { display: inline-flex; align-items: center; gap: 1px; }
 
 /* Coach (Muster 17) */
 .coach-mark {
@@ -2515,3 +2516,122 @@ body { overflow-x: clip; }
 }
 
 .chat-input textarea.input { resize: none; line-height: 1.4; font-family: inherit; }
+
+/* Sperrbildschirm (Konzept dunkel 2) */
+.pin { position: relative; gap: 0; padding-top: 7vh; }
+.pin-glow {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--brand) 22%, var(--bg)) 0%, var(--bg) 70%);
+}
+.pin-icon { display: block; }
+.pin-brand { margin-top: 20px; }
+.pin .pin-title { margin-top: 6px; font-size: 28px; font-weight: 700; }
+.pin-sub { margin-top: 6px; font-size: 15px; color: var(--text-2); }
+.pin .pin-dots { margin: 22px 0 4px; gap: 18px; }
+.pin .pin-dot { border-color: var(--line-strong); }
+.pin .pin-dot[data-on="true"] { background: var(--text); border-color: var(--text); }
+.pin .pin-pad { grid-template-columns: repeat(3, 76px); gap: 16px 26px; margin: 8px 0 14px; }
+.pin .pin-key {
+  width: 76px;
+  height: 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-color: var(--fill);
+  background: color-mix(in srgb, var(--card) 85%, transparent);
+}
+.pin .pin-key-ghost { border: 0; background: transparent; }
+.pin-num { font-size: 30px; font-weight: 500; line-height: 1; }
+.pin-letters { height: 11px; font-size: 9px; font-weight: 600; letter-spacing: 0.18em; color: var(--muted); }
+.pin-foot { margin-top: 8px; max-width: 300px; font-size: 12px; color: var(--muted); }
+.review-filter .pill { display: inline-flex; flex-direction: row; align-items: center; gap: 2px; }
+
+/* Gesundheit › Überblick und Gewohnheiten (Konzept dunkel 2) */
+.glance-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.glance-tile {
+  background: var(--fill);
+  border-radius: var(--radius-tile);
+  padding: 12px 8px;
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  color: var(--text);
+  text-decoration: none;
+}
+.glance-tile .cb-ring { width: 64px; height: 64px; }
+.glance-tile .cb-ring-center { font-size: 24px; }
+.glance-badge { width: 44px; height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; }
+.glance-ok { background: var(--recovery-bg); color: var(--recovery-fg); }
+.glance-warn { background: var(--warn-bg); color: var(--warn-fg); font-size: 12px; }
+.habit-month-row { display: flex; align-items: center; gap: 12px; min-height: 52px; color: var(--text); text-decoration: none; }
+.habit-month-name { flex: 1; min-width: 0; }
+.habit-weeks { display: flex; gap: 3px; }
+.habit-week { width: 8px; height: 22px; border-radius: 3px; background: var(--fill); display: flex; align-items: flex-end; overflow: hidden; }
+.habit-week span { display: block; width: 100%; background: var(--muted); border-radius: 3px; }
+.habit-month-count { width: 40px; text-align: right; font-size: 16px; font-weight: 700; }
+.pattern-block { display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
+.pattern-title { color: var(--text-2); }
+.pattern-text { font-size: 16px; font-weight: 600; line-height: 1.4; color: var(--text); }
+.pattern-bars { display: flex; flex-direction: column; gap: 8px; }
+.pattern-bar { display: grid; grid-template-columns: 112px 1fr 56px; align-items: center; gap: 10px; font-size: 13px; }
+.pattern-bar strong { text-align: right; }
+.pattern-track { height: 10px; border-radius: 5px; background: var(--fill); overflow: hidden; }
+.pattern-fill { display: block; height: 100%; border-radius: 5px; background: var(--line-strong); }
+.pattern-hi { background: var(--recovery); }
+.pattern-warn { background: var(--warn); }
+.card-link-row { flex-direction: row; align-items: center; justify-content: space-between; color: var(--text); text-decoration: none; min-height: 64px; }
+
+/* Tagebuch: Sauna-Details */
+.habit-detail { background: var(--fill); border-radius: var(--radius-tile); padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.choice-row { display: grid; gap: 6px; }
+.choice-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.choice-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.choice {
+  min-height: 44px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.choice[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); font-weight: 700; }
+.choice-wide { margin-top: 6px; }
+
+/* Einstellungen › Gewohnheiten */
+.habit-manage-row { display: flex; align-items: center; gap: 4px; }
+.habit-move { display: flex; flex-direction: row; }
+.habit-move .icon-btn { width: 40px; height: 44px; font-size: 16px; }
+.habit-manage-toggle { flex: 1; min-width: 0; }
+.habit-add { display: flex; gap: 8px; padding: 8px 0; }
+.habit-add .input { flex: 1; }
+.habit-add .btn { width: auto; margin-top: 0; }
+
+/* Gewohnheit im Detail */
+.habit-grid-13 { aspect-ratio: 13 / 7; }
+.habit-on-neutral { background: var(--sleep); }
+.legend .habit-key-neutral { background: var(--sleep); }
+.night-table { display: flex; flex-direction: column; }
+.night-head, .night-values { display: grid; grid-template-columns: 1fr 80px 80px; gap: 8px; align-items: baseline; }
+.night-head span { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); text-align: right; }
+.night-values strong, .night-values .meta { text-align: right; }
+.night-values strong { font-size: 17px; }
+.night-row { display: flex; flex-direction: column; gap: 4px; padding: 10px 0; border-bottom: 1px solid var(--line-soft); }
+.note-good { color: var(--recovery-fg); }
+.note-warn { color: var(--warn-fg); }
+.note-cycle { color: var(--cycle-fg); }
+.eyebrow-cycle { color: var(--cycle); }
+
+.segmented-tabs.segmented-4 { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); overflow: visible; }
+.segmented-tabs.segmented-4 button { padding: 4px 4px; font-size: 13px; line-height: 1.2; white-space: normal; }
+.card-row .settings-link { white-space: nowrap; }

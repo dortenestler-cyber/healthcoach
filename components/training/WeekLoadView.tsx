@@ -2,8 +2,8 @@ import { DayBars, ValueHeader, ZoneScale } from "@/components/charts";
 import type { Data } from "@/lib/insights";
 import { weekLoad } from "@/lib/trainingLoad";
 import { SPORTS, sportOfGarmin, type Sport } from "@/lib/training";
+import SportIcon from "@/components/ui/SportIcon";
 
-export const SPORT_ABBR: Record<Sport, string> = { karate: "KA", kettlebell: "KB", klettern: "BO", ausdauer: "AU", sonstiges: "SO" };
 const WD = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."];
 
 const n0 = (v: number) => String(Math.round(v));
@@ -59,7 +59,7 @@ export default function WeekLoadView({ today, data, planned, done, labels }: { t
             const d = (a.start_local as string).slice(0, 10);
             return (
               <div key={a.activity_id} className="contrib-row">
-                <span className={`sport-badge ink-${sp}`} style={{ background: SPORTS[sp].color }}>{SPORT_ABBR[sp]}</span>
+                <span className={`sport-badge ink-${sp}`} style={{ background: SPORTS[sp].color }} title={SPORTS[sp].label}><SportIcon sport={sp} /></span>
                 <div className="stack contrib-text">
                   <span className="row-strong">{a.name ?? SPORTS[sp].label}</span>
                   <span className="meta">{d === today ? "Heute" : `${WD[new Date(d + "T12:00:00").getDay()]} ${Number(d.slice(8, 10))}.${Number(d.slice(5, 7))}.`}{a.duration_s ? ` · ${Math.round(a.duration_s / 60)} min` : ""}</span>

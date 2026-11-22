@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, longDate, shortDate } from "@/lib/dates";
-import { BLEEDING, GRID_ROWS, INFLUENCES, LEVELS, SYMPTOMS } from "@/lib/catalog";
+import { BLEEDING, GRID_ROWS, LEVELS, SYMPTOMS } from "@/lib/catalog";
+import { DEFAULT_HABITS, loadHabits, SAUNA_GAENGE, SAUNA_WANN, WANN_LABEL, type Habit, type HabitDetails, type SaunaDetails } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
 import DayIntakes from "@/components/tagebuch/DayIntakes";
 import FlashCounter from "@/components/tagebuch/FlashCounter";
@@ -31,6 +33,9 @@ export default function TagebuchView({ initial }: { initial?: string }) {
   const [bleeding, setBleeding] = useState(0);
   const [symptoms, setSymptoms] = useState<Record<string, number>>({});
   const [influences, setInfluences] = useState<string[]>([]);
+  const [habits, setHabits] = useState<Habit[]>(DEFAULT_HABITS);
+  const [details, setDetails] = useState<HabitDetails>({});
+  const [detailsNote, setDetailsNote] = useState("");
   const [history, setHistory] = useState<Entry[]>([]);
   const [saved, setSaved] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -52,6 +57,10 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     setBleeding(t?.bleeding ?? 0);
     setSymptoms(t?.symptoms ?? {});
     setInfluences(t?.influences ?? []);
+    // Gewohnheiten-Liste und Details (Details erst nach der Migration, sonst leer)
+    loadHabits(sb).then(setHabits).catch(() => undefined);
+    const det = await sb.from("diary_entries").select("habit_details").eq("day", day).maybeSingle();
+    setDetails(det.error ? {} : (((det.data as { habit_details?: HabitDetails } | null)?.habit_details ?? {}) as HabitDetails));
     setSaved(!!t);
     setDirty(false);
   }, [day]);
@@ -63,6 +72,10 @@ export default function TagebuchView({ initial }: { initial?: string }) {
   const changed = () => {
     setSaved(false);
     setDirty(true);
+  };
+  const setSauna = (patch: Partial<SaunaDetails>) => {
+    setDetails((d) => ({ ...d, sauna: { ...(d.sauna ?? {}), ...patch } }));
+    changed();
   };
   // Tag wechseln: ungespeicherte Änderungen nicht still verwerfen
   const go = (d: string) => {
@@ -82,6 +95,10 @@ export default function TagebuchView({ initial }: { initial?: string }) {
       setError("Eintrag konnte nicht gespeichert werden: " + e.message);
       return;
     }
+    // Details nur für eingetragene Gewohnheiten speichern. Fehlt die Spalte noch, bleibt der Eintrag trotzdem gespeichert.
+    const keep: HabitDetails = Object.fromEntries(Object.entries(details).filter(([k]) => influences.includes(k)));
+    const d2 = await sb.from("diary_entries").update({ habit_details: keep }).eq("day", day);
+    setDetailsNote(d2.error ? "Die Sauna-Details werden gespeichert, sobald die Datenbank aktualisiert ist (PR mit Migration)." : "");
     setError("");
     setSaved(true);
     setDirty(false);
@@ -145,23 +162,54 @@ export default function TagebuchView({ initial }: { initial?: string }) {
       </section>
 
       <section className="card">
-        <h2>Einflüsse</h2>
-        <div className="pills wrap">
-          {INFLUENCES.map((f) => {
-            const on = influences.includes(f.key);
-            return (
-              <button
-                key={f.key}
-                type="button"
-                className="pill"
-                aria-pressed={on}
-                onClick={() => { setInfluences(on ? influences.filter((x) => x !== f.key) : [...influences, f.key]); changed(); }}
-              >
-                {f.label}
-              </button>
-            );
-          })}
+        <div className="card-row">
+          <h2>Gewohnheiten</h2>
+          <Link href="/einstellungen/gewohnheiten" className="settings-link">Verwalten ›</Link>
         </div>
+        <div className="pills wrap">
+          {habits
+            .filter((h) => h.on || influences.includes(h.key))
+            .map((f) => {
+              const on = influences.includes(f.key);
+              return (
+                <button
+                  key={f.key}
+                  type="button"
+                  className="pill"
+                  aria-pressed={on}
+                  onClick={() => { setInfluences(on ? influences.filter((x) => x !== f.key) : [...influences, f.key]); changed(); }}
+                >
+                  {f.label}
+                </button>
+              );
+            })}
+        </div>
+        {influences.includes("sauna") && (
+          <div className="habit-detail">
+            <span className="row-strong">Sauna · Details (freiwillig)</span>
+            <span className="meta">Gänge</span>
+            <div className="choice-row choice-4">
+              {SAUNA_GAENGE.map((g) => (
+                <button key={g} type="button" className="choice" aria-pressed={details.sauna?.gaenge === g} onClick={() => { setSauna({ gaenge: details.sauna?.gaenge === g ? undefined : g }); }}>
+                  {g}
+                </button>
+              ))}
+            </div>
+            <span className="meta">Wann</span>
+            <div className="choice-row choice-3">
+              {SAUNA_WANN.map((w) => (
+                <button key={w} type="button" className="choice" aria-pressed={details.sauna?.wann === w} onClick={() => { setSauna({ wann: details.sauna?.wann === w ? undefined : w }); }}>
+                  {WANN_LABEL[w]}
+                </button>
+              ))}
+            </div>
+            <button type="button" className="choice choice-wide" aria-pressed={!!details.sauna?.kaeltebecken} onClick={() => setSauna({ kaeltebecken: !details.sauna?.kaeltebecken })}>
+              Danach Kältebecken
+            </button>
+          </div>
+        )}
+        {detailsNote && <span className="meta">{detailsNote}</span>}
+        <span className="meta">Ein Tipp genügt. Die Auswertung findest du unter Gesundheit.</span>
       </section>
 
       <button type="button" className="btn btn-primary" onClick={save} disabled={saved}>

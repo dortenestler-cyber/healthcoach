@@ -120,31 +120,55 @@ export default function PinLock({ children }: { children: ReactNode }) {
         ? "Zur Sicherheit noch einmal."
         : "Health Coach ist gesperrt.";
 
+  const hour = new Date().getHours();
+  const greeting = hour < 11 ? "Guten Morgen" : hour < 18 ? "Guten Tag" : "Guten Abend";
+  const letters = ["", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ"];
+  const minutes = Math.round(LOCK_AFTER_MS / 60000);
+
+  // Sperrbildschirm (Konzept dunkel 2): App-Symbol, Gruß, PIN-Punkte, Ziffernfeld wie beim iPhone.
+  // Hier steht nie ein Gesundheitswert.
   return (
     <div className="pin">
-      <img src="/icons/icon.svg" alt="" width={56} height={56} className="login-icon" />
-      <h1 className="pin-title">{title}</h1>
-      <span className="page-sub">{sub}</span>
-      <div className="pin-dots" aria-label={`${digits.length} von 4 Ziffern eingegeben`}>
+      <div className="pin-glow" aria-hidden="true" />
+      <img src="/icons/enso.svg" alt="" width={104} height={104} className="pin-icon" />
+      <span className="eyebrow pin-brand">Health Coach</span>
+      <h1 className="pin-title">{mode === "eingeben" ? greeting : title}</h1>
+      <span className="pin-sub">{mode === "eingeben" ? "PIN eingeben" : sub}</span>
+      <div className="pin-dots" role="img" aria-label={`${digits.length} von 4 Ziffern eingegeben`}>
         {[0, 1, 2, 3].map((i) => (
           <span key={i} className="pin-dot" data-on={i < digits.length} />
         ))}
       </div>
       <p className="login-msg pin-msg" role="status">{msg}</p>
       <div className="pin-pad">
-        {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
-          <button key={d} type="button" className="pin-key" onClick={() => press(d)}>{d}</button>
+        {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d, i) => (
+          <button key={d} type="button" className="pin-key" aria-label={d} onClick={() => press(d)}>
+            <span className="pin-num">{d}</span>
+            <span className="pin-letters" aria-hidden="true">{letters[i]}</span>
+          </button>
         ))}
-        <span />
-        <button type="button" className="pin-key" onClick={() => press("0")}>0</button>
-        <button type="button" className="pin-key pin-key-ghost" aria-label="Löschen" onClick={() => setDigits(digits.slice(0, -1))}>⌫</button>
+        {mode === "eingeben" && face ? (
+          <button type="button" className="pin-key pin-key-ghost" aria-label="Mit Face ID entsperren" onClick={tryFace}>
+            <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 9.5v1M15 9.5v1M12 9.5V13h-1M9.5 15.5a3.5 3.5 0 0 0 5 0" />
+            </svg>
+          </button>
+        ) : (
+          <span />
+        )}
+        <button type="button" className="pin-key" aria-label="0" onClick={() => press("0")}>
+          <span className="pin-num">0</span>
+        </button>
+        <button type="button" className="pin-key pin-key-ghost" aria-label="Letzte Ziffer löschen" onClick={() => setDigits(digits.slice(0, -1))}>
+          <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 5H9l-6 7 6 7h12zM17 9.5l-5 5M12 9.5l5 5" />
+          </svg>
+        </button>
       </div>
-      {mode === "eingeben" && face && (
-        <button type="button" className="btn btn-soft pin-face" onClick={tryFace}>Mit Face ID entsperren</button>
-      )}
       {mode === "eingeben" && (
         <button type="button" className="btn btn-link" onClick={signOut}>PIN vergessen? Mit Passwort anmelden</button>
       )}
+      <span className="pin-foot">Gesperrt nach {minutes} Minuten im Hintergrund. Hier steht nie ein Gesundheitswert.</span>
     </div>
   );
 }
