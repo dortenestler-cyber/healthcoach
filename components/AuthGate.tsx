@@ -6,6 +6,8 @@ import { supabase } from "@/lib/supabase";
 import TabBar from "@/components/TabBar";
 import CoachButton from "@/components/CoachButton";
 import PinLock from "@/components/PinLock";
+import UsageTracker from "@/components/UsageTracker";
+import { clearOfflineData } from "@/components/ServiceWorker";
 import { markUnlocked } from "@/lib/pin";
 
 type State = "laden" | "aus" | "login" | "drin";
@@ -25,6 +27,7 @@ export default function AuthGate({ children }: { children: ReactNode }) {
     const { data: sub } = sb.auth.onAuthStateChange((event, session: Session | null) => {
       // Wer sich gerade mit Passwort angemeldet hat, muss nicht sofort noch die PIN eingeben
       if (event === "SIGNED_IN" && session) markUnlocked();
+      if (event === "SIGNED_OUT") clearOfflineData();
       setState(session ? "drin" : "login");
     });
     return () => sub.subscription.unsubscribe();
@@ -48,6 +51,7 @@ export default function AuthGate({ children }: { children: ReactNode }) {
       {children}
       <CoachButton />
       <TabBar />
+      <UsageTracker />
     </PinLock>
   );
 }

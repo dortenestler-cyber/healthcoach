@@ -4,6 +4,7 @@
 //
 // Benötigte Secrets in Supabase (Edge Functions → Secrets):
 //   GARMIN_API_KEY   persönlicher API-Schlüssel aus Garmin Connect
+//   GARMIN_API_KEY_EXPIRES  optional, Ablaufdatum des Schlüssels als JJJJ-MM-TT (für die Warnung in der App)
 // Automatisch vorhanden: SUPABASE_URL, SUPABASE_ANON_KEY
 //
 // Aufruf aus der App: supabase.functions.invoke("garmin-sync", { body: { days: 7, offset: 0 } })
@@ -117,6 +118,18 @@ Deno.serve(async (req) => {
     const userId = userData.user.id;
 
     const body = await req.json().catch(() => ({}));
+
+    // Einrichtungs-Check: nur prüfen, ob der Schlüssel angenommen wird, nichts abrufen
+    if (body?.check) {
+      const expires = Deno.env.get("GARMIN_API_KEY_EXPIRES") ?? null;
+      try {
+        await garminToken(apiKey);
+        return json(200, { ok: true, expires });
+      } catch (e) {
+        return json(200, { ok: false, expires, error: e instanceof Error ? e.message : String(e) });
+      }
+    }
+
     const days = Math.min(MAX_DAYS, Math.max(1, Number(body?.days) || 7));
     // offset: wie viele Tage vor heute der Zeitraum endet (für das Nachladen älterer Daten in Stücken)
     const offset = Math.min(MAX_DAYS, Math.max(0, Number(body?.offset) || 0));

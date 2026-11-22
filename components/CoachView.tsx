@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { supabase } from "@/lib/supabase";
 import { buildCoachContext } from "@/lib/coachContext";
+import Link from "next/link";
 import PageHead from "@/components/PageHead";
+import { getCoachPrefs, useCoachPrefs } from "@/lib/prefs";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -22,6 +24,7 @@ export default function CoachView() {
   const [error, setError] = useState("");
   const context = useRef<Promise<string> | null>(null);
   const end = useRef<HTMLDivElement>(null);
+  const prefs = useCoachPrefs();
 
   useEffect(() => {
     const sb = supabase();
@@ -51,7 +54,7 @@ export default function CoachView() {
     setMsgs((m) => [...m, { role: "user", content: question }]);
     setBusy(true);
     const ctx = await (context.current ?? Promise.resolve(""));
-    const { data, error: e } = await sb.functions.invoke("coach", { body: { message: question, context: ctx } });
+    const { data, error: e } = await sb.functions.invoke("coach", { body: { message: question, context: ctx, limit: getCoachPrefs().dailyLimit } });
     setBusy(false);
     let detail = data?.error as string | undefined;
     if (e) {
@@ -75,9 +78,23 @@ export default function CoachView() {
     send(text);
   };
 
+  if (!prefs.on) {
+    return (
+      <>
+        <PageHead title="Coach" sub="Ausgeschaltet" />
+        <section className="card">
+          <h2>Der Coach ist aus</h2>
+          <p>Solange er aus ist, gehen keine Fragen an Claude und es entstehen keine Kosten.</p>
+          <Link href="/einstellungen" className="btn btn-dark">In den Einstellungen einschalten</Link>
+        </section>
+      </>
+    );
+  }
+
   return (
     <>
       <PageHead title="Coach" sub="Kennt Training, Erholung, Zyklus, Symptome und Medikamente" />
+      <Link href="/coach/hinweise" className="settings-link">Alle Hinweise des Coachs ansehen ›</Link>
       <div className="chat">
         {!msgs.length && (
           <div className="bubble bubble-assistant">

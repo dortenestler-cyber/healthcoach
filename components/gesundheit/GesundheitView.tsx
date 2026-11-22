@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import PageHead from "@/components/PageHead";
+import { useFeatures, type Feature } from "@/lib/prefs";
 import MedsSection from "@/components/gesundheit/MedsSection";
 import IllnessSection from "@/components/gesundheit/IllnessSection";
 import InjurySection from "@/components/gesundheit/InjurySection";
@@ -14,22 +15,27 @@ const TABS: [string, string][] = [
   ["koerper", "Körper"],
 ];
 
+const TAB_FEATURE: Record<string, Feature> = {med: "medikamente", krank: "krankheit", verl: "verletzung"};
+
 export default function GesundheitView({ initial }: { initial: string }) {
   const [tab, setTab] = useState(TABS.some(([k]) => k === initial) ? initial : "med");
+  const feat = useFeatures();
+  const tabs = TABS.filter(([k]) => !TAB_FEATURE[k] || feat[TAB_FEATURE[k]]);
+  const shown = tabs.some(([k]) => k === tab) ? tab : tabs[0][0];
   return (
     <>
       <PageHead title="Gesundheit" sub="Medikamente, Krankheiten, Verletzungen, Körper" />
       <div className="segmented">
-        {TABS.map(([k, l]) => (
-          <button key={k} type="button" aria-pressed={tab === k} onClick={() => setTab(k)}>
+        {tabs.map(([k, l]) => (
+          <button key={k} type="button" aria-pressed={shown === k} onClick={() => setTab(k)}>
             {l}
           </button>
         ))}
       </div>
-      {tab === "med" && <MedsSection />}
-      {tab === "krank" && <IllnessSection />}
-      {tab === "verl" && <InjurySection />}
-      {tab === "koerper" && <BodySection />}
+      {shown === "med" && <MedsSection />}
+      {shown === "krank" && <IllnessSection />}
+      {shown === "verl" && <InjurySection />}
+      {shown === "koerper" && <BodySection />}
     </>
   );
 }

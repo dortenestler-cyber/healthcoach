@@ -17,6 +17,7 @@ import { dayRule } from "@/lib/cycle";
 import { SPOTS } from "@/lib/health";
 import { SPORTS, type Sport } from "@/lib/training";
 import type { Data, Diary } from "@/lib/insights";
+import { useFeatures } from "@/lib/prefs";
 
 type Checkin = { energy: number | null; sleep: number | null; mood: number | null };
 const empty: Checkin = { energy: null, sleep: null, mood: null };
@@ -30,6 +31,7 @@ export default function HeuteView() {
   const [rehaSports, setRehaSports] = useState<string[]>([]);
   const [chipBusy, setChipBusy] = useState(false);
   const today = isoDay();
+  const feat = useFeatures();
 
   const loadData = useCallback(async () => {
     try {
@@ -126,15 +128,15 @@ export default function HeuteView() {
 
       <HealthToday />
 
-      <SymptomChips symptoms={todayEntry.symptoms ?? {}} busy={chipBusy || !data} onToggle={toggleSymptom} />
+      {feat.perimenopause && <SymptomChips symptoms={todayEntry.symptoms ?? {}} busy={chipBusy || !data} onToggle={toggleSymptom} />}
 
-      {data && <HrvPhaseChart data={data} />}
+      {feat.zyklus && data && <HrvPhaseChart data={data} />}
 
-      <GarminCards onSynced={loadData} />
+      {feat.garmin && <GarminCards onSynced={loadData} />}
 
-      <TargetCard data={data} />
+      {feat.tagesziel && <TargetCard data={data} />}
 
-      <TodayPlan />
+      {feat.tagesplan && <TodayPlan />}
 
       <section className="card">
         <div className="card-row">
@@ -169,7 +171,7 @@ export default function HeuteView() {
         )}
       </section>
 
-      <section className="card">
+      {feat.perimenopause && <section className="card">
         <div className="card-row">
           <div className="stack">
             <span className="meta">Hitzewallungen heute</span>
@@ -180,7 +182,7 @@ export default function HeuteView() {
             + Eintragen
           </button>
         </div>
-      </section>
+      </section>}
     </>
   );
 }
