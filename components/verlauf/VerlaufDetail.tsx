@@ -25,6 +25,15 @@ export default function VerlaufDetail({ metric, span, rows, diary }: { metric: M
   const days = spanDays(span, today);
   const sweat = new Set(diary.filter((e) => (e.symptoms?.nacht ?? 0) > 0).map((e) => e.day));
   const sweatNights = days.filter((d) => sweat.has(d)).length;
+  // Hauttemperatur: Nächte nach der Sauna markieren (Garmin ordnet die Nacht dem Aufwachtag zu)
+  const saunaDays = new Set(diary.filter((e) => e.influences?.includes("sauna")).map((e) => e.day));
+  const dayBefore = (d: string) => {
+    const x = new Date(d + "T12:00:00");
+    x.setDate(x.getDate() - 1);
+    return x.toISOString().slice(0, 10);
+  };
+  const saunaNight = (d: string) => saunaDays.has(dayBefore(d));
+  const saunaNights = days.filter(saunaNight).length;
   // In der Lutealphase zählen Luteal-Tage gegen den Luteal-Bereich, alle anderen gegen den 30-Tage-Bereich
   const isLuteal = (d: string) => groupOf(cycleToday(d, diary).phase) === "luteal";
   const rangeFor = (d: string) => (base.luteal && isLuteal(d) ? base.luteal : base.range);
@@ -71,7 +80,7 @@ export default function VerlaufDetail({ metric, span, rows, diary }: { metric: M
               lutealBand={weekly ? null : base.luteal}
               phases={hasPhase ? phases : undefined}
               zeroLine={metric === "temperatur"}
-              markers={metric === "schlaf" && !weekly ? points.map((p) => sweat.has(p.day)) : undefined}
+              markers={metric === "schlaf" && !weekly ? points.map((p) => sweat.has(p.day)) : metric === "temperatur" && !weekly && saunaNights > 0 ? points.map((p) => saunaNight(p.day)) : undefined}
               xLabels={axisLabels(points, span)}
             />
           )}
@@ -88,6 +97,7 @@ export default function VerlaufDetail({ metric, span, rows, diary }: { metric: M
             </>
           )}
           {metric === "schlaf" && !weekly && sweatNights > 0 && <span><i className="legend-sweat" />Nachtschweiß</span>}
+          {metric === "temperatur" && !weekly && saunaNights > 0 && <span><i className="legend-sweat" />Nacht nach der Sauna</span>}
         </div>
         {metric === "temperatur" && !rows.some((r) => typeof r.skin_temp_delta === "number") && (
           <p>Noch keine Hauttemperatur. Sie kommt mit dem nächsten Garmin-Abruf, wenn deine Uhr sie nachts misst.</p>

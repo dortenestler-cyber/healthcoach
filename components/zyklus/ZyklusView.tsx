@@ -10,7 +10,7 @@ import CycleDayChart from "@/components/zyklus/CycleDayChart";
 import CycleHistory from "@/components/zyklus/CycleHistory";
 import { cycleToday, PHASES, windowText } from "@/lib/cycle";
 import { METRICS, type MetricKey } from "@/lib/garmin";
-import { patterns, type Data, type Diary } from "@/lib/insights";
+import type { Data, Diary } from "@/lib/insights";
 import { symptomHeat } from "@/lib/zyklusAuswertung";
 import { byCycleDay, CYCLE_METRICS, effectsByPhase, MIN_DAYS, phaseProfile } from "@/lib/zyklusSeite";
 
@@ -57,7 +57,6 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
   ]).filter((r) => r.value !== null);
   const waiting = effects.filter((e) => e.follikel === null && e.luteal === null).map((e) => e.label);
   const lutStrongest = [...effects].filter((e) => e.luteal !== null).sort((a, b) => Math.abs(b.luteal as number) - Math.abs(a.luteal as number))[0];
-  const more = patterns({ ...data }).filter((p) => p.key !== "zyklus");
 
   let effectSentence = `Unterschiede je Phase erscheinen ab je ${MIN_DAYS} Nächten mit und ohne einen Einfluss in dieser Phase.`;
   if (lutStrongest && Math.abs(lutStrongest.luteal as number) >= 2) {
@@ -188,18 +187,13 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         {lutStrongest && <ExplainCard tone="cycle" question={`Was bedeutet es, dass „${lutStrongest.label}“ in meiner Lutealphase mit meiner HRV zusammenhängt?`}>Ein Zusammenhang aus deinen eigenen Einträgen, keine Empfehlung.</ExplainCard>}
       </section>
 
-      {more.length > 0 && (
-        <section className="card">
-          <span className="meta">Weitere Muster</span>
-          {more.map((p) => (
-            <div key={p.key} className="stack list-line">
-              <span className="row-strong">{p.title}</span>
-              <span className={p.ready ? "" : "meta"}>{p.ready ? p.text : p.need}</span>
-              {p.ready && <span className="meta">Grundlage: {p.basis}. Ein Zusammenhang, kein Beweis.</span>}
-            </div>
-          ))}
-        </section>
-      )}
+      <Link href="/gesundheit" className="card card-link-row">
+        <span className="stack">
+          <span className="row-strong">Weitere Muster und Gewohnheiten</span>
+          <span className="meta">Ohne Zyklusbezug, unter Gesundheit › Überblick</span>
+        </span>
+        <span aria-hidden="true">›</span>
+      </Link>
     </>
   );
 }

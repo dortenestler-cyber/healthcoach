@@ -162,3 +162,24 @@ Auf Grundlage von 16 Vorlagen aus Whoop, Bevel und Sonar (`docs/bilder/vorlagen/
 ### Nicht übernommen
 
 Biologisches Alter und Alterungstempo (05), empfohlene Schlafens- und Aufstehzeit (11), Kalorienziele, „Top 41 %“ und andere Vergleiche mit anderen, Blutzucker, Hormon-Versprechen zur Phase, Neon-Leuchten, Ampel-Verläufe.
+
+### Ergänzung 23.11.2026: Gesundheit, Gewohnheiten, Sperrbildschirm
+
+- **Gesundheit** mit den Reitern Überblick · Medikamente · Krank & verletzt · Körper. Der Überblick zeigt:
+  - heute auf einen Blick: Einnahmen als Ring, Krankheit, Verletzung
+  - „Was dir guttut“: HRV der Nacht danach je Gewohnheit, über alle Tage
+  - Gewohnheiten im Monat mit den letzten 4 Wochen
+  - „Weitere Muster“ (vorher auf der Seite Zyklus)
+- **Gewohnheiten** statt „Einflüsse“:
+  - Erfassen im Tagebuch per Tipp. Sauna mit freiwilligen Details: Gänge, Wann, Kältebecken.
+  - Liste, Reihenfolge und eigene Gewohnheiten unter Einstellungen › Gewohnheiten.
+  - Nicht als Knopf auf Heute.
+- **Detailseite je Gewohnheit** (`/gesundheit/gewohnheit?k=sauna`):
+  - Wie oft, mit Raster der letzten 13 Wochen
+  - Die Nacht danach mit und ohne: HRV, Ruhepuls, Tiefschlaf, Hauttemperatur, Nachtschweiß
+  - Je Zyklusphase, dazu Hitzewallungen am Tag danach
+  - Hauttemperatur mit markierten Nächten nach der Gewohnheit
+  - Nächte nach der Sauna sind auch im Verlauf der Hauttemperatur markiert.
+- **Sperrbildschirm**: App-Symbol, Gruß nach Tageszeit, Ziffernfeld wie beim iPhone mit Buchstaben, Face ID im Ziffernfeld. Nie ein Gesundheitswert.
+- **Icons** statt Kürzeln für Sportarten. Coach-Symbol: Sprechblase mit Pulslinie.
+- **App-Symbol Zen-Ring** (Ensō, mit dem Pinsel gezeichnet): Entwurf liegt zur Freigabe vor.

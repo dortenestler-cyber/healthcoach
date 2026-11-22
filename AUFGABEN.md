@@ -65,6 +65,13 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 - [ ] Steht dort „Stress im Tagesverlauf ist bei Garmin nicht abrufbar“ oder fehlt die Atemfrequenz, Claude Bescheid geben
 - [ ] App einmal sperren lassen (5 Minuten im Hintergrund) und den neuen Sperrbildschirm mit PIN und Face ID ausprobieren
 
+### 12. Gesundheit mit Überblick und Gewohnheiten (auch in PR #51)
+- [ ] Mit dem Merge von PR #51 läuft auch die Migration `20261123100000_gewohnheiten.sql` (Sauna-Details). Vorher speichert das Tagebuch die Gewohnheit, aber noch keine Details
+- [ ] Im Tagebuch bei der nächsten Sauna „Sauna“ antippen und Gänge, Wann und Kältebecken wählen
+- [ ] Unter Einstellungen › Gewohnheiten die Liste prüfen und bei Bedarf eigene Gewohnheiten anlegen
+- [ ] Nach ein paar Wochen unter Gesundheit › Überblick › Sauna ansehen (Vergleiche erscheinen ab je 5 Nächten mit und ohne)
+- [ ] Entwurf für das neue App-Symbol (Zen-Ring) ansehen und freigeben oder Änderungen nennen
+
 ## Erledigt
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)
 - [x] PR #34, #35, #36, #37 gemergt (Konzept, `CLAUDE.md`, Fundament, Merge-Regel)
