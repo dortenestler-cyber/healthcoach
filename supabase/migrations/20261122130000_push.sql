@@ -1,6 +1,6 @@
 -- Health Coach · Push-Mitteilungen
 -- Ein Eintrag pro Gerät, das Mitteilungen bekommen soll (auf dem iPhone: App auf dem Home-Bildschirm).
--- Ausführen: einmal im SQL-Editor von Supabase einfügen und auf "Run" klicken. Mehrfaches Ausführen schadet nicht.
+-- Wird nach dem Merge automatisch ausgeführt. Mehrfaches Ausführen schadet nicht.
 
 create table if not exists public.push_subscriptions (
   id uuid primary key default gen_random_uuid(),
@@ -23,15 +23,4 @@ grant select, insert, update, delete on public.push_subscriptions to authenticat
 grant select, insert, update, delete on public.push_subscriptions to service_role;
 revoke all on public.push_subscriptions from anon;
 
--- Zeitplan: alle 15 Minuten fällige Erinnerungen verschicken.
--- Vorher in Supabase unter Database → Extensions "pg_cron" und "pg_net" einschalten.
--- Dann den folgenden Block OHNE die Kommentarzeichen ausführen und dabei
--- <PROJEKT> durch die Projekt-Kennung und <PUSH_CRON_SECRET> durch das gleichnamige Secret ersetzen.
---
--- select cron.schedule('health-coach-push', '*/15 * * * *', $$
---   select net.http_post(
---     url := 'https://<PROJEKT>.supabase.co/functions/v1/push',
---     headers := jsonb_build_object('Content-Type', 'application/json', 'x-cron-secret', '<PUSH_CRON_SECRET>'),
---     body := '{"action":"due"}'::jsonb
---   );
--- $$);
+-- Der Zeitplan für die Erinnerung steht in 20261122180000_push_zeitplan.sql.
