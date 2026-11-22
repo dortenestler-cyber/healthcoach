@@ -93,7 +93,8 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst du ihn selbst. In der App ist noch nichts zu sehen, die Anzeige baut danach die Rolle Oberfläche.
 - [x] PR #63 gemergt (22. Nov.), Migration `20261124090000_alltagslast.sql` und Upload von `garmin-sync` grün (geprüft von Claude)
 - [x] Synchronisiert (22. Nov.). Geprüft von Claude: Der Tagespuls kommt an, 21 Tage sind berechnet, persönlicher Faktor aus 6 Trainings
-- [ ] PR #68 mergen (ändert `garmin-sync`, nur Fehlersuche: speichert Feldnamen von Garmin, keine Werte). Danach noch einmal **Synchronisieren** und Claude Bescheid geben. Claude sucht dann die richtigen Felder für Bewegung im Alltag, aktive Zeit und Schritte je Training
+- [x] PR #68 gemergt und synchronisiert. Ergebnis: 39 Tage berechnet. Schrittverlauf und Stress je Tag gibt es bei Garmin unter dieser Adresse nicht (404), eine aktive Zeit liefert Garmin nicht
+- [ ] PR #69 mergen (ändert `garmin-sync`: aktive Kalorien, zweiter Versuch für den Schrittverlauf). Danach **Synchronisieren** und Claude Bescheid geben
 - [ ] Nichts weiter tun: Jeder Abruf füllt bis zu 21 ältere Tage nach, nach etwa einer Woche Morgen-Abrufen sind die letzten 90 Tage berechnet
 
 ## Erledigt
