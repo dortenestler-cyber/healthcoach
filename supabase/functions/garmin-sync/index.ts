@@ -207,11 +207,13 @@ Deno.serve(async (req) => {
     let stressCurveDays = 0;
     let stressNote = "";
     let sleepTempKeys: string[] = [];
+    const diag: Diag = {};
 
     for (const w of windows) {
       // Tageszusammenfassung: Ruhepuls, Stress, Body Battery, Schritte, Intensität
       const sums = await garminGet(token, `/usersummary-service/v2/dailysummaries?startDate=${w.s}&endDate=${w.e}`);
       for (const d of (sums?.data ?? sums ?? []) as Any[]) {
+        if (!diag.summary) diag.summary = keyNames(d);
         const day = d?.calendarDate;
         if (!day) continue;
         const r = row(day);
@@ -341,6 +343,7 @@ Deno.serve(async (req) => {
           `/activitylist-service/activities/search/activities?startDate=${w.s}&endDate=${w.e}&start=${start}&limit=20&sortOrder=desc&excludeChildren=true`,
         );
         const items = (Array.isArray(list) ? list : []) as Any[];
+        if (!diag.aktivitaet && items[0]) diag.aktivitaet = keyNames(items[0], 1);
         for (const a of items) {
           if (!a?.activityId) continue;
           activities.push({
@@ -456,7 +459,7 @@ Deno.serve(async (req) => {
     let alltagNote = "";
     if (!alltagMissing) {
       try {
-        const res = await syncAlltag(sb, token, userId, [...daily.keys()], offset === 0);
+        const res = await syncAlltag(sb, token, userId, [...daily.keys()], offset === 0, diag);
         alltagDays = res.days;
         alltagNote = res.note;
       } catch (e) {
@@ -564,7 +567,7 @@ async function firstPath(token: string, paths: string[], day: string, known: { p
   throw lastError ?? new Error("nicht abrufbar");
 }
 
-async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: string[], backfill: boolean): Promise<{ days: number; note: string }> {
+async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: string[], backfill: boolean, diag: Diag): Promise<{ days: number; note: string }> {
   const today = localDayMinute(Date.now()).day;
   const earliest = shiftDay(today, -(LOAD_BACK_DAYS - 1));
   const days = [...new Set(rangeDays)].filter((d) => d >= earliest && d <= today).sort().reverse().slice(0, MAX_LOAD_DAYS);
@@ -649,8 +652,10 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
           if (lm.day === day && active) moving.add(Math.floor(lm.minute / 15));
           bewegung = "schritte";
         }
-      } catch {
+        diag.schrittverlauf ??= bewegung === "schritte" ? "ok" : "leer: " + keyNames(chart, 0).join(",");
+      } catch (e) {
         // kein Schrittverlauf, Stress versuchen
+        diag.schrittverlauf ??= e instanceof Error ? e.message : String(e);
       }
       if (bewegung === "keine") {
         try {
@@ -662,8 +667,10 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
             const lm = localDayMinute(v[0]);
             if (lm.day === day) moving.add(Math.floor(lm.minute / 15));
           }
-        } catch {
+          diag.stress ??= bewegung === "stress" ? "ok" : "leer: " + keyNames(sd, 0).join(",");
+        } catch (e) {
           // ohne Bewegungsdaten zählt der Alltag erst ab Zone 2
+          diag.stress ??= e instanceof Error ? e.message : String(e);
         }
       }
     }
@@ -724,14 +731,33 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
   const f = conversionFactor((fRows ?? []) as Any[]);
   const factor = f.faktor ?? FACTOR_START;
 
+  diag.puls_pfad = hrKnown.path;
+  const newest = results.map((r) => r.day).sort().at(-1);
   const rows = results.map((r) => ({
     user_id: userId,
     day: r.day,
     hr_curve: r.curve,
     steps_outside_acts: r.stepsOutside,
-    load_daily_min: { ...r.base, faktor: f.faktor, faktor_n: f.faktor ? f.n : 0, last_alltag: Math.round(r.base.pkt_alltag * factor * 10) / 10 } satisfies LoadDay,
+    load_daily_min: {
+      ...({ ...r.base, faktor: f.faktor, faktor_n: f.faktor ? f.n : 0, last_alltag: Math.round(r.base.pkt_alltag * factor * 10) / 10 } satisfies LoadDay),
+      // Fehlersuche: nur Feldnamen und Fehlermeldungen von Garmin, keine Werte, nur am neuesten Tag
+      ...(r.day === newest ? { diag } : {}),
+    },
   }));
   const { error } = await sb.from("garmin_daily").upsert(rows, { onConflict: "user_id,day" });
   if (error) throw new Error(error.message);
   return { days: rows.length, note };
+}
+
+// Fehlersuche für die nicht dokumentierten Felder der Garmin Personal API: nur Feldnamen, nie Werte
+type Diag = { summary?: string[]; aktivitaet?: string[]; schrittverlauf?: string; stress?: string; puls_pfad?: string | null };
+function keyNames(obj: Any, depth = 1, prefix = ""): string[] {
+  if (Array.isArray(obj)) return obj.length ? keyNames(obj[0], depth, prefix + "[]") : [prefix + "[] leer"];
+  if (!obj || typeof obj !== "object") return prefix ? [prefix] : [];
+  const out: string[] = [];
+  for (const [k, v] of Object.entries(obj)) {
+    if (depth > 0 && v && typeof v === "object" && !Array.isArray(v)) out.push(...keyNames(v, depth - 1, prefix + k + "."));
+    else out.push(prefix + k);
+  }
+  return out.slice(0, 120);
 }

@@ -43,6 +43,8 @@ jobs:
           q "select day, load_daily_min->>'faktor' as faktor, load_daily_min->>'faktor_n' as trainings,
                load_daily_min->>'puls_max_quelle' as maxpuls_quelle, load_daily_min->>'abdeckung' as minuten_mit_puls
              from public.garmin_daily where load_daily_min is not null order by day desc limit 1;"
+          echo "== Fehlersuche: Feldnamen und Meldungen von Garmin (keine Werte) =="
+          q "select day, jsonb_pretty(load_daily_min->'diag') as diag from public.garmin_daily where load_daily_min ? 'diag' order by day desc limit 1;"
           echo "== Aktivitäten, letzte 90 Tage =="
           q "select count(*) as aktivitaeten,
                count(*) filter (where hr_points is not null) as mit_pulspunkten,
