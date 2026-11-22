@@ -11,3 +11,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-22 · OF · Nutzerin: Arbeit mit zwei Instanzen, Teilung Oberfläche / Daten · weniger Konflikte als eine Teilung nach Seiten
 2026-11-22 · OF · Nutzerin: Die Instanzen dürfen sich direkt Nachrichten schicken, verbindlich ist nur die Übergabe-Datei
 2026-11-22 · OF/DA · Nutzerin: Konzept Korridore und Alltagslast (PR #60): Alltag als Teil des Belastungsrings, Wochenlast standardmäßig mit Alltag, Korridore für alle vier Zyklusphasen, kranke Tage zählen nicht, kein Tippfeld „anstrengender Tag“, alle neuen Korridore
+2026-11-22 · OF · Nutzerin: Konzept Korridore und Alltagslast freigegeben („Leg los“), Umsetzung in der Reihenfolge des Konzepts
