@@ -94,7 +94,7 @@ export type Feature =
   | "tagesplan";
 
 export const FEATURES: { key: Feature; label: string; note: string }[] = [
-  { key: "zyklus", label: "Zyklus", note: "HRV nach Zyklusphase auf Heute" },
+  { key: "zyklus", label: "Zyklus", note: "Zyklusphasen im HRV-Verlauf auf Heute" },
   { key: "perimenopause", label: "Perimenopause", note: "Symptome und Hitzewallungen auf Heute" },
   { key: "medikamente", label: "Medikamente", note: "Bereich unter Gesundheit" },
   { key: "krankheit", label: "Krankheit", note: "Bereich unter Gesundheit" },
@@ -102,8 +102,8 @@ export const FEATURES: { key: Feature; label: string; note: string }[] = [
   { key: "kettlebell", label: "Kettlebell", note: "Bereich unter Training" },
   { key: "bouldern", label: "Bouldern", note: "Bereich unter Training" },
   { key: "karate", label: "Karate", note: "Bereich unter Training" },
-  { key: "garmin", label: "Garmin-Karten", note: "Werte der Uhr auf Heute" },
-  { key: "tagesziel", label: "Tagesziel", note: "Ring auf Heute" },
+  { key: "garmin", label: "Garmin-Karten", note: "Schlaf und Vitalwerte auf Heute" },
+  { key: "tagesziel", label: "Tagesziel", note: "Belastungsring und Ziel auf Heute" },
   { key: "tagesplan", label: "Tagesplan", note: "Plan für heute auf Heute" },
 ];
 

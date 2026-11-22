@@ -1998,3 +1998,58 @@ a.btn {
   font-size: 13px;
   line-height: 1.4;
 }
+
+/* Heute (Konzept PR 2): Ringe, Bedarf, Beitragsfaktoren */
+.ring-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 6px;
+  justify-items: center;
+}
+
+.ring-cell {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.today-line {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+.today-line .row-strong { color: var(--text); font-size: 15px; }
+
+.derive summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.derive ul { margin: 0; padding-left: 18px; }
+
+.value-unit { font-size: 15px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+
+.factor-list { display: flex; flex-direction: column; }
+.factor-list > * + * { border-top: 1px solid var(--line-soft); }
+.factor-list .range-row { border-top: 0; }
+
+.row-link {
+  display: block;
+  color: var(--text);
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.legend .legend-luteal { background: transparent; border: 1.5px dashed var(--cycle); }

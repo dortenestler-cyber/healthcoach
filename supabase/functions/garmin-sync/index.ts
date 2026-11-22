@@ -182,6 +182,11 @@ Deno.serve(async (req) => {
         const r = row(day);
         r.sleep_seconds = int(s?.sleepTimeSeconds);
         r.sleep_score = int(s?.sleepScores?.overall?.value);
+        // Schlafphasen in Sekunden; fehlen sie in der Antwort, bleiben sie leer
+        r.sleep_deep_s = int(s?.deepSleepSeconds ?? s?.deepSleepDurationInSeconds);
+        r.sleep_rem_s = int(s?.remSleepSeconds ?? s?.remSleepInSeconds ?? s?.remSleepDurationInSeconds);
+        r.sleep_light_s = int(s?.lightSleepSeconds ?? s?.lightSleepDurationInSeconds);
+        r.sleep_awake_s = int(s?.awakeSleepSeconds ?? s?.awakeDurationInSeconds);
         const t = findSkinTemp(s);
         if (t && plausibleTemp(t.value)) {
           r.skin_temp_delta = Math.round(t.value * 100) / 100;
@@ -274,18 +279,25 @@ Deno.serve(async (req) => {
 
     const dailyRows = [...daily.values()];
     let migrationMissing = false;
+    let stagesMissing = false;
     if (dailyRows.length) {
+      // Spalten aus späteren Migrationen: fehlt eine in der Datenbank, ohne sie speichern,
+      // damit der Abruf weiter funktioniert. Die App weist dann auf die fehlende Migration hin.
+      const optional: Record<string, string[]> = {
+        skin_temp_delta: ["skin_temp_delta"],
+        fitness_age: ["fitness_age"],
+        sleep_: ["sleep_deep_s", "sleep_rem_s", "sleep_light_s", "sleep_awake_s"],
+      };
+      const dropped = new Set<string>();
+      const strip = () => dailyRows.map((r) => Object.fromEntries(Object.entries(r).filter(([k]) => !dropped.has(k))));
       let { error } = await sb.from("garmin_daily").upsert(dailyRows, { onConflict: "user_id,day" });
-      // Spalte noch nicht angelegt: ohne Hauttemperatur speichern, damit der Abruf weiter funktioniert
-      if (error && /skin_temp_delta/.test(error.message)) {
-        migrationMissing = true;
-        const without = dailyRows.map(({ skin_temp_delta: _drop, ...rest }) => rest);
-        ({ error } = await sb.from("garmin_daily").upsert(without, { onConflict: "user_id,day" }));
-      }
-      // Spalte für das Fitness-Alter noch nicht angelegt: ohne sie speichern
-      if (error && /fitness_age/.test(error.message)) {
-        const without = dailyRows.map(({ fitness_age: _drop, ...rest }) => (migrationMissing ? (({ skin_temp_delta: _s, ...r }) => r)(rest) : rest));
-        ({ error } = await sb.from("garmin_daily").upsert(without, { onConflict: "user_id,day" }));
+      for (let tries = 0; error && tries < 3; tries++) {
+        const hit = Object.entries(optional).find(([, cols]) => cols.some((c) => error!.message.includes(c)) && !cols.every((c) => dropped.has(c)));
+        if (!hit) break;
+        hit[1].forEach((c) => dropped.add(c));
+        if (hit[0] === "skin_temp_delta") migrationMissing = true;
+        if (hit[0] === "sleep_") stagesMissing = true;
+        ({ error } = await sb.from("garmin_daily").upsert(strip(), { onConflict: "user_id,day" }));
       }
       if (error) throw new Error("Speichern der Tageswerte: " + error.message);
     }
@@ -303,6 +315,7 @@ Deno.serve(async (req) => {
       skinTempKeys: [...skinKeys],
       sleepTempKeys,
       skinNote: migrationMissing ? "Die Datenbank-Spalte für die Hauttemperatur fehlt noch." : skinNote,
+      sleepStagesNote: stagesMissing ? "Die Datenbank-Spalten für die Schlafphasen fehlen noch." : "",
       syncedAt: new Date().toISOString(),
     });
   } catch (e) {
