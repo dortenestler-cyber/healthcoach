@@ -5,9 +5,13 @@
 // Benötigte Secrets in Supabase (Edge Functions → Secrets):
 //   GARMIN_API_KEY   persönlicher API-Schlüssel aus Garmin Connect
 //   GARMIN_API_KEY_EXPIRES  optional, Ablaufdatum des Schlüssels als JJJJ-MM-TT (für die Warnung in der App)
-// Automatisch vorhanden: SUPABASE_URL, SUPABASE_ANON_KEY
+// Automatisch vorhanden: SUPABASE_URL, SUPABASE_ANON_KEY, Server-Schlüssel (für den Morgen-Abruf)
 //
-// Aufruf aus der App: supabase.functions.invoke("garmin-sync", { body: { days: 7, offset: 0 } })
+// Zwei Wege:
+//   App:          supabase.functions.invoke("garmin-sync", { body: { days: 7, offset: 0 } })
+//   Morgen-Abruf: der Zeitplan in der Datenbank schickt den Kopf "x-cron-key" mit.
+//                 Der Schlüssel liegt im Vault und wird über garmin_cron_key_ok geprüft.
+// Die Funktion läuft ohne JWT-Prüfung am Eingang (siehe Workflow), weil sie Login oder Schlüssel selbst prüft.
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
@@ -17,7 +21,7 @@ const MAX_DAYS = 365;
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-cron-key",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -111,21 +115,56 @@ const int = (v: unknown): number | null => {
   return n === null ? null : Math.round(n);
 };
 
+// Server-Schlüssel: alter Name oder neues Format (wie in der Funktion push)
+function serviceKey(): string {
+  const legacy = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (legacy) return legacy;
+  try {
+    const keys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}");
+    return keys.default ?? Object.values(keys)[0];
+  } catch {
+    return "";
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
-  try {
-    const apiKey = Deno.env.get("GARMIN_API_KEY");
-    if (!apiKey) return json(500, { error: "GARMIN_API_KEY fehlt in den Supabase-Secrets." });
+  // Ergebnis des Morgen-Abrufs festhalten, damit die App einen Fehler anzeigen kann
+  let logRun = async (_ok: boolean, _message: string | null) => {};
 
-    // Mit dem Login der Nutzerin arbeiten: der Zugriffsschutz pro Konto gilt auch hier
-    const authHeader = req.headers.get("Authorization") ?? "";
-    const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const { data: userData, error: userError } = await sb.auth.getUser(authHeader.replace(/^Bearer\s+/i, ""));
-    if (userError || !userData.user) return json(401, { error: "Nicht angemeldet." });
-    const userId = userData.user.id;
+  try {
+    const url = Deno.env.get("SUPABASE_URL")!;
+    const cronKey = req.headers.get("x-cron-key");
+    let sb: Any;
+    let userId: string;
+
+    if (cronKey) {
+      // Morgen-Abruf aus dem Zeitplan: Schlüssel prüfen, dann für das eine Konto der App abrufen
+      sb = createClient(url, serviceKey(), { auth: { persistSession: false } });
+      const { data: ok, error: keyError } = await sb.rpc("garmin_cron_key_ok", { k: cronKey });
+      if (keyError || ok !== true) return json(401, { error: "Schlüssel für den Morgen-Abruf ungültig." });
+      const { data: users, error: usersError } = await sb.auth.admin.listUsers({ page: 1, perPage: 2 });
+      if (usersError) return json(500, { error: "Konto nicht gefunden: " + usersError.message });
+      if (users.users.length !== 1) return json(500, { error: "Der Morgen-Abruf erwartet genau ein Konto." });
+      userId = users.users[0].id;
+      const uid = userId;
+      logRun = async (ok: boolean, message: string | null) => {
+        await sb.from("garmin_sync_runs").insert({ user_id: uid, ok, message });
+      };
+    } else {
+      // Mit dem Login der Nutzerin arbeiten: der Zugriffsschutz pro Konto gilt auch hier
+      const authHeader = req.headers.get("Authorization") ?? "";
+      sb = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: userData, error: userError } = await sb.auth.getUser(authHeader.replace(/^Bearer\s+/i, ""));
+      if (userError || !userData.user) return json(401, { error: "Nicht angemeldet." });
+      userId = userData.user.id;
+    }
+
+    const apiKey = Deno.env.get("GARMIN_API_KEY");
+    if (!apiKey) throw new Error("GARMIN_API_KEY fehlt in den Supabase-Secrets.");
 
     const body = await req.json().catch(() => ({}));
 
@@ -397,9 +436,34 @@ Deno.serve(async (req) => {
       if (error) throw new Error("Speichern der Aktivitäten: " + error.message);
     }
 
+    // Zyklus aus Garmin: ohne Zyklus-Tracking in Garmin oder ohne Tabelle bleibt es still beim Tagebuch
+    let cycles = 0;
+    let cycleNote = "";
+    if (offset === 0) {
+      try {
+        // Beim ersten Mal ein halbes Jahr zurück, danach reicht der Zeitraum plus ein Zyklus
+        const { count, error: countError } = await sb.from("garmin_cycles").select("start_date", { count: "exact", head: true }).eq("user_id", userId);
+        if (countError) throw new Error(countError.message);
+        const back = count ? days + 40 : 180;
+        const list = await garminCycles(token, isoDay(addDays(today, -(back - 1))), isoDay(today));
+        if (list.length) {
+          const { error } = await sb
+            .from("garmin_cycles")
+            .upsert(list.map((c) => ({ user_id: userId, ...c, synced_at: new Date().toISOString() })), { onConflict: "user_id,start_date" });
+          if (error) throw new Error(error.message);
+        }
+        cycles = list.length;
+      } catch (e) {
+        cycleNote = "Zyklus aus Garmin nicht abgerufen: " + (e instanceof Error ? e.message : String(e));
+      }
+    }
+
+    await logRun(true, null).catch(() => {});
     return json(200, {
       ok: true,
       days,
+      cycles,
+      cycleNote,
       dailyRows: dailyRows.length,
       activities: activities.length,
       skinTempNights: migrationMissing ? 0 : skinTempNights,
@@ -414,6 +478,26 @@ Deno.serve(async (req) => {
       syncedAt: new Date().toISOString(),
     });
   } catch (e) {
-    return json(500, { error: e instanceof Error ? e.message : String(e) });
+    const msg = e instanceof Error ? e.message : String(e);
+    await logRun(false, msg).catch(() => {});
+    return json(500, { error: msg });
   }
 });
+
+// Zyklusbeginne aus Garmin: Tagesansicht von heute holen, dann jeweils den Tag vor dem
+// Zyklusbeginn, bis der Zeitraum abgedeckt ist. So reichen wenige Abfragen pro Zyklus.
+async function garminCycles(token: string, fromDay: string, toDay: string): Promise<{ start_date: string; period_length: number | null }[]> {
+  const out = new Map<string, number | null>();
+  let day = toDay;
+  for (let i = 0; i < 16; i++) {
+    const res = await garminGet(token, `/periodichealth-service/menstrualcycle/dayview/${day}`);
+    const item = Array.isArray(res) ? res[0] : res;
+    const sum = item?.daySummary ?? item?.body?.daySummary ?? null;
+    const start = typeof sum?.startDate === "string" ? sum.startDate.slice(0, 10) : null;
+    if (!start || start > toDay || out.has(start)) break;
+    out.set(start, int(sum?.periodLength));
+    if (start <= fromDay) break;
+    day = isoDay(addDays(new Date(start + "T12:00:00Z"), -1));
+  }
+  return [...out].map(([start_date, period_length]) => ({ start_date, period_length }));
+}

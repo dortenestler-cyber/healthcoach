@@ -43,4 +43,5 @@ jobs:
           fi
           extra=""
           if [ "$PROBELAUF" = "true" ]; then extra="--dry-run"; fi
-          supabase db push --remote="$SUPABASE_DB_URL" --yes $extra
+          # --include-all: auch Migrationen mit älterem Datum ausführen, falls Pull Requests in anderer Reihenfolge gemergt werden
+          supabase db push --remote="$SUPABASE_DB_URL" --yes --include-all $extra

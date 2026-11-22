@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { loadPeriodDays } from "@/lib/garminZyklus";
 import { isoDay, longDate } from "@/lib/dates";
 import { activityLabel, durationText, type Activity } from "@/lib/garmin";
 import { SPOTS, type Illness, type Injury } from "@/lib/health";
@@ -67,14 +68,14 @@ export default function CalendarSection({ data }: { data: Data | null }) {
     const [p, a, d, il, inj] = await Promise.all([
       sb.from("planned_sessions").select("*").gte("day", first).lte("day", last).order("day"),
       sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load").gte("start_local", first).lte("start_local", last + "T23:59:59"),
-      sb.from("diary_entries").select("day").gte("day", first).lte("day", last).gt("bleeding", 0),
+      loadPeriodDays(sb, first, last),
       sb.from("illnesses").select("*").is("ended_on", null).limit(1),
       sb.from("injuries").select("*").is("ended_on", null),
     ]);
     if (p.error) setError("Kalender konnte nicht geladen werden: " + p.error.message);
     setSessions((p.data ?? []) as Session[]);
     setActs((a.data ?? []) as Activity[]);
-    setPeriod(new Set(((d.data ?? []) as { day: string }[]).map((r) => r.day)));
+    setPeriod(d);
     setIllness(((il.data ?? []) as Illness[])[0] ?? null);
     setInjuries((inj.data ?? []) as Injury[]);
   }, [first, last]);
@@ -229,7 +230,7 @@ export default function CalendarSection({ data }: { data: Data | null }) {
               <span><i className="ph-menses-bg" />Menstruation</span>
               <span><i className="ph-follikel-bg" />Follikel</span>
               <span><i className="ph-luteal-bg" />Luteal</span>
-              <span><i className="legend-period" />Periode eingetragen</span>
+              <span><i className="legend-period" />Periode (Tagebuch oder Garmin)</span>
               <span><i className="cal-dot-symptom legend-dot" />Symptome</span>
               <span>Phasen geschätzt, kommende Tage heller</span>
             </>

@@ -109,7 +109,7 @@ export function windowText(w: PeriodWindow, day: string): string {
   return a === b ? `Nächste Periode in etwa ${a} ${a === 1 ? "Tag" : "Tagen"}` : `Nächste Periode in etwa ${a}–${b} Tagen`;
 }
 
-export type CycleToday = { cycleDay: number | null; length: number; phase: Phase | null; window: PeriodWindow | null; cycles: number };
+export type CycleToday = { cycleDay: number | null; length: number; phase: Phase | null; window: PeriodWindow | null; cycles: number; fromGarmin: boolean };
 
 export function cycleToday(day: string, diary: Diary[]): CycleToday {
   const ci = cycleInfo(day, diary);
@@ -119,6 +119,7 @@ export function cycleToday(day: string, diary: Diary[]): CycleToday {
     phase: ci.cycleDay !== null ? phaseFor(ci.cycleDay, ci.length) : null,
     window: nextPeriodWindow(diary, day),
     cycles: ci.cycles,
+    fromGarmin: ci.fromGarmin,
   };
 }
 

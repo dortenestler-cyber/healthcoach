@@ -107,7 +107,7 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
           {phase && <> <span className="cycle-title-sep">|</span> <span className="cycle-title-phase">{phase.label}</span></>}
         </h2>
         <span className="cycle-title-sub">
-          {phase ? "Geschätzt" : "Trag deine Periode im Tagebuch ein, dann schätzt die App die Phase."}
+          {phase ? (ct.fromGarmin ? "Geschätzt · Beginn aus Garmin" : "Geschätzt") : "Trag deine Periode im Tagebuch ein, dann schätzt die App die Phase."}
           {ct.window ? ` · ${windowText(ct.window, today)} (${ct.window.earliest === ct.window.latest ? date(ct.window.earliest) : `${date(ct.window.earliest)}–${date(ct.window.latest)}`})` : ct.cycleDay !== null ? " · Periodenfenster ab 2 Zyklen" : ""}
         </span>
         {(!phase || !ct.window) && <Link href="/tagebuch#perioden" className="settings-link">Perioden nachtragen ›</Link>}
@@ -136,7 +136,7 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
             <p className="meta">Vorschlag: {phase.suggestion}. Anstrengung (1–10): {phase.rpe}. {phase.hint}</p>
           </div>
         )}
-        <span className="meta">Phasen sind aus deinem Tagebuch geschätzt. Vorschlag, keine Diagnose.</span>
+        <span className="meta">Phasen sind aus deinem Tagebuch geschätzt, Lücken füllt Garmin. Dein Tagebuch hat Vorrang. Vorschlag, keine Diagnose.</span>
       </section>
 
       <CycleCalendar today={today} diary={longDiary} />

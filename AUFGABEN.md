@@ -8,7 +8,7 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 ## Jetzt
 
 ### Wadenzucken und Wadenkrämpfe erfassen (PR #49)
-- [ ] PR #49 ansehen und selbst mergen. Er enthält die Migration `supabase/migrations/20261123110000_muskeln.sql` (neue Tabelle `muscle_events`). Dein Merge ist die Freigabe, danach legt GitHub die Tabelle automatisch an (das Secret `SUPABASE_DB_URL` ist eingerichtet)
+- [x] PR #49 gemergt (22. Nov.), Migration grün (geprüft von Claude). Er enthält die Migration `supabase/migrations/20261123110000_muskeln.sql` (neue Tabelle `muscle_events`). Dein Merge ist die Freigabe, danach legt GitHub die Tabelle automatisch an (das Secret `SUPABASE_DB_URL` ist eingerichtet)
 - [ ] Magnesium unter **Gesundheit › Medikamente** als Supplement eintragen (falls noch nicht geschehen) und täglich abhaken, damit die spätere Auswertung Tage mit und ohne Einnahme vergleichen kann
 - [ ] Im Tagebuch einen Testeintrag machen und wieder löschen
 - [ ] Unter **Gesundheit › Körper** (Karte Waden) und auf **Zyklus** nachsehen, ob die Karten erscheinen. Muster zeigt die App erst ab 8 Tagen mit Zucken oder Krampf
@@ -50,13 +50,18 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 - [ ] Die neue Seite **Zyklus** in der Navigation ansehen und sagen, was fehlt oder anders sein soll
 
 ### 7. Readiness nach dem persönlichen Bereich (PR #45)
-- [ ] PR #45 ansehen und mergen (Claude merged ihn nicht selbst, weil er die Uhr-Funktion `watch` ändert). Keine Migration nötig
+- [x] PR #45 gemergt (22. Nov.), Upload der Funktionen grün (Claude merged ihn nicht selbst, weil er die Uhr-Funktion `watch` ändert). Keine Migration nötig
 - [ ] Ein paar Tage beobachten, ob die Readiness-Stufe zu deinem Gefühl passt, und Claude Rückmeldung geben
 
 ### 8. Früheres nachtragen
 - [ ] Im Tagebuch unten unter **Vergangene Perioden nachtragen** deine früheren Perioden eintragen (die Zyklus-Seite verlinkt dorthin). Je mehr, desto genauer werden Phasen und Vergleiche
 
-### 9. Aufräumen
+### 9. Zyklus aus Garmin und Abruf um 6:15 Uhr (PR #47, ersetzt PR #14)
+- [ ] PR #47 ansehen und mergen (Claude merged ihn nicht selbst: Migration und `garmin-sync`). Danach laufen die Migration `20261123120000_garmin_zyklus_morgenabruf.sql` (Tabellen, Schlüssel im Vault, Zeitplan, `pg_cron` und `pg_net`) und der Upload von `garmin-sync` automatisch
+- [ ] PR #14 auf GitHub schließen, er ist durch #47 ersetzt
+- [ ] Am nächsten Morgen nach 6:15 Uhr die App öffnen: Die Daten sollten schon da sein. Steht auf Heute ein Hinweis zum Morgen-Abruf, Claude Bescheid geben
+
+### Aufräumen
 - [ ] Auf GitHub den Zweig `heute-neu` löschen (versehentlich angelegt, gleicher Inhalt wie PR #38)
 
 ### 10. Neues Design „dunkel 2“ (PR #50)

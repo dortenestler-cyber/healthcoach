@@ -33,7 +33,7 @@ export async function buildCoachContext(): Promise<string> {
   }
 
   const cyc = cycleInfo(day, data.diary);
-  lines.push(cyc.cycleDay ? `Zyklustag ${cyc.cycleDay}, Zyklus etwa ${cyc.length} Tage${cyc.beforePeriod ? ", Tage vor der Periode" : ""}.` : "Zyklus: noch keine Periode im Tagebuch.");
+  lines.push(cyc.cycleDay ? `Zyklustag ${cyc.cycleDay}, Zyklus etwa ${cyc.length} Tage${cyc.beforePeriod ? ", Tage vor der Periode" : ""}${cyc.fromGarmin ? " (Beginn aus Garmin)" : ""}.` : "Zyklus: noch keine Periode eingetragen.");
   const ct = cycleToday(day, data.diary);
   if (ct.phase) lines.push(`Geschätzte Phase: ${PHASES[ct.phase].label}.`);
   if (ct.window) lines.push(`Nächste Periode geschätzt zwischen ${ct.window.earliest} und ${ct.window.latest} (aus ${ct.window.basis} Zyklen).`);
