@@ -5,6 +5,7 @@ import { type Tone } from "@/components/charts/scale";
 
 type Props = {
   value: number; // 0–1 (über 1 wird voll gezeichnet)
+  split?: number | null; // 0–1: so viel vom Wert ist der kräftige Teil (Training), der Rest ist hell (Alltag)
   target?: { lo: number; hi: number } | null; // Zielbogen 0–1, z. B. Belastungsziel
   center: string; // große Zahl
   caption: string; // Wort darunter
@@ -13,7 +14,7 @@ type Props = {
   size?: number;
 };
 
-export default function ValueRing({ value, target, center, caption, label, tone = "recovery", size = 104 }: Props) {
+export default function ValueRing({ value, split, target, center, caption, label, tone = "recovery", size = 104 }: Props) {
   const r = 40;
   const c = 2 * Math.PI * r;
   const tr = 48; // Zielbogen außen
@@ -25,7 +26,8 @@ export default function ValueRing({ value, target, center, caption, label, tone 
     <svg className={`cb cb-ring cb-${tone}`} width={size} height={size} viewBox="0 0 104 104" role="img" aria-label={label}>
       <g transform="rotate(-90 52 52)" fill="none">
         <circle cx={52} cy={52} r={r} strokeWidth={9} className="cb-ring-track" />
-        {v > 0 && <circle cx={52} cy={52} r={r} strokeWidth={9} strokeLinecap="round" className="cb-ring-value" style={arc(Math.max(v, 0.01), c)} />}
+        {v > 0 && split != null && split < v && <circle cx={52} cy={52} r={r} strokeWidth={9} strokeLinecap="round" className="cb-ring-value-alltag" style={arc(Math.max(v, 0.01), c)} />}
+        {v > 0 && (split == null || split > 0) && <circle cx={52} cy={52} r={r} strokeWidth={9} strokeLinecap="round" className="cb-ring-value" style={arc(Math.max(split == null ? v : Math.min(split, v), 0.01), c)} />}
         {target && <circle cx={52} cy={52} r={tr} strokeWidth={3} strokeLinecap="round" className="cb-ring-target" style={arc(Math.max(0.01, target.hi - target.lo), tc, target.lo)} />}
       </g>
       <text x={52} y={55} textAnchor="middle" className="cb-ring-center">

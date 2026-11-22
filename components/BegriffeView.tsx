@@ -29,6 +29,11 @@ const TERMS: { term: string; text: string; tip: string }[] = [
     tip: "Hilfreich ist der Vergleich mit den letzten Wochen: Steigt die Last plötzlich stark, steigt auch das Risiko für Überlastung.",
   },
   {
+    term: "Belastung aus dem Alltag",
+    text: "Auch Bewegung ohne gestartetes Training zählt zur Belastung, etwa Gartenarbeit, Treppen oder lange Wege. Health Coach erkennt sie an deinem Puls über den Tag, wenn du dich dabei bewegst. Erhöhter Puls durch Stress allein zählt nicht.",
+    tip: "Ohne Pulsdaten wird der Alltag aus deinen Schritten geschätzt. Unter Training kannst du „Nur Training“ wählen, um wie bei Garmin nur die Trainings zu sehen.",
+  },
+  {
     term: "Readiness",
     text: "Die Tagesempfehlung von Health Coach: Wie viel Belastung passt heute? Sie fasst HRV, Ruhepuls, Schlaf, Check-in, Zyklus und Verletzungen zusammen.",
     tip: "Eine Orientierung, keine Vorschrift. Wie du dich fühlst, zählt mit.",

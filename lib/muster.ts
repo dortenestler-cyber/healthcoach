@@ -59,7 +59,7 @@ export function conditions(data: Data, extra: MusterExtra): Condition[] {
   out.push({ key: "luteal", group: "zyklus", label: "Tage der Lutealphase", has: (d) => group(d) === "luteal" });
 
   // Training am selben Tag (der Krampf kommt meist am Abend danach)
-  out.push({ key: "hart", group: "training", label: "harte Trainingstage", has: (d) => loadPercent(d, data.daily, data.acts) >= 70 });
+  out.push({ key: "hart", group: "training", label: "Tage mit hoher Belastung", has: (d) => loadPercent(d, data.daily, data.acts) >= 70 });
   const sportDays = new Map<string, Set<string>>();
   for (const a of data.acts) {
     const k = a.type_key && /run/.test(a.type_key) ? "ausdauer" : sportOfGarmin(a.type_key);

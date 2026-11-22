@@ -9,7 +9,7 @@ import { loadPercent, type Diary } from "@/lib/insights";
 const SHARE_DAYS = 30; // „so oft im Bereich“
 const LOOK_DAYS = 180; // Erholungszeit und „was davor war“
 const SHIFT_DAYS = 90; // Vergleich mit vor 3 Monaten
-const HARD_DAY_PCT = 70; // Belastung ab hier: harte Einheit
+const HARD_DAY_PCT = 70; // Belastung ab hier (Training und Alltag): Tag mit hoher Belastung
 
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");
@@ -159,7 +159,7 @@ function beforeLine(inp: KorridorInput): Line | null {
   };
   const inBad = count(bad);
   const inAll = count(r);
-  const name = (f: string) => (f === "hart" ? "harte Einheit" : f === "symptome" ? "starke Symptome" : inp.habitLabel(f.slice(2)));
+  const name = (f: string) => (f === "hart" ? "einen Tag mit hoher Belastung" : f === "symptome" ? "starke Symptome" : inp.habitLabel(f.slice(2)));
   const hits = [...inBad.entries()]
     .filter(([f, n]) => n >= 3 && n / bad.length >= 1.5 * ((inAll.get(f) ?? 0) / r.length))
     .sort((a, b) => b[1] - a[1])

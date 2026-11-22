@@ -4,7 +4,7 @@
 import type { Range } from "@/lib/baseline";
 import { W, extent, linear, niceTicks, type Tone } from "@/components/charts/scale";
 
-export type Bar = { label: string; value: number | null; today?: boolean; marker?: boolean };
+export type Bar = { label: string; value: number | null; today?: boolean; marker?: boolean; part?: number | null }; // part: kräftiger Teil unten (Training), der Rest hell (Alltag)
 
 type Props = {
   bars: Bar[];
@@ -62,7 +62,10 @@ export default function DayBars({ bars, fmt, label, tone = "training", band, cor
           const v = b.value;
           return (
             <g key={i}>
-              {v !== null && v > 0 && <rect x={cx - bw / 2} width={bw} y={y(v)} height={y(0) - y(v)} rx={Math.min(6, bw / 3)} className={b.today ? "cb-bar cb-bar-today" : "cb-bar"} />}
+              {v !== null && v > 0 && b.part != null && b.part < v && <rect x={cx - bw / 2} width={bw} y={y(v)} height={y(0) - y(v)} rx={Math.min(6, bw / 3)} className="cb-bar-alltag" />}
+              {v !== null && v > 0 && (b.part == null || b.part > 0) && (
+                <rect x={cx - bw / 2} width={bw} y={y(b.part == null ? v : Math.min(b.part, v))} height={y(0) - y(b.part == null ? v : Math.min(b.part, v))} rx={Math.min(6, bw / 3)} className={b.today ? "cb-bar cb-bar-today" : "cb-bar"} />
+              )}
               {v === null && <rect x={cx - bw / 2} width={bw} y={y(0) - 2} height={2} className="cb-bar-empty" />}
               {b.marker && <circle cx={cx} cy={(v !== null ? y(v) : y(0)) - 8} r={3.5} className="cb-marker" />}
               <text x={cx} y={height - 6} textAnchor="middle" className={b.today ? "cb-tick cb-tick-strong" : "cb-tick"}>

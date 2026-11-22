@@ -4,12 +4,11 @@ Zuletzt aktualisiert: 2026-11-22 · Sitzung: https://claude.ai/code/session_014p
 Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/design-*`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
 ## Stand in einem Satz
-Korridore Schritt 1 ist gemergt (PR #60): wandernder Bereich, Bereiche je Zyklusphase, Krankheitstage raus, Abschnitt „Dein Bereich“.
+Korridore Schritt 3 (Alltagslast in der Anzeige) ist fertig, PR offen. Danach A3 (weitere Korridore) und A4 (Hinweis auf Heute).
 
 ## In Arbeit
-- Korridore: Schritt 1 gemergt (PR #60). Konzept: `docs/konzept-korridore-alltagslast.md`.
-  Fertig: `lib/baseline.ts` (Bereiche je Phase, `rangeSeries`, `sickDays`, vorläufig ab 7 / stabil ab 14 Tagen), `lib/korridor.ts`, Verlauf-Detail mit Umschalter „Bereich über die Zeit · heute“, HRV-Karte auf Heute mit wanderndem Band.
-  Nächster Schritt: Teil B Daten (Alltagslast über den Tagespuls) ist Sache der Rolle Daten, danach Teil B Anzeige (OF), dann A3 (weitere Korridore) und A4 (Hinweis auf Heute nach 3 Tagen außerhalb, `badStreak` in `lib/korridor.ts` liegt schon bereit).
+- Korridore Schritt 3, Zweig `claude/confident-fermat-wy3iur`: `dayLoad` in `lib/insights.ts` (Training + Alltag, Rückfall auf alte Rechnung ohne `load_daily_min`), `loadByDay(acts, daily)` in `lib/today.ts`, `weekLoad`/`loadRatio` mit `alltag`. Ring auf Heute und Halbbogen geteilt (Training kräftig, Alltag `--training-alltag`), Belastungskarte mit Kachel „Alltag in Bewegung“, Wochenlast mit geteilten Säulen, Umschalter „Mit Alltag · Nur Training“ auf Training (nur sichtbar, wenn es Alltagsdaten gibt). Begriff „Belastung aus dem Alltag“.
+  Nächster Schritt: A3, neue Korridore (Tagesbelastung, Alltagsschritte, Tief- und REM-Schlaf, Schlafbeginn, Body Battery aufgeladen, hoher Stress). Danach A4 mit `badStreak` aus `lib/korridor.ts`.
 
 ## Wartet auf
 - Nutzerin: Rückmeldung zu Heute, Zyklus und Training im Design „dunkel 2“ (`AUFGABEN.md` Abschnitt 10)
@@ -25,6 +24,7 @@ Korridore Schritt 1 ist gemergt (PR #60): wandernder Bereich, Bereiche je Zyklus
 - Keine festen Farbwerte in Komponenten, nur Variablen aus `app/globals.css`.
 
 ## Erledigt seit letzter Übergabe
+- Korridore Schritt 3: Alltagslast in der Anzeige (PR folgt)
 - Aufräumen abgeschlossen (`docs/aufraeumen-vorschlag.md`): PR #62 Tagebuch und Zyklus (Hitzewallungen neben Symptomen, Verlauf 4 Wochen eingeklappt, Perioden nachtragen auf Zyklus).
 - Aufräumen 1–3 gemergt: PR #56 Heute (5 Karten, Check-in ins Tagebuch), #57 Training (Reiter Auswertung, `/tagesziel` leitet weiter), #59 Einstellungen (nur Einrichtung)
 - PR #60 gemergt: Korridore Schritt 1
