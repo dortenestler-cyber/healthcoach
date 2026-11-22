@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, shortDate } from "@/lib/dates";
 import { METRICS, stats, syncGarmin, type Daily, type MetricKey } from "@/lib/garmin";
 import PageHead from "@/components/PageHead";
-import { cycleLengths, cycleToday, groupOf, phaseInsight, phaseMeans, PHASE_GROUPS } from "@/lib/cycle";
+import { cycleLengths, cycleToday, cycleTraces, groupOf, phaseFor, phaseInsight, phaseMeans, PHASE_GROUPS } from "@/lib/cycle";
 import type { Diary } from "@/lib/insights";
 
 // Für Phasen und Muster mindestens ein halbes Jahr laden
@@ -23,6 +23,7 @@ const RANGES: [number, string][] = [
 export default function VerlaufView({ initial }: { initial: string }) {
   const [metric, setMetric] = useState<MetricKey>((initial in METRICS ? initial : "hrv") as MetricKey);
   const [range, setRange] = useState(30);
+  const [view, setView] = useState<"zeit" | "zyklus">("zeit");
   const [rows, setRows] = useState<Daily[]>([]);
   const [diary, setDiary] = useState<Diary[]>([]);
   const [busy, setBusy] = useState(false);
@@ -79,6 +80,27 @@ export default function VerlaufView({ initial }: { initial: string }) {
         pm: phaseMeans(rows.map((r) => ({ day: r.day, value: METRICS[k].value(r) })), diary),
       }))
     : [];
+  // Zyklus-Ansicht: x-Achse Zyklustag, frühere Zyklen dünn, laufender Zyklus kräftig
+  const today = isoDay();
+  const now = cycleToday(today, diary);
+  const traces = cycleTraces(series, diary, today);
+  const pastTraces = traces.filter((t) => t.length !== null);
+  const current = traces.find((t) => t.length === null) ?? null;
+  const cycLen = Math.min(45, Math.max(28, ...traces.map((t) => t.values.length)));
+  const cycVals = traces.flatMap((t) => t.values).filter((v): v is number => v !== null);
+  const cst = stats(cycVals);
+  const cLo = cst ? Math.min(cst.min, cst.mean - cst.sd) : 0;
+  const cHi = cst ? Math.max(cst.max, cst.mean + cst.sd) : 1;
+  const cPad = (cHi - cLo) * 0.1 || 1;
+  const cy = (v: number) => 100 - ((v - (cLo - cPad)) / (cHi + cPad - (cLo - cPad))) * 100;
+  const cx = (k: number) => (k / (cycLen - 1)) * 100; // k = Zyklustag - 1
+  const tracePoints = (t: { values: (number | null)[] }) =>
+    t.values.map((v, k) => (v === null || k >= cycLen ? null : `${cx(k).toFixed(2)},${cy(v).toFixed(2)}`)).filter(Boolean).join(" ");
+  const cycPhases = Array.from({ length: cycLen }, (_, k) => groupOf(phaseFor(k + 1, now.length)));
+  const sweatByCycleDay = new Set(
+    traces.flatMap((t) => t.values.map((_, k) => k).filter((k) => sweatDays.has(isoDay(new Date(new Date(t.start + "T12:00:00").getTime() + k * 864e5)))))
+  );
+
   const missingHistory = range > 30 && (!oldest || oldest > isoDay(daysAgo(range - 8)));
 
   // Diagramm 0..100 in x und y
@@ -120,13 +142,74 @@ export default function VerlaufView({ initial }: { initial: string }) {
       </div>
 
       <div className="segmented">
+        <button type="button" aria-pressed={view === "zeit"} onClick={() => setView("zeit")}>Zeitraum</button>
+        <button type="button" aria-pressed={view === "zyklus"} onClick={() => setView("zyklus")}>Nach Zyklustag</button>
+      </div>
+
+      {view === "zeit" && (
+      <div className="segmented">
         {RANGES.map(([v, l]) => (
           <button key={v} type="button" aria-pressed={range === v} onClick={() => setRange(v)}>
             {l}
           </button>
         ))}
       </div>
+      )}
 
+      {view === "zyklus" && (
+        <section className="card">
+          <h2>{traces.length ? insight : "Für die Zyklus-Ansicht fehlt noch eine eingetragene Periode."}</h2>
+          {traces.length > 0 && (
+            <>
+              <div className="card-row">
+                <div className="stack">
+                  <span className="meta">Heute{now.cycleDay ? ` · Zyklustag ${now.cycleDay}` : ""}</span>
+                  <span className="big-number">{latest === undefined ? "–" : m.fmt(latest)}</span>
+                </div>
+                <div className="stack right">
+                  <span className="meta">Zyklen</span>
+                  <span className="row-strong">{pastTraces.length} früher{current ? " + aktuell" : ""}</span>
+                </div>
+              </div>
+              <svg className="chart" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label={`${m.label} nach Zyklustag, ${traces.length} Zyklen übereinander`}>
+                {cycPhases.map((g, k) =>
+                  g ? <rect key={k} x={Math.max(0, cx(k) - 50 / cycLen)} y={0} width={100 / cycLen + 0.05} height={100} className={"ph-" + (g === "menstruation" ? "menses" : g)} /> : null
+                )}
+                {cst && (
+                  <>
+                    <line x1={0} x2={100} y1={cy(cst.mean + cst.sd)} y2={cy(cst.mean + cst.sd)} className="chart-norm" />
+                    <line x1={0} x2={100} y1={cy(cst.mean - cst.sd)} y2={cy(cst.mean - cst.sd)} className="chart-norm" />
+                  </>
+                )}
+                {pastTraces.map((t) => {
+                  const p = tracePoints(t);
+                  return p ? <polyline key={t.start} points={p} className="chart-line chart-trace-past" /> : null;
+                })}
+                {current && tracePoints(current) && <polyline points={tracePoints(current)} className="chart-line" />}
+                {now.cycleDay && now.cycleDay <= cycLen && <line x1={cx(now.cycleDay - 1)} x2={cx(now.cycleDay - 1)} y1={0} y2={100} className="chart-today" />}
+                {[...sweatByCycleDay].map((k) => (k < cycLen ? <line key={"s" + k} x1={cx(k)} x2={cx(k)} y1={0} y2={9} className="chart-sweat" /> : null))}
+              </svg>
+              <div className="card-row meta">
+                <span>Tag 1</span>
+                <span>Tag {Math.round(cycLen / 2)}</span>
+                <span>Tag {cycLen}</span>
+              </div>
+              <div className="legend">
+                <span><i className="legend-current" />Aktueller Zyklus</span>
+                {pastTraces.length > 0 && <span><i className="legend-past" />Frühere Zyklen</span>}
+                <span><i className="legend-norm" />Normalbereich</span>
+                <span><i className="ph-menses-bg" />Menstruation</span>
+                <span><i className="ph-follikel-bg" />Follikel</span>
+                <span><i className="ph-luteal-bg" />Luteal</span>
+                {sweatByCycleDay.size > 0 && <span><i className="legend-sweat" />Nachtschweiß</span>}
+              </div>
+              <p>Phasen geschätzt für deine übliche Zykluslänge von {now.length} Tagen. Zeigt die letzten 6 Monate.</p>
+            </>
+          )}
+        </section>
+      )}
+
+      {view === "zeit" && (
       <section className="card">
         <h2>{insight}</h2>
         <div className="card-row">
@@ -177,6 +260,7 @@ export default function VerlaufView({ initial }: { initial: string }) {
           <p>{metric === "temperatur" ? "Noch keine Hauttemperatur. Sie kommt mit dem nächsten Garmin-Abruf, wenn deine Uhr sie nachts misst." : "Für diesen Zeitraum gibt es noch keine Werte."}</p>
         )}
       </section>
+      )}
 
       <section className="card">
         <h2>Muster über deinen Zyklus</h2>

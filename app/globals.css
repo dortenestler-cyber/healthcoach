@@ -1647,3 +1647,23 @@ button.settings-row {
 .pattern-row {
   display: contents;
 }
+
+/* Verlauf: Ansicht nach Zyklustag */
+.chart-trace-past {
+  stroke: var(--text-2);
+  stroke-width: 1;
+  opacity: 0.45;
+}
+
+.legend .legend-current {
+  background: var(--recovery);
+  border-radius: 0;
+  height: 3px;
+}
+
+.legend .legend-past {
+  background: var(--text-2);
+  opacity: 0.45;
+  border-radius: 0;
+  height: 2px;
+}
