@@ -13,7 +13,7 @@ type Props = {
   tone?: Tone;
 };
 
-const LABEL_W = 92;
+const LABEL_W = 116;
 const ROW_H = 22;
 const GAP = 2;
 const AXIS_H = 16;
