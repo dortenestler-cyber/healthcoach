@@ -1,6 +1,7 @@
 // Health Coach · Zifferblatt "Datenraster" für die Fenix 9 Pro
 // Holt alle 30 Minuten im Hintergrund eine Kurzübersicht von Health Coach
-// (Zyklustag, Bufori-Hübe, nächste Einheit) und zeigt sie zusammen mit Garmin-Werten.
+// (Zyklustag, Tagesziel, Bufori-Hübe, nächste Einheit u. a.) und zeigt sie zusammen mit Garmin-Werten.
+// Welche Werte in welchem Feld stehen und welche Farbe jeder Bereich hat, wird in Garmin Connect eingestellt.
 
 import Toybox.Application;
 import Toybox.Background;
@@ -12,13 +13,16 @@ import Toybox.WatchUi;
 (:background)
 class HealthCoachFaceApp extends Application.AppBase {
 
+    var view = null;
+
     function initialize() {
         AppBase.initialize();
     }
 
     function getInitialView() {
         scheduleSync();
-        return [new FaceView()];
+        view = new FaceView();
+        return [view];
     }
 
     function getServiceDelegate() {
@@ -33,6 +37,10 @@ class HealthCoachFaceApp extends Application.AppBase {
     }
 
     function onSettingsChanged() {
+        // Felder und Farben aus Garmin Connect neu laden
+        if (view != null) {
+            view.loadSettings();
+        }
         scheduleSync();
         WatchUi.requestUpdate();
     }

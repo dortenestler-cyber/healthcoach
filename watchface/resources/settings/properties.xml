@@ -1,4 +1,31 @@
 <properties>
     <property id="token" type="string"></property>
     <property id="baseUrl" type="string">https://fkvhuxjsdvssmupewwgl.supabase.co</property>
+    <!-- Felder: Nummer des Werts, siehe Fields.mc -->
+    <property id="s_a1" type="number">1</property>
+    <property id="s_a2" type="number">2</property>
+    <property id="s_b1" type="number">3</property>
+    <property id="s_b2" type="number">5</property>
+    <property id="s_b3" type="number">6</property>
+    <property id="s_b4" type="number">4</property>
+    <property id="s_c1" type="number">7</property>
+    <property id="s_c2" type="number">8</property>
+    <property id="s_c3" type="number">9</property>
+    <property id="s_c4" type="number">10</property>
+    <property id="s_d1" type="number">11</property>
+    <property id="s_d2" type="number">12</property>
+    <property id="s_e1" type="number">13</property>
+    <property id="s_e2" type="number">14</property>
+    <property id="g_l" type="number">1</property>
+    <property id="g_r" type="number">2</property>
+    <!-- Farben: 0 = Standard wie im Konzept -->
+    <property id="c_date" type="number">0</property>
+    <property id="c_top" type="number">0</property>
+    <property id="c_wx" type="number">0</property>
+    <property id="c_time" type="number">0</property>
+    <property id="c_mid" type="number">0</property>
+    <property id="c_low" type="number">0</property>
+    <property id="c_bot" type="number">0</property>
+    <property id="c_bars" type="number">0</property>
+    <property id="c_lines" type="number">0</property>
 </properties>

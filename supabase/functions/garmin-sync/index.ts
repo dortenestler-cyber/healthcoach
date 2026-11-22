@@ -214,6 +214,18 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Fitness-Alter für das Zifferblatt: nur beim Abruf bis heute, Fehler brechen den Abruf nicht ab.
+    // Garmin dokumentiert den Pfad der Personal API nicht; es wird der Pfad aus Garmin Connect versucht.
+    if (offset === 0) {
+      try {
+        const fa = await garminGet(token, `/fitnessage-service/fitnessage/${isoDay(today)}`);
+        const v = num(fa?.fitnessAge ?? fa?.currentFitnessAge ?? fa?.fitnessAgeValue);
+        if (v !== null && v > 10 && v < 100) row(isoDay(today)).fitness_age = Math.round(v);
+      } catch {
+        // kein Fitness-Alter verfügbar
+      }
+    }
+
     // Fallback: einzelne Nächte der letzten 14 Tage abfragen, wenn die Übersicht keine Hauttemperatur hatte.
     // Fehler hier brechen den Abruf nicht ab.
     let skinNote = "";
@@ -255,6 +267,11 @@ Deno.serve(async (req) => {
       if (error && /skin_temp_delta/.test(error.message)) {
         migrationMissing = true;
         const without = dailyRows.map(({ skin_temp_delta: _drop, ...rest }) => rest);
+        ({ error } = await sb.from("garmin_daily").upsert(without, { onConflict: "user_id,day" }));
+      }
+      // Spalte für das Fitness-Alter noch nicht angelegt: ohne sie speichern
+      if (error && /fitness_age/.test(error.message)) {
+        const without = dailyRows.map(({ fitness_age: _drop, ...rest }) => (migrationMissing ? (({ skin_temp_delta: _s, ...r }) => r)(rest) : rest));
         ({ error } = await sb.from("garmin_daily").upsert(without, { onConflict: "user_id,day" }));
       }
       if (error) throw new Error("Speichern der Tageswerte: " + error.message);
