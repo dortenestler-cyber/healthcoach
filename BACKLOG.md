@@ -46,4 +46,4 @@ Konzept: `docs/konzept-korridore-alltagslast.md`
 - [x] **Abschnitt „Dein Bereich“** je Wert: so oft im Bereich, Serie, Erholungszeit, Verschiebung, was davor war.
 - [x] **Tagesbelastung aus Training und Alltag** über den Tagespuls (Migration und `garmin-sync`).
 - [x] **Anzeige** Ring, Belastung heute und Wochenlast mit Anteil Alltag.
-- [ ] **Weitere Korridore**: Tagesbelastung, Alltagsschritte, Tief- und REM-Schlaf, Schlafbeginn, Body Battery aufgeladen, hoher Stress.
+- [x] **Weitere Korridore**: Tagesbelastung, Alltagsschritte, Tief- und REM-Schlaf, Schlafbeginn, Body Battery aufgeladen, hoher Stress.

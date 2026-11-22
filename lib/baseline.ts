@@ -20,7 +20,7 @@ export const SICK_AFTER = 3; // Tage nach einer Krankheit, die noch nicht mitzä
 export const NO_RANGE_TEXT = `Bereich ab ${MIN_PROVISIONAL} Tagen`;
 
 // Für diese Werte verschiebt die Zyklusphase das Übliche
-export const CYCLE_SENSITIVE: MetricKey[] = ["hrv", "ruhepuls", "temperatur", "atem", "schlaf"];
+export const CYCLE_SENSITIVE: MetricKey[] = ["hrv", "ruhepuls", "temperatur", "atem", "schlaf", "tiefschlaf", "rem"];
 
 export type Point = { day: string; value: number | null };
 
