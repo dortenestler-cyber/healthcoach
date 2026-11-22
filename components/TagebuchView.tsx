@@ -5,6 +5,10 @@ import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, longDate, shortDate } from "@/lib/dates";
 import { BLEEDING, GRID_ROWS, INFLUENCES, LEVELS, SYMPTOMS } from "@/lib/catalog";
 import PageHead from "@/components/PageHead";
+import DayIntakes from "@/components/tagebuch/DayIntakes";
+import FlashCounter from "@/components/tagebuch/FlashCounter";
+import PeriodBackfill from "@/components/tagebuch/PeriodBackfill";
+import { useFeatures } from "@/lib/prefs";
 
 type Entry = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[] };
 
@@ -12,43 +16,60 @@ const DAYS = 28;
 // Symptom-Stärke 0 bis 3 in Amber
 const heat = ["var(--line-soft)", "var(--warn-bg)", "var(--warn-mid)", "var(--warn)"];
 
-export default function TagebuchView() {
+const shift = (iso: string, n: number) => {
+  const d = new Date(iso + "T12:00:00");
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+
+// Tagebuch für heute oder einen vergangenen Tag: Blutung, Symptome, Einflüsse, Einnahmen, Hitzewallungen.
+// Dazu vergangene Perioden schnell nachtragen.
+export default function TagebuchView({ initial }: { initial?: string }) {
   const today = isoDay();
+  const [day, setDay] = useState(initial && /^\d{4}-\d{2}-\d{2}$/.test(initial) && initial <= today ? initial : today);
+  const feat = useFeatures();
   const [bleeding, setBleeding] = useState(0);
   const [symptoms, setSymptoms] = useState<Record<string, number>>({});
   const [influences, setInfluences] = useState<string[]>([]);
   const [history, setHistory] = useState<Entry[]>([]);
   const [saved, setSaved] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
     const sb = supabase();
     if (!sb) return;
-    const { data, error: e } = await sb
-      .from("diary_entries")
-      .select("day, bleeding, symptoms, influences")
-      .gte("day", isoDay(daysAgo(DAYS - 1)))
-      .order("day");
-    if (e) {
-      setError("Tagebuch konnte nicht geladen werden: " + e.message);
+    const [h, d] = await Promise.all([
+      sb.from("diary_entries").select("day, bleeding, symptoms, influences").gte("day", isoDay(daysAgo(DAYS - 1))).order("day"),
+      sb.from("diary_entries").select("day, bleeding, symptoms, influences").eq("day", day).maybeSingle(),
+    ]);
+    if (h.error || d.error) {
+      setError("Tagebuch konnte nicht geladen werden: " + (h.error ?? d.error)?.message);
       return;
     }
-    const rows = (data ?? []) as Entry[];
-    setHistory(rows);
-    const t = rows.find((r) => r.day === today);
-    if (t) {
-      setBleeding(t.bleeding);
-      setSymptoms(t.symptoms ?? {});
-      setInfluences(t.influences ?? []);
-      setSaved(true);
-    }
-  }, [today]);
+    setHistory((h.data ?? []) as Entry[]);
+    const t = d.data as Entry | null;
+    setBleeding(t?.bleeding ?? 0);
+    setSymptoms(t?.symptoms ?? {});
+    setInfluences(t?.influences ?? []);
+    setSaved(!!t);
+    setDirty(false);
+  }, [day]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  const changed = () => setSaved(false);
+  const changed = () => {
+    setSaved(false);
+    setDirty(true);
+  };
+  // Tag wechseln: ungespeicherte Änderungen nicht still verwerfen
+  const go = (d: string) => {
+    if (d === day || d > today) return;
+    if (dirty && !window.confirm("Deine Änderungen für diesen Tag sind noch nicht gespeichert. Trotzdem wechseln?")) return;
+    setDay(d);
+  };
 
   const save = async () => {
     const sb = supabase();
@@ -56,20 +77,21 @@ export default function TagebuchView() {
     const clean = Object.fromEntries(Object.entries(symptoms).filter(([, v]) => v > 0));
     const { error: e } = await sb
       .from("diary_entries")
-      .upsert({ day: today, bleeding, symptoms: clean, influences, updated_at: new Date().toISOString() }, { onConflict: "user_id,day" });
+      .upsert({ day, bleeding, symptoms: clean, influences, updated_at: new Date().toISOString() }, { onConflict: "user_id,day" });
     if (e) {
       setError("Eintrag konnte nicht gespeichert werden: " + e.message);
       return;
     }
     setError("");
     setSaved(true);
+    setDirty(false);
     load();
   };
 
   const byDay = new Map(history.map((h) => [h.day, h]));
   const days = Array.from({ length: DAYS }, (_, i) => isoDay(daysAgo(DAYS - 1 - i)));
-  const cellColor = (rowKey: string, day: string) => {
-    const e = day === today ? { day, bleeding, symptoms, influences } : byDay.get(day);
+  const cellColor = (rowKey: string, d: string) => {
+    const e = d === day ? { day: d, bleeding, symptoms, influences } : byDay.get(d);
     if (!e) return "var(--line-soft)";
     if (rowKey === "blut") return e.bleeding > 0 ? "var(--menses-fg)" : "var(--line-soft)";
     return heat[e.symptoms?.[rowKey] ?? 0];
@@ -77,8 +99,17 @@ export default function TagebuchView() {
 
   return (
     <>
-      <PageHead title="Tagebuch" sub={"Eintrag für " + longDate()} />
+      <PageHead title="Tagebuch" sub={(day === today ? "Eintrag für " : "Nachtrag für ") + longDate(new Date(day + "T12:00:00"))} />
       {error && <p className="alert" role="alert">{error}</p>}
+
+      <div className="day-nav">
+        <button type="button" className="btn btn-soft btn-44" aria-label="Vorheriger Tag" onClick={() => go(shift(day, -1))}>‹</button>
+        <input type="date" className="input" aria-label="Tag wählen" max={today} value={day} onChange={(e) => e.target.value && go(e.target.value)} />
+        <button type="button" className="btn btn-soft btn-44" aria-label="Nächster Tag" disabled={day >= today} onClick={() => go(shift(day, 1))}>›</button>
+      </div>
+      {day !== today && (
+        <button type="button" className="btn btn-link btn-44" onClick={() => go(today)}>Zurück zu heute</button>
+      )}
 
       <section className="card">
         <h2>Blutung</h2>
@@ -133,6 +164,14 @@ export default function TagebuchView() {
         </div>
       </section>
 
+      <button type="button" className="btn btn-primary" onClick={save} disabled={saved}>
+        {saved ? "Gespeichert" : day === today ? "Eintrag speichern" : "Nachtrag speichern"}
+      </button>
+
+      <DayIntakes key={"i" + day} day={day} />
+
+      {feat.perimenopause && <FlashCounter key={"f" + day} day={day} />}
+
       <section className="card">
         <div className="card-row">
           <h2>Verlauf, 4 Wochen</h2>
@@ -143,7 +182,7 @@ export default function TagebuchView() {
             <span className="grid-label">{r.label}</span>
             <div className="grid-28" aria-label={r.label + " der letzten 4 Wochen"}>
               {days.map((d) => (
-                <span key={d} className="grid-cell" style={{ background: cellColor(r.key, d) }} />
+                <span key={d} className="grid-cell" data-selected={d === day} style={{ background: cellColor(r.key, d) }} />
               ))}
             </div>
           </div>
@@ -157,9 +196,7 @@ export default function TagebuchView() {
         {history.length === 0 && <p>Sobald du Einträge machst, füllt sich das Raster.</p>}
       </section>
 
-      <button type="button" className="btn btn-primary" onClick={save} disabled={saved}>
-        {saved ? "Gespeichert" : "Eintrag speichern"}
-      </button>
+      {feat.zyklus && <PeriodBackfill onChanged={load} />}
     </>
   );
 }
