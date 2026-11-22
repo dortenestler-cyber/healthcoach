@@ -1,4 +1,688 @@
 <settings>
+    <setting propertyKey="@Properties.s_a1" title="@Strings.N_s_a1">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.T0</listEntry>
+            <listEntry value="1">@Strings.T1</listEntry>
+            <listEntry value="2">@Strings.T2</listEntry>
+            <listEntry value="3">@Strings.T3</listEntry>
+            <listEntry value="4">@Strings.T4</listEntry>
+            <listEntry value="5">@Strings.T5</listEntry>
+            <listEntry value="6">@Strings.T6</listEntry>
+            <listEntry value="7">@Strings.T7</listEntry>
+            <listEntry value="8">@Strings.T8</listEntry>
+            <listEntry value="9">@Strings.T9</listEntry>
+            <listEntry value="10">@Strings.T10</listEntry>
+            <listEntry value="11">@Strings.T11</listEntry>
+            <listEntry value="12">@Strings.T12</listEntry>
+            <listEntry value="13">@Strings.T13</listEntry>
+            <listEntry value="14">@Strings.T14</listEntry>
+            <listEntry value="15">@Strings.T15</listEntry>
+            <listEntry value="16">@Strings.T16</listEntry>
+            <listEntry value="17">@Strings.T17</listEntry>
+            <listEntry value="18">@Strings.T18</listEntry>
+            <listEntry value="19">@Strings.T19</listEntry>
+            <listEntry value="20">@Strings.T20</listEntry>
+            <listEntry value="21">@Strings.T21</listEntry>
+            <listEntry value="22">@Strings.T22</listEntry>
+            <listEntry value="23">@Strings.T23</listEntry>
+            <listEntry value="24">@Strings.T24</listEntry>
+            <listEntry value="25">@Strings.T25</listEntry>
+            <listEntry value="26">@Strings.T26</listEntry>
+            <listEntry value="27">@Strings.T27</listEntry>
+            <listEntry value="28">@Strings.T28</listEntry>
+            <listEntry value="29">@Strings.T29</listEntry>
+            <listEntry value="30">@Strings.T30</listEntry>
+            <listEntry value="31">@Strings.T31</listEntry>
+            <listEntry value="32">@Strings.T32</listEntry>
+            <listEntry value="33">@Strings.T33</listEntry>
+            <listEntry value="34">@Strings.T34</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.s_a2" title="@Strings.N_s_a2">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.T0</listEntry>
+            <listEntry value="1">@Strings.T1</listEntry>
+            <listEntry value="2">@Strings.T2</listEntry>
+            <listEntry value="3">@Strings.T3</listEntry>
+            <listEntry value="4">@Strings.T4</listEntry>
+            <listEntry value="5">@Strings.T5</listEntry>
+            <listEntry value="6">@Strings.T6</listEntry>
+            <listEntry value="7">@Strings.T7</listEntry>
+            <listEntry value="8">@Strings.T8</listEntry>
+            <listEntry value="9">@Strings.T9</listEntry>
+            <listEntry value="10">@Strings.T10</listEntry>
+            <listEntry value="11">@Strings.T11</listEntry>
+            <listEntry value="12">@Strings.T12</listEntry>
+            <listEntry value="13">@Strings.T13</listEntry>
+            <listEntry value="14">@Strings.T14</listEntry>
+            <listEntry value="15">@Strings.T15</listEntry>
+            <listEntry value="16">@Strings.T16</listEntry>
+            <listEntry value="17">@Strings.T17</listEntry>
+            <listEntry value="18">@Strings.T18</listEntry>
+            <listEntry value="19">@Strings.T19</listEntry>
+            <listEntry value="20">@Strings.T20</listEntry>
+            <listEntry value="21">@Strings.T21</listEntry>
+            <listEntry value="22">@Strings.T22</listEntry>
+            <listEntry value="23">@Strings.T23</listEntry>
+            <listEntry value="24">@Strings.T24</listEntry>
+            <listEntry value="25">@Strings.T25</listEntry>
+            <listEntry value="26">@Strings.T26</listEntry>
+            <listEntry value="27">@Strings.T27</listEntry>
+            <listEntry value="28">@Strings.T28</listEntry>
+            <listEntry value="29">@Strings.T29</listEntry>
+            <listEntry value="30">@Strings.T30</listEntry>
+            <listEntry value="31">@Strings.T31</listEntry>
+            <listEntry value="32">@Strings.T32</listEntry>
+            <listEntry value="33">@Strings.T33</listEntry>
+            <listEntry value="34">@Strings.T34</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.s_b1" title="@Strings.N_s_b1">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.T0</listEntry>
+            <listEntry value="1">@Strings.T1</listEntry>
+            <listEntry value="2">@Strings.T2</listEntry>
+            <listEntry value="3">@Strings.T3</listEntry>
+            <listEntry value="4">@Strings.T4</listEntry>
+            <listEntry value="5">@Strings.T5</listEntry>
+            <listEntry value="6">@Strings.T6</listEntry>
+            <listEntry value="7">@Strings.T7</listEntry>
+            <listEntry value="8">@Strings.T8</listEntry>
+            <listEntry value="9">@Strings.T9</listEntry>
+            <listEntry value="10">@Strings.T10</listEntry>
+            <listEntry value="11">@Strings.T11</listEntry>
+            <listEntry value="12">@Strings.T12</listEntry>
+            <listEntry value="13">@Strings.T13</listEntry>
+            <listEntry value="14">@Strings.T14</listEntry>
+            <listEntry value="15">@Strings.T15</listEntry>
+            <listEntry value="16">@Strings.T16</listEntry>
+            <listEntry value="17">@Strings.T17</listEntry>
+            <listEntry value="18">@Strings.T18</listEntry>
+            <listEntry value="19">@Strings.T19</listEntry>
+            <listEntry value="20">@Strings.T20</listEntry>
+            <listEntry value="21">@Strings.T21</listEntry>
+            <listEntry value="22">@Strings.T22</listEntry>
+            <listEntry value="23">@Strings.T23</listEntry>
+            <listEntry value="24">@Strings.T24</listEntry>
+            <listEntry value="25">@Strings.T25</listEntry>
+            <listEntry value="26">@Strings.T26</listEntry>
+            <listEntry value="27">@Strings.T27</listEntry>
+            <listEntry value="28">@Strings.T28</listEntry>
+            <listEntry value="29">@Strings.T29</listEntry>
+            <listEntry value="30">@Strings.T30</listEntry>
+            <listEntry value="31">@Strings.T31</listEntry>
+            <listEntry value="32">@Strings.T32</listEntry>
+            <listEntry value="33">@Strings.T33</listEntry>
+            <listEntry value="34">@Strings.T34</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.s_b2" title="@Strings.N_s_b2">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.T0</listEntry>
+            <listEntry value="1">@Strings.T1</listEntry>
+            <listEntry value="2">@Strings.T2</listEntry>
+            <listEntry value="3">@Strings.T3</listEntry>
+            <listEntry value="4">@Strings.T4</listEntry>
+            <listEntry value="5">@Strings.T5</listEntry>
+            <listEntry value="6">@Strings.T6</listEntry>
+            <listEntry value="7">@Strings.T7</listEntry>
+            <listEntry value="8">@Strings.T8</listEntry>
+            <listEntry value="9">@Strings.T9</listEntry>
+            <listEntry value="10">@Strings.T10</listEntry>
+            <listEntry value="11">@Strings.T11</listEntry>
+            <listEntry value="12">@Strings.T12</listEntry>
+            <listEntry value="13">@Strings.T13</listEntry>
+            <listEntry value="14">@Strings.T14</listEntry>
+            <listEntry value="15">@Strings.T15</listEntry>
+            <listEntry value="16">@Strings.T16</listEntry>
+            <listEntry value="17">@Strings.T17</listEntry>
+            <listEntry value="18">@Strings.T18</listEntry>
+            <listEntry value="19">@Strings.T19</listEntry>
+            <listEntry value="20">@Strings.T20</listEntry>
+            <listEntry value="21">@Strings.T21</listEntry>
+            <listEntry value="22">@Strings.T22</listEntry>
+            <listEntry value="23">@Strings.T23</listEntry>
+            <listEntry value="24">@Strings.T24</listEntry>
+            <listEntry value="25">@Strings.T25</listEntry>
+            <listEntry value="26">@Strings.T26</listEntry>
+            <listEntry value="27">@Strings.T27</listEntry>
+            <listEntry value="28">@Strings.T28</listEntry>
+            <listEntry value="29">@Strings.T29</listEntry>
+            <listEntry value="30">@Strings.T30</listEntry>
+            <listEntry value="31">@Strings.T31</listEntry>
+            <listEntry value="32">@Strings.T32</listEntry>
+            <listEntry value="33">@Strings.T33</listEntry>
+            <listEntry value="34">@Strings.T34</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.s_b3" title="@Strings.N_s_b3">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.T0</listEntry>
+            <listEntry value="1">@Strings.T1</listEntry>
+            <listEntry value="2">@Strings.T2</listEntry>
+            <listEntry value="3">@Strings.T3</listEntry>
+            <listEntry value="4">@Strings.T4</listEntry>
+            <listEntry value="5">@Strings.T5</listEntry>
+            <listEntry value="6">@Strings.T6</listEntry>
+            <listEntry value="7">@Strings.T7</listEntry>
+            <listEntry value="8">@Strings.T8</listEntry>
+            <listEntry value="9">@Strings.T9</listEntry>
+            <listEntry value="10">@Strings.T10</listEntry>
+            <listEntry value="11">@Strings.T11</listEntry>
+            <listEntry value="12">@Strings.T12</listEntry>
+            <listEntry value="13">@Strings.T13</listEntry>
+            <listEntry value="14">@Strings.T14</listEntry>
+            <listEntry value="15">@Strings.T15</listEntry>
+            <listEntry value="16">@Strings.T16</listEntry>
+            <listEntry value="17">@Strings.T17</listEntry>
+            <listEntry value="18">@Strings.T18</listEntry>
+            <listEntry value="19">@Strings.T19</listEntry>
+            <listEntry value="20">@Strings.T20</listEntry>
+            <listEntry value="21">@Strings.T21</listEntry>
+            <listEntry value="22">@Strings.T22</listEntry>
+            <listEntry value="23">@Strings.T23</listEntry>
+            <listEntry value="24">@Strings.T24</listEntry>
+            <listEntry value="25">@Strings.T25</listEntry>
+            <listEntry value="26">@Strings.T26</listEntry>
+            <listEntry value="27">@Strings.T27</listEntry>
+            <listEntry value="28">@Strings.T28</listEntry>
+            <listEntry value="29">@Strings.T29</listEntry>
+            <listEntry value="30">@Strings.T30</listEntry>
+            <listEntry value="31">@Strings.T31</listEntry>
+            <listEntry value="32">@Strings.T32</listEntry>
+            <listEntry value="33">@Strings.T33</listEntry>
+            <listEntry value="34">@Strings.T34</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.s_b4" title="@Strings.N_s_b4">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.T0</listEntry>
+            <listEntry value="1">@Strings.T1</listEntry>
+            <listEntry value="2">@Strings.T2</listEntry>
+            <listEntry value="3">@Strings.T3</listEntry>
+            <listEntry value="4">@Strings.T4</listEntry>
+            <listEntry value="5">@Strings.T5</listEntry>
+            <listEntry value="6">@Strings.T6</listEntry>
+            <listEntry value="7">@Strings.T7</listEntry>
+            <listEntry value="8">@Strings.T8</listEntry>
+            <listEntry value="9">@Strings.T9</listEntry>
+            <listEntry value="10">@Strings.T10</listEntry>
+            <listEntry value="11">@Strings.T11</listEntry>
+            <listEntry value="12">@Strings.T12</listEntry>
+            <listEntry value="13">@Strings.T13</listEntry>
+            <listEntry value="14">@Strings.T14</listEntry>
+            <listEntry value="15">@Strings.T15</listEntry>
+            <listEntry value="16">@Strings.T16</listEntry>
+            <listEntry value="17">@Strings.T17</listEntry>
+            <listEntry value="18">@Strings.T18</listEntry>
+            <listEntry value="19">@Strings.T19</listEntry>
+            <listEntry value="20">@Strings.T20</listEntry>
+            <listEntry value="21">@Strings.T21</listEntry>
+            <listEntry value="22">@Strings.T22</listEntry>
+            <listEntry value="23">@Strings.T23</listEntry>
+            <listEntry value="24">@Strings.T24</listEntry>
+            <listEntry value="25">@Strings.T25</listEntry>
+            <listEntry value="26">@Strings.T26</listEntry>
+            <listEntry value="27">@Strings.T27</listEntry>
+            <listEntry value="28">@Strings.T28</listEntry>
+            <listEntry value="29">@Strings.T29</listEntry>
+            <listEntry value="30">@Strings.T30</listEntry>
+            <listEntry value="31">@Strings.T31</listEntry>
+            <listEntry value="32">@Strings.T32</listEntry>
+            <listEntry value="33">@Strings.T33</listEntry>
+            <listEntry value="34">@Strings.T34</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.s_c1" title="@Strings.N_s_c1">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.T0</listEntry>
+            <listEntry value="1">@Strings.T1</listEntry>
+            <listEntry value="2">@Strings.T2</listEntry>
+            <listEntry value="3">@Strings.T3</listEntry>
+            <listEntry value="4">@Strings.T4</listEntry>
+            <listEntry value="5">@Strings.T5</listEntry>
+            <listEntry value="6">@Strings.T6</listEntry>
+            <listEntry value="7">@Strings.T7</listEntry>
+            <listEntry value="8">@Strings.T8</listEntry>
+            <listEntry value="9">@Strings.T9</listEntry>
+            <listEntry value="10">@Strings.T10</listEntry>
+            <listEntry value="11">@Strings.T11</listEntry>
+            <listEntry value="12">@Strings.T12</listEntry>
+            <listEntry value="13">@Strings.T13</listEntry>
+            <listEntry value="14">@Strings.T14</listEntry>
+            <listEntry value="15">@Strings.T15</listEntry>
+            <listEntry value="16">@Strings.T16</listEntry>
+            <listEntry value="17">@Strings.T17</listEntry>
+            <listEntry value="18">@Strings.T18</listEntry>
+            <listEntry value="19">@Strings.T19</listEntry>
+            <listEntry value="20">@Strings.T20</listEntry>
+            <listEntry value="21">@Strings.T21</listEntry>
+            <listEntry value="22">@Strings.T22</listEntry>
+            <listEntry value="23">@Strings.T23</listEntry>
+            <listEntry value="24">@Strings.T24</listEntry>
+            <listEntry value="25">@Strings.T25</listEntry>
+            <listEntry value="26">@Strings.T26</listEntry>
+            <listEntry value="27">@Strings.T27</listEntry>
+            <listEntry value="28">@Strings.T28</listEntry>
+            <listEntry value="29">@Strings.T29</listEntry>
+            <listEntry value="30">@Strings.T30</listEntry>
+            <listEntry value="31">@Strings.T31</listEntry>
+            <listEntry value="32">@Strings.T32</listEntry>
+            <listEntry value="33">@Strings.T33</listEntry>
+            <listEntry value="34">@Strings.T34</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.s_c2" title="@Strings.N_s_c2">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.T0</listEntry>
+            <listEntry value="1">@Strings.T1</listEntry>
+            <listEntry value="2">@Strings.T2</listEntry>
+            <listEntry value="3">@Strings.T3</listEntry>
+            <listEntry value="4">@Strings.T4</listEntry>
+            <listEntry value="5">@Strings.T5</listEntry>
+            <listEntry value="6">@Strings.T6</listEntry>
+            <listEntry value="7">@Strings.T7</listEntry>
+            <listEntry value="8">@Strings.T8</listEntry>
+            <listEntry value="9">@Strings.T9</listEntry>
+            <listEntry value="10">@Strings.T10</listEntry>
+            <listEntry value="11">@Strings.T11</listEntry>
+            <listEntry value="12">@Strings.T12</listEntry>
+            <listEntry value="13">@Strings.T13</listEntry>
+            <listEntry value="14">@Strings.T14</listEntry>
+            <listEntry value="15">@Strings.T15</listEntry>
+            <listEntry value="16">@Strings.T16</listEntry>
+            <listEntry value="17">@Strings.T17</listEntry>
+            <listEntry value="18">@Strings.T18</listEntry>
+            <listEntry value="19">@Strings.T19</listEntry>
+            <listEntry value="20">@Strings.T20</listEntry>
+            <listEntry value="21">@Strings.T21</listEntry>
+            <listEntry value="22">@Strings.T22</listEntry>
+            <listEntry value="23">@Strings.T23</listEntry>
+            <listEntry value="24">@Strings.T24</listEntry>
+            <listEntry value="25">@Strings.T25</listEntry>
+            <listEntry value="26">@Strings.T26</listEntry>
+            <listEntry value="27">@Strings.T27</listEntry>
+            <listEntry value="28">@Strings.T28</listEntry>
+            <listEntry value="29">@Strings.T29</listEntry>
+            <listEntry value="30">@Strings.T30</listEntry>
+            <listEntry value="31">@Strings.T31</listEntry>
+            <listEntry value="32">@Strings.T32</listEntry>
+            <listEntry value="33">@Strings.T33</listEntry>
+            <listEntry value="34">@Strings.T34</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.s_c3" title="@Strings.N_s_c3">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.T0</listEntry>
+            <listEntry value="1">@Strings.T1</listEntry>
+            <listEntry value="2">@Strings.T2</listEntry>
+            <listEntry value="3">@Strings.T3</listEntry>
+            <listEntry value="4">@Strings.T4</listEntry>
+            <listEntry value="5">@Strings.T5</listEntry>
+            <listEntry value="6">@Strings.T6</listEntry>
+            <listEntry value="7">@Strings.T7</listEntry>
+            <listEntry value="8">@Strings.T8</listEntry>
+            <listEntry value="9">@Strings.T9</listEntry>
+            <listEntry value="10">@Strings.T10</listEntry>
+            <listEntry value="11">@Strings.T11</listEntry>
+            <listEntry value="12">@Strings.T12</listEntry>
+            <listEntry value="13">@Strings.T13</listEntry>
+            <listEntry value="14">@Strings.T14</listEntry>
+            <listEntry value="15">@Strings.T15</listEntry>
+            <listEntry value="16">@Strings.T16</listEntry>
+            <listEntry value="17">@Strings.T17</listEntry>
+            <listEntry value="18">@Strings.T18</listEntry>
+            <listEntry value="19">@Strings.T19</listEntry>
+            <listEntry value="20">@Strings.T20</listEntry>
+            <listEntry value="21">@Strings.T21</listEntry>
+            <listEntry value="22">@Strings.T22</listEntry>
+            <listEntry value="23">@Strings.T23</listEntry>
+            <listEntry value="24">@Strings.T24</listEntry>
+            <listEntry value="25">@Strings.T25</listEntry>
+            <listEntry value="26">@Strings.T26</listEntry>
+            <listEntry value="27">@Strings.T27</listEntry>
+            <listEntry value="28">@Strings.T28</listEntry>
+            <listEntry value="29">@Strings.T29</listEntry>
+            <listEntry value="30">@Strings.T30</listEntry>
+            <listEntry value="31">@Strings.T31</listEntry>
+            <listEntry value="32">@Strings.T32</listEntry>
+            <listEntry value="33">@Strings.T33</listEntry>
+            <listEntry value="34">@Strings.T34</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.s_c4" title="@Strings.N_s_c4">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.T0</listEntry>
+            <listEntry value="1">@Strings.T1</listEntry>
+            <listEntry value="2">@Strings.T2</listEntry>
+            <listEntry value="3">@Strings.T3</listEntry>
+            <listEntry value="4">@Strings.T4</listEntry>
+            <listEntry value="5">@Strings.T5</listEntry>
+            <listEntry value="6">@Strings.T6</listEntry>
+            <listEntry value="7">@Strings.T7</listEntry>
+            <listEntry value="8">@Strings.T8</listEntry>
+            <listEntry value="9">@Strings.T9</listEntry>
+            <listEntry value="10">@Strings.T10</listEntry>
+            <listEntry value="11">@Strings.T11</listEntry>
+            <listEntry value="12">@Strings.T12</listEntry>
+            <listEntry value="13">@Strings.T13</listEntry>
+            <listEntry value="14">@Strings.T14</listEntry>
+            <listEntry value="15">@Strings.T15</listEntry>
+            <listEntry value="16">@Strings.T16</listEntry>
+            <listEntry value="17">@Strings.T17</listEntry>
+            <listEntry value="18">@Strings.T18</listEntry>
+            <listEntry value="19">@Strings.T19</listEntry>
+            <listEntry value="20">@Strings.T20</listEntry>
+            <listEntry value="21">@Strings.T21</listEntry>
+            <listEntry value="22">@Strings.T22</listEntry>
+            <listEntry value="23">@Strings.T23</listEntry>
+            <listEntry value="24">@Strings.T24</listEntry>
+            <listEntry value="25">@Strings.T25</listEntry>
+            <listEntry value="26">@Strings.T26</listEntry>
+            <listEntry value="27">@Strings.T27</listEntry>
+            <listEntry value="28">@Strings.T28</listEntry>
+            <listEntry value="29">@Strings.T29</listEntry>
+            <listEntry value="30">@Strings.T30</listEntry>
+            <listEntry value="31">@Strings.T31</listEntry>
+            <listEntry value="32">@Strings.T32</listEntry>
+            <listEntry value="33">@Strings.T33</listEntry>
+            <listEntry value="34">@Strings.T34</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.s_d1" title="@Strings.N_s_d1">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.T0</listEntry>
+            <listEntry value="1">@Strings.T1</listEntry>
+            <listEntry value="2">@Strings.T2</listEntry>
+            <listEntry value="3">@Strings.T3</listEntry>
+            <listEntry value="4">@Strings.T4</listEntry>
+            <listEntry value="5">@Strings.T5</listEntry>
+            <listEntry value="6">@Strings.T6</listEntry>
+            <listEntry value="7">@Strings.T7</listEntry>
+            <listEntry value="8">@Strings.T8</listEntry>
+            <listEntry value="9">@Strings.T9</listEntry>
+            <listEntry value="10">@Strings.T10</listEntry>
+            <listEntry value="11">@Strings.T11</listEntry>
+            <listEntry value="12">@Strings.T12</listEntry>
+            <listEntry value="13">@Strings.T13</listEntry>
+            <listEntry value="14">@Strings.T14</listEntry>
+            <listEntry value="15">@Strings.T15</listEntry>
+            <listEntry value="16">@Strings.T16</listEntry>
+            <listEntry value="17">@Strings.T17</listEntry>
+            <listEntry value="18">@Strings.T18</listEntry>
+            <listEntry value="19">@Strings.T19</listEntry>
+            <listEntry value="20">@Strings.T20</listEntry>
+            <listEntry value="21">@Strings.T21</listEntry>
+            <listEntry value="22">@Strings.T22</listEntry>
+            <listEntry value="23">@Strings.T23</listEntry>
+            <listEntry value="24">@Strings.T24</listEntry>
+            <listEntry value="25">@Strings.T25</listEntry>
+            <listEntry value="26">@Strings.T26</listEntry>
+            <listEntry value="27">@Strings.T27</listEntry>
+            <listEntry value="28">@Strings.T28</listEntry>
+            <listEntry value="29">@Strings.T29</listEntry>
+            <listEntry value="30">@Strings.T30</listEntry>
+            <listEntry value="31">@Strings.T31</listEntry>
+            <listEntry value="32">@Strings.T32</listEntry>
+            <listEntry value="33">@Strings.T33</listEntry>
+            <listEntry value="34">@Strings.T34</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.s_d2" title="@Strings.N_s_d2">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.T0</listEntry>
+            <listEntry value="1">@Strings.T1</listEntry>
+            <listEntry value="2">@Strings.T2</listEntry>
+            <listEntry value="3">@Strings.T3</listEntry>
+            <listEntry value="4">@Strings.T4</listEntry>
+            <listEntry value="5">@Strings.T5</listEntry>
+            <listEntry value="6">@Strings.T6</listEntry>
+            <listEntry value="7">@Strings.T7</listEntry>
+            <listEntry value="8">@Strings.T8</listEntry>
+            <listEntry value="9">@Strings.T9</listEntry>
+            <listEntry value="10">@Strings.T10</listEntry>
+            <listEntry value="11">@Strings.T11</listEntry>
+            <listEntry value="12">@Strings.T12</listEntry>
+            <listEntry value="13">@Strings.T13</listEntry>
+            <listEntry value="14">@Strings.T14</listEntry>
+            <listEntry value="15">@Strings.T15</listEntry>
+            <listEntry value="16">@Strings.T16</listEntry>
+            <listEntry value="17">@Strings.T17</listEntry>
+            <listEntry value="18">@Strings.T18</listEntry>
+            <listEntry value="19">@Strings.T19</listEntry>
+            <listEntry value="20">@Strings.T20</listEntry>
+            <listEntry value="21">@Strings.T21</listEntry>
+            <listEntry value="22">@Strings.T22</listEntry>
+            <listEntry value="23">@Strings.T23</listEntry>
+            <listEntry value="24">@Strings.T24</listEntry>
+            <listEntry value="25">@Strings.T25</listEntry>
+            <listEntry value="26">@Strings.T26</listEntry>
+            <listEntry value="27">@Strings.T27</listEntry>
+            <listEntry value="28">@Strings.T28</listEntry>
+            <listEntry value="29">@Strings.T29</listEntry>
+            <listEntry value="30">@Strings.T30</listEntry>
+            <listEntry value="31">@Strings.T31</listEntry>
+            <listEntry value="32">@Strings.T32</listEntry>
+            <listEntry value="33">@Strings.T33</listEntry>
+            <listEntry value="34">@Strings.T34</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.s_e1" title="@Strings.N_s_e1">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.T0</listEntry>
+            <listEntry value="1">@Strings.T1</listEntry>
+            <listEntry value="2">@Strings.T2</listEntry>
+            <listEntry value="3">@Strings.T3</listEntry>
+            <listEntry value="4">@Strings.T4</listEntry>
+            <listEntry value="5">@Strings.T5</listEntry>
+            <listEntry value="6">@Strings.T6</listEntry>
+            <listEntry value="7">@Strings.T7</listEntry>
+            <listEntry value="8">@Strings.T8</listEntry>
+            <listEntry value="9">@Strings.T9</listEntry>
+            <listEntry value="10">@Strings.T10</listEntry>
+            <listEntry value="11">@Strings.T11</listEntry>
+            <listEntry value="12">@Strings.T12</listEntry>
+            <listEntry value="13">@Strings.T13</listEntry>
+            <listEntry value="14">@Strings.T14</listEntry>
+            <listEntry value="15">@Strings.T15</listEntry>
+            <listEntry value="16">@Strings.T16</listEntry>
+            <listEntry value="17">@Strings.T17</listEntry>
+            <listEntry value="18">@Strings.T18</listEntry>
+            <listEntry value="19">@Strings.T19</listEntry>
+            <listEntry value="20">@Strings.T20</listEntry>
+            <listEntry value="21">@Strings.T21</listEntry>
+            <listEntry value="22">@Strings.T22</listEntry>
+            <listEntry value="23">@Strings.T23</listEntry>
+            <listEntry value="24">@Strings.T24</listEntry>
+            <listEntry value="25">@Strings.T25</listEntry>
+            <listEntry value="26">@Strings.T26</listEntry>
+            <listEntry value="27">@Strings.T27</listEntry>
+            <listEntry value="28">@Strings.T28</listEntry>
+            <listEntry value="29">@Strings.T29</listEntry>
+            <listEntry value="30">@Strings.T30</listEntry>
+            <listEntry value="31">@Strings.T31</listEntry>
+            <listEntry value="32">@Strings.T32</listEntry>
+            <listEntry value="33">@Strings.T33</listEntry>
+            <listEntry value="34">@Strings.T34</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.s_e2" title="@Strings.N_s_e2">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.T0</listEntry>
+            <listEntry value="1">@Strings.T1</listEntry>
+            <listEntry value="2">@Strings.T2</listEntry>
+            <listEntry value="3">@Strings.T3</listEntry>
+            <listEntry value="4">@Strings.T4</listEntry>
+            <listEntry value="5">@Strings.T5</listEntry>
+            <listEntry value="6">@Strings.T6</listEntry>
+            <listEntry value="7">@Strings.T7</listEntry>
+            <listEntry value="8">@Strings.T8</listEntry>
+            <listEntry value="9">@Strings.T9</listEntry>
+            <listEntry value="10">@Strings.T10</listEntry>
+            <listEntry value="11">@Strings.T11</listEntry>
+            <listEntry value="12">@Strings.T12</listEntry>
+            <listEntry value="13">@Strings.T13</listEntry>
+            <listEntry value="14">@Strings.T14</listEntry>
+            <listEntry value="15">@Strings.T15</listEntry>
+            <listEntry value="16">@Strings.T16</listEntry>
+            <listEntry value="17">@Strings.T17</listEntry>
+            <listEntry value="18">@Strings.T18</listEntry>
+            <listEntry value="19">@Strings.T19</listEntry>
+            <listEntry value="20">@Strings.T20</listEntry>
+            <listEntry value="21">@Strings.T21</listEntry>
+            <listEntry value="22">@Strings.T22</listEntry>
+            <listEntry value="23">@Strings.T23</listEntry>
+            <listEntry value="24">@Strings.T24</listEntry>
+            <listEntry value="25">@Strings.T25</listEntry>
+            <listEntry value="26">@Strings.T26</listEntry>
+            <listEntry value="27">@Strings.T27</listEntry>
+            <listEntry value="28">@Strings.T28</listEntry>
+            <listEntry value="29">@Strings.T29</listEntry>
+            <listEntry value="30">@Strings.T30</listEntry>
+            <listEntry value="31">@Strings.T31</listEntry>
+            <listEntry value="32">@Strings.T32</listEntry>
+            <listEntry value="33">@Strings.T33</listEntry>
+            <listEntry value="34">@Strings.T34</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.g_l" title="@Strings.N_g_l">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.G0</listEntry>
+            <listEntry value="1">@Strings.G1</listEntry>
+            <listEntry value="2">@Strings.G2</listEntry>
+            <listEntry value="3">@Strings.G3</listEntry>
+            <listEntry value="4">@Strings.G4</listEntry>
+            <listEntry value="5">@Strings.G5</listEntry>
+            <listEntry value="6">@Strings.G6</listEntry>
+            <listEntry value="7">@Strings.G7</listEntry>
+            <listEntry value="8">@Strings.G8</listEntry>
+            <listEntry value="9">@Strings.G9</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.g_r" title="@Strings.N_g_r">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.G0</listEntry>
+            <listEntry value="1">@Strings.G1</listEntry>
+            <listEntry value="2">@Strings.G2</listEntry>
+            <listEntry value="3">@Strings.G3</listEntry>
+            <listEntry value="4">@Strings.G4</listEntry>
+            <listEntry value="5">@Strings.G5</listEntry>
+            <listEntry value="6">@Strings.G6</listEntry>
+            <listEntry value="7">@Strings.G7</listEntry>
+            <listEntry value="8">@Strings.G8</listEntry>
+            <listEntry value="9">@Strings.G9</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.c_date" title="@Strings.N_c_date">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.C0</listEntry>
+            <listEntry value="1">@Strings.C1</listEntry>
+            <listEntry value="2">@Strings.C2</listEntry>
+            <listEntry value="3">@Strings.C3</listEntry>
+            <listEntry value="4">@Strings.C4</listEntry>
+            <listEntry value="5">@Strings.C5</listEntry>
+            <listEntry value="6">@Strings.C6</listEntry>
+            <listEntry value="7">@Strings.C7</listEntry>
+            <listEntry value="8">@Strings.C8</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.c_top" title="@Strings.N_c_top">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.C0</listEntry>
+            <listEntry value="1">@Strings.C1</listEntry>
+            <listEntry value="2">@Strings.C2</listEntry>
+            <listEntry value="3">@Strings.C3</listEntry>
+            <listEntry value="4">@Strings.C4</listEntry>
+            <listEntry value="5">@Strings.C5</listEntry>
+            <listEntry value="6">@Strings.C6</listEntry>
+            <listEntry value="7">@Strings.C7</listEntry>
+            <listEntry value="8">@Strings.C8</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.c_wx" title="@Strings.N_c_wx">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.C0</listEntry>
+            <listEntry value="1">@Strings.C1</listEntry>
+            <listEntry value="2">@Strings.C2</listEntry>
+            <listEntry value="3">@Strings.C3</listEntry>
+            <listEntry value="4">@Strings.C4</listEntry>
+            <listEntry value="5">@Strings.C5</listEntry>
+            <listEntry value="6">@Strings.C6</listEntry>
+            <listEntry value="7">@Strings.C7</listEntry>
+            <listEntry value="8">@Strings.C8</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.c_time" title="@Strings.N_c_time">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.C0</listEntry>
+            <listEntry value="1">@Strings.C1</listEntry>
+            <listEntry value="2">@Strings.C2</listEntry>
+            <listEntry value="3">@Strings.C3</listEntry>
+            <listEntry value="4">@Strings.C4</listEntry>
+            <listEntry value="5">@Strings.C5</listEntry>
+            <listEntry value="6">@Strings.C6</listEntry>
+            <listEntry value="7">@Strings.C7</listEntry>
+            <listEntry value="8">@Strings.C8</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.c_mid" title="@Strings.N_c_mid">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.C0</listEntry>
+            <listEntry value="1">@Strings.C1</listEntry>
+            <listEntry value="2">@Strings.C2</listEntry>
+            <listEntry value="3">@Strings.C3</listEntry>
+            <listEntry value="4">@Strings.C4</listEntry>
+            <listEntry value="5">@Strings.C5</listEntry>
+            <listEntry value="6">@Strings.C6</listEntry>
+            <listEntry value="7">@Strings.C7</listEntry>
+            <listEntry value="8">@Strings.C8</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.c_low" title="@Strings.N_c_low">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.C0</listEntry>
+            <listEntry value="1">@Strings.C1</listEntry>
+            <listEntry value="2">@Strings.C2</listEntry>
+            <listEntry value="3">@Strings.C3</listEntry>
+            <listEntry value="4">@Strings.C4</listEntry>
+            <listEntry value="5">@Strings.C5</listEntry>
+            <listEntry value="6">@Strings.C6</listEntry>
+            <listEntry value="7">@Strings.C7</listEntry>
+            <listEntry value="8">@Strings.C8</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.c_bot" title="@Strings.N_c_bot">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.C0</listEntry>
+            <listEntry value="1">@Strings.C1</listEntry>
+            <listEntry value="2">@Strings.C2</listEntry>
+            <listEntry value="3">@Strings.C3</listEntry>
+            <listEntry value="4">@Strings.C4</listEntry>
+            <listEntry value="5">@Strings.C5</listEntry>
+            <listEntry value="6">@Strings.C6</listEntry>
+            <listEntry value="7">@Strings.C7</listEntry>
+            <listEntry value="8">@Strings.C8</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.c_bars" title="@Strings.N_c_bars">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.C0</listEntry>
+            <listEntry value="1">@Strings.C1</listEntry>
+            <listEntry value="2">@Strings.C2</listEntry>
+            <listEntry value="3">@Strings.C3</listEntry>
+            <listEntry value="4">@Strings.C4</listEntry>
+            <listEntry value="5">@Strings.C5</listEntry>
+            <listEntry value="6">@Strings.C6</listEntry>
+            <listEntry value="7">@Strings.C7</listEntry>
+            <listEntry value="8">@Strings.C8</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.c_lines" title="@Strings.N_c_lines">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.L0</listEntry>
+            <listEntry value="1">@Strings.L1</listEntry>
+        </settingConfig>
+    </setting>
     <setting propertyKey="@Properties.token" title="@Strings.TokenTitle" prompt="@Strings.TokenPrompt">
         <settingConfig type="alphaNumeric"/>
     </setting>

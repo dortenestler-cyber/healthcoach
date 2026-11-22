@@ -6,6 +6,7 @@
 // Aktionen (POST, JSON): today, flash, intake, checkin, kbsets
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { asDay, cycleInfo, periodStarts, phaseShort, targetScore } from "./target.ts";
 
 const TZ = "Europe/Berlin";
 // CORS, damit die Web-App die Verbindung testen kann
@@ -123,7 +124,24 @@ Deno.serve(async (req) => {
         const next = (t.plan as Any[]).find((p) => !p.done) ?? (t.plan as Any[])[0] ?? null;
         const hubs = (t.needed as Any[]).reduce((s, n) => s + (n.today ?? 0), 0);
         const open = (t.slots as Any[]).filter((s) => !s.done).length;
-        return json(200, { time: t.time, cycleDay: t.cycleDay, pause: t.pause, hubs, open, flashes: t.flashes24h, next: next ? { label: next.label, time: next.time, done: next.done, note: next.note } : null });
+        return json(200, {
+          time: t.time,
+          cycleDay: t.cycleDay,
+          pause: t.pause,
+          sick: t.illness !== null,
+          hubs,
+          open,
+          flashes: t.flashes24h,
+          next: next ? { label: next.label, time: next.time, done: next.done, note: next.note } : null,
+          // Zusatzwerte für wählbare Felder auf dem Zifferblatt
+          goal: t.goal,
+          phase: t.phase,
+          hrv: t.hrv,
+          sleep: t.sleep,
+          skin: t.skin,
+          fa: t.fitnessAge,
+          rhr: t.rhr,
+        });
       }
       return json(200, t);
     } catch (e) {
@@ -136,17 +154,20 @@ Deno.serve(async (req) => {
 
 // Alles, was die Uhr für heute braucht, kompakt und in Großbuchstaben für das Datenraster
 async function today(sb: Any, uid: string, day: string) {
-  const [meds, intakes, flashes, checkin, plan, illness, injuries, daily, kbPlan, diary] = await Promise.all([
+  const [meds, intakes, flashes, checkin, plan, illness, injuries, daily, kbPlan, diary, gcycles] = await Promise.all([
     sb.from("medications").select("id, name, kind, regular, as_needed, times, notes_key").eq("user_id", uid).eq("active", true).order("created_at"),
     sb.from("medication_intakes").select("medication_id, as_needed, slot, day, at").eq("user_id", uid).gte("day", addDays(day, -6)),
     sb.from("hot_flashes").select("id", { count: "exact", head: true }).eq("user_id", uid).gte("at", new Date(Date.now() - 864e5).toISOString()),
-    sb.from("checkins").select("energy").eq("user_id", uid).eq("day", day).maybeSingle(),
+    sb.from("checkins").select("energy, sleep, mood").eq("user_id", uid).eq("day", day).maybeSingle(),
     sb.from("planned_sessions").select("sport, time, status").eq("user_id", uid).eq("day", day).neq("status", "ausgelassen"),
-    sb.from("illnesses").select("label, severity, fever, below_neck").eq("user_id", uid).is("ended_on", null).limit(1),
+    sb.from("illnesses").select("label, kind, severity, fever, below_neck").eq("user_id", uid).is("ended_on", null).limit(1),
     sb.from("injuries").select("spot").eq("user_id", uid).is("ended_on", null),
-    sb.from("garmin_daily").select("bb_max, hrv_last_night, sleep_score").eq("user_id", uid).eq("day", day).maybeSingle(),
+    // Alle Spalten, damit neue Spalten (Hauttemperatur, Fitness-Alter) fehlen dürfen, ohne dass die Abfrage scheitert
+    sb.from("garmin_daily").select("*").eq("user_id", uid).gte("day", addDays(day, -179)).order("day"),
     sb.from("kb_plans").select("id, name, weeks, step_kg, step_every_weeks, start_date").eq("user_id", uid).eq("active", true).order("created_at", { ascending: false }).limit(1),
-    sb.from("diary_entries").select("day, bleeding").eq("user_id", uid).gte("day", addDays(day, -60)).order("day"),
+    sb.from("diary_entries").select("day, bleeding, symptoms").eq("user_id", uid).gte("day", addDays(day, -179)).order("day"),
+    // Zyklen aus Garmin; die Tabelle gibt es erst nach der SQL aus PR #14, bis dahin wird sie übersprungen
+    sb.from("garmin_cycles").select("start_date").eq("user_id", uid).gte("start_date", addDays(day, -179)).lte("start_date", day),
   ]);
 
   const ins = (intakes.data ?? []) as Any[];
@@ -196,17 +217,22 @@ async function today(sb: Any, uid: string, day: string) {
     };
   }
 
-  // Zyklustag aus dem Tagebuch: letzter Beginn mit mindestens leichter Blutung
+  // Zyklustag wie in der App: Tagebuch zuerst, Garmin-Zyklen ergänzen
   const di = (diary.data ?? []) as Any[];
-  const any = new Set(di.filter((d) => d.bleeding >= 1).map((d) => d.day));
-  const starts = di.filter((d) => d.bleeding >= 2 && !any.has(addDays(d.day, -1)) && !any.has(addDays(d.day, -2))).map((d) => d.day);
-  const last = starts[starts.length - 1];
-  const cycleDay = last ? Math.round((new Date(day).getTime() - new Date(last).getTime()) / 864e5) + 1 : null;
+  const garminStarts = (gcycles.error ? [] : gcycles.data ?? []).map((c: Any) => String(c.start_date));
+  const starts = periodStarts(di, garminStarts);
+  const cyc = cycleInfo(day, starts);
+  const cycleDay = cyc.cycleDay;
 
   const ill = ((illness.data ?? []) as Any[])[0] ?? null;
   const pause = !!ill && (ill.fever || ill.below_neck || ill.severity >= 4);
   const blockedClimb = ((injuries.data ?? []) as Any[]).some((i) => ["finger", "hand", "schulter", "fuss"].includes(i.spot));
-  const g = (daily.data ?? null) as Any;
+  const days = (daily.data ?? []) as Any[];
+  const g = days.find((r) => r.day === day) ?? null;
+  // Tagesziel "Belastung heute" 0–100, wie in der App
+  const target = targetScore(day, days.map(asDay), di, (checkin.data ?? null) as Any, ill, starts);
+  // Fitness-Alter ändert sich selten: letzter bekannter Wert
+  const fa = [...days].reverse().find((r) => typeof r.fitness_age === "number")?.fitness_age ?? null;
 
   return {
     day,
@@ -214,6 +240,11 @@ async function today(sb: Any, uid: string, day: string) {
     flashes24h: flashes.count ?? 0,
     checkinDone: !!checkin.data,
     cycleDay,
+    phase: phaseShort(cycleDay, cyc.length),
+    goal: target.score,
+    fitnessAge: fa,
+    rhr: g?.resting_hr ?? null,
+    skin: typeof g?.skin_temp_delta === "number" ? g.skin_temp_delta : null,
     bb: g?.bb_max ?? null,
     hrv: g?.hrv_last_night ?? null,
     sleep: g?.sleep_score ?? null,
