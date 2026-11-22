@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import AuthGate from "@/components/AuthGate";
+import ServiceWorker from "@/components/ServiceWorker";
+import { THEME_BOOT } from "@/lib/themeBoot";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -32,9 +34,13 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={inter.variable}>
+    <html lang="de" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
+      </head>
       <body>
         <main className="shell">
+          <ServiceWorker />
           <AuthGate>{children}</AuthGate>
         </main>
       </body>

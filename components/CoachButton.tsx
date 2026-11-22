@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
+import { useCoachPrefs } from "@/lib/prefs";
 
 // Schwebender Knopf, auf jeder Seite sichtbar.
 // Öffnet den Coach; im Coach selbst wird er zum Schließen-Knopf.
@@ -8,6 +9,7 @@ export default function CoachButton() {
   const pathname = usePathname();
   const router = useRouter();
   const open = pathname.startsWith("/coach");
+  const { on } = useCoachPrefs();
 
   const onClick = () => {
     if (!open) {
@@ -18,6 +20,9 @@ export default function CoachButton() {
       router.push("/");
     }
   };
+
+  // Coach aus: Knopf nur noch auf der Coach-Seite selbst (zum Schließen)
+  if (!on && !open) return null;
 
   return (
     <button
