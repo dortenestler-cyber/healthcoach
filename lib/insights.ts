@@ -301,13 +301,13 @@ export function patterns(data: Data): Pattern[] {
   const worst = [...rows].sort((x, y) => x.with - x.without - (y.with - y.without))[0];
   out.push({
     key: "einfluss",
-    title: "Einflüsse und Schlaf",
+    title: "Gewohnheiten und Schlaf",
     ready: rows.length > 0,
     need: "Braucht mindestens 4 Tage mit einem Einfluss im Tagebuch und Schlafdaten in der Nacht danach.",
     text:
       worst && worst.with < worst.without - 2
         ? `Nach Tagen mit „${worst.label}“ liegt dein Schlafwert im Schnitt bei ${Math.round(worst.with)} statt ${Math.round(worst.without)} (${pct(worst.with, worst.without)} %).`
-        : "Bisher zeigt keiner der Einflüsse einen deutlichen Unterschied beim Schlaf.",
+        : "Bisher zeigt keine der Gewohnheiten einen deutlichen Unterschied beim Schlaf.",
     bars: rows.map((r) => ({ label: r.label, value: r.with, display: `${Math.round(r.with)} statt ${Math.round(r.without)}`, highlight: r === worst })),
     basis: rows.map((r) => `${r.label} ${r.n}×`).join(", ") || "noch keine",
   });

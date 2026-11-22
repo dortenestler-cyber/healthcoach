@@ -3,20 +3,28 @@
 import { useState } from "react";
 import Link from "next/link";
 import { DivergingBars } from "@/components/charts";
-import CycleRing, { groupLabel } from "@/components/zyklus/CycleRing";
+import CycleRing, { arcs4, PHASE4, PHASE4_LABEL, PhaseIcon, phase4Of } from "@/components/zyklus/CycleRing";
+import CycleCalendar from "@/components/zyklus/CycleCalendar";
+import ExplainCard from "@/components/ui/ExplainCard";
 import CycleDayChart from "@/components/zyklus/CycleDayChart";
 import CycleHistory from "@/components/zyklus/CycleHistory";
-import { cycleToday, groupOf, PHASES, type PhaseGroup } from "@/lib/cycle";
+import { cycleToday, PHASES, windowText } from "@/lib/cycle";
 import { METRICS, type MetricKey } from "@/lib/garmin";
-import { patterns, type Data, type Diary } from "@/lib/insights";
+import type { Data, Diary } from "@/lib/insights";
 import { symptomHeat } from "@/lib/zyklusAuswertung";
 import { MIN_EVENT_DAYS, muscleAnalysis, muscleByPhase, type MusterExtra } from "@/lib/muster";
-import { byCycleDay, CYCLE_METRICS, effectsByPhase, MIN_DAYS, phaseProfile, ringArcs } from "@/lib/zyklusSeite";
+import { byCycleDay, CYCLE_METRICS, effectsByPhase, MIN_DAYS, phaseProfile } from "@/lib/zyklusSeite";
 
 const MONTHS = ["Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sep.", "Okt.", "Nov.", "Dez."];
 const date = (iso: string) => `${Number(iso.slice(8, 10))}. ${MONTHS[Number(iso.slice(5, 7)) - 1]}`;
 const tone = (k: MetricKey) => (k === "schlaf" ? "sleep" : k === "temperatur" ? "cycle" : k === "bb" ? "training" : "recovery");
 const ms = (v: number) => `${Math.round(v)} ms`;
+const addDays = (iso: string, n: number) => {
+  const d = new Date(iso + "T12:00:00");
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+const isNew = (n: number) => n >= MIN_DAYS && n <= MIN_DAYS + 1; // Schwelle gerade erreicht
 
 type Props = { today: string; data: Data; longDiary: Diary[]; flashes: string[]; showFlashes: boolean; extra?: MusterExtra | null };
 
@@ -25,7 +33,15 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
   const [metric, setMetric] = useState<MetricKey>("hrv");
   const ct = cycleToday(today, longDiary);
   const phase = ct.phase ? PHASES[ct.phase] : null;
-  const group = groupOf(ct.phase);
+  const p4 = phase4Of(ct.phase);
+  // Zeitraum der heutigen Phase (geschätzt)
+  const span = (() => {
+    if (ct.cycleDay === null || !p4) return null;
+    const a = arcs4(ct.length).find((x) => x.phase === p4 && ct.cycleDay! >= x.from && ct.cycleDay! <= x.to);
+    if (!a) return null;
+    const to = ct.cycleDay > ct.length ? ct.cycleDay : a.to;
+    return { from: addDays(today, a.from - ct.cycleDay), to: addDays(today, to - ct.cycleDay) };
+  })();
   const profile = ct.phase ? phaseProfile(today, { ...data, diary: longDiary }, ct.phase) : [];
   const muscle = new Map<string, number>();
   for (const m of extra?.muscle ?? []) muscle.set(m.day, Math.max(muscle.get(m.day) ?? 0, m.intensity));
@@ -39,19 +55,17 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
   const bcd = byCycleDay(metric, today, { ...data, diary: longDiary });
   const effects = effectsByPhase({ ...data, diary: longDiary });
   const effectRows = effects.flatMap((e) => [
-    { label: `${e.label}`, value: e.follikel, note: e.follikel === null ? `Follikel · ${e.nF} von ${MIN_DAYS} Nächten` : `Follikel · ${e.nF} Nächte` },
-    { label: `${e.label}`, value: e.luteal, note: e.luteal === null ? `Luteal · ${e.nL} von ${MIN_DAYS} Nächten` : `Luteal · ${e.nL} Nächte` },
+    { label: `${e.label}`, value: e.follikel, note: e.follikel === null ? `Follikel · ${e.nF} von ${MIN_DAYS} Nächten` : `Follikelphase · ${e.nF} Nächte mit`, isNew: isNew(e.nF) },
+    { label: `${e.label}`, value: e.luteal, note: e.luteal === null ? `Luteal · ${e.nL} von ${MIN_DAYS} Nächten` : `Lutealphase · ${e.nL} Nächte mit`, isNew: isNew(e.nL) },
   ]).filter((r) => r.value !== null);
   const waiting = effects.filter((e) => e.follikel === null && e.luteal === null).map((e) => e.label);
   const lutStrongest = [...effects].filter((e) => e.luteal !== null).sort((a, b) => Math.abs(b.luteal as number) - Math.abs(a.luteal as number))[0];
-  const more = patterns({ ...data }).filter((p) => p.key !== "zyklus");
 
-  // Wadenzucken und -krämpfe je Phase; Muster ohne Zyklusbezug stehen unten unter „Weitere Muster“
+  // Wadenzucken und -krämpfe je Phase; Muster ohne Zyklusbezug stehen unter Gesundheit › Körper
   const full = { ...data, diary: longDiary };
   const phaseRows = extra ? muscleByPhase(full, extra, today).filter((r) => r.days > 0) : [];
   const muscleTotal = muscle.size;
   const ma = extra && muscleTotal ? muscleAnalysis(full, extra, today) : null;
-  const otherMuscle = ma?.findings.find((f) => f.group !== "zyklus") ?? null;
   const pct = (r: { days: number; events: number }) => Math.round((r.events / r.days) * 100);
   const peakPhase = [...phaseRows].sort((a, b) => b.events / b.days - a.events / a.days)[0];
   const muscleSentence = !ma?.ready
@@ -87,32 +101,45 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
 
   return (
     <>
+      <div className="cycle-title">
+        <h2 className="cycle-title-main">
+          {ct.cycleDay !== null ? `Zyklustag ${ct.cycleDay}` : "Zyklustag unbekannt"}
+          {phase && <> <span className="cycle-title-sep">|</span> <span className="cycle-title-phase">{phase.label}</span></>}
+        </h2>
+        <span className="cycle-title-sub">
+          {phase ? "Geschätzt" : "Trag deine Periode im Tagebuch ein, dann schätzt die App die Phase."}
+          {ct.window ? ` · ${windowText(ct.window, today)} (${ct.window.earliest === ct.window.latest ? date(ct.window.earliest) : `${date(ct.window.earliest)}–${date(ct.window.latest)}`})` : ct.cycleDay !== null ? " · Periodenfenster ab 2 Zyklen" : ""}
+        </span>
+        {(!phase || !ct.window) && <Link href="/tagebuch#perioden" className="settings-link">Perioden nachtragen ›</Link>}
+      </div>
+
       <section className="card">
-        <div className="cycle-head">
-          <CycleRing cycleDay={ct.cycleDay} length={ct.length} phaseLabel={phase ? phase.label : "Phase unbekannt"} size={140} />
-          <div className="stack">
-            <span className="meta">Dein Zyklus heute</span>
-            <span className="target-label">{phase ? phase.label : "Phase noch unbekannt"}</span>
-            <span className="meta">{phase ? "geschätzt" : "Trag deine Periode im Tagebuch ein, dann schätzt die App die Phase."}</span>
-            {ct.window && <span className="meta">Nächste Periode etwa {date(ct.window.earliest)} bis {date(ct.window.latest)}</span>}
-            {!ct.window && ct.cycleDay !== null && <span className="meta">Periodenfenster ab 2 Zyklen</span>}
-            {(!phase || !ct.window) && <Link href="/tagebuch#perioden" className="settings-link">Perioden nachtragen ›</Link>}
-          </div>
+        <div className="ring-hero">
+          <CycleRing cycleDay={ct.cycleDay} length={ct.length} phase={p4} />
         </div>
-        <div className="legend">
-          {ringArcs(ct.length).filter((a, i, all) => all.findIndex((b) => b.group === a.group) === i).map((a) => (
-            <span key={a.group}><i className={`cycle-key-${a.group}`} />{groupLabel(a.group as PhaseGroup)}</span>
+        <div className="phase-icons">
+          {PHASE4.map((k) => (
+            <div key={k} className={`phase-icon cyc4-text-${k}`} data-on={k === p4}>
+              <PhaseIcon phase={k} />
+              <span>{PHASE4_LABEL[k]}</span>
+            </div>
           ))}
-          <span>Punkt = heute</span>
         </div>
         {phase && (
-          <div className="suggest suggest-cycle">
-            <span className="row-strong">{phase.pattern}</span>
-            <span>Vorschlag: {phase.suggestion}. Anstrengung (1–10): {phase.rpe}. {phase.hint}</span>
+          <div className="phase-card">
+            <div className="phase-card-head">
+              <span className="phase-card-title">{phase.label}</span>
+              <span className="here-badge">● Du bist hier</span>
+            </div>
+            {span && <span className="phase-card-dates">{date(span.from)} – {date(span.to)} · geschätzt</span>}
+            <p>{phase.pattern}</p>
+            <p className="meta">Vorschlag: {phase.suggestion}. Anstrengung (1–10): {phase.rpe}. {phase.hint}</p>
           </div>
         )}
         <span className="meta">Phasen sind aus deinem Tagebuch geschätzt. Vorschlag, keine Diagnose.</span>
       </section>
+
+      <CycleCalendar today={today} diary={longDiary} />
 
       {phase && (
         <section className="card">
@@ -181,39 +208,28 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
             </div>
           ))}
           <span className="meta">Tage seit deinem ersten Eintrag, Phasen aus dem Tagebuch geschätzt. Ein Zusammenhang, kein Beweis.</span>
-          <Link href="/gesundheit?t=waden" className="settings-link">Alle Muster zu den Waden ›</Link>
+          <Link href="/gesundheit?t=koerper" className="settings-link">Alle Muster zu den Waden ›</Link>
         </section>
       )}
 
       <section className="card">
-        <span className="meta">Was dir guttut · je Phase</span>
-        <h2>{effectSentence}</h2>
+        <span className="eyebrow">Täglich aktualisiert · was dir guttut je Phase</span>
+        <h2 className="card-title-lg">{effectSentence}</h2>
+        <p>HRV in der Nacht danach, Tage mit Einfluss gegen Tage ohne, jeweils in derselben Phase. Ein Zusammenhang, keine Ursache. Erst ab je {MIN_DAYS} Nächten.</p>
         {effectRows.length > 0 && (
-          <DivergingBars fmt={ms} label={`HRV in der Nacht danach je Phase: ${effectRows.map((r) => `${r.label} ${r.note} ${r.value! > 0 ? "plus" : "minus"} ${ms(Math.abs(r.value!))}`).join(", ")}`} rows={effectRows} />
+          <DivergingBars fmt={ms} scaleMin={8} neg="HRV niedriger" pos="HRV höher" label={`HRV in der Nacht danach je Phase: ${effectRows.map((r) => `${r.label} ${r.note} ${r.value! > 0 ? "plus" : "minus"} ${ms(Math.abs(r.value!))}`).join(", ")}`} rows={effectRows} />
         )}
         {waiting.length > 0 && <span className="meta">Noch zu wenige Nächte: {waiting.join(", ")}.</span>}
-        <span className="meta">HRV in der Nacht danach, Tage mit Einfluss gegen Tage ohne, jeweils in derselben Phase. Ein Zusammenhang, keine Empfehlung.</span>
+        {lutStrongest && <ExplainCard tone="cycle" question={`Was bedeutet es, dass „${lutStrongest.label}“ in meiner Lutealphase mit meiner HRV zusammenhängt?`}>Ein Zusammenhang aus deinen eigenen Einträgen, keine Empfehlung.</ExplainCard>}
       </section>
 
-      {(more.length > 0 || otherMuscle) && (
-        <section className="card">
-          <span className="meta">Weitere Muster</span>
-          {more.map((p) => (
-            <div key={p.key} className="stack list-line">
-              <span className="row-strong">{p.title}</span>
-              <span className={p.ready ? "" : "meta"}>{p.ready ? p.text : p.need}</span>
-              {p.ready && <span className="meta">Grundlage: {p.basis}. Ein Zusammenhang, kein Beweis.</span>}
-            </div>
-          ))}
-          {otherMuscle && (
-            <div className="stack list-line">
-              <span className="row-strong">Wadenkrämpfe</span>
-              <span>{otherMuscle.text}</span>
-              <Link href="/gesundheit?t=waden" className="settings-link">Mehr unter Gesundheit ›</Link>
-            </div>
-          )}
-        </section>
-      )}
+      <Link href="/gesundheit" className="card card-link-row">
+        <span className="stack">
+          <span className="row-strong">Weitere Muster und Gewohnheiten</span>
+          <span className="meta">Ohne Zyklusbezug, unter Gesundheit › Überblick</span>
+        </span>
+        <span aria-hidden="true">›</span>
+      </Link>
     </>
   );
 }

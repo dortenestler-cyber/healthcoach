@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-// Die Seite Muster heißt jetzt Zyklus. Alte Links und Lesezeichen führen dorthin.
+// Muster stehen jetzt unter Gesundheit › Überblick (mit Zyklusbezug auf der Seite Zyklus).
 export default function MusterPage() {
-  redirect("/zyklus");
+  redirect("/gesundheit");
 }

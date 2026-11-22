@@ -1,44 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PageHead from "@/components/PageHead";
 import { useFeatures, type Feature } from "@/lib/prefs";
 import MedsSection from "@/components/gesundheit/MedsSection";
 import IllnessSection from "@/components/gesundheit/IllnessSection";
 import InjurySection from "@/components/gesundheit/InjurySection";
 import BodySection from "@/components/gesundheit/BodySection";
+import OverviewSection from "@/components/gesundheit/OverviewSection";
 import WadenSection from "@/components/gesundheit/WadenSection";
 
 const TABS: [string, string][] = [
+  ["ueberblick", "Überblick"],
   ["med", "Medikamente"],
-  ["krank", "Krankheit"],
-  ["verl", "Verletzung"],
-  ["waden", "Waden"],
+  ["krankverl", "Krank & verletzt"],
   ["koerper", "Körper"],
 ];
 
-const TAB_FEATURE: Record<string, Feature> = {med: "medikamente", krank: "krankheit", verl: "verletzung", waden: "muskeln"};
+const TAB_FEATURE: Record<string, Feature> = { med: "medikamente" };
+// Alte Links (?t=krank, ?t=verl) führen in den gemeinsamen Reiter, ?t=waden in Körper
+const ALIAS: Record<string, string> = { krank: "krankverl", verl: "krankverl", waden: "koerper" };
 
 export default function GesundheitView({ initial }: { initial: string }) {
-  const [tab, setTab] = useState(TABS.some(([k]) => k === initial) ? initial : "med");
+  const start = ALIAS[initial] ?? initial;
+  const [tab, setTab] = useState(TABS.some(([k]) => k === start) ? start : "ueberblick");
+  // Links innerhalb der Seite (z. B. aus dem Überblick) wechseln den Reiter
+  useEffect(() => {
+    if (TABS.some(([k]) => k === start)) setTab(start);
+  }, [start]);
   const feat = useFeatures();
-  const tabs = TABS.filter(([k]) => !TAB_FEATURE[k] || feat[TAB_FEATURE[k]]);
+  const tabs = TABS.filter(([k]) => (k === "krankverl" ? feat.krankheit || feat.verletzung : !TAB_FEATURE[k] || feat[TAB_FEATURE[k]]));
   const shown = tabs.some(([k]) => k === tab) ? tab : tabs[0][0];
   return (
     <>
-      <PageHead title="Gesundheit" sub="Medikamente, Krankheiten, Verletzungen, Waden, Körper" />
-      <div className="segmented segmented-tabs">
+      <PageHead title="Gesundheit" sub="Muster, Gewohnheiten, Medikamente, Körper" tone="gesundheit" />
+      <div className="segmented segmented-tabs segmented-4">
         {tabs.map(([k, l]) => (
           <button key={k} type="button" aria-pressed={shown === k} onClick={() => setTab(k)}>
             {l}
           </button>
         ))}
       </div>
+      {shown === "ueberblick" && <OverviewSection />}
       {shown === "med" && <MedsSection />}
-      {shown === "krank" && <IllnessSection />}
-      {shown === "verl" && <InjurySection />}
-      {shown === "koerper" && <BodySection />}
-      {shown === "waden" && <WadenSection />}
+      {shown === "krankverl" && (
+        <>
+          {feat.krankheit && <IllnessSection />}
+          {feat.verletzung && <InjurySection />}
+        </>
+      )}
+      {shown === "koerper" && (
+        <>
+          {feat.muskeln && <WadenSection />}
+          <BodySection />
+        </>
+      )}
     </>
   );
 }

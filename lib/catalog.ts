@@ -15,7 +15,9 @@ export const SYMPTOMS: { key: string; label: string }[] = [
 
 export const LEVELS = ["", "leicht", "mittel", "stark"];
 
+// Gewohnheiten (früher „Einflüsse“). Reihenfolge und eigene Gewohnheiten: lib/habits.ts
 export const INFLUENCES: { key: string; label: string }[] = [
+  { key: "sauna", label: "Sauna" },
   { key: "alkohol", label: "Alkohol" },
   { key: "koffein", label: "Koffein" },
   { key: "stress", label: "Stress" },

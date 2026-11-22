@@ -3,7 +3,7 @@
 
 export const W = 326; // Innenbreite einer Karte auf dem iPhone (390 px minus Ränder)
 
-export type Tone = "recovery" | "cycle" | "menses" | "training" | "warn" | "mobility" | "sleep" | "neutral";
+export type Tone = "recovery" | "cycle" | "menses" | "training" | "warn" | "mobility" | "sleep" | "stress" | "neutral";
 
 // Lineare Abbildung von [d0, d1] auf [r0, r1]
 export function linear(d0: number, d1: number, r0: number, r1: number) {

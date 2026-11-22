@@ -25,6 +25,13 @@ export type Daily = {
   bb_curve?: (number | null)[] | null; // 96 Werte, alle 15 Minuten ab Mitternacht
   sleep_start_min?: number | null; // Einschlafen, Minuten seit Mitternacht (oft am Vortag)
   sleep_end_min?: number | null; // Aufwachen
+  // Atemfrequenz und Stress im Detail (ab Migration 20261123090000_atem_stress)
+  respiration_avg?: number | null; // Atemzüge pro Minute im Schlaf
+  stress_rest_s?: number | null; // Sekunden in Ruhe (Stress 0–25)
+  stress_low_s?: number | null; // niedrig (26–50)
+  stress_medium_s?: number | null; // mittel (51–75)
+  stress_high_s?: number | null; // hoch (76–100)
+  stress_curve?: (number | null)[] | null; // 96 Werte, alle 15 Minuten ab Mitternacht
   synced_at: string;
 };
 
@@ -40,7 +47,7 @@ export type Activity = {
   training_load: number | null;
 };
 
-export type MetricKey = "schlaf" | "hrv" | "ruhepuls" | "temperatur" | "bb" | "stress" | "schritte";
+export type MetricKey = "schlaf" | "hrv" | "ruhepuls" | "atem" | "temperatur" | "bb" | "stress" | "schritte";
 
 // higherIsBetter steuert, ob "unter dem Schnitt" als Hinweis gilt
 export const METRICS: Record<MetricKey, { label: string; value: (d: Daily) => number | null; fmt: (v: number) => string; higherIsBetter: boolean }> = {
@@ -56,6 +63,12 @@ export const METRICS: Record<MetricKey, { label: string; value: (d: Daily) => nu
   },
   hrv: { label: "HRV", value: (d) => d.hrv_last_night, fmt: (v) => `${Math.round(v)} ms`, higherIsBetter: true },
   ruhepuls: { label: "Ruhepuls", value: (d) => d.resting_hr, fmt: (v) => `${Math.round(v)} bpm`, higherIsBetter: false },
+  atem: {
+    label: "Atemfrequenz",
+    value: (d) => (typeof d.respiration_avg === "number" ? Number(d.respiration_avg) : null),
+    fmt: (v) => `${v.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} /min`,
+    higherIsBetter: false,
+  },
   temperatur: {
     label: "Temperatur",
     value: (d) => (typeof d.skin_temp_delta === "number" ? Number(d.skin_temp_delta) : null),
@@ -74,7 +87,7 @@ export function stats(values: number[]) {
   return { mean, sd, min: Math.min(...values), max: Math.max(...values) };
 }
 
-export type SyncResult = { ok: boolean; error?: string; skinTempNights?: number; skinNote?: string; sleepTempKeys?: string[]; sleepStagesNote?: string; energyNote?: string };
+export type SyncResult = { ok: boolean; error?: string; skinTempNights?: number; skinNote?: string; sleepTempKeys?: string[]; sleepStagesNote?: string; energyNote?: string; stressNote?: string };
 
 export async function syncGarmin(days: number, offset = 0): Promise<SyncResult> {
   const sb = supabase();
@@ -95,7 +108,7 @@ export async function syncGarmin(days: number, offset = 0): Promise<SyncResult> 
     return { ok: false, error: detail };
   }
   if (data?.error) return { ok: false, error: data.error };
-  return { ok: true, skinTempNights: data?.skinTempNights, skinNote: data?.skinNote, sleepTempKeys: data?.sleepTempKeys, sleepStagesNote: data?.sleepStagesNote, energyNote: data?.energyNote };
+  return { ok: true, skinTempNights: data?.skinTempNights, skinNote: data?.skinNote, sleepTempKeys: data?.sleepTempKeys, sleepStagesNote: data?.sleepStagesNote, energyNote: data?.energyNote, stressNote: data?.stressNote };
 }
 
 const TYPE_LABELS: Record<string, string> = {

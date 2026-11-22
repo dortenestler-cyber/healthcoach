@@ -1,9 +1,13 @@
 import Link from "next/link";
 
-// Seitenkopf mit Zahnrad zu den Einstellungen (auf der Einstellungsseite selbst ausgeblendet)
-export default function PageHead({ title, sub, gear = true }: { title: string; sub: string; gear?: boolean }) {
+export type HeadTone = "heute" | "zyklus" | "training" | "gesundheit";
+
+// Seitenkopf mit Zahnrad zu den Einstellungen (auf der Einstellungsseite selbst ausgeblendet).
+// Mit `tone` liegt ein Farbverlauf in der Bereichsfarbe hinter dem Kopf (Konzept dunkel 2, Muster 10).
+export default function PageHead({ title, sub, gear = true, tone }: { title: string; sub: string; gear?: boolean; tone?: HeadTone }) {
   return (
     <header className="page-head">
+      {tone && <div className="page-glow" data-tone={tone} aria-hidden="true" />}
       <div className="page-head-row">
         <div className="page-head-text">
           <span className="page-sub">{sub}</span>

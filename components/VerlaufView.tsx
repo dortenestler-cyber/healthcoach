@@ -67,7 +67,7 @@ export default function VerlaufView({ initial }: { initial: string }) {
       {error && <p className="alert" role="alert">{error}</p>}
 
       <div className="pills scroll">
-        {(Object.keys(METRICS) as MetricKey[]).map((k) => (
+        {(Object.keys(METRICS) as MetricKey[]).filter((k) => k !== "atem" || metric === "atem" || rows.some((r) => typeof r.respiration_avg === "number")).map((k) => (
           <button key={k} type="button" className="pill" aria-pressed={metric === k} onClick={() => setMetric(k)}>
             {METRICS[k].label}
           </button>

@@ -40,7 +40,7 @@ export default function ZyklusPage() {
 
   return (
     <>
-      <PageHead title="Zyklus" sub="Dein Zyklus und was sich darin wiederholt" />
+      <PageHead title="Zyklus" sub="Dein Zyklus und was sich darin wiederholt" tone="zyklus" />
       {error && <p className="alert" role="alert">{error}</p>}
       {!error && (!data || !longDiary) && <p className="hint">Lädt …</p>}
       {data && longDiary && <ZyklusView today={isoDay()} data={data} longDiary={longDiary} flashes={flashes} showFlashes={feat.perimenopause} extra={feat.muskeln ? extra : null} />}
