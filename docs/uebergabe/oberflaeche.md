@@ -4,10 +4,10 @@ Zuletzt aktualisiert: 2026-11-22 · Sitzung: https://claude.ai/code/session_014p
 Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/design-*`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
 ## Stand in einem Satz
-Korridore Schritt 1 ist fertig (PR #60, Zweig `claude/confident-fermat-wy3iur`): wandernder Bereich, Bereiche je Zyklusphase, Krankheitstage raus, Abschnitt „Dein Bereich“.
+Korridore Schritt 1 ist gemergt (PR #60): wandernder Bereich, Bereiche je Zyklusphase, Krankheitstage raus, Abschnitt „Dein Bereich“.
 
 ## In Arbeit
-- PR #60 `[OF/DA] Konzept und Schritt 1: lebendige Korridore`. Konzept: `docs/konzept-korridore-alltagslast.md`.
+- Korridore: Schritt 1 gemergt (PR #60). Konzept: `docs/konzept-korridore-alltagslast.md`.
   Fertig: `lib/baseline.ts` (Bereiche je Phase, `rangeSeries`, `sickDays`, vorläufig ab 7 / stabil ab 14 Tagen), `lib/korridor.ts`, Verlauf-Detail mit Umschalter „Bereich über die Zeit · heute“, HRV-Karte auf Heute mit wanderndem Band.
   Nächster Schritt: Teil B Daten (Alltagslast über den Tagespuls) ist Sache der Rolle Daten, danach Teil B Anzeige (OF), dann A3 (weitere Korridore) und A4 (Hinweis auf Heute nach 3 Tagen außerhalb, `badStreak` in `lib/korridor.ts` liegt schon bereit).
 
@@ -25,6 +25,6 @@ Korridore Schritt 1 ist fertig (PR #60, Zweig `claude/confident-fermat-wy3iur`):
 - Keine festen Farbwerte in Komponenten, nur Variablen aus `app/globals.css`.
 
 ## Erledigt seit letzter Übergabe
-- Korridore Schritt 1 (PR #60, noch offen)
+- PR #60 gemergt: Korridore Schritt 1
 - PR #50: Design-Konzept „dunkel 2“
 - PR #51: Sperrbildschirm, Sport-Icons, Coach-Symbol, Gesundheit mit Überblick, App-Symbol Zen-Ring
