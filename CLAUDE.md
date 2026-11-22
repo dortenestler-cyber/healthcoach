@@ -9,6 +9,7 @@ Health Coach bringt Training, Erholung, Zyklus, Perimenopause-Symptome, Krankhei
 - Eigene Pull Requests selbst mergen, wenn `tsc` und `npm run build` fehlerfrei sind und es keine Konflikte gibt. Bei Änderungen an der Datenbank (Migrationen) oder an Supabase-Funktionen auf Freigabe warten.
 - Antworten und Texte in der App auf Deutsch, klar und knapp, ohne Fachjargon.
 - Beispieldaten immer als solche kennzeichnen.
+- Was die Nutzerin selbst tun muss (Migrationen, Secrets, Einstellungen in Supabase oder GitHub), in `AUFGABEN.md` eintragen und Erledigtes abhaken.
 
 ## Begriffe
 - Immer „Kettlebell“, nie „Glocke“.
