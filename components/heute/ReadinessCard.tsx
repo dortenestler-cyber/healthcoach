@@ -60,7 +60,7 @@ export default function ReadinessCard({ rule, factors }: { rule: DayRule; factor
       <div className="ring-hero">
         <ValueRing tone="recovery" size={208} value={value / 10} center={num(value)} caption={label} label={`Readiness ${num(value)} von 10, ${label}`} />
       </div>
-      {!rule.target.enoughData && <span className="meta">Wird genauer, sobald 7 Tage Garmin-Daten da sind.</span>}
+      {!rule.target.enoughData && <span className="meta">Wird genauer, sobald 14 Tage Garmin-Daten da sind.</span>}
 
       <div className="stage-bar" aria-hidden="true">
         {STAGE_ORDER.map((s) => (
