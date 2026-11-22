@@ -2526,14 +2526,7 @@ body { overflow-x: clip; }
   pointer-events: none;
   background: radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--brand) 22%, var(--bg)) 0%, var(--bg) 70%);
 }
-.pin-icon { border-radius: 18px; }
-.pin-icon-dark { display: none; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .pin-icon-light { display: none; }
-  :root:not([data-theme="light"]) .pin-icon-dark { display: block; }
-}
-:root[data-theme="dark"] .pin-icon-light { display: none; }
-:root[data-theme="dark"] .pin-icon-dark { display: block; }
+.pin-icon { display: block; }
 .pin-brand { margin-top: 20px; }
 .pin .pin-title { margin-top: 6px; font-size: 28px; font-weight: 700; }
 .pin-sub { margin-top: 6px; font-size: 15px; color: var(--text-2); }

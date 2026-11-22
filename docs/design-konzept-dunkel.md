@@ -180,6 +180,6 @@ Biologisches Alter und Alterungstempo (05), empfohlene Schlafens- und Aufstehzei
   - Je Zyklusphase, dazu Hitzewallungen am Tag danach
   - Hauttemperatur mit markierten Nächten nach der Gewohnheit
   - Nächte nach der Sauna sind auch im Verlauf der Hauttemperatur markiert.
-- **Sperrbildschirm**: App-Symbol, Gruß nach Tageszeit, Ziffernfeld wie beim iPhone mit Buchstaben, Face ID im Ziffernfeld. Nie ein Gesundheitswert.
+- **Sperrbildschirm**: nur der Zen-Ring ohne Kachel (`public/icons/enso.svg`), Gruß nach Tageszeit, Ziffernfeld wie beim iPhone mit Buchstaben, Face ID im Ziffernfeld. Nie ein Gesundheitswert.
 - **Icons** statt Kürzeln für Sportarten. Coach-Symbol: Sprechblase mit Pulslinie.
 - **App-Symbol Zen-Ring** (Ensō, mit dem Pinsel gezeichnet, trockene Pinselspuren, ausfaserndes Ende): dunkle Variante freigegeben, Beere auf Anthrazit, für hell und dunkel gleich.

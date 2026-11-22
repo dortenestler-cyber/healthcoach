@@ -130,8 +130,7 @@ export default function PinLock({ children }: { children: ReactNode }) {
   return (
     <div className="pin">
       <div className="pin-glow" aria-hidden="true" />
-      <img src="/icons/icon.svg" alt="" width={76} height={76} className="pin-icon pin-icon-light" />
-      <img src="/icons/icon-dark.svg" alt="" width={76} height={76} className="pin-icon pin-icon-dark" />
+      <img src="/icons/enso.svg" alt="" width={104} height={104} className="pin-icon" />
       <span className="eyebrow pin-brand">Health Coach</span>
       <h1 className="pin-title">{mode === "eingeben" ? greeting : title}</h1>
       <span className="pin-sub">{mode === "eingeben" ? "PIN eingeben" : sub}</span>
