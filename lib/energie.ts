@@ -60,3 +60,23 @@ export function energyDay(day: string, daily: Daily[], acts: Activity[], nowMinu
     });
   return { today, usual, projection, nowSlot, usualDays: past.length, sleep, training };
 }
+
+// Tagesrhythmus aus deinem üblichen Tag: wann die Energie meist am höchsten ist und wann sie am stärksten sinkt.
+// Zwei-Stunden-Fenster zwischen 6 und 22 Uhr. Ein Muster aus deinen Daten, keine Vorhersage für einzelne Tage.
+export function usualRhythm(usual: (number | null)[]): { peak: [number, number]; drain: [number, number] | null } | null {
+  const WIN = 8;
+  let peak: { at: number; v: number } | null = null;
+  let drain: { at: number; d: number } | null = null;
+  for (let i = 24; i + WIN <= 88; i += 4) {
+    const w = usual.slice(i, i + WIN);
+    if (w.some((x) => x === null)) continue;
+    const vals = w as number[];
+    const m = vals.reduce((a, b) => a + b, 0) / WIN;
+    if (!peak || m > peak.v) peak = { at: i, v: m };
+    const d = vals[0] - vals[WIN - 1];
+    if (d > 0 && (!drain || d > drain.d)) drain = { at: i, d };
+  }
+  if (!peak) return null;
+  const h = (slot: number) => Math.round(slot / 4);
+  return { peak: [h(peak.at), h(peak.at + WIN)], drain: drain && drain.d >= 5 ? [h(drain.at), h(drain.at + WIN)] : null };
+}

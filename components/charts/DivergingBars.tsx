@@ -1,36 +1,49 @@
-// Balken um den Nullpunkt: Unterschied je Zeile, rechts mehr, links weniger. Zahl mit Vorzeichen und Anzahl stehen immer dabei.
+// Balken um den Nullpunkt (Konzept dunkel 2, Muster 11): eine Zeile je Einfluss, schraffierte Spur, Punkt in der Mitte.
+// Rechts mehr, links weniger. Zahl mit Vorzeichen und Anzahl der Nächte stehen immer dabei.
 // Positive Werte in der Farbe des Tons, negative neutral: keine Ampelfarben.
 
-import { W, type Tone } from "@/components/charts/scale";
+import { type Tone } from "@/components/charts/scale";
 
-export type DivRow = { label: string; value: number | null; note: string };
+export type DivRow = { label: string; value: number | null; note: string; isNew?: boolean };
 
-const ROW = 40;
-const LABEL_W = 120;
-const VALUE_W = 64;
+type Props = {
+  rows: DivRow[];
+  fmt: (v: number) => string;
+  label: string;
+  tone?: Tone;
+  neg?: string; // Überschrift links, z. B. „HRV niedriger“
+  pos?: string; // Überschrift rechts
+  scaleMin?: number; // kleinster Vollausschlag, damit kleine Unterschiede auch klein aussehen
+};
 
-export default function DivergingBars({ rows, fmt, label, tone = "recovery" }: { rows: DivRow[]; fmt: (v: number) => string; label: string; tone?: Tone }) {
-  const max = Math.max(1, ...rows.map((r) => Math.abs(r.value ?? 0)));
-  const x0 = LABEL_W + (W - LABEL_W - VALUE_W) / 2;
-  const half = (W - LABEL_W - VALUE_W) / 2 - 4;
-  const h = rows.length * ROW;
+export default function DivergingBars({ rows, fmt, label, tone = "recovery", neg = "niedriger", pos = "höher", scaleMin = 1 }: Props) {
+  const max = Math.max(scaleMin, ...rows.map((r) => Math.abs(r.value ?? 0)));
   return (
-    <svg className={`cb cb-${tone}`} viewBox={`0 0 ${W} ${h}`} role="img" aria-label={label}>
-      <line x1={x0} x2={x0} y1={0} y2={h} className="cb-zero" />
+    <div className={`div-list cb-${tone}`} role="group" aria-label={label}>
+      <div className="div-head" aria-hidden="true">
+        <span>▾ {neg}</span>
+        <span>Unterschied</span>
+        <span>{pos} ▴</span>
+      </div>
       {rows.map((r, i) => {
-        const cy = i * ROW + ROW / 2 - 4;
-        const w = r.value === null ? 0 : (Math.abs(r.value) / max) * half;
+        const w = r.value === null ? 0 : (Math.abs(r.value) / max) * 48;
+        const zero = r.value === null || fmt(Math.abs(r.value)) === fmt(0);
+        const sign = zero ? "±" : (r.value as number) > 0 ? "+" : "−";
         return (
-          <g key={r.label}>
-            <text x={0} y={cy + 4} className="cb-tick cb-tick-strong">{r.label}</text>
-            <text x={0} y={cy + 17} className="cb-tick">{r.note}</text>
-            {r.value !== null && <rect x={r.value >= 0 ? x0 : x0 - w} width={Math.max(2, w)} y={cy - 7} height={14} rx={4} className={r.value >= 0 ? "cb-bar-pos" : "cb-bar-neg"} />}
-            <text x={W} y={cy + 4} textAnchor="end" className={r.value === null ? "cb-tick" : "cb-value"}>
-              {r.value === null ? "–" : `${fmt(Math.abs(r.value)) === fmt(0) ? "±" : r.value > 0 ? "+" : "−"}${fmt(Math.abs(r.value))}`}
-            </text>
-          </g>
+          <div key={r.label + i} className={`div-row${r.isNew ? " div-new" : ""}`}>
+            <div className="div-row-head">
+              {r.isNew && <span className="badge-new">Neu</span>}
+              <span className="div-label">{r.label}</span>
+              <span className={`div-value${r.value !== null && r.value > 0 && !zero ? " div-pos" : ""}`}>{r.value === null ? "–" : `${sign}${fmt(Math.abs(r.value))}`}</span>
+            </div>
+            <div className="div-track" aria-hidden="true">
+              {r.value !== null && <span className={r.value >= 0 ? "div-bar div-bar-pos" : "div-bar div-bar-neg"} style={{ left: r.value >= 0 ? "50%" : `${50 - w}%`, width: `${Math.max(1, w)}%` }} />}
+              <span className="div-zero" />
+            </div>
+            <span className="meta">{r.note}</span>
+          </div>
         );
       })}
-    </svg>
+    </div>
   );
 }

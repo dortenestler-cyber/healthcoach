@@ -33,7 +33,7 @@ export default function CoachButton() {
       onClick={onClick}
     >
       <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d={open ? "M6 6l12 12M18 6L6 18" : "M4 5h16v11H9l-5 4z"} />
+        <path d={open ? "M6 6l12 12M18 6L6 18" : "M4 5h16v11H9l-5 4zM7 10.5h2.5l1.5-2.5 2 5 1.5-2.5H17"} />
       </svg>
     </button>
   );

@@ -203,6 +203,8 @@ Deno.serve(async (req) => {
     const skinKeys = new Set<string>();
     let bbCurveDays = 0;
     let bbNote = "";
+    let stressCurveDays = 0;
+    let stressNote = "";
     let sleepTempKeys: string[] = [];
 
     for (const w of windows) {
@@ -223,6 +225,15 @@ Deno.serve(async (req) => {
         const mod = num(im?.moderate?.value ?? im?.moderateValue ?? im?.moderate) ?? 0;
         const vig = num(im?.vigorous?.value ?? im?.vigorousValue ?? im?.vigorous) ?? 0;
         r.intensity_minutes = mod || vig ? Math.round(mod + 2 * vig) : null;
+        // Stress-Aufteilung in Sekunden (Ruhe, niedrig, mittel, hoch) und Atemfrequenz im Schlaf.
+        // Garmin benennt die Felder je nach Schnittstelle unterschiedlich; fehlt ein Feld, bleibt es leer.
+        const st = d?.stress ?? {};
+        r.stress_rest_s = int(st?.restDuration ?? d?.restStressDuration);
+        r.stress_low_s = int(st?.lowDuration ?? d?.lowStressDuration);
+        r.stress_medium_s = int(st?.mediumDuration ?? d?.mediumStressDuration);
+        r.stress_high_s = int(st?.highDuration ?? d?.highStressDuration);
+        const resp = num(d?.respiration?.avgSleepValue ?? d?.avgSleepRespirationValue ?? d?.respiration?.avgValue);
+        if (resp !== null && resp >= 5 && resp <= 40) r.respiration_avg = Math.round(resp * 10) / 10;
       }
 
       // Schlaf
@@ -240,6 +251,8 @@ Deno.serve(async (req) => {
         r.sleep_awake_s = int(s?.awakeSleepSeconds ?? s?.awakeDurationInSeconds);
         r.sleep_start_min = localStampMinute(s?.sleepStartTimestampLocal);
         r.sleep_end_min = localStampMinute(s?.sleepEndTimestampLocal);
+        const sResp = num(s?.averageRespirationValue ?? s?.avgSleepRespirationValue ?? s?.respiration?.avgValue);
+        if (sResp !== null && sResp >= 5 && sResp <= 40) r.respiration_avg = Math.round(sResp * 10) / 10;
         const t = findSkinTemp(s);
         if (t && plausibleTemp(t.value)) {
           r.skin_temp_delta = Math.round(t.value * 100) / 100;
@@ -276,6 +289,33 @@ Deno.serve(async (req) => {
         }
       } catch {
         bbNote = "Body Battery im Tagesverlauf ist bei Garmin nicht abrufbar.";
+      }
+
+      // Stress im Tagesverlauf (für den Tagesrückblick): ein Abruf pro Tag, daher nur für die letzten 7 Tage.
+      // Pfad aus Garmin Connect, nicht dokumentiert. Fehler brechen den Abruf nicht ab.
+      for (let day = w.s; day <= w.e; day = isoDay(addDays(new Date(day + "T12:00:00"), 1))) {
+        if (day < isoDay(addDays(today, -6))) continue;
+        try {
+          const sd = await garminGet(token, `/wellness-service/wellness/dailyStress/${day}`);
+          const values = (sd?.stressValuesArray ?? []) as Any[];
+          const curve: (number | null)[] = Array(96).fill(null);
+          let any = false;
+          for (const v of values) {
+            if (!Array.isArray(v) || typeof v[0] !== "number" || typeof v[1] !== "number") continue;
+            if (v[1] < 0 || v[1] > 100) continue; // -1/-2: kein Wert oder Bewegung
+            const lm = localDayMinute(v[0]);
+            if (lm.day !== day) continue;
+            const i = Math.floor(lm.minute / 15);
+            curve[i] = curve[i] === null ? v[1] : Math.max(curve[i] as number, v[1]);
+            any = true;
+          }
+          if (any) {
+            row(day).stress_curve = curve;
+            stressCurveDays++;
+          }
+        } catch {
+          stressNote = "Stress im Tagesverlauf ist bei Garmin nicht abrufbar.";
+        }
       }
 
       // HRV
@@ -365,6 +405,7 @@ Deno.serve(async (req) => {
     let migrationMissing = false;
     let stagesMissing = false;
     let energyMissing = false;
+    let stressMissing = false;
     if (dailyRows.length) {
       // Spalten aus späteren Migrationen: fehlt eine in der Datenbank, ohne sie speichern,
       // damit der Abruf weiter funktioniert. Die App weist dann auf die fehlende Migration hin.
@@ -373,17 +414,19 @@ Deno.serve(async (req) => {
         fitness_age: ["fitness_age"],
         sleep_: ["sleep_deep_s", "sleep_rem_s", "sleep_light_s", "sleep_awake_s"],
         energie_: ["bb_curve", "sleep_start_min", "sleep_end_min"],
+        atem_stress_: ["respiration_avg", "stress_rest_s", "stress_low_s", "stress_medium_s", "stress_high_s", "stress_curve"],
       };
       const dropped = new Set<string>();
       const strip = () => dailyRows.map((r) => Object.fromEntries(Object.entries(r).filter(([k]) => !dropped.has(k))));
       let { error } = await sb.from("garmin_daily").upsert(dailyRows, { onConflict: "user_id,day" });
-      for (let tries = 0; error && tries < 4; tries++) {
+      for (let tries = 0; error && tries < 5; tries++) {
         const hit = Object.entries(optional).find(([, cols]) => cols.some((c) => error!.message.includes(c)) && !cols.every((c) => dropped.has(c)));
         if (!hit) break;
         hit[1].forEach((c) => dropped.add(c));
         if (hit[0] === "skin_temp_delta") migrationMissing = true;
         if (hit[0] === "sleep_") stagesMissing = true;
         if (hit[0] === "energie_") energyMissing = true;
+        if (hit[0] === "atem_stress_") stressMissing = true;
         ({ error } = await sb.from("garmin_daily").upsert(strip(), { onConflict: "user_id,day" }));
       }
       if (error) throw new Error("Speichern der Tageswerte: " + error.message);
@@ -430,6 +473,8 @@ Deno.serve(async (req) => {
       sleepStagesNote: stagesMissing ? "Die Datenbank-Spalten für die Schlafphasen fehlen noch." : "",
       bbCurveDays: energyMissing ? 0 : bbCurveDays,
       energyNote: energyMissing ? "Die Datenbank-Spalten für die Energie über den Tag fehlen noch." : bbNote,
+      stressCurveDays: stressMissing ? 0 : stressCurveDays,
+      stressNote: stressMissing ? "Die Datenbank-Spalten für Atemfrequenz und Stress fehlen noch." : stressNote,
       syncedAt: new Date().toISOString(),
     });
   } catch (e) {

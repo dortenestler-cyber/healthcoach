@@ -45,6 +45,7 @@ export default function VitalsCard({ day, data, onSynced }: { day: string; data:
       if (typeof res.skinTempNights === "number") parts.push(`Hauttemperatur: ${res.skinTempNights} ${res.skinTempNights === 1 ? "Nacht" : "Nächte"} gefunden.` + (res.skinNote ? " " + res.skinNote : ""));
       if (res.sleepStagesNote) parts.push(res.sleepStagesNote);
       if (res.energyNote) parts.push(res.energyNote);
+      if (res.stressNote) parts.push(res.stressNote);
       setNote(parts.join(" "));
       onSynced();
     },
