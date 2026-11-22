@@ -9,6 +9,7 @@ import PageHead from "@/components/PageHead";
 import VerlaufDetail, { HISTORY } from "@/components/verlauf/VerlaufDetail";
 import { SPANS, spanOf, type Span } from "@/lib/verlauf";
 import type { Diary } from "@/lib/insights";
+import { loadGarminCycles, mergeGarminCycles } from "@/lib/garminZyklus";
 
 // Detailansicht eines Garmin-Werts: Zeitraum T · W · M · 6M · J, fester persönlicher Bereich als Band,
 // Zyklusphasen getönt, Vergleich nach Zyklusphase und Highlights. Ab 6M Wochenmittel.
@@ -26,16 +27,17 @@ export default function VerlaufView({ initial }: { initial: string }) {
     if (!sb) return;
     const from = isoDay(daysAgo(need - 1));
     const diaryFrom = isoDay(daysAgo(need + 60));
-    const [g, d] = await Promise.all([
+    const [g, d, gc] = await Promise.all([
       sb.from("garmin_daily").select("*").gte("day", from).order("day"),
       sb.from("diary_entries").select("day, bleeding, symptoms, influences").gte("day", diaryFrom).order("day"),
+      loadGarminCycles(sb, diaryFrom),
     ]);
     if (g.error) {
       setError("Verlauf konnte nicht geladen werden: " + g.error.message);
       return;
     }
     setRows((g.data ?? []) as Daily[]);
-    setDiary(((d.data ?? []) as Diary[]).map((e) => ({ ...e, symptoms: e.symptoms ?? {}, influences: e.influences ?? [] })));
+    setDiary(mergeGarminCycles(((d.data ?? []) as Diary[]).map((e) => ({ ...e, symptoms: e.symptoms ?? {}, influences: e.influences ?? [] })), gc));
   }, [need]);
 
   useEffect(() => {

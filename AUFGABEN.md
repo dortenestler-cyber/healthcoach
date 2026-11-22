@@ -47,7 +47,13 @@ In Supabase unter **Edge Functions → Secrets** anlegen:
 ### 8. Früheres nachtragen
 - [ ] Im Tagebuch unten unter **Vergangene Perioden nachtragen** deine früheren Perioden eintragen (die Zyklus-Seite verlinkt dorthin). Je mehr, desto genauer werden Phasen und Vergleiche
 
-### 9. Aufräumen
+### 9. Zyklus aus Garmin und Abruf um 6:15 Uhr (PR #47, ersetzt PR #14)
+- [ ] `supabase/migrations/20261122190000_garmin_zyklus_morgenabruf.sql` komplett ausführen (legt Tabellen, Schlüssel im Vault und den Zeitplan an, schaltet `pg_cron` und `pg_net` ein)
+- [ ] PR #47 ansehen und mergen (Claude merged ihn nicht selbst: Migration und `garmin-sync`)
+- [ ] PR #14 auf GitHub schließen, er ist durch #47 ersetzt
+- [ ] Am nächsten Morgen nach 6:15 Uhr die App öffnen: Die Daten sollten schon da sein. Steht auf Heute ein Hinweis zum Morgen-Abruf, Claude Bescheid geben
+
+### 10. Aufräumen
 - [ ] Auf GitHub den Zweig `heute-neu` löschen (versehentlich angelegt, gleicher Inhalt wie PR #38)
 
 ## Erledigt

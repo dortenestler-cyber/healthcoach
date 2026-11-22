@@ -109,7 +109,7 @@ export function effectsByPhase(data: Data): PhaseEffect[] {
     return { d: a.length >= MIN_DAYS && b.length >= MIN_DAYS ? (mean(a) as number) - (mean(b) as number) : null, n: a.length };
   };
   const rows: { key: string; label: string; withD: string[]; withoutD: string[] }[] = [];
-  const diaryDays = data.diary.map((d) => d.day);
+  const diaryDays = data.diary.filter((d) => !d.garminOnly).map((d) => d.day); // nur Tage mit eigenem Eintrag
   for (const i of INFLUENCES) {
     const withD = data.diary.filter((d) => d.influences?.includes(i.key)).map((d) => d.day);
     rows.push({ key: i.key, label: i.label, withD, withoutD: diaryDays.filter((d) => !withD.includes(d)) });

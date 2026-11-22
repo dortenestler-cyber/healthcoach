@@ -8,6 +8,7 @@ import { daysAgo, isoDay } from "@/lib/dates";
 import { loadInsightData } from "@/lib/insightData";
 import type { Data, Diary } from "@/lib/insights";
 import { useFeatures } from "@/lib/prefs";
+import { loadGarminCycles, mergeGarminCycles } from "@/lib/garminZyklus";
 
 // Lädt die Daten für die Seite Zyklus: 6 Monate Werte, zwei Jahre Tagebuch, 12 Wochen Hitzewallungen
 export default function ZyklusPage() {
@@ -24,11 +25,12 @@ export default function ZyklusPage() {
       loadInsightData(),
       sb.from("diary_entries").select("day, bleeding, symptoms, influences").gte("day", isoDay(daysAgo(760))).order("day"),
       sb.from("hot_flashes").select("at").gte("at", daysAgo(90).toISOString()),
+      loadGarminCycles(sb, isoDay(daysAgo(760))),
     ])
-      .then(([d, diary, f]) => {
+      .then(([d, diary, f, gc]) => {
         if (diary.error) throw new Error(diary.error.message);
         setData(d);
-        setLongDiary(((diary.data ?? []) as Diary[]).map((e) => ({ ...e, symptoms: e.symptoms ?? {}, influences: e.influences ?? [] })));
+        setLongDiary(mergeGarminCycles(((diary.data ?? []) as Diary[]).map((e) => ({ ...e, symptoms: e.symptoms ?? {}, influences: e.influences ?? [] })), gc));
         setFlashes(((f.data ?? []) as { at: string }[]).map((r) => r.at));
       })
       .catch((e) => setError("Daten konnten nicht geladen werden: " + (e instanceof Error ? e.message : String(e))));

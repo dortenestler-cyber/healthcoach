@@ -100,7 +100,7 @@ export function nextPeriodWindow(diary: Diary[], day: string): PeriodWindow | nu
   return { earliest: addDays(last, Math.min(...lens)), latest: addDays(last, Math.max(...lens)), basis: lens.length };
 }
 
-export type CycleToday = { cycleDay: number | null; length: number; phase: Phase | null; window: PeriodWindow | null; cycles: number };
+export type CycleToday = { cycleDay: number | null; length: number; phase: Phase | null; window: PeriodWindow | null; cycles: number; fromGarmin: boolean };
 
 export function cycleToday(day: string, diary: Diary[]): CycleToday {
   const ci = cycleInfo(day, diary);
@@ -110,6 +110,7 @@ export function cycleToday(day: string, diary: Diary[]): CycleToday {
     phase: ci.cycleDay !== null ? phaseFor(ci.cycleDay, ci.length) : null,
     window: nextPeriodWindow(diary, day),
     cycles: ci.cycles,
+    fromGarmin: ci.fromGarmin,
   };
 }
 

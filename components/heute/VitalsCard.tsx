@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RangeRow } from "@/components/charts";
 import { countInRange } from "@/lib/baseline";
-import { clock } from "@/lib/dates";
+import { clock, isoDay } from "@/lib/dates";
+import { supabase } from "@/lib/supabase";
 import { syncGarmin } from "@/lib/garmin";
 import type { Data } from "@/lib/insights";
 import { vitalRows } from "@/lib/today";
@@ -16,7 +17,19 @@ export default function VitalsCard({ day, data, onSynced }: { day: string; data:
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [note, setNote] = useState("");
+  const [morning, setMorning] = useState<{ at: string; ok: boolean; message: string | null } | null>(null);
   const autoDone = useRef(false);
+
+  // Letzter automatischer Abruf am Morgen (fehlt die Tabelle noch, bleibt es still)
+  useEffect(() => {
+    supabase()
+      ?.from("garmin_sync_runs")
+      .select("at, ok, message")
+      .order("at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data: run, error: e }) => setMorning(!e && run && isoDay(new Date(run.at)) === isoDay() ? run : null));
+  }, [data]);
 
   const sync = useCallback(
     async (days: number) => {
@@ -68,6 +81,11 @@ export default function VitalsCard({ day, data, onSynced }: { day: string; data:
           {busy ? "Läuft …" : "Synchronisieren"}
         </button>
       </div>
+      {morning && !morning.ok && lastSync < new Date(morning.at).getTime() && (
+        <p className="alert alert-inline">
+          Der Abruf heute Morgen um {clock(new Date(morning.at))} hat nicht geklappt. Tippe auf „Synchronisieren“, um es jetzt zu versuchen. ({morning.message ?? "unbekannter Fehler"})
+        </p>
+      )}
       {error && <p className="alert alert-inline">{error}</p>}
       {note && <span className="meta">{note}</span>}
       <div className="factor-list">
