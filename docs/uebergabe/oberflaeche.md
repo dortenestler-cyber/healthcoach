@@ -10,6 +10,7 @@ Design „dunkel 2“ ist auf Heute, Zyklus, Training und Gesundheit umgesetzt (
 - Nichts.
 
 ## Wartet auf
+- Nutzerin: Freigabe für den Aufräum-Vorschlag `docs/aufraeumen-vorschlag.md` (PR #53, aus einer anderen Sitzung). Betrifft vor allem Seiten, darum Oberfläche. Braucht das Aufräumen Änderungen an der Datenbank, übernimmt Daten diesen Teil
 - Nutzerin: Rückmeldung zu Heute, Zyklus und Training im Design „dunkel 2“ (`AUFGABEN.md` Abschnitt 10)
 - Nutzerin: Rückmeldung zur Seite Zyklus (`AUFGABEN.md` Abschnitt 6)
 
