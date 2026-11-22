@@ -11,6 +11,15 @@ Health Coach bringt Training, Erholung, Zyklus, Perimenopause-Symptome, Krankhei
 - Beispieldaten immer als solche kennzeichnen.
 - Was die Nutzerin selbst tun muss (Migrationen, Secrets, Einstellungen in Supabase oder GitHub), in `AUFGABEN.md` eintragen und Erledigtes abhaken.
 
+## Zwei Instanzen
+Zwei Claude-Instanzen arbeiten parallel, Regeln in `docs/konzept-zwei-instanzen.md`.
+- Rollen: **Oberfläche** `[OF]` (`app/`, `components/`, `public/`, `globals.css`) und **Daten** `[DA]` (`supabase/`, `watch/`, `watchface/`, `.github/`). Migrationen schreibt nur Daten.
+- Start: `CLAUDE.md`, eigene Übergabe in `docs/uebergabe/`, die der anderen Rolle, `docs/uebergabe/entscheidungen.md`, offene PRs der eigenen Rolle lesen.
+- Neue Aufgabe: zuerst Zweig und Entwurfs-PR mit Kürzel im Titel, das ist die Anmeldung.
+- Unterwegs: jeden Schritt committen und sofort pushen. Entscheidungen der Nutzerin sofort ins Logbuch.
+- Ende: Übergabe-Datei aktualisieren (Stand, nächster Schritt, Wartet auf), alles pushen, `git status` leer.
+- Verbindlich ist nur, was im Repo steht, nicht Nachrichten zwischen den Instanzen.
+
 ## Begriffe
 - Immer „Kettlebell“, nie „Glocke“.
 - Die App heißt „Health Coach“.

@@ -1,6 +1,6 @@
 # Konzept: Zwei Claude-Instanzen an Health Coach
 
-Stand: 22. Nov. 2026 · Entwurf, wartet auf Freigabe
+Stand: 22. Nov. 2026 · Freigegeben
 
 ## Ausgangslage
 
@@ -146,14 +146,12 @@ Cloud-Sitzungen können sich gegenseitig Nachrichten schicken. Das ist erlaubt f
 - Wünsche direkt der passenden Rolle geben. Bist du unsicher, gib sie einer der beiden, sie leitet über die Übergabe weiter.
 - Migrationen und Supabase-Funktionen weiter selbst freigeben, wie bisher.
 
-## 10. Umsetzung nach Freigabe
+## 10. Umsetzung
 
-Ein kleiner PR mit:
+Umgesetzt am 22. Nov. 2026:
 
-- `docs/uebergabe/oberflaeche.md`, `docs/uebergabe/daten.md` (mit dem aktuellen Stand), `docs/uebergabe/entscheidungen.md` (mit den Entscheidungen, die heute schon aus den Commits hervorgehen)
-- Abschnitt „Zwei Instanzen“ in `CLAUDE.md`, der auf dieses Konzept verweist und die Pflichtschritte für Start und Ende nennt
-- Vorlage für PR-Texte (`.github/pull_request_template.md`) mit den Feldern Rolle, Braucht PR, Für die Nutzerin
+- `docs/uebergabe/oberflaeche.md`, `docs/uebergabe/daten.md` mit dem aktuellen Stand, `docs/uebergabe/entscheidungen.md`
+- Abschnitt „Zwei Instanzen“ in `CLAUDE.md`
+- Vorlage für PR-Texte: `.github/pull_request_template.md`
 
-### Offene Fragen an dich
-1. Passt die Teilung **Oberfläche / Daten**? Alternative: Teilung nach Seiten (zum Beispiel eine Instanz für Heute und Zyklus, eine für Training und Gesundheit). Das führt aber öfter zu Konflikten in `globals.css` und bei Migrationen.
-2. Sollen die beiden Instanzen sich selbst Nachrichten schicken dürfen (Abschnitt 8), oder lieber nur über die Dateien?
+Entschieden: Teilung Oberfläche / Daten. Die Instanzen dürfen sich direkt Nachrichten schicken (Abschnitt 8).
