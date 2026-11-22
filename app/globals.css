@@ -1058,6 +1058,20 @@ button {
   font-weight: 600;
 }
 
+/* Einnahmen: einzeln, je Gruppe oder alles */
+.btn-44 { min-height: 44px; }
+.intake-all { padding-bottom: 4px; }
+.intake-group { display: flex; flex-direction: column; }
+.intake-sub { padding: 2px 0 2px 16px; border-left: 2px solid var(--line-soft); margin-left: 2px; }
+.intake-sub .row-label { font-size: 14px; }
+.counter { display: flex; gap: 8px; flex: none; align-items: center; }
+.counter .btn { min-width: 44px; width: auto; flex: none; padding: 0 14px; white-space: nowrap; margin-top: 0; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.counter-value { min-width: 64px; text-align: center; }
+.day-nav { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 8px; align-items: center; margin-bottom: 14px; }
+.day-nav .input { text-align: center; }
+.grid-cell[data-selected="true"] { outline: 2px solid var(--text); outline-offset: 1px; }
+
 .kyu {
   background: var(--training-bg);
   color: var(--training-fg) !important;
