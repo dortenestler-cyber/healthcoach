@@ -1,7 +1,7 @@
 import Link from "next/link";
-import EnergyChart from "@/components/muster/EnergyChart";
+import EnergyChart from "@/components/heute/EnergyChart";
 import type { Data } from "@/lib/insights";
-import { energyDay } from "@/lib/muster";
+import { energyDay } from "@/lib/energie";
 
 // Energie über den Tag: Satz, aktuelle Body Battery, Diagramm. Ohne Netzwerk.
 export default function EnergyCard({ day, data, nowMinute }: { day: string; data: Data; nowMinute: number }) {

@@ -2130,3 +2130,14 @@ a.btn {
 .cb-key-projection { background: transparent; border-top: 2px dashed var(--c, var(--recovery)); height: 0 !important; border-radius: 0 !important; }
 .cb-key-usual { background: var(--muted); height: 2px !important; }
 .cb-key-sleep-area { background: var(--fill); }
+
+/* Seite Zyklus: Ring mit Phasenbögen */
+.cycle-arc-menstruation { stroke: var(--menses-fg); }
+.cycle-arc-follikel { stroke: var(--line-strong); }
+.cycle-arc-luteal { stroke: var(--cycle); }
+.cycle-today { fill: var(--text); stroke: var(--card); stroke-width: 2.5; }
+.cycle-head { display: flex; align-items: center; gap: 16px; }
+.cycle-head .stack { gap: 4px; min-width: 0; }
+.legend .cycle-key-menstruation { background: var(--menses-fg); }
+.legend .cycle-key-follikel { background: var(--line-strong); }
+.legend .cycle-key-luteal { background: var(--cycle); }

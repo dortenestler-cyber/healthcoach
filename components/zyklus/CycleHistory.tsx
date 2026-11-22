@@ -7,9 +7,9 @@ const MONTHS = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", 
 const short = (iso: string) => `${Number(iso.slice(8, 10))}. ${MONTHS[Number(iso.slice(5, 7)) - 1]}`;
 const de1 = (v: number) => v.toLocaleString("de-DE", { maximumFractionDigits: 1 });
 
-// Gesundheit · Zyklus: Zykluslängen mit Bereich von vor einem Jahr, Hitzewallungen pro Woche, Symptome nach Zyklustag.
+// Seite Zyklus, unterer Teil: Zykluslängen mit Bereich von vor einem Jahr, Hitzewallungen pro Woche, Symptome nach Zyklustag.
 // Ohne Netzwerk. Zusammenhänge, keine Diagnose.
-export default function CycleView({ today, diary, flashes, showFlashes }: { today: string; diary: Diary[]; flashes: string[]; showFlashes: boolean }) {
+export default function CycleHistory({ today, diary, flashes, showFlashes }: { today: string; diary: Diary[]; flashes: string[]; showFlashes: boolean }) {
   const cl = cycleLengthView(diary, today);
   const last = cl.recent[cl.recent.length - 1];
   const y = cl.yearAgo;

@@ -59,7 +59,7 @@ Dann im Browser `http://localhost:3000` öffnen.
 
 ## Aufbau
 ```
-app/            Seiten: Heute, Tagebuch, Training, Muster, Gesundheit, Coach
+app/            Seiten: Heute, Tagebuch, Training, Zyklus, Gesundheit, Coach
 components/     Navigation, Coach-Knopf, Anmeldung, Ansichten
 lib/            Supabase-Verbindung, Datum, feste Listen
 supabase/       Datenbank-Tabellen mit Zugriffsschutz, Funktion garmin-sync

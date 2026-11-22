@@ -9,7 +9,7 @@ const NAMES: Record<string, string> = {
   "/": "Heute",
   "/tagebuch": "Tagebuch",
   "/training": "Training",
-  "/muster": "Muster",
+  "/zyklus": "Zyklus",
   "/gesundheit": "Gesundheit",
   "/coach": "Coach",
   "/coach/hinweise": "Hinweise des Coachs",

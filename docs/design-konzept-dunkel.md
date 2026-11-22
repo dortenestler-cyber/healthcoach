@@ -104,3 +104,14 @@ Jeder PR mit Bildschirmfotos auf iPhone-Größe.
 - Readiness bleibt 0–10.
 - Die alte Belastungskarte auf Heute entfällt, sobald die Last als Faktor in der Readiness steht.
 - Reihenfolge: PR 1 und 2 zuerst, damit Heute schnell im Alltag getestet werden kann.
+
+## Änderung 22.11.2026: Muster wird Zyklus
+
+Auf Wunsch der Nutzerin heißt der vierte Reiter jetzt **Zyklus** (`/zyklus`, `/muster` leitet weiter). Der Fokus liegt auf dem eigenen Zyklus, die Muster sind innerhalb des Zyklus eingeordnet:
+
+1. Zyklus-Ring mit Phasenbögen, Zyklustag, Phase (geschätzt), Periodenfenster und Vorschlag zur Phase.
+2. Heute in deinem Zyklus: HRV, Ruhepuls, Temperatur und Schlaf in der heutigen Phase gegen den Schnitt, häufige Symptome um diesen Zyklustag.
+3. Werte nach Zyklustag: laufender Zyklus gegen den Schnitt der früheren Zyklen (HRV, Ruhepuls, Temperatur, Schlaf, Body Battery).
+4. Zykluslängen, Hitzewallungen pro Woche, Symptome nach Zyklustag (vorher Reiter unter Gesundheit).
+5. Was dir guttut je Phase: HRV der Folgenacht, Follikel- und Lutealphase getrennt, ab je 5 Nächten.
+6. Weitere Muster ohne Zyklusbezug unten. „Energie über den Tag“ steht auf Heute.

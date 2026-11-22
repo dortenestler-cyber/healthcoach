@@ -1,5 +1,5 @@
 import { segments, W } from "@/components/charts/scale";
-import type { EnergyDay } from "@/lib/muster";
+import type { EnergyDay } from "@/lib/energie";
 
 const H = 190;
 const PAD_L = 4;

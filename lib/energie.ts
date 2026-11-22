@@ -1,12 +1,9 @@
-// Muster: Energie über den Tag (Body Battery) und „Was dir guttut“ (Einflüsse und HRV der Folgenacht).
+// Energie über den Tag (Body Battery) für die Seite Heute.
 // Reine Berechnungen ohne Netzwerk. Zusammenhänge aus den eigenen Daten, keine Empfehlungen.
 
-import { INFLUENCES } from "@/lib/catalog";
 import type { Activity, Daily } from "@/lib/garmin";
-import { loadPercent, type Data } from "@/lib/insights";
 
 export const SLOTS = 96; // alle 15 Minuten
-export const MIN_NIGHTS = 5; // je Gruppe (mit und ohne)
 
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");
@@ -19,7 +16,6 @@ const median = (v: number[]) => {
   const m = Math.floor(s.length / 2);
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 };
-const mean = (v: number[]) => (v.length ? v.reduce((a, b) => a + b, 0) / v.length : null);
 
 // ---------- Energie über den Tag
 
@@ -63,32 +59,4 @@ export function energyDay(day: string, daily: Daily[], acts: Activity[], nowMinu
       return { start, end: Math.min(1440, start + Math.round((a.duration_s ?? 1800) / 60)), label: a.name ?? "Training" };
     });
   return { today, usual, projection, nowSlot, usualDays: past.length, sleep, training };
-}
-
-// ---------- Was dir guttut
-
-export type Effect = { key: string; label: string; diff: number | null; withN: number; withoutN: number };
-
-// Unterschied der HRV in der Nacht danach: Tage mit Einfluss gegen Tage ohne (nur Tage mit Tagebuch-Eintrag)
-export function hrvEffects(data: Data): Effect[] {
-  const hrv = new Map(data.daily.map((d) => [d.day, d.hrv_last_night]));
-  const next = (day: string) => hrv.get(addDays(day, 1)) ?? null;
-  const vals = (days: string[]) => days.map(next).filter((v): v is number => v !== null);
-  const out: Effect[] = [];
-  const add = (key: string, label: string, withD: string[], withoutD: string[]) => {
-    const a = vals(withD);
-    const b = vals(withoutD);
-    const ok = a.length >= MIN_NIGHTS && b.length >= MIN_NIGHTS;
-    out.push({ key, label, diff: ok ? (mean(a) as number) - (mean(b) as number) : null, withN: a.length, withoutN: b.length });
-  };
-  const diaryDays = data.diary.map((d) => d.day);
-  for (const i of INFLUENCES) {
-    const withD = data.diary.filter((d) => d.influences?.includes(i.key)).map((d) => d.day);
-    add(i.key, i.label, withD, diaryDays.filter((d) => !withD.includes(d)));
-  }
-  // Harte Trainingstage aus Garmin (Belastung ab 70 %), verglichen mit allen anderen Tagen mit Garmin-Daten
-  const days = data.daily.map((d) => d.day);
-  const hard = days.filter((d) => loadPercent(d, data.daily, data.acts) >= 70);
-  add("hart", "Harter Trainingstag", hard, days.filter((d) => !hard.includes(d)));
-  return out;
 }

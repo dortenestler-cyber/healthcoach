@@ -27,7 +27,8 @@ Health Coach bringt Training, Erholung, Zyklus, Perimenopause-Symptome, Krankhei
 - Jedes Diagramm bekommt eine Überschrift mit einem Satz, der das Ergebnis nennt.
 - Farben und Abstände kommen aus den Variablen in `app/globals.css`, keine festen Farbwerte in Komponenten.
 - Tap-Ziele mindestens 44 px, Kontrast mindestens AA.
-- Navigation: Heute, Tagebuch, Training, Muster, Gesundheit. Der Coach ist ein schwebender Knopf auf jeder Seite.
+- Navigation: Heute, Tagebuch, Training, Zyklus, Gesundheit. Der Coach ist ein schwebender Knopf auf jeder Seite.
+- Die Seite Zyklus stellt den Zyklus in den Mittelpunkt: Ring mit Phasen, was in der heutigen Phase üblich ist, Werte und Symptome nach Zyklustag, Einflüsse je Phase. Muster ohne Zyklusbezug stehen dort unten unter „Weitere Muster“, „Energie über den Tag“ steht auf Heute.
 - App-Symbol: Tagesziel-Ring, hell (`public/icons/icon.svg`) und dunkel (`public/icons/icon-dark.svg`).
 
 ## Gesundheit und Sicherheit

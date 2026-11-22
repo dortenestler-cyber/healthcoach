@@ -26,7 +26,7 @@ export default function DivergingBars({ rows, fmt, label, tone = "recovery" }: {
             <text x={0} y={cy + 17} className="cb-tick">{r.note}</text>
             {r.value !== null && <rect x={r.value >= 0 ? x0 : x0 - w} width={Math.max(2, w)} y={cy - 7} height={14} rx={4} className={r.value >= 0 ? "cb-bar-pos" : "cb-bar-neg"} />}
             <text x={W} y={cy + 4} textAnchor="end" className={r.value === null ? "cb-tick" : "cb-value"}>
-              {r.value === null ? "–" : `${r.value > 0 ? "+" : r.value < 0 ? "−" : "±"}${fmt(Math.abs(r.value))}`}
+              {r.value === null ? "–" : `${fmt(Math.abs(r.value)) === fmt(0) ? "±" : r.value > 0 ? "+" : "−"}${fmt(Math.abs(r.value))}`}
             </text>
           </g>
         );
