@@ -3,13 +3,16 @@
 Was du selbst erledigen musst, meist in Supabase oder auf GitHub. Claude trägt hier neue Aufgaben ein, sobald ein Pull Request etwas von dir braucht, und hakt ab, was erledigt ist.
 Projekt in Supabase: `fkvhuxjsdvssmupewwgl` (Region Frankfurt).
 
-So führst du eine Migration aus: In Supabase links **SQL Editor** öffnen, den Inhalt der Datei einfügen, **Run** drücken. Mehrfaches Ausführen schadet nicht.
+Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests führt GitHub neue Dateien aus `supabase/migrations` in der Datenbank aus (Workflow „Supabase-Migrationen ausführen“). Pull Requests mit Migrationen merged du selbst, dein Merge ist die Freigabe.
 
 ## Jetzt
 
-### 1. Migrationen ausführen
-- [ ] `supabase/migrations/20261122120000_coach_kosten.sql`: Verbrauch des Coachs, damit die App die Kosten pro Monat zeigt (aus PR #33)
-- [ ] `supabase/migrations/20261122130000_push.sql`: Tabelle für Push-Mitteilungen. Nur den oberen Teil ausführen, der Zeitplan unten kommt erst in Schritt 4 (aus PR #33)
+### 1. Migrationen automatisch ausführen lassen (PR #47)
+- [ ] Datenbank-Passwort bereitlegen: In Supabase unter **Project Settings → Database** steht, wie du es neu setzen kannst, falls du es nicht mehr weißt
+- [ ] In Supabase oben auf **Connect** tippen, **Session pooler** wählen und die Verbindungs-Adresse kopieren. Darin `[YOUR-PASSWORD]` durch das Passwort ersetzen
+- [ ] Auf GitHub unter **Settings → Secrets and variables → Actions** das Secret `SUPABASE_DB_URL` mit dieser Adresse anlegen
+- [ ] PR #47 ansehen und mergen. Danach läuft der Workflow „Supabase-Migrationen ausführen“ zum ersten Mal. Er führt alle Migrationen einmal aus, auch die alten. Das schadet nicht, weil jede mehrfach laufen darf. Damit sind auch `coach_kosten`, `push`, `schlafphasen` und `energie_tag` erledigt
+- [ ] Claude Bescheid geben, dann prüft Claude, ob der Lauf grün ist
 
 ### 2. Funktionen hochladen
 Der automatische Upload nach PR #33 ist gescheitert (GitHub hatte zu viele Anfragen). Das ist inzwischen behoben, muss aber einmal von Hand angestoßen werden:
@@ -23,18 +26,18 @@ In Supabase unter **Edge Functions → Secrets** anlegen:
 - [ ] `PUSH_CRON_SECRET`: ein langes, beliebiges Passwort (brauchst du gleich noch einmal)
 
 ### 4. Zeitplan für die Check-in-Erinnerung
-- [ ] In Supabase unter **Database → Extensions** `pg_cron` und `pg_net` einschalten
-- [ ] Den Zeitplan-Block unten in `supabase/migrations/20261122130000_push.sql` ohne die `--` am Zeilenanfang ausführen. Dabei `<PROJEKT>` durch `fkvhuxjsdvssmupewwgl` und `<PUSH_CRON_SECRET>` durch das Passwort aus Schritt 3 ersetzen
+Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch an (pg_cron und pg_net schaltet sie selbst ein). Es fehlt nur das Passwort im Tresor:
+- [ ] In Supabase unter **Integrations → Vault** (oder **Project Settings → Vault**) einen Eintrag mit dem Namen `push_cron_secret` anlegen. Wert: dasselbe Passwort wie `PUSH_CRON_SECRET` aus Schritt 3
 - [ ] In der App unter **Einstellungen** die Erinnerung einschalten und eine Testmitteilung schicken
 
 ### 5. Heute im neuen Design (PR #38)
 - [x] PR #38 ansehen und mergen
-- [ ] `supabase/migrations/20261122150000_schlafphasen.sql` ausführen: Spalten für die Schlafphasen
+- [ ] `supabase/migrations/20261122150000_schlafphasen.sql`: läuft automatisch mit Schritt 1
 - [x] Upload von `garmin-sync` nach dem Merge ist grün
 - [ ] In der App auf Heute **Synchronisieren** tippen. Die Schlafkarte sollte dann Tief, REM, Leicht und Wach zeigen. Wenn nicht, Claude Bescheid geben
 
 ### 6. Seite Zyklus und Energie über den Tag (PR #43, enthält PR #42)
-- [ ] `supabase/migrations/20261122170000_energie_tag.sql` ausführen: Spalten für den Body-Battery-Verlauf und die Schlafzeiten
+- [ ] `supabase/migrations/20261122170000_energie_tag.sql`: läuft automatisch mit Schritt 1
 - [x] PR #42 und #43 gemergt
 - [x] Upload von `garmin-sync` nach dem Merge ist grün (geprüft von Claude)
 - [ ] In der App auf Heute **Synchronisieren** tippen. Die Karte „Energie über den Tag“ steht jetzt auf Heute. Steht dort „Body Battery im Tagesverlauf ist bei Garmin nicht abrufbar“, Claude Bescheid geben
