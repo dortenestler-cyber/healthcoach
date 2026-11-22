@@ -57,8 +57,8 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 - [ ] Im Tagebuch unten unter **Vergangene Perioden nachtragen** deine früheren Perioden eintragen (die Zyklus-Seite verlinkt dorthin). Je mehr, desto genauer werden Phasen und Vergleiche
 
 ### 9. Zyklus aus Garmin und Abruf um 6:15 Uhr (PR #47, ersetzt PR #14)
-- [ ] PR #47 ansehen und mergen (Claude merged ihn nicht selbst: Migration und `garmin-sync`). Danach laufen die Migration `20261123120000_garmin_zyklus_morgenabruf.sql` (Tabellen, Schlüssel im Vault, Zeitplan, `pg_cron` und `pg_net`) und der Upload von `garmin-sync` automatisch
-- [ ] PR #14 auf GitHub schließen, er ist durch #47 ersetzt
+- [x] PR #47 gemergt (22. Nov.), Migration und Upload von `garmin-sync` grün (geprüft von Claude). Damit liefen die Migration `20261123120000_garmin_zyklus_morgenabruf.sql` (Tabellen, Schlüssel im Vault, Zeitplan, `pg_cron` und `pg_net`) und der Upload von `garmin-sync` automatisch
+- [x] PR #14 geschlossen, er ist durch #47 ersetzt
 - [ ] Am nächsten Morgen nach 6:15 Uhr die App öffnen: Die Daten sollten schon da sein. Steht auf Heute ein Hinweis zum Morgen-Abruf, Claude Bescheid geben
 
 ### Aufräumen
@@ -87,7 +87,7 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 ### 13. Zwei Claude-Instanzen (PR #54, Konzept `docs/konzept-zwei-instanzen.md`)
 - [ ] Neue Sitzungen mit diesem Satz starten: „Du bist die Rolle **Oberfläche** (oder **Daten**) im Projekt Health Coach. Folge `docs/konzept-zwei-instanzen.md`, Abschnitt 6 „Start“.“
 - [ ] Pro Rolle nur eine Sitzung gleichzeitig laufen lassen
-- [ ] PR #14 schließen (ersetzt durch PR #47)
+- [x] PR #14 geschlossen (ersetzt durch PR #47)
 
 ## Erledigt
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)
