@@ -14,10 +14,13 @@ Health Coach bringt Training, Erholung, Zyklus, Perimenopause-Symptome, Krankhei
 - Die App heißt „Health Coach“.
 
 ## Design
-- Stil angelehnt an Apple Health und Google Health: große weiße Karten auf `#F2F2F7`, Radius 24 (Kacheln 18), große Zahlen, Schrift Inter mit Ziffern in gleicher Breite.
-- Farben haben eine feste Bedeutung und stehen nie allein, immer mit Text:
-  Erholung/Readiness Sage `#2D6A4F` · Zyklus/Perimenopause Terracotta `#B4491F` · Menstruation `#7F1D1D` auf `#F6DADA` · Training/Garmin Slate-Blau `#3B5998` · Symptome/Warnung Amber `#B45309` · Mobility Violett `#6D4AA8`.
-- Hauptbutton, aktive Auswahl und Links in Dunkel `#1C1C1E`.
+- Dunkel ist der Standard, angelehnt an Whoop und Bevel: dunkelgraue Karten `#15181D` auf `#0B0D10`, Flächen `#262B33`, Text `#F2F4F7`, gedämpft `#9AA3AE`. Radius 24 (Kacheln 18), große Zahlen, Schrift Inter mit Ziffern in gleicher Breite. Konzept: `docs/design-konzept-dunkel.md`.
+- Hell bleibt wählbar (Einstellungen › Darstellung): weiße Karten auf `#F2F2F7` wie Apple Health.
+- Ringe für Schlaf, Readiness und Belastung gehören zum Stil. Ein Ring steht nie ohne Zahl und Wort.
+- Farben haben eine feste Bedeutung und stehen nie allein, immer mit Text. Keine Ampelfarben für die Erholung.
+  Dunkel: Erholung/Readiness Sage `#52B788` · Zyklus/Perimenopause Terracotta `#E8845A` · Menstruation `#F28B8B` auf `#3B1E22` · Training/Garmin Slate-Blau `#7C9AE0` · Symptome/Warnung Amber `#F0A24A` · Mobility Violett `#A98BE0` · Schlaf neutral `#E5E7EB`.
+  Hell: Sage `#2D6A4F` · Terracotta `#B4491F` · Menstruation `#7F1D1D` auf `#F6DADA` · Slate-Blau `#3B5998` · Amber `#B45309` · Violett `#6D4AA8`.
+- Hauptbutton, aktive Auswahl und Links: hell auf dunkel (`#F2F4F7`), im hellen Design `#1C1C1E`.
 - Beere `#A3234F` ist nur noch Markenfarbe: App-Symbol und Coach-Knopf.
 - Jedes Diagramm bekommt eine Überschrift mit einem Satz, der das Ergebnis nennt.
 - Farben und Abstände kommen aus den Variablen in `app/globals.css`, keine festen Farbwerte in Komponenten.
