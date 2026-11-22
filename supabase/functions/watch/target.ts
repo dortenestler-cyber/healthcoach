@@ -84,34 +84,69 @@ function cycleBeforeDiff(daily: Map<string, Day>, starts: string[]): { ready: bo
   return { ready, beforeDiff: before !== null && rest ? ((before - rest) / rest) * 100 : null };
 }
 
-// Persönlicher Bereich wie lib/baseline.ts: 30 Tage ohne heute, mittlere Hälfte, ab 14 Tagen.
-// In der Lutealphase für HRV und Ruhepuls der Bereich aus Luteal-Tagen der letzten 120 Tage.
-type Range = { lo: number; hi: number; median: number };
+// Persönlicher Bereich wie lib/baseline.ts (Stand PR #60):
+// - 30-Tage-Bereich: Tage day-30 bis day-1, mittlere Hälfte, vorläufig ab 7, stabil ab 14 Tagen
+// - je Zyklusphase (Menstruation, Follikel, Eisprung, Luteal) ein eigener Bereich aus den letzten 150 Tagen,
+//   ab 10 Tagen derselben Phase; gilt für Schlaf, HRV und Ruhepuls
+// - Krankheitstage und die 3 Tage danach zählen nicht
+// Für die Readiness zählt nur ein stabiler Bereich (ab 14 Tagen), sonst wirkt der Wert nicht.
+type Range = { lo: number; hi: number; median: number; stable: boolean };
+const RANGE_DAYS = 30;
+const MIN_DAYS = 14;
+const MIN_PROVISIONAL = 7;
+const PHASE_LOOKBACK = 150;
+const MIN_PHASE_DAYS = 10;
+const SICK_AFTER = 3;
+type RangePhase = "menstruation" | "follikel" | "eisprung" | "luteal";
+
 const quantile = (v: number[], q: number) => {
   const pos = (v.length - 1) * q;
   const i = Math.floor(pos);
   return i + 1 < v.length ? v[i] + (pos - i) * (v[i + 1] - v[i]) : v[i];
 };
-function middleHalf(values: number[]): Range | null {
+function middleHalf(values: number[], minDays: number): Range | null {
   const v = values.filter((x) => Number.isFinite(x)).sort((a, b) => a - b);
-  return v.length < 14 ? null : { lo: quantile(v, 0.25), hi: quantile(v, 0.75), median: quantile(v, 0.5) };
+  return v.length < minDays ? null : { lo: quantile(v, 0.25), hi: quantile(v, 0.75), median: quantile(v, 0.5), stable: v.length >= MIN_DAYS };
 }
-function isLuteal(day: string, starts: string[]): boolean {
-  const c = cycleInfo(day, starts);
-  const p = phaseShort(c.cycleDay, c.length);
-  return p === "LUT1" || p === "LUT2";
-}
-function rangeFor(daily: Day[], day: string, f: (r: Day) => number | null, starts: string[], cycleSensitive: boolean): Range | null {
-  const vals = (from: string, keep: (d: string) => boolean) => daily.filter((r) => r.day >= from && r.day < day && keep(r.day)).map(f).filter((v): v is number => v !== null);
-  if (cycleSensitive && isLuteal(day, starts)) {
-    const lut = middleHalf(vals(addDays(day, -120), (d) => isLuteal(d, starts)));
-    if (lut) return lut;
+
+// Krankheitstage wie sickDays in lib/baseline.ts: Beginn bis Ende (offen: bis heute), dazu 3 Tage danach
+export type IllnessSpan = { started_on: string; ended_on: string | null };
+export function sickDays(ill: IllnessSpan[], today: string): Set<string> {
+  const out = new Set<string>();
+  for (const i of ill) {
+    if (!i?.started_on) continue;
+    const end = addDays(i.ended_on ?? today, SICK_AFTER);
+    for (let d = i.started_on; d <= end && d <= today; d = addDays(d, 1)) out.add(d);
   }
-  return middleHalf(vals(addDays(day, -30), () => true));
+  return out;
+}
+
+// Phase eines Tags wie rangePhaseOf: frühe und späte Lutealphase zusammen; Periode lange her (Perimenopause): keine Phase
+function rangePhaseOf(day: string, starts: string[]): RangePhase | null {
+  const c = cycleInfo(day, starts);
+  if (c.cycleDay === null || c.cycleDay > c.length + 10) return null;
+  const p = phaseShort(c.cycleDay, c.length);
+  return p === "MENS" ? "menstruation" : p === "FOLL" ? "follikel" : p === "EISP" ? "eisprung" : "luteal";
+}
+
+function rangeFor(daily: Day[], day: string, f: (r: Day) => number | null, starts: string[], sick: Set<string>, phases: Map<string, RangePhase | null>): Range | null {
+  const phaseOf = (d: string) => {
+    if (!phases.has(d)) phases.set(d, rangePhaseOf(d, starts));
+    return phases.get(d) ?? null;
+  };
+  const vals = (from: string, keep: (d: string) => boolean) =>
+    daily.filter((r) => r.day >= from && r.day < day && !sick.has(r.day) && keep(r.day)).map(f).filter((v): v is number => v !== null);
+  const ph = starts.length ? phaseOf(day) : null;
+  if (ph) {
+    const v = vals(addDays(day, -PHASE_LOOKBACK), (d) => phaseOf(d) === ph);
+    const r = v.length >= MIN_PHASE_DAYS ? middleHalf(v, MIN_PHASE_DAYS) : null;
+    if (r) return r;
+  }
+  return middleHalf(vals(addDays(day, -RANGE_DAYS), () => true), MIN_PROVISIONAL);
 }
 // Abstand außerhalb des Bereichs in Bereichsbreiten: ab 0,6 voller Abzug, darunter halber, deutlich besser kleiner Bonus
 function rangeEffect(v: number | null, range: Range | null, higherIsBetter: boolean, weight: number): number {
-  if (v === null || !range) return 0;
+  if (v === null || !range || !range.stable) return 0;
   const width = range.hi - range.lo || Math.max(1, Math.abs(range.median) * 0.05);
   const below = v < range.lo ? (range.lo - v) / width : 0;
   const above = v > range.hi ? (v - range.hi) / width : 0;
@@ -123,12 +158,14 @@ function rangeEffect(v: number | null, range: Range | null, higherIsBetter: bool
 }
 
 // Tagesziel 0–100 wie computeTarget in der App
-export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checkin: Checkin, illness: Illness, starts: string[]): { score: number; pause: boolean } {
+export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checkin: Checkin, illness: Illness, starts: string[], sick: Set<string> = new Set()): { score: number; pause: boolean } {
   const today = daily.find((r) => r.day === day) ?? null;
+  const phases = new Map<string, RangePhase | null>();
   let eff = 0;
-  eff += rangeEffect(today?.sleep_score ?? null, rangeFor(daily, day, (r) => r.sleep_score, starts, false), true, 10);
-  eff += rangeEffect(today?.hrv_last_night ?? null, rangeFor(daily, day, (r) => r.hrv_last_night, starts, true), true, 12);
-  eff += rangeEffect(today?.resting_hr ?? null, rangeFor(daily, day, (r) => r.resting_hr, starts, true), false, 8);
+  // Schlaf, HRV und Ruhepuls sind zyklusabhängig (CYCLE_SENSITIVE in lib/baseline.ts)
+  eff += rangeEffect(today?.sleep_score ?? null, rangeFor(daily, day, (r) => r.sleep_score, starts, sick, phases), true, 10);
+  eff += rangeEffect(today?.hrv_last_night ?? null, rangeFor(daily, day, (r) => r.hrv_last_night, starts, sick, phases), true, 12);
+  eff += rangeEffect(today?.resting_hr ?? null, rangeFor(daily, day, (r) => r.resting_hr, starts, sick, phases), false, 8);
   if (today?.bb_max !== null && today?.bb_max !== undefined) {
     const bb = today.bb_max;
     eff += bb < 30 ? -15 : bb < 50 ? -8 : bb >= 75 ? 3 : 0;
