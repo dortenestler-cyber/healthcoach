@@ -116,7 +116,7 @@ function SportPicker({ unit, onSaved }: { unit: Unit; onSaved: (override: string
     const { error } = await sb.from("garmin_activities").update({ sport_override: override, sport_label: label }).eq("activity_id", unit.activity_id);
     setBusy(false);
     if (error) {
-      setMsg("Das hat nicht geklappt: " + error.message);
+      setMsg(/sport_/.test(error.message) ? "Die Datenbank kennt die eigene Sportart noch nicht. Sie kommt mit dem nächsten Update." : "Das hat nicht geklappt: " + error.message);
       return;
     }
     setMsg("");
