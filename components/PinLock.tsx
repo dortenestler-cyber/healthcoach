@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 import { checkFaceId, faceIdOn } from "@/lib/faceid";
-import { checkPin, clearPin, fails, hasPin, isUnlocked, lock, markUnlocked, MAX_FAILS, setPin, LOCK_AFTER_MS } from "@/lib/pin";
+import { checkPin, clearPin, fails, hasPin, isUnlocked, lock, markUnlocked, MAX_FAILS, pinRequired, setPin, LOCK_AFTER_MS } from "@/lib/pin";
 import { greeting } from "@/lib/dates";
 
 type Mode = "laden" | "festlegen" | "bestaetigen" | "eingeben" | "offen";
 
 // Sperrt die App mit einer 4-stelligen PIN.
 // Beim ersten Start wird die PIN festgelegt, danach beim Öffnen und nach 5 Minuten im Hintergrund abgefragt.
+// Nur auf dem iPhone in der App vom Home-Bildschirm (pinRequired). Im Browser und auf dem iPad keine PIN.
 export default function PinLock({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<Mode>("laden");
   const [digits, setDigits] = useState("");
@@ -40,6 +41,10 @@ export default function PinLock({ children }: { children: ReactNode }) {
   }, [mode]);
 
   useEffect(() => {
+    if (!pinRequired()) {
+      setMode("offen");
+      return;
+    }
     setMode(!hasPin() ? "festlegen" : isUnlocked() ? "offen" : "eingeben");
 
     const onVisibility = () => {

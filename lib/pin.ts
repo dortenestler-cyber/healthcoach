@@ -95,3 +95,16 @@ export function lock(): void {
     // nichts zu tun
   }
 }
+
+// PIN nur auf dem iPhone in der App vom Home-Bildschirm (Konzept Web-App, Entscheidung 23.11.).
+// Im Browser am Computer und auf dem iPad gibt es keine PIN, die Anmeldung bleibt bestehen.
+export function pinRequired(): boolean {
+  try {
+    const standalone = window.matchMedia("(display-mode: standalone)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true;
+    const ipad = /iPad/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const phone = Math.min(window.screen.width, window.screen.height) < 600;
+    return standalone && phone && !ipad;
+  } catch {
+    return false;
+  }
+}
