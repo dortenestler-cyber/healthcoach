@@ -33,3 +33,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-23 · OF · Nutzerin: App-Symbol in grüner Fassung (Sage hell auf dunklem Grüngrau) statt Beere, passend zu getönten iOS-Symbolen; Coach-Knopf bleibt Beere
 2026-11-23 · OF · Nutzerin: Web-App-Konzept: Coach am Computer als feste Spalte, „vorerfasst“ = nur Anmeldedaten, iPad wie Computer (keine PIN)
 2026-11-23 · OF · Nutzerin: Sammelliste Oberfläche (Punkte 1–13, PR #77) freigegeben, inklusive Datenbank-Änderungen für Punkt 6 (eigene Sportart Garmin) und Punkt 10 (Eisprung-Zeichen im Tagebuch)
+2026-11-23 · OF · Nutzerin: Vercel baut nur noch `main`, keine Vorschau-Builds für Arbeitszweige (vercel.json, ignoreCommand), weil der Merge von PR #77 nicht gebaut wurde (vermutlich Tageslimit)
