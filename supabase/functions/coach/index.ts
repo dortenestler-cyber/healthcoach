@@ -47,7 +47,9 @@ So antwortest du:
 - Muster benennst du vorsichtig als Zusammenhang, nie als Beweis. Wenn Daten fehlen, sagst du das.
 - Du stellst keine Diagnosen und nennst keine Medikamentendosierungen. Bei Fragen zu Dosierung oder Wechselwirkungen verweist du an Apotheke oder Arztpraxis.
 - Bei Warnzeichen empfiehlst du ärztliche Abklärung: sehr starke oder anhaltende Blutungen, Blutungen nach dem Sex, Brustschmerz, starkes Herzrasen mit Schwindel, anhaltende Niedergeschlagenheit, Atemnot trotz Inhalator (dann Notruf 112), Fieber über mehrere Tage.
-- Du erfindest keine Werte. Was nicht in der Zusammenfassung steht, weißt du nicht.`;
+- Du erfindest keine Werte. Was nicht in der Zusammenfassung steht, weißt du nicht.
+- Für heutige Zahlen gilt nur die Zusammenfassung unten, sie ist immer aktuell. Zahlen aus früheren Antworten im Verlauf können veraltet sein. Du korrigierst frühere Antworten nicht, entschuldigst dich nicht dafür und beginnst ohne Vorrede direkt mit der Antwort.
+- Formatierung sparsam: höchstens **fett** für ein Stichwort und Listen mit „- “. Keine Überschriften, keine Tabellen.`;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -95,7 +97,9 @@ Deno.serve(async (req) => {
       headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
       body: JSON.stringify({
         model,
-        max_tokens: 900,
+        // Das Modell denkt vor der Antwort nach; das zählt zu max_tokens. Mit 900 brachen Antworten mitten im Satz ab.
+        max_tokens: 6000,
+        output_config: { effort: "low" },
         system: `${SYSTEM}\n\nZusammenfassung von heute (aus der App):\n${context || "Keine Daten mitgeschickt."}`,
         messages: merged,
       }),
@@ -105,12 +109,15 @@ Deno.serve(async (req) => {
       return json(502, { error: `Claude antwortet mit ${res.status}. ${res.status === 401 ? "Ist der ANTHROPIC_API_KEY richtig?" : res.status === 400 && t.includes("credit") ? "Ist noch Guthaben vorhanden?" : ""}`.trim() });
     }
     const out = await res.json();
+    if (out?.stop_reason === "refusal") return json(502, { error: "Claude hat diese Frage nicht beantwortet. Bitte anders formulieren." });
     const answer = ((out?.content ?? []) as { type: string; text?: string }[])
       .filter((c) => c.type === "text")
       .map((c) => c.text)
       .join("\n")
       .trim();
     if (!answer) return json(502, { error: "Claude hat keine Antwort geliefert." });
+    // Abgeschnittene Antworten nicht speichern, sonst landen sie im Verlauf und verwirren die nächsten Antworten
+    if (out?.stop_reason === "max_tokens") return json(502, { error: "Die Antwort wurde zu lang und abgeschnitten. Bitte noch einmal fragen." });
 
     const inTok = Number(out?.usage?.input_tokens ?? 0);
     const outTok = Number(out?.usage?.output_tokens ?? 0);
