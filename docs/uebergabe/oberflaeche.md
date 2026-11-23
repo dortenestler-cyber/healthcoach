@@ -7,7 +7,7 @@ Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/desig
 Farbsystem „Nacht“ und Heute als Einstiegsseite umgesetzt.
 
 ## In Arbeit
-- Heute als Einstiegsseite umgesetzt (PR #75, Zweig `claude/determined-davinci-s4e3l7`): `HeuteView` neu aus `DayHead`, `RingRow`, `DaySentence`, `GlanceTiles`, `TodayAgenda`, `RecentActivities`; Detailseiten `app/heute/[wert]` (`HeuteDetail`, Schlüssel in `lib/heuteDetails.ts`). Synchronisieren in `lib/useGarminSync.ts`, Ziehen in `components/ui/PullToRefresh.tsx`. Entfernt: `ValuesCard`, `TodayRings`.
+- Heute als Einstiegsseite umgesetzt (PR #76, Zweig `claude/determined-davinci-s4e3l7`): `HeuteView` neu aus `DayHead`, `RingRow`, `DaySentence`, `GlanceTiles`, `TodayAgenda`, `RecentActivities`; Detailseiten `app/heute/[wert]` (`HeuteDetail`, Schlüssel in `lib/heuteDetails.ts`). Synchronisieren in `lib/useGarminSync.ts`, Ziehen in `components/ui/PullToRefresh.tsx`. Entfernt: `ValuesCard`, `TodayRings`.
   Nächster Schritt: Detailseiten näher an Whoop (Faktorliste mit Pfeilen statt Bereichsbalken, 3-Stufen-Balken beim Schlaf, Stress-Halbbogen). Stift zum Wählen von Ringen und Kacheln steht noch aus.
 - Farb- und Designkonzept „Nacht“, gleicher Zweig: `docs/farb-und-designkonzept.md`, Ansicht `docs/entwurf-farbkonzept.html` (https://claude.ai/artifact/JAF54suDGLf1afKAyjjNQN). Immer dunkel, sechs Farbfamilien, „mehr ist heller“, Energie in Sage hell, neue Variablen `--card-2`, `--axis`, Stufen für Readiness, Pulszonen, Schlafphasen. Heute-Entwurf nutzt die Farben schon.
   Umgesetzt in PR #72: helles Thema, `lib/themeBoot.ts` und Einstellung Darstellung entfernt, `CLAUDE.md` angepasst, neue Variablen in `app/globals.css` (`--card-2`, `--axis`, `--ring-track`, `--energy`, `--recovery-1..4`, `--sleep-rem/-leicht/-wach`, `--stress-ruhe`, `--zone-1..5`, `--brand-light`), Ringe schmal (`ValueRing` Strich 5, `HalfGauge` 8), Ton `energy` für Body Battery und Ruhepuls im Verlauf, Erklärkarte mit Beere am Rand-Ende.
@@ -25,7 +25,7 @@ Farbsystem „Nacht“ und Heute als Einstiegsseite umgesetzt.
 - Daten: Die Readiness der Uhr (`supabase/functions/watch/target.ts`) nutzt noch nur den Luteal-Bereich. Die App misst jetzt je Zyklusphase, Schlaf zählt auch als zyklusabhängig, und Krankheitstage zählen nicht. Bitte angleichen, damit Uhr und App dasselbe zeigen.
 
 ## Fallstricke
-- Bildschirmfotos mit Beispieldaten: Skript-Muster siehe PR #75 (Supabase-Anfragen abfangen, Sitzung und PIN in localStorage/sessionStorage setzen, Filter `eq/gte/lt` nachbauen).
+- Bildschirmfotos mit Beispieldaten: Skript-Muster siehe PR #76 (Supabase-Anfragen abfangen, Sitzung und PIN in localStorage/sessionStorage setzen, Filter `eq/gte/lt` nachbauen).
 - Bildschirmfotos ohne echte Daten: mit `NEXT_PUBLIC_SUPABASE_URL=https://beispiel.supabase.co` bauen und die Anfragen in Playwright abfangen (Beispieldaten kennzeichnen). Vorher alte `next-server`-Prozesse beenden, sonst liefert ein alter Server veraltete Dateien.
 - Vor jedem Umbau eines Bildschirms den Prompt in `docs/prompt-designkonzept.md` befolgen.
 - Keine festen Farbwerte in Komponenten, nur Variablen aus `app/globals.css`.

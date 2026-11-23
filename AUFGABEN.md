@@ -65,7 +65,7 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 - [x] Ansehen und drei Fragen beantworten (immer dunkel überall, Energie Sage hell, Beere im Rand der Erklärkarte)
 - [ ] Nach dem Merge die App auf dem iPhone öffnen: Sie sollte dunkel sein, auch wenn das iPhone auf Hell steht. Ringe schmaler, Readiness-Stufen in vier Grüntönen. Falls die Statusleiste oben falsch aussieht: App vom Home-Bildschirm entfernen und neu hinzufügen (iOS merkt sich die alte Einstellung)
 
-### Heute als Einstiegsseite (PR #75)
+### Heute als Einstiegsseite (PR #76)
 - [x] Entwurf ansehen und die fünf Fragen beantworten
 - [ ] Nach dem Merge Heute auf dem iPhone ansehen: Gruß, fünf Ringe (seitlich wischen), Satz zum Tag, vier Kacheln, Heute steht an, Letzte Aktivitäten
 - [ ] Einen Ring antippen: Die Detailseite öffnet sich, der Pfeil oben links führt zurück

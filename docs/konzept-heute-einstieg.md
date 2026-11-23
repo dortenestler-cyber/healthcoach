@@ -1,6 +1,6 @@
 # Konzept: Heute als ruhige Einstiegsseite
 
-Stand 23.11.2026 · freigegeben und umgesetzt (PR #75). Alle Zahlen im Entwurf und in den Bildschirmfotos (`docs/bilder/heute-einstieg/`) sind Beispieldaten.
+Stand 23.11.2026 · freigegeben und umgesetzt (PR #76). Alle Zahlen im Entwurf und in den Bildschirmfotos (`docs/bilder/heute-einstieg/`) sind Beispieldaten.
 
 - Entwurf zum Anklicken: `docs/entwurf-heute-einstieg.html` (auch als Seite in Claude veröffentlicht)
 - Prompt, nach dem gearbeitet wurde: `docs/prompt-heute-einstieg.md`
