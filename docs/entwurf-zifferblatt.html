@@ -683,6 +683,9 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
     });
   }
 
+  // Für die Store-Screenshots (watchface/tools/store_bilder.js)
+  window.HC = { state: state, drawRaster: drawRaster, PROPS: PROPS, el: el, seg7: seg7, segWidth: segWidth, txt: txt, field: field, fieldW: fieldW, icon: icon };
+
   buildControls();
   buildFamilies();
   function all() { drawRaster(face); drawProps(); }
