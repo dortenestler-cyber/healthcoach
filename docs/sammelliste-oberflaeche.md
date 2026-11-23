@@ -57,6 +57,7 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    - **Diagrammfläche bleibt ruhig:** kein Hintergrund mehr. Nur am ersten Periodentag eine feine senkrechte Linie mit kleinem Tropfen oben, so sieht man die Zyklusgrenzen.
    - **Tippen auf die Leiste** tönt die gewählte Phase kurz ganz leicht im Chart ein und nennt sie mit Datum, passend zu Punkt 3.
    - Gilt für alle Charts mit Phasen: HRV, Schlaf, Ruhepuls, Verlauf, Detailseiten unter Heute.
+   Entwurf mit Beispieldaten: `docs/bilder/entwuerfe/zyklusphasen-charts.png` (zeigt auch Punkt 9).
    Dateien: `components/charts/LineBand.tsx`, `components/heute/HrvCard.tsx`, `components/verlauf/VerlaufDetail.tsx`, `app/globals.css`
 
 9. ☐ **Charts: Tippen auf einen Datenpunkt zeigt Wert und Datum** (23.11.)
