@@ -7,6 +7,12 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Training-Insights (PR #101)
+- [ ] PR #101 ansehen und mergen. Er enthält die Migration `supabase/migrations/20261127090000_training_insights.sql` (drei neue Spalten in `garmin_activities`: Pulszonen, Pulsverlauf, Anstrengung) und eine Änderung an `garmin-sync`. Dein Merge ist die Freigabe, Migration und Upload der Funktion laufen danach automatisch
+- [ ] Claude Bescheid geben, dann prüft Claude, ob beide Läufe grün sind
+- [ ] Einmal synchronisieren (auf Heute nach unten ziehen). Danach haben die Einheiten der letzten Tage Pulszonen und Zeitstrahl. Für ältere Einheiten im Verlauf „Ein Jahr laden“ antippen
+- [ ] Auf Training eine Aktivität antippen und die Einheit-Seite ansehen, dort die Anstrengung 1–10 eintragen. Unter Training › Insights Verlauf und Muster ansehen
+
 ### Coach mit Verlauf vergangener Chats (PR #86)
 - [x] PR #86 gemergt (23. Nov.), Migration und Upload der Funktion grün (geprüft von Claude). Er enthält die Migration `supabase/migrations/20261126090000_coach_chats.sql` (neue Tabelle `coach_chats`). Deine bisherigen Coach-Nachrichten landen dabei im Chat „Frühere Fragen“
 - [ ] Im Coach auf **Verlauf** tippen: Die Liste zeigt deine Chats nach Tagen. Mit **Neuer Chat** beginnt ein leerer Chat, nach 6 Stunden ohne Nachricht passiert das von selbst

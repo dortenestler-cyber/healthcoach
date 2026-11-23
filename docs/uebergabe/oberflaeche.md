@@ -3,6 +3,11 @@ Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014p
 
 Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/design-*`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
+## Training-Insights (PR #101, 23.11.)
+- Einheit-Seite `app/training/einheit/[id]` → `components/training/UnitDetail.tsx`, Reiter „Insights“ in `TrainingView` → `components/training/InsightsSection.tsx`, Rechnung in `lib/trainingInsights.ts`. Aktivitäten in `CalendarSection`, `TodayPlan` und `RecentActivities` verlinken auf die Einheit. Training-Muster mit Ergebnis zusätzlich in `OverviewSection` („Weitere Muster“), letzte Einheit im Coach-Kontext.
+- Beide Seiten laden `garmin_activities` mit `select("*")`, damit sie ohne die neuen Spalten weiterlaufen. `loadInsightData` bleibt unverändert.
+- Offen: Muster „Ruhetage zwischen harten Einheiten“ (Konzept).
+
 ## Stand in einem Satz
 Sammelliste Runde 2 (Punkte 14–21) umgesetzt in PR #83, inklusive Teil A der Datenaktualisierung.
 

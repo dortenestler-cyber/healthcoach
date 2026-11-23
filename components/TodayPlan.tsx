@@ -96,13 +96,16 @@ export default function TodayPlan({ children }: { children?: ReactNode }) {
       {acts
         .filter((a) => !open.some((s) => s.sport === sportOf(a)))
         .map((a) => (
-          <div key={a.activity_id} className="card-row list-line">
+          <Link key={a.activity_id} href={`/training/einheit/${a.activity_id}`} className="card-row list-line unit-link">
             <span className="row-strong">
               <i className="dot" style={{ background: SPORTS[sportOf(a)].color }} />
               {activityLabel(a)}
             </span>
-            <span className="meta">{durationText(a.duration_s)} · Garmin</span>
-          </div>
+            <span className="meta">
+              {durationText(a.duration_s)} · Garmin
+              <span className="row-chev" aria-hidden="true">›</span>
+            </span>
+          </Link>
         ))}
       {children}
     </div>

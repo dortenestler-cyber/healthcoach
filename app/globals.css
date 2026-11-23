@@ -2977,3 +2977,61 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
   border: 0; border-radius: var(--radius-control); background: var(--text); color: var(--bg);
   font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
 }
+
+/* ---------- Training-Insights (docs/konzept-training-insights.md) */
+.zone-bg-0 { background: var(--fill); }
+.zone-bg-1 { background: var(--zone-1); }
+.zone-bg-2 { background: var(--zone-2); }
+.zone-bg-3 { background: var(--zone-3); }
+.zone-bg-4 { background: var(--zone-4); }
+.zone-bg-5 { background: var(--zone-5); }
+.zone-fill-0 { fill: var(--line); }
+.zone-fill-1 { fill: var(--zone-1); }
+.zone-fill-2 { fill: var(--zone-2); }
+.zone-fill-3 { fill: var(--zone-3); }
+.zone-fill-4 { fill: var(--zone-4); }
+.zone-fill-5 { fill: var(--zone-5); }
+.unit-hero { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; margin: 4px 0 14px; }
+.unit-title { margin: 0; font-size: 28px; font-weight: 700; text-wrap: balance; }
+.unit-sentence { margin: 4px 0 10px; text-wrap: balance; }
+.unit-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.unit-tile { background: var(--card-2); border-radius: 18px; padding: 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.unit-tile-value { font-size: 28px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.unit-tile-value small { font-size: 14px; font-weight: 500; color: var(--muted); }
+.unit-tile-note { font-size: 12.5px; color: var(--training-fg); }
+.rpe-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 8px 0; }
+.rpe-btn { min-height: 44px; border-radius: 14px; border: 1px solid var(--line); background: var(--card-2); color: var(--text); font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; cursor: pointer; }
+.rpe-btn[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+.zone-bar { display: flex; gap: 2px; height: 14px; border-radius: 7px; overflow: hidden; margin: 6px 0 10px; }
+.zone-seg { display: block; min-width: 2px; }
+.zone-legend { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 10px; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.zone-legend span { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.zone-legend b { flex-basis: 100%; color: var(--text-2); font-size: 13.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.zone-key { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.unit-timeline { width: 100%; height: auto; display: block; margin: 4px 0; touch-action: pan-y; }
+.unit-timeline .tl-grid { stroke: var(--line-soft, var(--fill)); stroke-width: 1; }
+.unit-timeline .tl-axis { fill: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+.unit-timeline .tl-peak { fill: var(--training-bg); }
+.unit-timeline .tl-cum { fill: none; stroke: var(--text); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.unit-timeline .tl-cum-dot { fill: var(--text); }
+.unit-timeline .tl-hit { fill: transparent; cursor: pointer; }
+.unit-timeline .tl-picked { stroke: var(--text); stroke-width: 1.5; }
+.tl-readout { min-height: 2.6em; }
+.unit-after-value { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; text-align: right; }
+.chip-sm { display: inline-block; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.chip-ok { background: var(--recovery-bg); color: var(--recovery-fg); }
+.chip-warn { background: var(--warn-bg); color: var(--warn-fg); }
+.chip-muted { background: var(--fill); color: var(--text-2); }
+.chip-cycle { background: var(--cycle-bg); color: var(--cycle-fg); white-space: normal; text-align: right; }
+.insight-sports { margin: 4px 0 12px; }
+.sport-chart { width: 100%; height: auto; display: block; margin: 6px 0; }
+.sport-chart .sc-bar { fill: var(--zone-3); }
+.sport-chart .sc-bar-last { fill: var(--zone-5); }
+.sport-chart .sc-line { fill: none; stroke: var(--text); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.sport-chart .sc-dot { fill: var(--text); }
+.sport-chart .sc-grid { stroke: var(--fill); stroke-width: 1; }
+.sport-chart .sc-axis { fill: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+.sport-chart .sc-hit { fill: transparent; cursor: pointer; }
+.unit-link { color: inherit; text-decoration: none; }
+.unit-link .row-chev { color: var(--muted); margin-left: 6px; }
+.pattern-hi-training { background: var(--training); }

@@ -1,6 +1,6 @@
 # Konzept: Insights zu Trainingseinheiten
 
-Stand: 23.11.2026 · Status: **Freigegeben (23.11.)**, Umsetzung in Arbeit · Ansicht: `docs/entwurf-training-insights.html` (alle Zahlen dort sind Beispieldaten)
+Stand: 23.11.2026 · Status: **Freigegeben (23.11.)** · Umgesetzt in PR #101 (Schritte 1–4 und Anstrengung) · Ansicht: `docs/entwurf-training-insights.html` (alle Zahlen dort sind Beispieldaten)
 
 ## Was die Nutzerin will
 Zu jeder Trainingseinheit und über Wochen verstehen: Wie hart war es, wie hat der Körper reagiert, und was hilft oder bremst.
@@ -49,7 +49,14 @@ Texte beschreiben nur, was zusammen vorkommt, nie Ursache. Keine Diagnosen, kein
 
 Schritt 1 und 3 brauchen keine Migration und könnten sofort nach Freigabe starten. Eigene Zweige und Entwurfs-PRs mit Kürzel, wie in `CLAUDE.md`.
 
-## Entscheidungen, die ich von dir brauche
+## Umsetzung (PR #101)
+- Einheit: `/training/einheit/<Garmin-ID>` (`components/training/UnitDetail.tsx`), erreichbar über jede Aktivität im Kalender, unter „Heute steht an“ und „Letzte Aktivitäten“.
+- Insights: Reiter „Insights“ auf Training (`components/training/InsightsSection.tsx`). Muster mit Ergebnis erscheinen zusätzlich unter Gesundheit › Überblick › Weitere Muster.
+- Rechnung: `lib/trainingInsights.ts`. Pulszonen und Pulsverlauf berechnet `garmin-sync` aus dem Tagespuls (ein Wert etwa alle 2 Minuten), ohne zusätzliche Abrufe bei Garmin. Gleiche Zonen wie die Belastung aus dem Alltag.
+- Anstrengung 1–10 direkt auf der Einheit-Seite statt im Tagebuch: Dort gehört sie zur richtigen Einheit, auch bei zwei Einheiten am Tag.
+- Noch nicht umgesetzt: das Muster „Ruhetage zwischen harten Einheiten“. Es braucht eine Festlegung, was eine harte Einheit ist, und folgt bei Bedarf.
+
+## Entscheidungen (23.11., alle freigegeben)
 1. Einstieg: Tipp auf die Aktivität in der Tagesliste (Training) und zusätzlich Karte „Insights“ auf Training. Passt das?
 2. Pulszonen (Schritt 2) mit Migration: ja oder erst später?
 3. Eigene Anstrengung 1–10 nach der Einheit: ja oder nein? Die Vorschlag-Karte nennt schon „Anstrengung (1–10)“, ein Vergleich Gefühl gegen Garmin-Belastung wäre dann möglich.

@@ -1,5 +1,6 @@
 "use client";
 
+import { trainingPatterns } from "@/lib/trainingInsights";
 import { useRefresh } from "@/lib/refresh";
 import Link from "next/link";
 import { Row } from "@/components/SettingsView";
@@ -69,7 +70,8 @@ export default function OverviewSection() {
   const signs = data ? signAnalysis(data, { muscle: [], intakes: [], illnesses: allIll }, today) : null;
   const signsShown = signs && signs.eventDays > 0 ? signs : null;
   const freq = data ? habits.map((h) => ({ h, f: frequency(data.diary, h.key, today) })).filter((x) => x.f.month > 0 || x.f.prevMonth > 0) : [];
-  const more = data ? patterns(data).filter((p) => p.key !== "zyklus") : [];
+  // Training-Muster nur, wenn sie schon etwas zeigen; alle stehen unter Training › Insights
+  const more = data ? [...patterns(data).filter((p) => p.key !== "zyklus"), ...trainingPatterns(data).filter((p) => p.ready)] : [];
   const injury = injuries[0];
   const month = MONTHS[Number(today.slice(5, 7)) - 1];
 

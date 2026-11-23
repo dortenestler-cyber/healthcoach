@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { loadPeriodDays } from "@/lib/garminZyklus";
@@ -292,13 +293,16 @@ export default function CalendarSection({ data }: { data: Data | null }) {
           );
         })}
         {selActs.map((a) => (
-          <div key={a.activity_id} className="card-row list-line">
+          <Link key={a.activity_id} href={`/training/einheit/${a.activity_id}`} className="card-row list-line unit-link">
             <span className="row-strong">
               <i className="dot" style={{ background: SPORTS[sportOf(a)].color }} />
               {activityLabel(a)}
             </span>
-            <span className="meta">{[durationText(a.duration_s), a.avg_hr ? "Puls Ø " + a.avg_hr : ""].filter(Boolean).join(" · ")} · Garmin</span>
-          </div>
+            <span className="meta">
+              {[durationText(a.duration_s), a.avg_hr ? "Puls Ø " + a.avg_hr : ""].filter(Boolean).join(" · ")} · Garmin
+              <span className="row-chev" aria-hidden="true">›</span>
+            </span>
+          </Link>
         ))}
         {selected >= isoDay() && (
           <div className="pills wrap">
