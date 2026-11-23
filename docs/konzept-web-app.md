@@ -1,6 +1,6 @@
 # Konzept · Health Coach im Browser am Computer
 
-Stand: 23.11.2026 · Rolle Oberfläche `[OF]` · zur Sichtung, noch nicht freigegeben
+Stand: 23.11.2026 · Rolle Oberfläche `[OF]` · Fragen beantwortet, wartet auf Freigabe zur Umsetzung
 Entwurf mit Beispieldaten: `docs/bilder/entwuerfe/web-heute.png`
 
 ## Ausgangslage
@@ -19,23 +19,23 @@ Am Computer nutzt Health Coach die Breite: Man sieht mehr auf einmal, ohne dass 
 | | iPhone (App auf dem Home-Bildschirm) | Browser am Computer |
 |---|---|---|
 | Anmeldung | einmal mit E-Mail und Passwort, bleibt bestehen | einmal mit E-Mail und Passwort, bleibt bestehen |
-| PIN / Face ID | wie bisher | **keine PIN** |
+| PIN / Face ID | wie bisher | **keine PIN** (auch iPad, im Browser und vom Home-Bildschirm) |
 | Abmelden | Einstellungen | Einstellungen und unten in der Seitenleiste |
 
-- **Keine PIN im Browser:** Die PIN-Sperre gilt nur noch, wenn die App vom Home-Bildschirm gestartet ist (eigenes Fenster, `display-mode: standalone`). Im normalen Browser-Tab entfällt sie. In den Einstellungen bleibt ein Schalter „PIN auch im Browser“ für später, standardmäßig aus.
+- **Keine PIN im Browser und auf dem iPad:** Die PIN-Sperre gilt nur noch auf dem iPhone, wenn die App vom Home-Bildschirm gestartet ist (eigenes Fenster, `display-mode: standalone`, schmaler Bildschirm). Im Browser am Computer und auf dem iPad entfällt sie. In den Einstellungen bleibt ein Schalter „PIN auch im Browser“ für später, standardmäßig aus.
 - **Angemeldet bleiben:** Die Anmeldung bleibt im Browser gespeichert und wird im Hintergrund erneuert. Man muss sich erst wieder anmelden, wenn man sich selbst abmeldet oder die Browserdaten löscht.
 - **Anmeldedaten vorausgefüllt:** Die E-Mail-Adresse bleibt nach dem Abmelden im Feld stehen (nur auf diesem Gerät gespeichert). Das Passwort füllt der Passwort-Manager des Browsers bzw. der iCloud-Schlüsselbund aus. Die Felder sind dafür richtig gekennzeichnet. Das Passwort speichert die App selbst nie.
 - **Hinweis zur Sicherheit:** Ohne PIN kann jeder, der an deinem Computer sitzt, die App offen sehen. Das ist in Ordnung, solange es dein eigener Computer mit Bildschirmsperre ist.
 
-Zu klären: Meinst du mit „Daten sollen vorerfasst stehen bleiben“ die Anmeldedaten (so oben beschrieben) oder auch etwas anderes, z. B. halb ausgefüllte Eingaben im Tagebuch? Die könnte die App als Entwurf auf dem Gerät behalten, bis du speicherst.
+Entschieden: „Vorerfasst“ meint nur die Anmeldedaten. Halb ausgefüllte Eingaben werden nicht als Entwurf gespeichert.
 
 ## 2. Aufbau nach Bildschirmbreite
 
 | Breite | Gerät | Navigation | Inhalt | Coach |
 |---|---|---|---|---|
 | bis 767 px | iPhone | Leiste unten (wie heute) | eine Spalte | schwebender Knopf |
-| 768–1199 px | iPad, kleines Fenster | schmale Seitenleiste links, nur Symbole | zwei Spalten | schwebender Knopf, öffnet Seitenfenster |
-| ab 1200 px | Computer | Seitenleiste links mit Namen | zwei Spalten, höchstens 1180 px breit | eigene Spalte rechts, ein- und ausklappbar |
+| 768–1023 px | iPad hochkant, kleines Fenster | schmale Seitenleiste links, nur Symbole | zwei Spalten | schwebender Knopf, Coach kommt als Fenster von rechts |
+| ab 1024 px | iPad quer, Computer | Seitenleiste links mit Namen (iPad quer: nur Symbole) | zwei Spalten, höchstens 1180 px breit | feste Spalte rechts, einklappbar |
 
 **Seitenleiste:** App-Symbol und „Health Coach“ oben. Darunter Heute · Tagebuch · Training · Zyklus · Gesundheit, die aktive Seite hell hinterlegt. Unten Einstellungen, der Garmin-Stand als Punkt (Sammelliste Punkt 7) und Abmelden.
 
@@ -88,8 +88,8 @@ Zu klären: Meinst du mit „Daten sollen vorerfasst stehen bleiben“ die Anmel
 
 Schritte 1 und 2 gehen zuerst, danach ist die App am Computer schon gut benutzbar. Jeder Schritt bekommt Bildschirmfotos mit Beispieldaten zur Kontrolle. Das iPhone wird bei jedem Schritt mitgeprüft, damit dort nichts verrutscht.
 
-## Fragen an dich
+## Entscheidungen (23.11.)
 
-1. Coach am Computer als feste Spalte rechts, oder lieber wie am iPhone als eigene Seite?
-2. „Vorerfasst stehen bleiben“: nur Anmeldedaten, oder auch halb ausgefüllte Eingaben (siehe Abschnitt 1)?
-3. Soll das iPad wie der Computer funktionieren (ohne PIN im Browser), oder wie das iPhone?
+1. Coach am Computer als feste Spalte rechts, einklappbar.
+2. Vorerfasst bleiben nur die Anmeldedaten.
+3. iPad wie Computer: keine PIN. Querformat (ab 1024 px) mit dem Computer-Aufbau inklusive Coach-Spalte; im Hochformat (768–1023 px) Seitenleiste mit Symbolen und der Coach als Fenster, das von rechts hereinkommt, weil die Breite für drei Spalten nicht reicht.

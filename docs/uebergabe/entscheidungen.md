@@ -31,3 +31,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-23 · OF · Nutzerin: Einklapp-Vorschläge 5a–5h der Sammelliste alle übernommen
 2026-11-23 · OF · Nutzerin: Eisprung auch selbst eintragen (Feld im Tagebuch, Migration durch DA nach Freigabe) und weitere übliche Zyklus-Symptome aufnehmen (Sammelliste Punkt 10 und 12)
 2026-11-23 · OF · Nutzerin: App-Symbol in grüner Fassung (Sage hell auf dunklem Grüngrau) statt Beere, passend zu getönten iOS-Symbolen; Coach-Knopf bleibt Beere
+2026-11-23 · OF · Nutzerin: Web-App-Konzept: Coach am Computer als feste Spalte, „vorerfasst“ = nur Anmeldedaten, iPad wie Computer (keine PIN)
