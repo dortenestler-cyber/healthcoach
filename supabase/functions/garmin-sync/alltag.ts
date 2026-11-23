@@ -16,7 +16,7 @@ export function zoneOf(hr: number, rest: number, max: number): number {
   return z;
 }
 
-export type Interval = { from: number; to: number; id?: number }; // Minuten seit Mitternacht, Ortszeit
+export type Interval = { from: number; to: number; id?: number; start?: number }; // Minuten seit Mitternacht, Ortszeit; start = Beginn der Einheit (am Vortag negativ)
 
 // Aktivitäten eines Tages als Zeitfenster. start_local ist Ortszeit „JJJJ-MM-TT HH:MM:SS“.
 // Eine Einheit vom Vortag, die über Mitternacht geht, zählt mit ihrem Rest.
@@ -30,7 +30,7 @@ export function activityIntervals(day: string, acts: { activity_id: number; star
     const from = (t - dayStart) / 60000;
     const to = from + a.duration_s / 60;
     if (to <= 0 || from >= 1440) continue;
-    out.push({ from: Math.max(0, from), to: Math.min(1440, to), id: a.activity_id });
+    out.push({ from: Math.max(0, from), to: Math.min(1440, to), id: a.activity_id, start: from });
   }
   return out;
 }
@@ -64,6 +64,10 @@ export type LoadDay = {
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
 
+// Pulsverlauf einer Einheit in Abschnitten zu 5 Minuten ab Beginn (Training-Insights)
+export const SERIES_STEP = 5;
+export type ActDetail = { zones: number[]; buckets: Map<number, { sum: number; n: number }> };
+
 // Zonenminuten eines Tages. move(minute) sagt, ob in diesem Abschnitt Bewegung gemessen wurde.
 // Ohne Bewegungsdaten (null): Zone 2 und höher zählt immer, Zone 1 nur in Abschnitten,
 // in denen der Puls mindestens 10 Minuten am Stück über der Ruhezone liegt (Lücken bis 5 Minuten zählen mit).
@@ -73,12 +77,13 @@ export function computeDay(
   rest: number,
   max: number,
   move: ((minute: number) => boolean) | null,
-): { training: number[]; alltag: number[]; ohne_bewegung: number; pkt_training: number; pkt_alltag: number; abdeckung: number; actPoints: Map<number, number>; curve: (number | null)[] } {
+): { training: number[]; alltag: number[]; ohne_bewegung: number; pkt_training: number; pkt_alltag: number; abdeckung: number; actPoints: Map<number, number>; actDetail: Map<number, ActDetail>; curve: (number | null)[] } {
   const training = [0, 0, 0, 0, 0, 0];
   const alltag = [0, 0, 0, 0, 0, 0];
   let ohne = 0;
   let abdeckung = 0;
   const actPoints = new Map<number, number>();
+  const actDetail = new Map<number, ActDetail>();
   const sums = Array(96).fill(0);
   const counts = Array(96).fill(0);
   const s = [...samples].sort((a, b) => a.minute - b.minute);
@@ -110,7 +115,17 @@ export function computeDay(
     const act = acts.find((a) => minute >= a.from && minute < a.to);
     if (act) {
       training[z] += dur;
-      if (act.id !== undefined) actPoints.set(act.id, (actPoints.get(act.id) ?? 0) + dur * z);
+      if (act.id !== undefined) {
+        actPoints.set(act.id, (actPoints.get(act.id) ?? 0) + dur * z);
+        const d = actDetail.get(act.id) ?? { zones: [0, 0, 0, 0, 0, 0], buckets: new Map() };
+        d.zones[z] += dur;
+        const b = Math.max(0, Math.floor((minute - (act.start ?? act.from)) / SERIES_STEP));
+        const cur = d.buckets.get(b) ?? { sum: 0, n: 0 };
+        cur.sum += hr;
+        cur.n++;
+        d.buckets.set(b, cur);
+        actDetail.set(act.id, d);
+      }
     } else if (z === 0) {
       alltag[0] += dur;
     } else if (move ? move(minute) : z >= 2 || longRun[i]) {
@@ -129,6 +144,7 @@ export function computeDay(
     pkt_alltag: r1(pts(alltag)),
     abdeckung: Math.round(abdeckung),
     actPoints,
+    actDetail,
     curve: sums.map((v, i) => (counts[i] ? Math.round(v / counts[i]) : null)),
   };
 }
@@ -158,3 +174,31 @@ export function pointsFromSteps(stepsOutside: number | null): number {
 }
 
 export const MIN_COVERAGE = 8 * 60; // unter 8 Stunden Pulsdaten gilt der Tag als „Uhr nicht getragen“
+
+// Zonen und Pulsverlauf einer Einheit fürs Speichern. Abschnitte ohne Messung bleiben null.
+export function actDetailRow(d: ActDetail, durationS: number | null): { hr_zones: number[]; hr_series: (number | null)[] } {
+  const maxB = Math.max(-1, ...d.buckets.keys());
+  const len = Math.min(288, Math.max(maxB + 1, durationS ? Math.ceil(durationS / 60 / SERIES_STEP) : 0));
+  const series: (number | null)[] = [];
+  for (let i = 0; i < len; i++) {
+    const c = d.buckets.get(i);
+    series.push(c && c.n ? Math.round(c.sum / c.n) : null);
+  }
+  return { hr_zones: d.zones.map(r1), hr_series: series };
+}
+
+// Mehrere Tage (Einheit über Mitternacht) zusammenführen
+export function mergeActDetail(into: Map<number, ActDetail>, from: Map<number, ActDetail>): void {
+  for (const [id, d] of from) {
+    const t = into.get(id);
+    if (!t) {
+      into.set(id, { zones: [...d.zones], buckets: new Map(d.buckets) });
+      continue;
+    }
+    d.zones.forEach((v, z) => (t.zones[z] += v));
+    for (const [b, c] of d.buckets) {
+      const cur = t.buckets.get(b) ?? { sum: 0, n: 0 };
+      t.buckets.set(b, { sum: cur.sum + c.sum, n: cur.n + c.n });
+    }
+  }
+}
