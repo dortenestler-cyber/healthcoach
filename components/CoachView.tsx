@@ -6,8 +6,27 @@ import { buildCoachContext } from "@/lib/coachContext";
 import Link from "next/link";
 import PageHead from "@/components/PageHead";
 import { getCoachPrefs, useCoachPrefs } from "@/lib/prefs";
+import { daysAgo, isoDay } from "@/lib/dates";
 
 type Msg = { role: "user" | "assistant"; content: string };
+type Chat = { id: string; title: string; updated_at: string };
+
+// Nach 6 Stunden ohne Nachricht beginnt beim Öffnen ein neuer Chat
+const NEW_CHAT_AFTER = 6 * 3600 * 1000;
+
+function chatGroup(iso: string): string {
+  const d = isoDay(new Date(iso));
+  if (d === isoDay()) return "Heute";
+  if (d === isoDay(daysAgo(1))) return "Gestern";
+  if (d >= isoDay(daysAgo(6))) return "Diese Woche";
+  return "Älter";
+}
+
+function chatWhen(iso: string): string {
+  const d = new Date(iso);
+  if (isoDay(d) === isoDay()) return d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleDateString("de-DE", { weekday: "short", day: "numeric", month: "numeric" });
+}
 
 // Leichtes Markdown der Antworten: **fett** und Listen mit „- “, sonst reiner Text
 function Inline({ text }: { text: string }) {
@@ -70,6 +89,10 @@ export default function CoachView({ panel, onClose }: { panel?: boolean; onClose
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [prefilled, setPrefilled] = useState(false);
+  // chats: null = Tabelle coach_chats fehlt noch (alter Verlauf ohne Chats)
+  const [chats, setChats] = useState<Chat[] | null>(null);
+  const [chatId, setChatId] = useState<string | null>(null);
+  const [listOpen, setListOpen] = useState(false);
   const context = useRef<Promise<string> | null>(null);
   const contextAt = useRef(0);
   const end = useRef<HTMLDivElement>(null);
@@ -79,14 +102,22 @@ export default function CoachView({ panel, onClose }: { panel?: boolean; onClose
   useEffect(() => {
     const sb = supabase();
     if (!sb) return;
-    sb.from("coach_messages")
-      .select("role, content")
-      .order("created_at", { ascending: false })
-      .limit(40)
-      .then(({ data, error: e }) => {
-        if (e) setError("Verlauf konnte nicht geladen werden: " + e.message);
-        setMsgs(((data ?? []) as Msg[]).reverse());
-      });
+    loadChats().then((list) => {
+      if (list === null) {
+        // Ohne Chats: die letzten Nachrichten wie bisher
+        sb.from("coach_messages")
+          .select("role, content")
+          .order("created_at", { ascending: false })
+          .limit(40)
+          .then(({ data, error: e }) => {
+            if (e) setError("Verlauf konnte nicht geladen werden: " + e.message);
+            setMsgs(((data ?? []) as Msg[]).reverse());
+          });
+        return;
+      }
+      const last = list[0];
+      if (last && Date.now() - new Date(last.updated_at).getTime() < NEW_CHAT_AFTER) openChat(last.id);
+    });
     // Zusammenfassung schon vorbereiten, damit die erste Antwort schneller kommt
     context.current = buildCoachContext().catch(() => "");
     contextAt.current = Date.now();
@@ -98,6 +129,49 @@ export default function CoachView({ panel, onClose }: { panel?: boolean; onClose
       window.history.replaceState(null, "", "/coach");
     }
   }, []);
+
+  async function loadChats(): Promise<Chat[] | null> {
+    const sb = supabase();
+    if (!sb) return null;
+    const { data, error: e } = await sb.from("coach_chats").select("id, title, updated_at").order("updated_at", { ascending: false }).limit(200);
+    const list = e ? null : ((data ?? []) as Chat[]);
+    setChats(list);
+    return list;
+  }
+
+  async function openChat(id: string) {
+    const sb = supabase();
+    if (!sb) return;
+    setChatId(id);
+    setListOpen(false);
+    setError("");
+    const { data, error: e } = await sb.from("coach_messages").select("role, content").eq("chat_id", id).order("created_at", { ascending: true }).limit(400);
+    if (e) setError("Chat konnte nicht geladen werden: " + e.message);
+    setMsgs((data ?? []) as Msg[]);
+  }
+
+  function newChat() {
+    setChatId(null);
+    setMsgs([]);
+    setError("");
+    setListOpen(false);
+    field.current?.focus();
+  }
+
+  async function deleteChat(c: Chat) {
+    const sb = supabase();
+    if (!sb || !window.confirm(`Chat „${c.title}“ löschen? Das lässt sich nicht rückgängig machen.`)) return;
+    const { error: e } = await sb.from("coach_chats").delete().eq("id", c.id);
+    if (e) {
+      setError("Chat konnte nicht gelöscht werden: " + e.message);
+      return;
+    }
+    setChats((l) => (l ?? []).filter((x) => x.id !== c.id));
+    if (c.id === chatId) {
+      setChatId(null);
+      setMsgs([]);
+    }
+  }
 
   // Eingabefeld wächst mit dem Text (bis zur Obergrenze in globals.css)
   useEffect(() => {
@@ -140,7 +214,7 @@ export default function CoachView({ panel, onClose }: { panel?: boolean; onClose
       contextAt.current = Date.now();
     }
     const ctx = await context.current;
-    const { data, error: e } = await sb.functions.invoke("coach", { body: { message: question, context: ctx, limit: getCoachPrefs().dailyLimit } });
+    const { data, error: e } = await sb.functions.invoke("coach", { body: { message: question, context: ctx, limit: getCoachPrefs().dailyLimit, chat_id: chatId } });
     setBusy(false);
     let detail = data?.error as string | undefined;
     if (e) {
@@ -157,6 +231,10 @@ export default function CoachView({ panel, onClose }: { panel?: boolean; onClose
       return;
     }
     setMsgs((m) => [...m, { role: "assistant", content: data.answer as string }]);
+    if (typeof data.chat_id === "string") {
+      setChatId(data.chat_id);
+      loadChats();
+    }
   };
 
   const submit = (ev: FormEvent) => {
@@ -196,9 +274,61 @@ export default function CoachView({ panel, onClose }: { panel?: boolean; onClose
     </>
   );
 
+  const current = chats?.find((c) => c.id === chatId);
+  const bar = chats !== null && (
+    <div className="coach-bar">
+      <span className="coach-bar-title">{listOpen ? "Verlauf" : current ? current.title : "Neuer Chat"}</span>
+      <button type="button" className="btn btn-soft" aria-pressed={listOpen} onClick={() => setListOpen((o) => !o)}>
+        {listOpen ? "Zurück" : "Verlauf"}
+      </button>
+      <button type="button" className="btn btn-soft" onClick={newChat} disabled={busy || (!chatId && !msgs.length && !listOpen)}>
+        Neuer Chat
+      </button>
+    </div>
+  );
+
+  if (listOpen && chats) {
+    const groups: [string, Chat[]][] = [];
+    for (const c of chats) {
+      const g = chatGroup(c.updated_at);
+      const last = groups[groups.length - 1];
+      if (last && last[0] === g) last[1].push(c);
+      else groups.push([g, [c]]);
+    }
+    return (
+      <>
+        {head}
+        {bar}
+        <div className="coach-list">
+          {!chats.length && <p className="meta">Noch keine Chats. Deine Fragen erscheinen hier, sobald der Coach geantwortet hat.</p>}
+          {groups.map(([g, list]) => (
+            <section key={g} className="coach-list-group" aria-label={g}>
+              <h3 className="coach-list-head">{g}</h3>
+              {list.map((c) => (
+                <div key={c.id} className={c.id === chatId ? "coach-list-row is-current" : "coach-list-row"}>
+                  <button type="button" className="coach-list-open" onClick={() => openChat(c.id)}>
+                    <span className="coach-list-title">{c.title}</span>
+                    <span className="coach-list-when">{c.id === chatId ? "Offen · " : ""}{chatWhen(c.updated_at)}</span>
+                  </button>
+                  <button type="button" className="coach-list-del" onClick={() => deleteChat(c)} aria-label={`Chat „${c.title}“ löschen`}>
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 12.5h9l1-12.5M10 11v5M14 11v5" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </section>
+          ))}
+        </div>
+        {error && <p className="alert">{error}</p>}
+      </>
+    );
+  }
+
   return (
     <>
       {head}
+      {bar}
       <div className="chat">
         {!msgs.length && (
           <div className="bubble bubble-assistant">
