@@ -37,6 +37,7 @@ Sammelliste (13 Punkte) und Web-App am Computer umgesetzt (PR #77).
 - Keine festen Farbwerte in Komponenten, nur Variablen aus `app/globals.css`.
 
 ## Erledigt seit letzter Übergabe
+- Coach-Fehler behoben (Zweig `claude/blissful-darwin-ww6tm7`): Antworten brachen ab, weil das Nachdenken des Modells zu `max_tokens` 900 zählte (jetzt 6000, effort low, abgeschnittene Antworten werden nicht gespeichert). Zusammenfassung enthält jetzt die Werte von heute und wird vor jeder Frage erneuert, wenn sie älter als 2 Minuten ist. Antworten mit fett und Listen, Senden als runder Pfeil-Knopf. Ändert auch `supabase/functions/coach` (DA-Bereich), daher Merge erst nach Freigabe.
 - PR #72 gemergt: Farbsystem „Nacht“ (immer dunkel, schmale Ringe, Energie Sage hell) und Konzept Heute als Einstiegsseite (nur Doku)
 - PR #65 gemergt: Korridore Schritt 3, Alltagslast in der Anzeige
 - Aufräumen abgeschlossen (`docs/aufraeumen-vorschlag.md`): PR #62 Tagebuch und Zyklus (Hitzewallungen neben Symptomen, Verlauf 4 Wochen eingeklappt, Perioden nachtragen auf Zyklus).
