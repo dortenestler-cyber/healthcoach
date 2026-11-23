@@ -59,4 +59,10 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    - Gilt für alle Charts mit Phasen: HRV, Schlaf, Ruhepuls, Verlauf, Detailseiten unter Heute.
    Dateien: `components/charts/LineBand.tsx`, `components/heute/HrvCard.tsx`, `components/verlauf/VerlaufDetail.tsx`, `app/globals.css`
 
+9. ☐ **Charts: Tippen auf einen Datenpunkt zeigt Wert und Datum** (23.11.)
+   Bisher reagiert kein Chart auf Tippen.
+   Vorschlag: Tippen oder mit dem Finger über den Chart fahren setzt eine feine senkrechte Linie mit Punkt auf den nächsten Tag. Darüber erscheint ein kleines Schild, z. B. „Mo, 16. Nov. · 8:57 h“. Dazu, wo es passt, ein zweites Wort: „im Bereich“ oder „über deinem Bereich“, und die Zyklusphase. Am Computer geht es auch mit der Maus. Das Schild verschwindet nach Tippen daneben oder nach ein paar Sekunden. Fehlende Tage zeigen „kein Wert“. Für den Screenreader bekommt jeder Punkt die Beschriftung „Datum, Wert“.
+   Einmal gebaut für alle Charts: Linien (`LineBand`), Balken (`DayBars`, `DivergingBars`), Schlafphasen (`SleepStagesBar`), Heatmap.
+   Dateien: `components/charts/*`, `app/globals.css`
+
 ## Erledigt
