@@ -7,6 +7,7 @@ Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/desig
 Sammelliste Runde 2 (Punkte 14–21) umgesetzt in PR #83, inklusive Teil A der Datenaktualisierung.
 
 ## In Arbeit
+- Zweig `claude/blissful-cori-3k6ad7`: Schmerzwerte früherer Tage einer Verletzung ändern, Wadenzucken auch Tag und Uhrzeit ändern.
 - Keine offene Arbeit. PR #83 (Zweig `claude/tender-archimedes-h1rwvr`): Sammelliste Runde 2.
   Neu: `components/charts/useChartWidth.ts` (Charts zeichnen in echter Breite, `grownHeight`), `monotoneCurve`/`smoothBand` in `scale.ts`, `usePick(..., w, shared)` für gemeinsamen Tag, `components/verlauf/VerlaufGroup.tsx` (Gruppen, `?m=` öffnet weiter die Detailansicht), `components/ui/DayPick.tsx`, `components/ui/EditSheet.tsx` (natives `<dialog>`), `lib/anzeichen.ts` und `SIGNS`/`ALL_SYMPTOMS` in `lib/catalog.ts`, `components/heute/SignHintCard.tsx`, `lib/refresh.ts` (`useRefresh`, `useToday`, `announceNewData`), `app/version/route.ts` und `NEXT_PUBLIC_BUILD_ID` in `next.config.ts`.
   `useGarminSync(data, enabled)` ruft kein `onSynced` mehr auf, sondern `announceNewData()`; Seiten laden über `useRefresh` neu.
