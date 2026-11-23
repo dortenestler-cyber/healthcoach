@@ -96,8 +96,8 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 ### 11. Atemfrequenz, Stress, Sperrbildschirm, Sport-Icons (PR #51)
 Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst du ihn selbst. Der neue Sperrbildschirm, die Sport-Icons und das neue Coach-Symbol kommen mit demselben Merge.
 - [x] PR #51 gemergt. Migration `20261123090000_atem_stress.sql` und Upload von `garmin-sync` grün (geprüft von Claude)
-- [ ] In der App auf Heute **Synchronisieren** tippen. Unter Vitalwerte sollte dann die Atemfrequenz stehen, auf der Stress-Karte die Aufteilung und die längste Phase mit erhöhtem Stress
-- [ ] Steht dort „Stress im Tagesverlauf ist bei Garmin nicht abrufbar“ oder fehlt die Atemfrequenz, Claude Bescheid geben
+- [x] Synchronisiert: Atemfrequenz und Stress-Aufteilung kommen an (23. Nov., von dir bestätigt). Die Hauttemperatur fehlt, Claude sucht den Grund
+- [x] Stressverlauf: Garmin liefert ihn nicht (404), die App erklärt das
 - [ ] App einmal sperren lassen (5 Minuten im Hintergrund) und den neuen Sperrbildschirm mit PIN und Face ID ausprobieren
 
 ### 12. Gesundheit mit Überblick und Gewohnheiten (auch in PR #51)

@@ -19,7 +19,6 @@ Korridore Teil B Daten ist fertig und läuft (PR #63–#73): Alltagslast aus dem
 - Alltagslast Version 2: ohne Bewegungsdaten zählt Zone 1 ab 10 Minuten am Stück, Zone 2 und höher immer (`bewegung: "dauer"`). Ältere Tage (v1) rechnet jeder Abruf nach.
 
 ## Wartet auf
-- Nutzerin: Rückmeldung, ob Atemfrequenz und Stress im Tagesverlauf ankommen (`AUFGABEN.md` Abschnitt 11)
 
 ## Für die andere Rolle
 - Oberfläche: Dein Wunsch „Readiness der Uhr angleichen“ ist mit PR #70 erledigt (gemergt). Die Stresskurve (`stress_curve`) bleibt leer, Garmin liefert sie nicht: Karte „Stress im Tagesverlauf“ entsprechend erklären. `lib/alltagslast.ts`: `v` kann 1 oder 2 sein, `bewegung` neu „stress“ oder „dauer“ (Zone 1 ab 10 Minuten am Stück).
