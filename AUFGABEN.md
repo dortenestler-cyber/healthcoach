@@ -8,8 +8,8 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 ## Jetzt
 
 ### Training-Insights (PR #101)
-- [ ] PR #101 ansehen und mergen. Er enthält die Migration `supabase/migrations/20261127090000_training_insights.sql` (drei neue Spalten in `garmin_activities`: Pulszonen, Pulsverlauf, Anstrengung) und eine Änderung an `garmin-sync`. Dein Merge ist die Freigabe, Migration und Upload der Funktion laufen danach automatisch
-- [ ] Claude Bescheid geben, dann prüft Claude, ob beide Läufe grün sind
+- [x] PR #101 gemergt (23. Nov.), Migration und Upload der Funktion grün (geprüft von Claude). Er enthält die Migration `supabase/migrations/20261127090000_training_insights.sql` (drei neue Spalten in `garmin_activities`: Pulszonen, Pulsverlauf, Anstrengung) und eine Änderung an `garmin-sync`. Dein Merge ist die Freigabe, Migration und Upload der Funktion laufen danach automatisch
+- [x] Claude Bescheid gegeben, Läufe grün
 - [ ] Einmal synchronisieren (auf Heute nach unten ziehen). Danach haben die Einheiten der letzten Tage Pulszonen und Zeitstrahl. Für ältere Einheiten im Verlauf „Ein Jahr laden“ antippen
 - [ ] Auf Training eine Aktivität antippen und die Einheit-Seite ansehen, dort die Anstrengung 1–10 eintragen. Unter Training › Insights Verlauf und Muster ansehen
 
