@@ -60,7 +60,7 @@ export default function HeuteView() {
 
   return (
     <PullToRefresh onRefresh={refresh} busy={gsync.busy}>
-      <DayHead day={day} today={today} lastSync={gsync.lastSync} onDay={setDay} />
+      <DayHead day={day} today={today} lastSync={gsync.lastSync} failed={!!gsync.error || gsync.morningFailed} onDay={setDay} />
       {error && <p className="alert" role="alert">{error}</p>}
       {gsync.error && <p className="alert" role="alert">{gsync.error}</p>}
       {isToday && gsync.morningFailed && gsync.morning && (

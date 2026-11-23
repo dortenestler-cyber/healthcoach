@@ -2684,3 +2684,17 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
 .fold-row:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 8px; }
 .agenda-foot { display: inline-flex; align-items: center; min-height: 44px; color: var(--muted); }
 .more-link { margin-top: 6px; min-height: 44px; padding: 0; color: var(--muted); font-size: 14px; }
+
+/* Garmin-Stand als Punkt am Zahnrad (Sammelliste Punkt 7) */
+.gear-btn { position: relative; }
+.sync-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--card);
+  background: var(--muted);
+}
+.sync-dot[data-level="veraltet"] { background: var(--warn); }
