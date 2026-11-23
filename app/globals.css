@@ -2806,6 +2806,10 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
   .sidenav-dot[data-level="alt"] { background: var(--muted); }
   .sidenav-dot[data-level="veraltet"] { background: var(--warn); }
   .sidenav-label { display: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidenav-refresh { background: none; border: 0; font: inherit; font-size: 12.5px; color: var(--muted); cursor: pointer; text-align: left; min-height: 44px; width: 100%; border-radius: var(--radius-control); }
+  .sidenav-refresh:hover:not(:disabled) { color: var(--text); background: var(--fill); }
+  .sidenav-refresh:disabled { cursor: default; }
+  .sidenav-refresh-word { color: var(--text); }
 
   /* Coach als schwebender Knopf unten rechts, ohne Leiste darunter */
   .coach-fab { right: 24px; bottom: 24px; }
@@ -2933,3 +2937,10 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .sign-hint-eyebrow { color: var(--warn-fg); }
 .sign-hint-text { margin: 0; font-size: 16px; line-height: 1.4; }
 .sign-hint-ask { display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid var(--line-soft); }
+
+/* Neue Version (Konzept Datenaktualisierung A7): hell auf dunkel wie der Hauptbutton */
+.update-note {
+  display: block; width: 100%; min-height: 44px; margin: 0; padding: 10px 14px;
+  border: 0; border-radius: var(--radius-control); background: var(--text); color: var(--bg);
+  font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+}

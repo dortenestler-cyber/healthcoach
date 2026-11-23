@@ -1,5 +1,6 @@
 "use client";
 
+import { useRefresh } from "@/lib/refresh";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -58,6 +59,7 @@ export default function VerlaufView({ initial }: { initial: string | null }) {
   useEffect(() => {
     load();
   }, [load]);
+  useRefresh(load);
 
   const loadYear = async () => {
     setBusy(true);

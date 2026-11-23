@@ -1,5 +1,6 @@
 "use client";
 
+import { useRefresh } from "@/lib/refresh";
 import Link from "next/link";
 import { Row } from "@/components/SettingsView";
 import { useEffect, useState } from "react";
@@ -32,6 +33,8 @@ export default function OverviewSection() {
   const [error, setError] = useState("");
   const today = isoDay();
 
+  const [tick, setTick] = useState(0); // Neu laden (Konzept Datenaktualisierung)
+  useRefresh(() => setTick((t) => t + 1));
   useEffect(() => {
     const sb = supabase();
     if (!sb) return;
@@ -51,7 +54,7 @@ export default function OverviewSection() {
       setIllness(((il.data ?? []) as Illness[])[0] ?? null);
       setInjuries((inj.data ?? []) as Injury[]);
     });
-  }, [today]);
+  }, [today, tick]);
 
   const from = isoDay(daysAgo(90));
   const effects = data

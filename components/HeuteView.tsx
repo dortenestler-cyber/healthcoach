@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRefresh, useToday } from "@/lib/refresh";
 import { supabase } from "@/lib/supabase";
-import { isoDay } from "@/lib/dates";
 import DayHead from "@/components/heute/DayHead";
 import RingRow from "@/components/heute/RingRow";
 import DaySentence from "@/components/heute/DaySentence";
@@ -30,8 +30,16 @@ export default function HeuteView() {
   const [error, setError] = useState("");
   const [data, setData] = useState<Data | null>(null);
   const [rehaSports, setRehaSports] = useState<string[]>([]);
-  const today = isoDay();
+  const today = useToday();
   const [day, setDay] = useState(today);
+  // Tageswechsel (A5): Wer gerade den alten Tag ansah, springt auf den neuen
+  const prevToday = useRef(today);
+  useEffect(() => {
+    if (prevToday.current !== today) {
+      setDay((d) => (d === prevToday.current ? today : d));
+      prevToday.current = today;
+    }
+  }, [today]);
   const feat = useFeatures();
 
   const loadData = useCallback(async () => {
@@ -50,7 +58,8 @@ export default function HeuteView() {
     loadData();
   }, [loadData]);
 
-  const gsync = useGarminSync(data, loadData, feat.garmin);
+  const gsync = useGarminSync(data, feat.garmin);
+  useRefresh(loadData);
   const refresh = useCallback(() => {
     if (feat.garmin) gsync.sync(3);
     else loadData();

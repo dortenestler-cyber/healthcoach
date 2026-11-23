@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRefresh } from "@/lib/refresh";
+import { useCallback, useEffect, useState } from "react";
 import TwoCol from "@/components/ui/TwoCol";
 import PageHead from "@/components/PageHead";
 import { useFeatures, type Feature } from "@/lib/prefs";
@@ -61,11 +62,15 @@ export default function TrainingView({ initial }: { initial: string }) {
   const hasAlltag = !!data && firstAlltagDay(data.daily) !== null;
   const withAlltag = hasAlltag && alltag;
 
-  useEffect(() => {
+  const loadData = useCallback(() => {
     loadInsightData()
       .then(setData)
       .catch((e) => setError("Daten konnten nicht geladen werden: " + (e instanceof Error ? e.message : String(e))));
   }, []);
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+  useRefresh(loadData);
 
   return (
     <>
