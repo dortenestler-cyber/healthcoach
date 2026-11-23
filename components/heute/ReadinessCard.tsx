@@ -14,7 +14,7 @@ const date = (iso: string) => new Date(iso + "T12:00:00").toLocaleDateString("de
 const joinDe = (parts: string[]) => (parts.length <= 1 ? parts.join("") : `${parts.slice(0, -1).join(", ")} und ${parts[parts.length - 1]}`);
 
 // Ein Satz, warum die Readiness so ist: welche Faktoren über, unter oder in deinem Bereich liegen
-function why(factors: Row[], label: string): string | null {
+export function why(factors: Row[], label: string): string | null {
   const over: string[] = [];
   const under: string[] = [];
   const typical: string[] = [];
@@ -32,7 +32,7 @@ function why(factors: Row[], label: string): string | null {
 }
 
 // Readiness 0–10 mit Stufenleiste, Vorschlag nach der Regelreihenfolge und vier Beitragsfaktoren (HRV, Ruhepuls, Schlaf, Last)
-export default function ReadinessCard({ rule, factors }: { rule: DayRule; factors: Row[] }) {
+export default function ReadinessCard({ rule, factors, open = false }: { rule: DayRule; factors: Row[]; open?: boolean }) {
   // Warnzeichen: nur der ärztliche Hinweis, sonst nichts
   if (rule.level === "warnzeichen") {
     return (
@@ -76,7 +76,7 @@ export default function ReadinessCard({ rule, factors }: { rule: DayRule; factor
         <span>{rule.text}</span>
       </div>
 
-      <details className="derive">
+      <details className="derive" open={open}>
         <summary>Faktoren und Erklärung</summary>
         <div className="factor-list factor-box">
           {factors.map((f) => {
