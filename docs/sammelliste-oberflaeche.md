@@ -24,4 +24,16 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Sobald alle festen Einnahmen des Tages abgehakt sind, zeigt Heute statt der Liste nur noch eine Zeile: „✓ Medikamente und Supplements · alles genommen (5 von 5)“ mit Pfeil. Tippen klappt die Liste wieder auf, z. B. um etwas rückgängig zu machen. „Bufori bei Bedarf“ mit „+ Hub“ bleibt sichtbar, weil man es jederzeit spontan braucht. „Krank oder verletzt?“ bleibt ebenfalls. Im Tagebuch bleibt die volle Liste.
    Dateien: `components/HealthToday.tsx`, evtl. `components/IntakeChecklist.tsx`
 
+5. ☐ **Generell: Was noch eingeklappt werden kann** (23.11., Vorschlag zum Auswählen)
+   Regel für alle Punkte: Erledigtes klappt zu einer Zeile mit ✓ zusammen, Offenes bleibt offen. Warnungen, Hinweise auf ärztliche Abklärung und Krankheit/Verletzung werden nie eingeklappt. Eine Zeile lässt sich immer per Tipp aufklappen. Am nächsten Tag ist alles wieder offen.
+   - 5a **Heute · Geplantes Training:** Nach dem Training (Garmin-Aktivität passt zum Plan) nur noch „✓ Kettlebell erledigt · 42 min“.
+   - 5b **Heute · „Krank oder verletzt?“:** Statt eigener Zeile mit zwei Knöpfen ein kleiner Link am Ende der Karte „Krank oder verletzt? ›“.
+   - 5c **Tagebuch · Medikamente und Supplements:** dasselbe wie Punkt 4, wenn alles abgehakt ist.
+   - 5d **Tagebuch · Check-in:** Nach dem Speichern nur noch eine Zeile mit den Werten, z. B. „✓ Check-in · Schlaf gut · Energie 7“, Tipp zum Ändern.
+   - 5e **Tagebuch · Symptome und Gewohnheiten:** Oben stehen die heute eingetragenen und die, die du oft nutzt. Der Rest liegt hinter „Weitere anzeigen“.
+   - 5f **Gesundheit · Medikamente:** Das Formular „Neues Mittel“ erst nach Tipp auf „+ Neues Mittel“. „Frühere Mittel“ eingeklappt.
+   - 5g **Gesundheit · Krank & verletzt:** „Frühere Verletzungen“ und der Krankheits-Verlauf eingeklappt. Die Körperkarte „Wo tut es weh?“ erst nach Tipp auf „+ Verletzung“.
+   - 5h **Gesundheit · Körper:** Die Erklärung „So geht die App mit deinen Werten um“ eingeklappt.
+   Schon eingeklappt sind: Verlauf 4 Wochen im Tagebuch, Faktoren auf der Readiness-Seite, Check-in-Hinweis auf Heute (verschwindet nach dem Check-in).
+
 ## Erledigt
