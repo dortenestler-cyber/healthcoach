@@ -1,6 +1,6 @@
 # Konzept: Insights zu Trainingseinheiten
 
-Stand: 23.11.2026 · Status: **Vorschlag, wartet auf Freigabe** · Ansicht: `docs/entwurf-training-insights.html` (alle Zahlen dort sind Beispieldaten)
+Stand: 23.11.2026 · Status: **Freigegeben (23.11.)**, Umsetzung in Arbeit · Ansicht: `docs/entwurf-training-insights.html` (alle Zahlen dort sind Beispieldaten)
 
 ## Was die Nutzerin will
 Zu jeder Trainingseinheit und über Wochen verstehen: Wie hart war es, wie hat der Körper reagiert, und was hilft oder bremst.

@@ -44,3 +44,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-23 · DA · Nutzerin: Monolith ist die Anzeige „Immer an“ auch für das Datenraster (dünner Strich wegen der 10-%-Grenze bei AMOLED, gilt für alle Layouts)
 2026-11-23 · DA · Nutzerin: Farbmodus (Einfarbig, Bedeutung, Nacht) ersetzt die 9 Farbregler des Zifferblatts; Zifferblatt auf ganze Pixel anpassen
 2026-11-23 · DA · Nutzerin: Uhr-App und Zifferblätter nur über das Garmin-Entwicklerportal hochladen (kein USB). Jede Änderung liefert ein Upload-Paket mit .iq, Store-Icon, Screenshots und Beschreibung (Regel in CLAUDE.md)
+2026-11-23 · OF/DA · Nutzerin: Konzept Training-Insights (`docs/konzept-training-insights.md`) freigegeben: Einstieg per Tipp auf die Aktivität und „Insights“ auf Training · Pulszonen und Zeitstrahl der Einheit gleich mit (Migration freigegeben) · eigene Anstrengung 1–10 nach der Einheit ja · Muster ab 5 Einheiten je Gruppe
