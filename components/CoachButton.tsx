@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useCoachPrefs } from "@/lib/prefs";
+import { coachPanel, useCoachPanel, useTablet, useWide } from "@/lib/layout";
 
 // Schwebender Knopf, auf jeder Seite sichtbar.
 // Öffnet den Coach; im Coach selbst wird er zum Schließen-Knopf.
@@ -10,8 +11,17 @@ export default function CoachButton() {
   const router = useRouter();
   const open = pathname.startsWith("/coach");
   const { on } = useCoachPrefs();
+  const wide = useWide();
+  const tablet = useTablet();
+  const panel = useCoachPanel();
 
   const onClick = () => {
+    // Ab 768 px öffnet der Knopf die Coach-Spalte bzw. das Fenster statt einer eigenen Seite
+    if (tablet && !open) {
+      if (wide) coachPanel.setDocked(true);
+      else coachPanel.setOverlay(!panel.overlay);
+      return;
+    }
     if (!open) {
       router.push("/coach");
     } else if (window.history.length > 1) {
@@ -23,6 +33,7 @@ export default function CoachButton() {
 
   // Coach aus: Knopf nur noch auf der Coach-Seite selbst (zum Schließen)
   if (!on && !open) return null;
+  if (tablet && !open && ((wide && panel.docked) || (!wide && panel.overlay))) return null;
 
   return (
     <button

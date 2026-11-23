@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTablet } from "@/lib/layout";
 import { clock, greeting, longDate, shiftDay } from "@/lib/dates";
 
 const WEEKDAY = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
@@ -18,8 +19,20 @@ export function syncState(lastSync: number, failed: boolean, now: number): { lev
   return { level: "veraltet", text: stand + ", älter als 1 Stunde" };
 }
 
-export default function DayHead({ day, today, lastSync, failed = false, onDay }: { day: string; today: string; lastSync: number; failed?: boolean; onDay: (d: string) => void }) {
+export default function DayHead({ day, today, lastSync, failed = false, onDay, onRefresh, busy = false }: { day: string; today: string; lastSync: number; failed?: boolean; onDay: (d: string) => void; onRefresh?: () => void; busy?: boolean }) {
   const [now, setNow] = useState(() => Date.now());
+  const tablet = useTablet();
+  // Am Computer: ← → wechselt den Tag (nicht in Eingabefeldern)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName) || t.isContentEditable || t.closest("svg.cb-pickable"))) return;
+      if (e.key === "ArrowLeft") onDay(shiftDay(day, -1));
+      else if (e.key === "ArrowRight" && day < today) onDay(shiftDay(day, 1));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [day, today, onDay]);
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 60000);
     return () => clearInterval(t);
@@ -50,6 +63,11 @@ export default function DayHead({ day, today, lastSync, failed = false, onDay }:
             </button>
           )}
         </div>
+        {tablet && onRefresh && (
+          <button type="button" className="btn btn-soft refresh-btn" onClick={onRefresh} disabled={busy} title={sync.text}>
+            {busy ? "Aktualisiere …" : "↻ Aktualisieren"}
+          </button>
+        )}
         <Link href="/einstellungen" className="gear-btn" aria-label={`Einstellungen · ${sync.text}`} title={sync.text}>
           {sync.level !== "frisch" && <span className="sync-dot" data-level={sync.level} aria-hidden="true" />}
           <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

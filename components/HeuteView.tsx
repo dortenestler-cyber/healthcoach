@@ -10,6 +10,7 @@ import GlanceTiles from "@/components/heute/GlanceTiles";
 import TodayAgenda from "@/components/heute/TodayAgenda";
 import RecentActivities from "@/components/heute/RecentActivities";
 import ActivityQuestion from "@/components/heute/ActivityQuestion";
+import TwoCol, { useTwoCols } from "@/components/ui/TwoCol";
 import PullToRefresh from "@/components/ui/PullToRefresh";
 import { readinessFactors } from "@/lib/today";
 import { loadInsightData } from "@/lib/insightData";
@@ -54,14 +55,21 @@ export default function HeuteView() {
     else loadData();
   }, [feat.garmin, gsync, loadData]);
 
+  const twoCols = useTwoCols();
   const isToday = day === today;
   const rule = data ? dayRule(day, data, isToday ? rehaSports : []) : null;
   const now = new Date();
   const nowMinute = isToday ? now.getHours() * 60 + now.getMinutes() : 24 * 60 - 1;
 
+  // Auf dem iPhone untereinander wie bisher, am Computer links „Auf einen Blick“ und Aktivitäten, rechts „Heute steht an“
+  const glance = data && rule ? <GlanceTiles day={day} data={data} rule={rule} showGarmin={feat.garmin} showCycle={feat.zyklus} /> : null;
+  const agenda = isToday ? <TodayAgenda day={day} data={data} rule={rule} showPlan={feat.tagesplan} /> : null;
+  const question = isToday && data && feat.garmin ? <ActivityQuestion acts={data.acts} onSaved={loadData} /> : null;
+  const recent = data && feat.garmin ? <RecentActivities day={day} data={data} /> : null;
+
   return (
     <PullToRefresh onRefresh={refresh} busy={gsync.busy}>
-      <DayHead day={day} today={today} lastSync={gsync.lastSync} failed={!!gsync.error || gsync.morningFailed} onDay={setDay} />
+      <DayHead day={day} today={today} lastSync={gsync.lastSync} failed={!!gsync.error || gsync.morningFailed} onDay={setDay} onRefresh={refresh} busy={gsync.busy} />
       {error && <p className="alert" role="alert">{error}</p>}
       {gsync.error && <p className="alert" role="alert">{gsync.error}</p>}
       {isToday && gsync.morningFailed && gsync.morning && (
@@ -75,13 +83,29 @@ export default function HeuteView() {
 
       {data && rule && <DaySentence rule={rule} factors={readinessFactors(day, data)} showLoad={feat.tagesziel} />}
 
-      {data && rule && <GlanceTiles day={day} data={data} rule={rule} showGarmin={feat.garmin} showCycle={feat.zyklus} />}
-
-      {isToday && <TodayAgenda day={day} data={data} rule={rule} showPlan={feat.tagesplan} />}
-
-      {isToday && data && feat.garmin && <ActivityQuestion acts={data.acts} onSaved={loadData} />}
-
-      {data && feat.garmin && <RecentActivities day={day} data={data} />}
+      {twoCols ? (
+        <TwoCol
+          left={
+            <>
+              {glance}
+              {recent}
+            </>
+          }
+          right={
+            <>
+              {agenda}
+              {question}
+            </>
+          }
+        />
+      ) : (
+        <>
+          {glance}
+          {agenda}
+          {question}
+          {recent}
+        </>
+      )}
 
       {!data && !error && <p className="meta">Lädt …</p>}
     </PullToRefresh>

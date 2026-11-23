@@ -27,8 +27,9 @@ const SUGGESTIONS = [
   "Wie bereite ich mich diese Woche auf den 5. Kyu vor?",
 ];
 
-// Coach-Chat: die Frage und eine kompakte Zusammenfassung gehen an die Funktion "coach"
-export default function CoachView() {
+// Coach-Chat: die Frage und eine kompakte Zusammenfassung gehen an die Funktion "coach".
+// panel: als Spalte rechts am Computer (Konzept Web-App), mit eigenem Kopf und Einklappen-Knopf.
+export default function CoachView({ panel, onClose }: { panel?: boolean; onClose?: () => void } = {}) {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -53,7 +54,7 @@ export default function CoachView() {
     // Zusammenfassung schon vorbereiten, damit die erste Antwort schneller kommt
     context.current = buildCoachContext().catch(() => "");
     // Coach-Einstieg aus einer Karte: Frage vorbelegen, gesendet wird erst nach deinem Tippen
-    const frage = new URLSearchParams(window.location.search).get("frage");
+    const frage = panel ? null : new URLSearchParams(window.location.search).get("frage");
     if (frage) {
       setText(frage.slice(0, 2000));
       setPrefilled(true);
@@ -72,6 +73,20 @@ export default function CoachView() {
   useEffect(() => {
     end.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [msgs, busy]);
+
+  // Am Computer: „/“ springt ins Eingabefeld
+  useEffect(() => {
+    if (!panel) return;
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (e.key === "/" && t && !["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName) && !t.isContentEditable) {
+        e.preventDefault();
+        field.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [panel]);
 
   const send = async (q: string) => {
     const sb = supabase();
@@ -107,6 +122,7 @@ export default function CoachView() {
     send(text);
   };
 
+  if (!prefs.on && panel) return null;
   if (!prefs.on) {
     return (
       <>
@@ -121,10 +137,26 @@ export default function CoachView() {
     );
   }
 
-  return (
+  const head = panel ? (
+    <div className="coach-panel-head">
+      <span className="coach-panel-title"><CoachMark /> Coach</span>
+      <Link href="/coach/hinweise" className="link-small">Hinweise</Link>
+      {onClose && (
+        <button type="button" className="btn btn-soft btn-44" onClick={onClose} aria-label="Coach einklappen">
+          Einklappen ›
+        </button>
+      )}
+    </div>
+  ) : (
     <>
       <PageHead title="Coach" sub="Kennt Training, Erholung, Zyklus, Symptome und Medikamente" />
       <Link href="/coach/hinweise" className="settings-link">Alle Hinweise des Coachs ansehen ›</Link>
+    </>
+  );
+
+  return (
+    <>
+      {head}
       <div className="chat">
         {!msgs.length && (
           <div className="bubble bubble-assistant">

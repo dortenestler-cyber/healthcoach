@@ -5,6 +5,8 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import TabBar from "@/components/TabBar";
 import CoachButton from "@/components/CoachButton";
+import CoachPanel from "@/components/CoachPanel";
+import SideNav from "@/components/SideNav";
 import PinLock from "@/components/PinLock";
 import UsageTracker from "@/components/UsageTracker";
 import { clearOfflineData } from "@/components/ServiceWorker";
@@ -48,7 +50,11 @@ export default function AuthGate({ children }: { children: ReactNode }) {
   if (state === "login") return <Login />;
   return (
     <PinLock>
-      {children}
+      <div className="app-frame">
+        <SideNav />
+        <div className="app-content">{children}</div>
+        <CoachPanel />
+      </div>
       <CoachButton />
       <TabBar />
       <UsageTracker />
