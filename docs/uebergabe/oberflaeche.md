@@ -6,6 +6,7 @@ Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/desig
 ## Training-Insights (PR #101, 23.11.)
 - Einheit-Seite `app/training/einheit/[id]` → `components/training/UnitDetail.tsx`, Reiter „Insights“ in `TrainingView` → `components/training/InsightsSection.tsx`, Rechnung in `lib/trainingInsights.ts`. Aktivitäten in `CalendarSection`, `TodayPlan` und `RecentActivities` verlinken auf die Einheit. Training-Muster mit Ergebnis zusätzlich in `OverviewSection` („Weitere Muster“), letzte Einheit im Coach-Kontext.
 - Beide Seiten laden `garmin_activities` mit `select("*")`, damit sie ohne die neuen Spalten weiterlaufen. `loadInsightData` bleibt unverändert.
+- PR #103: Zeitstrahl mit zwei Achsen (Puls links, Belastung rechts) und Legende. PR #104: `SportPicker` auf der Einheit-Seite schreibt `sport_override`/`sport_label`; „Sonstiges“ ohne Namen wird nicht verglichen.
 - Offen: Muster „Ruhetage zwischen harten Einheiten“ (Konzept).
 
 ## Stand in einem Satz
