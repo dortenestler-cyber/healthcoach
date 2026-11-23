@@ -1,5 +1,6 @@
 "use client";
 
+import DayPick from "@/components/ui/DayPick";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { loadPeriodDays } from "@/lib/garminZyklus";
@@ -120,7 +121,8 @@ function TrendCard(props: {
   const points = rows.filter((r) => r[field] !== null).map((r) => ({ day: r.day, v: r[field] as number }));
   const last = points[points.length - 1];
   const [value, setValue] = useState<number | null>(null);
-  const shown = value ?? last?.v ?? (field === "weight_kg" ? 65 : 80);
+  const [day, setDay] = useState(isoDay()); // Tag des Eintrags, nachtragen möglich (Punkt 18/20)
+  const shown = value ?? points.find((p) => p.day === day)?.v ?? last?.v ?? (field === "weight_kg" ? 65 : 80);
   const fmt = (v: number) => v.toLocaleString("de-DE", { minimumFractionDigits: digits, maximumFractionDigits: digits }) + " " + unit;
 
   // Trend: Mittel der letzten 28 Tage gegen die 28 Tage davor
@@ -153,7 +155,7 @@ function TrendCard(props: {
   const save = async () => {
     const sb = supabase();
     if (!sb) return;
-    const { error: e } = await sb.from("body_measurements").upsert({ day: isoDay(), [field]: Math.round(shown * 10) / 10 }, { onConflict: "user_id,day" });
+    const { error: e } = await sb.from("body_measurements").upsert({ day, [field]: Math.round(shown * 10) / 10 }, { onConflict: "user_id,day" });
     if (e) onError("Speichern hat nicht geklappt: " + e.message);
     else {
       onError("");
@@ -162,7 +164,17 @@ function TrendCard(props: {
     }
   };
 
-  const savedToday = last?.day === isoDay() && value === null;
+  const savedToday = points.some((p) => p.day === day) && value === null;
+  // Wert eines Tages löschen; ist der andere Wert auch leer, verschwindet die Zeile
+  const removeDay = async (d: string) => {
+    const sb = supabase();
+    if (!sb || !window.confirm(`${label} vom ${shortDate(new Date(d + "T12:00:00"))} löschen?`)) return;
+    const row = rows.find((r) => r.day === d);
+    const other = field === "weight_kg" ? row?.waist_cm : row?.weight_kg;
+    const { error: e } = other == null ? await sb.from("body_measurements").delete().eq("day", d) : await sb.from("body_measurements").update({ [field]: null }).eq("day", d);
+    if (e) onError("Löschen hat nicht geklappt: " + e.message);
+    else onSaved();
+  };
 
   return (
     <section className="card" id={field === "waist_cm" ? "bauchumfang" : undefined}>
@@ -186,8 +198,9 @@ function TrendCard(props: {
           <span>heute</span>
         </div>
       )}
+      <DayPick label="Für welchen Tag?" value={day} onChange={(d) => { setDay(d); setValue(null); }} />
       <div className="card-row list-line">
-        <span className="row-label">Diese Woche</span>
+        <span className="row-label">Wert</span>
         <div className="stepper">
           <button type="button" aria-label="Weniger" onClick={() => setValue(Math.round((shown - step) * 10) / 10)}>−</button>
           <span>{fmt(shown)}</span>
@@ -195,8 +208,23 @@ function TrendCard(props: {
         </div>
       </div>
       <button type="button" className="btn btn-dark" disabled={savedToday} onClick={save}>
-        {savedToday ? "Heute eingetragen" : "Eintragen"}
+        {savedToday ? (day === isoDay() ? "Heute eingetragen" : "Eingetragen") : points.some((p) => p.day === day) ? "Ändern" : "Eintragen"}
       </button>
+      {points.length > 0 && (
+        <details className="derive">
+          <summary>Einträge ({points.length})</summary>
+          {[...points].reverse().slice(0, 20).map((p) => (
+            <div key={p.day} className="card-row list-line">
+              <span>{shortDate(new Date(p.day + "T12:00:00"))}</span>
+              <span className="footer-links">
+                <span className="row-strong">{fmt(p.v)}</span>
+                <button type="button" className="btn btn-link btn-44" onClick={() => { setDay(p.day); setValue(null); }}>Ändern</button>
+                <button type="button" className="btn btn-link btn-44" onClick={() => removeDay(p.day)}>Löschen</button>
+              </span>
+            </div>
+          ))}
+        </details>
+      )}
     </section>
   );
 }
