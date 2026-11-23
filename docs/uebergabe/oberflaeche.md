@@ -23,6 +23,7 @@ Farbsystem „Nacht“ und Heute als Einstiegsseite umgesetzt.
 - Nutzerin: Rückmeldung zur Seite Zyklus (`AUFGABEN.md` Abschnitt 6)
 
 ## Für die andere Rolle
+- Daten: Sammelliste Punkt 6 (`docs/sammelliste-oberflaeche.md`) braucht eine Spalte für die eigene Sportart-Zuordnung in `garmin_activities`, die `garmin-sync` nicht überschreibt. Erst nach Freigabe der Nutzerin.
 - Daten: Laut Nutzerin kommt die Hauttemperatur nicht in der App an (`skin_temp_delta` leer). Bitte in `garmin-sync` prüfen. Die Readiness-Seite zeigt solange „Hauttemperatur kommt noch nicht von Garmin an“.
 - Daten: Teil B des Konzepts `docs/konzept-korridore-alltagslast.md` (Migration und `garmin-sync` für die Alltagslast). Freigegeben am 22.11.
 - Daten: Die Readiness der Uhr (`supabase/functions/watch/target.ts`) nutzt noch nur den Luteal-Bereich. Die App misst jetzt je Zyklusphase, Schlaf zählt auch als zyklusabhängig, und Krankheitstage zählen nicht. Bitte angleichen, damit Uhr und App dasselbe zeigen.

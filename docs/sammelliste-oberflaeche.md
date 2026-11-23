@@ -36,4 +36,9 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    - 5h **Gesundheit · Körper:** Die Erklärung „So geht die App mit deinen Werten um“ eingeklappt.
    Schon eingeklappt sind: Verlauf 4 Wochen im Tagebuch, Faktoren auf der Readiness-Seite, Check-in-Hinweis auf Heute (verschwindet nach dem Check-in).
 
+6. ☐ **Unklare Garmin-Aktivität: Coach fragt nach** (23.11.)
+   Wenn eine Aktivität bei „Sonstiges“ landet, erscheint auf Heute unter „Heute steht an“ eine Frage mit dem Coach-Zeichen: „Was war das am Mo, 16. Nov., 1:44 h, Puls Ø 133?“. Darunter stehen Knöpfe: Karate · Kettlebell · Bouldern · Ausdauer · Anderes … (eigener Name) · „Nicht zuordnen“. Nach dem Tipp zählt die Aktivität überall zur gewählten Sportart (Kalender, Belastung, Training). Dafür ist keine Anfrage an Claude nötig, also entstehen keine Kosten. Ist der Coach ausgeschaltet, steht die Frage ohne Coach-Zeichen da.
+   Braucht Daten `[DA]`: eine Spalte für die eigene Zuordnung in `garmin_activities` (Migration, wartet auf Freigabe). `garmin-sync` darf sie beim nächsten Abruf nicht überschreiben.
+   Dateien OF: `lib/training.ts` (Zuordnung lesen), neue Karte unter `components/heute/`
+
 ## Erledigt
