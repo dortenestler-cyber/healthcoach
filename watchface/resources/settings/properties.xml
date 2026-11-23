@@ -24,14 +24,8 @@
     <property id="s_l3" type="number">2</property>
     <property id="g_l" type="number">1</property>
     <property id="g_r" type="number">2</property>
-    <!-- Farben: 0 = Standard wie im Konzept -->
-    <property id="c_date" type="number">0</property>
-    <property id="c_top" type="number">0</property>
-    <property id="c_wx" type="number">0</property>
-    <property id="c_time" type="number">0</property>
-    <property id="c_mid" type="number">0</property>
-    <property id="c_low" type="number">0</property>
-    <property id="c_bot" type="number">0</property>
-    <property id="c_bars" type="number">0</property>
-    <property id="c_lines" type="number">0</property>
+    <!-- Farbmodus: 0 Einfarbig, 1 Bedeutung (Farbe aus der Familie des Werts), 2 Nacht (gedimmt) -->
+    <property id="cmode" type="number">0</property>
+    <!-- Nacht automatisch zur Schlafenszeit aus dem Garmin-Profil -->
+    <property id="nauto" type="boolean">false</property>
 </properties>

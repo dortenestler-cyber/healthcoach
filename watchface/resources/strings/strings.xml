@@ -47,17 +47,6 @@
     <string id="G7">Intensitätsminuten-Ziel</string>
     <string id="G8">Etagen-Ziel</string>
     <string id="G9">Readiness</string>
-    <string id="C0">Standard</string>
-    <string id="C1">Weiß</string>
-    <string id="C2">Grau</string>
-    <string id="C3">Beere</string>
-    <string id="C4">Sage</string>
-    <string id="C5">Terracotta</string>
-    <string id="C6">Slate-Blau</string>
-    <string id="C7">Amber</string>
-    <string id="C8">Violett</string>
-    <string id="L0">Grau</string>
-    <string id="L1">Weiß</string>
     <string id="N_s_a1">Feld: Oben links</string>
     <string id="N_s_a2">Feld: Oben rechts</string>
     <string id="N_s_b1">Feld: Wetterzeile links</string>
@@ -74,15 +63,6 @@
     <string id="N_s_e2">Feld: Ganz unten rechts</string>
     <string id="N_g_l">Strich-Anzeige links</string>
     <string id="N_g_r">Strich-Anzeige rechts</string>
-    <string id="N_c_date">Farbe: Datum</string>
-    <string id="N_c_top">Farbe: obere Zeile</string>
-    <string id="N_c_wx">Farbe: Wetterzeile</string>
-    <string id="N_c_time">Farbe: Uhrzeit</string>
-    <string id="N_c_mid">Farbe: unter der Uhrzeit</string>
-    <string id="N_c_low">Farbe: untere Zeile</string>
-    <string id="N_c_bot">Farbe: ganz unten</string>
-    <string id="N_c_bars">Farbe: Strich-Anzeigen</string>
-    <string id="N_c_lines">Farbe: Linien und Rahmen</string>
     <string id="N_layout">Layout</string>
     <string id="Y0">Datenraster</string>
     <string id="Y1">Monolith</string>
@@ -92,4 +72,9 @@
     <string id="N_s_l1">Schlichte Layouts: Feld 1</string>
     <string id="N_s_l2">Schlichte Layouts: Feld 2</string>
     <string id="N_s_l3">Schlichte Layouts: Feld 3</string>
+    <string id="N_cmode">Farbmodus</string>
+    <string id="M0">Einfarbig</string>
+    <string id="M1">Bedeutung</string>
+    <string id="M2">Nacht</string>
+    <string id="N_nauto">Nacht automatisch zur Schlafenszeit</string>
 </strings>

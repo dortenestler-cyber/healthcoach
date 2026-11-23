@@ -682,115 +682,15 @@
             <listEntry value="9">@Strings.G9</listEntry>
         </settingConfig>
     </setting>
-    <setting propertyKey="@Properties.c_date" title="@Strings.N_c_date">
+    <setting propertyKey="@Properties.cmode" title="@Strings.N_cmode">
         <settingConfig type="list">
-            <listEntry value="0">@Strings.C0</listEntry>
-            <listEntry value="1">@Strings.C1</listEntry>
-            <listEntry value="2">@Strings.C2</listEntry>
-            <listEntry value="3">@Strings.C3</listEntry>
-            <listEntry value="4">@Strings.C4</listEntry>
-            <listEntry value="5">@Strings.C5</listEntry>
-            <listEntry value="6">@Strings.C6</listEntry>
-            <listEntry value="7">@Strings.C7</listEntry>
-            <listEntry value="8">@Strings.C8</listEntry>
+            <listEntry value="0">@Strings.M0</listEntry>
+            <listEntry value="1">@Strings.M1</listEntry>
+            <listEntry value="2">@Strings.M2</listEntry>
         </settingConfig>
     </setting>
-    <setting propertyKey="@Properties.c_top" title="@Strings.N_c_top">
-        <settingConfig type="list">
-            <listEntry value="0">@Strings.C0</listEntry>
-            <listEntry value="1">@Strings.C1</listEntry>
-            <listEntry value="2">@Strings.C2</listEntry>
-            <listEntry value="3">@Strings.C3</listEntry>
-            <listEntry value="4">@Strings.C4</listEntry>
-            <listEntry value="5">@Strings.C5</listEntry>
-            <listEntry value="6">@Strings.C6</listEntry>
-            <listEntry value="7">@Strings.C7</listEntry>
-            <listEntry value="8">@Strings.C8</listEntry>
-        </settingConfig>
-    </setting>
-    <setting propertyKey="@Properties.c_wx" title="@Strings.N_c_wx">
-        <settingConfig type="list">
-            <listEntry value="0">@Strings.C0</listEntry>
-            <listEntry value="1">@Strings.C1</listEntry>
-            <listEntry value="2">@Strings.C2</listEntry>
-            <listEntry value="3">@Strings.C3</listEntry>
-            <listEntry value="4">@Strings.C4</listEntry>
-            <listEntry value="5">@Strings.C5</listEntry>
-            <listEntry value="6">@Strings.C6</listEntry>
-            <listEntry value="7">@Strings.C7</listEntry>
-            <listEntry value="8">@Strings.C8</listEntry>
-        </settingConfig>
-    </setting>
-    <setting propertyKey="@Properties.c_time" title="@Strings.N_c_time">
-        <settingConfig type="list">
-            <listEntry value="0">@Strings.C0</listEntry>
-            <listEntry value="1">@Strings.C1</listEntry>
-            <listEntry value="2">@Strings.C2</listEntry>
-            <listEntry value="3">@Strings.C3</listEntry>
-            <listEntry value="4">@Strings.C4</listEntry>
-            <listEntry value="5">@Strings.C5</listEntry>
-            <listEntry value="6">@Strings.C6</listEntry>
-            <listEntry value="7">@Strings.C7</listEntry>
-            <listEntry value="8">@Strings.C8</listEntry>
-        </settingConfig>
-    </setting>
-    <setting propertyKey="@Properties.c_mid" title="@Strings.N_c_mid">
-        <settingConfig type="list">
-            <listEntry value="0">@Strings.C0</listEntry>
-            <listEntry value="1">@Strings.C1</listEntry>
-            <listEntry value="2">@Strings.C2</listEntry>
-            <listEntry value="3">@Strings.C3</listEntry>
-            <listEntry value="4">@Strings.C4</listEntry>
-            <listEntry value="5">@Strings.C5</listEntry>
-            <listEntry value="6">@Strings.C6</listEntry>
-            <listEntry value="7">@Strings.C7</listEntry>
-            <listEntry value="8">@Strings.C8</listEntry>
-        </settingConfig>
-    </setting>
-    <setting propertyKey="@Properties.c_low" title="@Strings.N_c_low">
-        <settingConfig type="list">
-            <listEntry value="0">@Strings.C0</listEntry>
-            <listEntry value="1">@Strings.C1</listEntry>
-            <listEntry value="2">@Strings.C2</listEntry>
-            <listEntry value="3">@Strings.C3</listEntry>
-            <listEntry value="4">@Strings.C4</listEntry>
-            <listEntry value="5">@Strings.C5</listEntry>
-            <listEntry value="6">@Strings.C6</listEntry>
-            <listEntry value="7">@Strings.C7</listEntry>
-            <listEntry value="8">@Strings.C8</listEntry>
-        </settingConfig>
-    </setting>
-    <setting propertyKey="@Properties.c_bot" title="@Strings.N_c_bot">
-        <settingConfig type="list">
-            <listEntry value="0">@Strings.C0</listEntry>
-            <listEntry value="1">@Strings.C1</listEntry>
-            <listEntry value="2">@Strings.C2</listEntry>
-            <listEntry value="3">@Strings.C3</listEntry>
-            <listEntry value="4">@Strings.C4</listEntry>
-            <listEntry value="5">@Strings.C5</listEntry>
-            <listEntry value="6">@Strings.C6</listEntry>
-            <listEntry value="7">@Strings.C7</listEntry>
-            <listEntry value="8">@Strings.C8</listEntry>
-        </settingConfig>
-    </setting>
-    <setting propertyKey="@Properties.c_bars" title="@Strings.N_c_bars">
-        <settingConfig type="list">
-            <listEntry value="0">@Strings.C0</listEntry>
-            <listEntry value="1">@Strings.C1</listEntry>
-            <listEntry value="2">@Strings.C2</listEntry>
-            <listEntry value="3">@Strings.C3</listEntry>
-            <listEntry value="4">@Strings.C4</listEntry>
-            <listEntry value="5">@Strings.C5</listEntry>
-            <listEntry value="6">@Strings.C6</listEntry>
-            <listEntry value="7">@Strings.C7</listEntry>
-            <listEntry value="8">@Strings.C8</listEntry>
-        </settingConfig>
-    </setting>
-    <setting propertyKey="@Properties.c_lines" title="@Strings.N_c_lines">
-        <settingConfig type="list">
-            <listEntry value="0">@Strings.L0</listEntry>
-            <listEntry value="1">@Strings.L1</listEntry>
-        </settingConfig>
+    <setting propertyKey="@Properties.nauto" title="@Strings.N_nauto">
+        <settingConfig type="boolean"/>
     </setting>
     <setting propertyKey="@Properties.token" title="@Strings.TokenTitle" prompt="@Strings.TokenPrompt">
         <settingConfig type="alphaNumeric"/>
