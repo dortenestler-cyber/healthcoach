@@ -1,7 +1,11 @@
-import { segments, W } from "@/components/charts/scale";
+"use client";
+
+import { grownHeight, segments } from "@/components/charts/scale";
+import { useChartWidth } from "@/components/charts/useChartWidth";
+
 import type { EnergyDay } from "@/lib/energie";
 
-const H = 190;
+const H0 = 190;
 const PAD_L = 4;
 const PAD_R = 40;
 const PAD_T = 18;
@@ -10,6 +14,8 @@ const PAD_B = 22;
 // Energie über den Tag: heutige Body Battery, üblicher Tag, Hochrechnung, Schlaf und Training als Flächen.
 // Feste Achse 0–100, 0 bis 24 Uhr.
 export default function EnergyChart({ e, label }: { e: EnergyDay; label: string }) {
+  const { ref, w: W } = useChartWidth();
+  const H = grownHeight(H0, W);
   const x = (min: number) => PAD_L + (Math.max(0, Math.min(1440, min)) / 1440) * (W - PAD_L - PAD_R);
   const xs = (slot: number) => x(slot * 15 + 7.5);
   const y = (v: number) => PAD_T + (1 - v / 100) * (H - PAD_T - PAD_B);
@@ -20,7 +26,7 @@ export default function EnergyChart({ e, label }: { e: EnergyDay; label: string 
 
   return (
     <figure className="cb-figure cb-energy">
-      <svg className="cb" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
+      <svg ref={ref} className="cb" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
         {e.sleep && (
           <g>
             <rect x={x(e.sleep.start)} width={Math.max(1, x(e.sleep.end) - x(e.sleep.start))} y={PAD_T - 6} height={H - PAD_T - PAD_B + 6} className="cb-sleep-area" />

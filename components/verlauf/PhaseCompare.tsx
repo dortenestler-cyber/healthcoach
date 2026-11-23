@@ -1,4 +1,8 @@
-import { W, extent, linear, type Tone } from "@/components/charts/scale";
+"use client";
+
+import { extent, linear, type Tone } from "@/components/charts/scale";
+import { useChartWidth } from "@/components/charts/useChartWidth";
+
 import type { Range } from "@/lib/baseline";
 import { PHASE_GROUPS, type PhaseGroup } from "@/lib/cycle";
 
@@ -18,6 +22,7 @@ const MIN_N = 3;
 
 // Vergleich nach Zyklusphase: Schnitt je Phase als Punkt auf einer gemeinsamen Skala, mit Zahl und Anzahl der Tage
 export default function PhaseCompare({ means, range, ranges, fmt, label, tone = "recovery" }: Props) {
+  const { ref, w: W } = useChartWidth();
   const vals = PHASE_GROUPS.map(([g]) => (means[g].n >= MIN_N ? means[g].mean : null));
   const own = ranges && PHASE_GROUPS.some(([g]) => ranges[g]);
   const rowRange = (g: PhaseGroup) => (own ? ranges?.[g] ?? null : null);
@@ -28,7 +33,7 @@ export default function PhaseCompare({ means, range, ranges, fmt, label, tone = 
   const desc = PHASE_GROUPS.map(([g, l], i) => `${l} ${vals[i] === null ? "zu wenige Tage" : `${fmt(vals[i] as number)} aus ${means[g].n} Tagen`}${rowRange(g) ? `, Bereich ${fmt(rowRange(g)!.lo)} bis ${fmt(rowRange(g)!.hi)}` : ""}`).join(", ");
 
   return (
-    <svg className={`cb cb-${tone}`} viewBox={`0 0 ${W} ${h}`} role="img" aria-label={`${label} nach Zyklusphase: ${desc}`}>
+    <svg ref={ref} className={`cb cb-${tone}`} viewBox={`0 0 ${W} ${h}`} role="img" aria-label={`${label} nach Zyklusphase: ${desc}`}>
       {range && !own && <rect x={x(range.lo)} width={Math.max(2, x(range.hi) - x(range.lo))} y={2} height={h - 4} rx={6} className="cb-band" />}
       {PHASE_GROUPS.map(([g, l], i) => {
         const cy = i * ROW + ROW / 2;

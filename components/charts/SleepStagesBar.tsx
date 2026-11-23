@@ -1,7 +1,9 @@
+"use client";
+
 // Schlafphasen-Balken: Anteile von Tief-, REM-, Leichtschlaf und Wachzeit in einer Nacht.
 // Schlaf hat keine eigene Bedeutungsfarbe: Abstufungen von neutral, jede Phase mit Wort und Dauer darunter.
 
-import { W } from "@/components/charts/scale";
+import { useChartWidth } from "@/components/charts/useChartWidth";
 
 export type SleepStage = "tief" | "rem" | "leicht" | "wach";
 export const STAGE_LABEL: Record<SleepStage, string> = { tief: "Tief", rem: "REM", leicht: "Leicht", wach: "Wach" };
@@ -19,11 +21,12 @@ export default function SleepStagesBar({ minutes }: { minutes: Partial<Record<Sl
   const stages = ORDER.filter((s) => (minutes[s] ?? 0) > 0);
   const total = stages.reduce((a, s) => a + (minutes[s] ?? 0), 0) || 1;
   let acc = 0;
+  const { ref, w: W } = useChartWidth();
   const label = stages.map((s) => `${STAGE_LABEL[s]} ${hm(minutes[s] ?? 0)}`).join(", ");
 
   return (
     <figure className="cb-figure cb-sleep">
-      <svg className="cb cb-sleepbar" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Schlafphasen: ${label}`}>
+      <svg ref={ref} className="cb cb-sleepbar" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Schlafphasen: ${label}`}>
         <g>
           {stages.map((s) => {
             const w = ((minutes[s] ?? 0) / total) * W;

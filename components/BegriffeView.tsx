@@ -24,9 +24,9 @@ const TERMS: { term: string; text: string; tip: string }[] = [
     tip: "Tiefschlaf hilft dem Körper bei der Erholung, REM-Schlaf dem Kopf. Die Uhr schätzt die Phasen über Puls und Bewegung, die Gesamtdauer ist verlässlicher als die einzelnen Phasen.",
   },
   {
-    term: "Trainingslast",
-    text: "Fasst zusammen, wie anstrengend dein Training war, aus Dauer und Puls. Eine Woche mit viel Last braucht danach mehr Erholung.",
-    tip: "Hilfreich ist der Vergleich mit den letzten Wochen: Steigt die Last plötzlich stark, steigt auch das Risiko für Überlastung.",
+    term: "Belastung",
+    text: "Fasst zusammen, wie anstrengend dein Training war, aus Dauer und Puls (bei Garmin „Trainingslast“). Mit Alltag zählt auch Bewegung ohne gestartetes Training. Eine Woche mit viel Belastung braucht danach mehr Erholung.",
+    tip: "Hilfreich ist der Vergleich mit den letzten Wochen: Steigt die Belastung plötzlich stark, steigt auch das Risiko für Überlastung.",
   },
   {
     term: "Belastung aus dem Alltag",

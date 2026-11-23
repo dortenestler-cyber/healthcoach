@@ -53,9 +53,9 @@ export function loadRatio(today: string, data: Data, alltag = true): { ratio: nu
 }
 
 export function ratioText(r: number): string {
-  if (r < RATIO_LO) return "Deine Last ist zuletzt niedriger als üblich. Unter 0,8 baust du ab.";
-  if (r > RATIO_HI) return "Deine Last steigt gerade schnell. Über 1,3 lieber ein paar ruhigere Tage einplanen.";
-  return "Deine Last steigt gleichmäßig.";
+  if (r < RATIO_LO) return "Deine Belastung ist zuletzt niedriger als üblich. Unter 0,8 baust du ab.";
+  if (r > RATIO_HI) return "Deine Belastung steigt gerade schnell. Über 1,3 lieber ein paar ruhigere Tage einplanen.";
+  return "Deine Belastung steigt gleichmäßig.";
 }
 
 // Intensitätsminuten dieser Woche (Montag bis heute), Garmin zählt intensive Minuten doppelt

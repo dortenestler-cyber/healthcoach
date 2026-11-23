@@ -121,7 +121,7 @@ export function readinessFactors(day: string, data: Data): Row[] {
     metricRow("hrv", day, data),
     metricRow("ruhepuls", day, data),
     metricRow("schlaf", day, data),
-    { key: "last", label: "Last 7 Tage", value: l.value, fmt: (v) => String(Math.round(v)), base: plain(l.range) },
+    { key: "last", label: "Belastung 7 Tage", value: l.value, fmt: (v) => String(Math.round(v)), base: plain(l.range) },
   ];
 }
 

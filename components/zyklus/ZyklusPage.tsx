@@ -1,5 +1,6 @@
 "use client";
 
+import { useRefresh } from "@/lib/refresh";
 import { useCallback, useEffect, useState } from "react";
 import { loadOvulation, withOvulation } from "@/lib/ovulation";
 import PageHead from "@/components/PageHead";
@@ -44,6 +45,7 @@ export default function ZyklusPage() {
       .catch((e) => setError("Daten konnten nicht geladen werden: " + (e instanceof Error ? e.message : String(e))));
   }, []);
 
+  useRefresh(load);
   useEffect(() => {
     load();
   }, [load]);

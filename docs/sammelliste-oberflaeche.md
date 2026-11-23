@@ -1,13 +1,73 @@
 # Sammelliste · Anpassungen Oberfläche
 
 Hier sammelt die Oberfläche (OF) deine Änderungswünsche. Umgesetzt wird erst, wenn du die Liste freigibst, dann alles zusammen in einem Pull Request.
-Zweig: `claude/kind-keller-hmdy0s`
+Zweig: `claude/tender-archimedes-h1rwvr`
 
 Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Freigabe) · ☑ umgesetzt und gemergt
 
-**Freigegeben am 23.11. inklusive Datenbank-Änderungen. Alle Punkte umgesetzt (PR #77).** Punkt 6 und 10 (Eintragen) erscheinen, sobald die Daten-Instanz die Spalten angelegt hat.
+## Runde 2 · freigegeben am 23.11., umgesetzt in PR #83
 
-## Umgesetzt in PR #77
+14. ☑ **„Last“ heißt künftig „Belastung“** (23.11., Nutzerin: „Belastung“ statt „Trainingsbelastung“, mit „mit Alltag“ bzw. „nur Training“)
+   Betrifft alle sichtbaren Texte: Ring und Erklärkarte auf Training („Trainingsbelastung 7 Tage“), Chart „Trainingsbelastung und Korridor“, Kachel auf Heute, „Letzte Aktivitäten“ („Trainingsbelastung 85“), Begriffe-Seite und die Frage an den Coach.
+   Offene Frage: Wenn der Alltag mitzählt, ist es streng genommen keine reine Trainingsbelastung. Vorschlag: überall „Trainingsbelastung“, mit dem Zusatz „mit Alltag“ bzw. „nur Training“ wie heute. Die Belastung in % auf Heute (Ring „Belastung“) bleibt, wie sie ist.
+   Dateien: `components/training/RatioCard.tsx`, `LoadTrendCard.tsx`, `components/heute/RecentActivities.tsx`, `lib/today.ts`, `components/BegriffeView.tsx`
+
+15. ☑ **Charts am Computer viel zu groß** (23.11.)
+   Ursache: Jeder Chart ist für die iPhone-Breite gezeichnet (340 Punkte) und wird am Computer einfach hochgezogen. Bei 900 px Breite wird alles fast dreimal so groß, auch Schrift, Linien und das Schild beim Antippen.
+   Vorschlag: Die Charts messen ihre echte Breite und zeichnen in echten Pixeln. Schrift bleibt immer 11–12 px, Linien bleiben schmal, die Höhe wächst nur leicht (iPhone 170 px, Computer höchstens etwa 220 px). Am Computer entsteht so mehr Platz für Tage statt größerer Zahlen.
+   Gilt für alle Charts: Linien, Balken, Schlafphasen, Heatmap, Energie über den Tag, Phasenleiste.
+   Dateien: `components/charts/*`, neuer kleiner Helfer zum Messen der Breite, `app/globals.css`
+
+16. ☑ **Verlauf: Werte bündeln** (23.11., Alternative oder Ergänzung zu Punkt 15)
+   Heute: 13 Knöpfe nebeneinander, immer nur ein Wert sichtbar.
+   Vorschlag: vier Gruppen statt 13 Knöpfen. Jede Gruppe zeigt ihre Werte als kleine Charts untereinander (iPhone) bzw. zwei nebeneinander (Computer), alle mit derselben Zeitachse und einer gemeinsamen Phasenleiste. Fährt man über einen Tag, zeigen alle Charts der Gruppe denselben Tag.
+   - **Schlaf:** Schlaf, Tiefschlaf, REM-Schlaf, Einschlafen
+   - **Herz und Körper:** HRV, Ruhepuls, Atemfrequenz, Temperatur
+   - **Energie und Stress:** Body Battery, Body Battery aufgeladen, Stress, Stress hoch
+   - **Bewegung:** Schritte, Alltagsschritte, Trainingsbelastung
+   Tippen auf einen kleinen Chart öffnet ihn groß wie heute. Zeitraum T · W · M · 6M · J bleibt oben und gilt für alle.
+   Empfehlung: Punkt 15 in jedem Fall, Punkt 16 dazu.
+   Dateien: `components/VerlaufView.tsx`, `components/verlauf/*`, `components/charts/pick.tsx` (gemeinsamer Tag)
+
+17. ☑ **Korridor glatt statt Treppe** (23.11.)
+   Der persönliche Bereich wird heute Tag für Tag als Stufe gezeichnet. Vorschlag: Ober- und Unterkante als weiche Kurve durch die Tagesmitten. Die Kurve bleibt dabei immer zwischen den echten Tageswerten, sie erfindet keine Spitzen. Lücken ohne Bereich bleiben frei. Das Schild beim Antippen nennt weiter den genauen Bereich des Tages.
+   Gilt für alle Charts mit wanderndem Bereich (Verlauf, Detailseiten unter Heute, Trainingsbelastung und Korridor).
+   Dateien: `components/charts/LineBand.tsx`, `components/charts/scale.ts`, `components/training/LoadTrendCard.tsx`
+
+18. ☑ **Krankheiten und Verletzungen nachtragen** (23.11.)
+   Heute beginnt jede Krankheit und Verletzung „heute“ und endet mit „Wieder gesund“ am selben Tag. Vorschlag:
+   - Nach dem Tipp auf eine Krankheit (oder „+ Verletzung eintragen“) fragt eine Zeile **„Seit wann?“** · Heute · Gestern · Vorgestern · Datum wählen.
+   - Darunter **„Schon vorbei?“** · Nein, noch krank · Ja, bis … (Datum). So lässt sich auch eine Erkältung von vor drei Wochen in einem Schritt eintragen.
+   - „Wieder gesund“ fragt ebenso: heute · gestern · Datum.
+   Keine Änderung an der Datenbank nötig, Beginn und Ende gibt es schon. Nachgetragene Tage zählen sofort überall mit: Readiness (Krankheitstage zählen nicht in den Bereich), „Weitere Muster“, Wiedereinstieg in Stufen (nur wenn das Ende höchstens 5 Tage her ist).
+   Dateien: `components/gesundheit/IllnessSection.tsx`, `InjurySection.tsx`
+
+19. ☑ **Leichte Anzeichen erfassen, ohne gleich krank zu sein** (23.11.)
+   Vorschlag: Im Tagebuch eine eigene Gruppe **„Anzeichen“** neben den Symptomen, per Tipp, jeweils leicht · mittel · stark:
+   Rauer Hals · Halsschmerzen · Verstopfte Nase · Schnupfen · Niesen · Husten · Frösteln · Gliederschmerzen · Abgeschlagen · Druck im Kopf/Nebenhöhlen · Lippenbläschen.
+   Wie die Symptome gespeichert, deshalb keine Änderung an der Datenbank nötig. Punkt 5e gilt: oben die eingetragenen und häufig genutzten, der Rest unter „Weitere anzeigen“.
+   Einbindung in die Mustererkennung:
+   - **Frühwarnung:** Treffen Anzeichen auf HRV unter deinem Bereich, Ruhepuls oder Hauttemperatur darüber, steht auf Heute ein ruhiger Hinweis: „Rauer Hals und HRV unter deinem Bereich. Heute lieber locker trainieren.“ Keine Diagnose.
+   - **Übergang zur Krankheit:** Werden die Anzeichen an zwei Tagen in Folge stärker, fragt die App „Bist du krank?“ mit einem Tipp auf „Erkältung eintragen“, Beginn am ersten Tag mit Anzeichen (nutzt Punkt 18).
+   - **Muster:** Unter Gesundheit › Überblick in „Weitere Muster“ z. B. „Anzeichen kamen 4 von 5 Mal nach einer Woche über deinem Korridor“ oder „… häufiger nach kurzen Nächten“. Nach Zyklusphase in Zyklus › Werte und Symptome. Erst ab genug Tagen, vorher „noch zu wenige Tage“.
+   - Der Coach bekommt die Anzeichen der letzten 7 Tage mit, nur Name und Stärke.
+   Bei Warnzeichen (Fieber über mehrere Tage, Atemnot, Brustschmerz) bleibt der Hinweis auf ärztliche Abklärung stehen.
+   Dateien: `lib/catalog.ts`, Tagebuch-Komponenten, `lib/muster.ts`, `components/heute/*`, `components/gesundheit/OverviewSection.tsx`
+
+20. ☑ **Einträge überall nachträglich ändern** (23.11.)
+   Heute lassen sich frühere Krankheiten, Verletzungen und manche Einträge nur ansehen. Vorschlag, einheitlich für alle Listen:
+   - Tippen auf einen Eintrag (z. B. „Grippaler Infekt · 23. Nov. · 1 Tag“) öffnet ihn zum Bearbeiten: Name, Beginn, Ende, Stärke, Fieber, Notiz; bei Verletzungen Stelle, Art, Ursache, Schmerzwerte.
+   - Unten immer **„Löschen“**, mit Rückfrage.
+   - Gilt für: Krankheiten, Verletzungen, Medikamente und Supplements (auch frühere), Einnahmen, Perioden, Körperwerte, Wadenzucken, Gewohnheiten mit Details (z. B. Sauna) und Tagebuch-Tage (über ‹ › im Tagebuch, das geht schon).
+   - Ein Stift-Symbol rechts in der Zeile zeigt, dass man tippen kann (Tippfläche 44 px).
+   Ich gehe beim Umsetzen alle Bereiche durch und liste vorher auf, wo heute etwas fehlt.
+   Dateien: `components/gesundheit/*`, `components/tagebuch/*`, `components/zyklus/*`, neuer gemeinsamer Bearbeiten-Bogen in `components/ui/`
+
+21. ☑ **Daten regelmäßig aktualisieren** (23.11., Teil A umgesetzt; Teil B liegt bei Daten `[DA]`)
+   Konzept: `docs/konzept-datenaktualisierung.md`. Umgesetzt: `lib/refresh.ts` (neu laden beim Zurückkehren, alle 15 Minuten, beim Tageswechsel), Garmin-Abruf ab 60 Minuten altem Stand, ab 20 Minuten wenn heute Training geplant ist und die Aktivität fehlt (höchstens alle 30 Minuten je Gerät), Hinweis „Neue Version“ (`/version`), „Aktualisieren“ in der Seitenleiste. A6 (zentraler Datenspeicher) ersetzt durch den gemeinsamen Hook.
+
+## Runde 1 · umgesetzt in PR #77
+
 
 1. ☑ **Coach: Eingabefeld zu klein** (23.11.)
    Das Feld ist jetzt so breit wie möglich, zeigt drei Zeilen und wächst beim Schreiben mit (höchstens 40 % der Bildschirmhöhe). Senden steht rechts unten daneben. Die Scrollleiste unter den Vorschlägen ist ausgeblendet, man kann weiterhin seitlich wischen.

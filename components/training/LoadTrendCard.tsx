@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { W, linear, niceTicks, segments } from "@/components/charts/scale";
+import { grownHeight, linear, monotoneCurve, niceTicks, segments } from "@/components/charts/scale";
+import { useChartWidth } from "@/components/charts/useChartWidth";
+
 import type { Data } from "@/lib/insights";
 import { loadByDay } from "@/lib/today";
 import { RATIO_HI, RATIO_LO } from "@/lib/trainingLoad";
@@ -18,7 +20,7 @@ const addDays = (iso: string, n: number) => {
   return d.toISOString().slice(0, 10);
 };
 const short = (iso: string) => `${Number(iso.slice(8, 10))}. ${MONTHS[Number(iso.slice(5, 7)) - 1]}`;
-const H = 180;
+const H0 = 180;
 const PAD_R = 40;
 const PAD_T = 12;
 const PAD_B = 22;
@@ -27,6 +29,8 @@ const PAD_B = 22;
 // der Korridor (80–130 % des Wochenschnitts der 4 Wochen davor) als Band. Zeitraum 1M · 3M · 6M.
 export default function LoadTrendCard({ today, data, alltag = true }: { today: string; data: Data; alltag?: boolean }) {
   const [span, setSpan] = useState<(typeof SPANS)[number]["key"]>("1M");
+  const { ref, w: W } = useChartWidth();
+  const H = grownHeight(H0, W);
   const n = SPANS.find((s) => s.key === span)!.days;
   const m = loadByDay(data.acts, alltag ? data.daily : undefined);
   const sumBack = (day: string, len: number) => Array.from({ length: len }, (_, i) => m.get(addDays(day, -i)) ?? 0).reduce((a, b) => a + b, 0);
@@ -43,20 +47,21 @@ export default function LoadTrendCard({ today, data, alltag = true }: { today: s
   const inside = withBoth.filter((p) => (p.acute as number) >= (p.lo as number) && (p.acute as number) <= (p.hi as number)).length;
   const sentence = !withBoth.length
     ? "Der Korridor entsteht nach 5 Wochen mit Garmin-Aktivitäten."
-    : `Deine Last lag an ${inside} von ${withBoth.length} Tagen in deinem Korridor.`;
+    : `Deine Belastung lag an ${inside} von ${withBoth.length} Tagen in deinem Korridor.`;
 
   const vals = pts.flatMap((p) => [p.acute, p.hi]).filter((v): v is number => v !== null);
   const ticks = niceTicks(0, Math.max(10, ...vals));
   const y = linear(ticks[0] ?? 0, ticks[ticks.length - 1] ?? 1, H - PAD_B, PAD_T);
   const x = linear(0, n - 1, 4, W - PAD_R);
   const line = segments(pts.map((p, i) => (p.acute === null ? null : { x: x(i), y: y(p.acute) })));
-  const bandTop = pts.map((p, i) => (p.hi === null ? null : `${x(i).toFixed(1)},${y(p.hi).toFixed(1)}`)).filter(Boolean);
-  const bandBot = pts.map((p, i) => (p.lo === null ? null : `${x(i).toFixed(1)},${y(p.lo).toFixed(1)}`)).filter(Boolean).reverse();
+  // Korridor als weiche Fläche (Sammelliste Punkt 17)
+  const bandTop = pts.flatMap((p, i) => (p.hi === null ? [] : [{ x: x(i), y: y(p.hi) }]));
+  const bandBot = pts.flatMap((p, i) => (p.lo === null ? [] : [{ x: x(i), y: y(p.lo) }])).reverse();
   const last = pts[pts.length - 1];
 
   return (
     <section className="card">
-      <span className="eyebrow">Last und Korridor</span>
+      <span className="eyebrow">Belastung und Korridor</span>
       <h2>{sentence}</h2>
       <div className="segmented" role="group" aria-label="Zeitraum">
         {SPANS.map((s) => (
@@ -65,14 +70,14 @@ export default function LoadTrendCard({ today, data, alltag = true }: { today: s
           </button>
         ))}
       </div>
-      <svg className="cb cb-training" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Last der letzten 7 Tage über ${SPANS.find((s) => s.key === span)!.name}, heute ${last.acute ?? "kein Wert"}${last.lo !== null ? `, Korridor ${Math.round(last.lo)} bis ${Math.round(last.hi!)}` : ""}`}>
+      <svg ref={ref} className="cb cb-training" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Belastung der letzten 7 Tage über ${SPANS.find((s) => s.key === span)!.name}, heute ${last.acute ?? "kein Wert"}${last.lo !== null ? `, Korridor ${Math.round(last.lo)} bis ${Math.round(last.hi!)}` : ""}`}>
         {ticks.map((t) => (
           <g key={t}>
             <line x1={0} x2={W - PAD_R} y1={y(t)} y2={y(t)} className="cb-grid" />
             <text x={W - PAD_R + 6} y={y(t) + 4} className="cb-tick">{t}</text>
           </g>
         ))}
-        {bandTop.length > 1 && <polygon points={[...bandTop, ...bandBot].join(" ")} className="cb-zone" />}
+        {bandTop.length > 1 && <path d={`M${monotoneCurve(bandTop)}L${monotoneCurve(bandBot)}Z`} className="cb-zone" />}
         {line.map((p, i) => <polyline key={i} points={p} className="cb-line" />)}
         {last.acute !== null && (
           <g>
@@ -85,7 +90,7 @@ export default function LoadTrendCard({ today, data, alltag = true }: { today: s
         <text x={x(n - 1)} y={H - 4} textAnchor="end" className="cb-tick cb-tick-strong">heute</text>
       </svg>
       <div className="legend cb-training">
-        <span><i className="cb-key-line" />Last der letzten 7 Tage{alltag ? " mit Alltag" : ", nur Training"}</span>
+        <span><i className="cb-key-line" />Belastung der letzten 7 Tage{alltag ? " mit Alltag" : ", nur Training"}</span>
         <span><i className="cb-key-zone" />Korridor aus den 4 Wochen davor</span>
       </div>
     </section>

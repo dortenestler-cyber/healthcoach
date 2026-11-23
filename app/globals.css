@@ -2839,6 +2839,10 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
   .sidenav-dot[data-level="alt"] { background: var(--muted); }
   .sidenav-dot[data-level="veraltet"] { background: var(--warn); }
   .sidenav-label { display: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidenav-refresh { background: none; border: 0; font: inherit; font-size: 12.5px; color: var(--muted); cursor: pointer; text-align: left; min-height: 44px; width: 100%; border-radius: var(--radius-control); }
+  .sidenav-refresh:hover:not(:disabled) { color: var(--text); background: var(--fill); }
+  .sidenav-refresh:disabled { cursor: default; }
+  .sidenav-refresh-word { color: var(--text); }
 
   /* Coach als schwebender Knopf unten rechts, ohne Leiste darunter */
   .coach-fab { right: 24px; bottom: 24px; }
@@ -2920,3 +2924,56 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
 .factor-legend-steps { display: inline-flex; align-items: center; gap: 10px; }
 .factor-legend-steps .factor-steps { width: 40px; }
 .cb-stress .cb-gauge-caption { fill: var(--stress-fg); }
+
+/* Verlauf in Gruppen (Sammelliste Punkt 16): kleine Charts, am Computer zwei nebeneinander */
+button.back-link { background: none; border: 0; padding: 0; color: var(--text); cursor: pointer; font: inherit; font-size: 14px; font-weight: 500; min-height: 44px; text-align: left; }
+.verlauf-group-note { margin: 0; }
+.verlauf-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.verlauf-grid > .card { margin-top: 0; }
+@media (min-width: 1024px) {
+  .verlauf-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+}
+.verlauf-mini { display: flex; flex-direction: column; gap: 10px; }
+.verlauf-mini-head {
+  display: grid; grid-template-columns: 1fr auto; column-gap: 8px; row-gap: 2px; align-items: center;
+  background: none; border: 0; padding: 0; margin: 0; color: var(--text); text-align: left; cursor: pointer; min-height: 44px; font: inherit;
+}
+.verlauf-mini-head .meta { grid-column: 1; }
+.verlauf-mini-sentence { grid-column: 1; font-size: 15px; font-weight: 600; line-height: 1.3; }
+.verlauf-mini-more { grid-column: 2; grid-row: 1 / span 2; color: var(--muted); font-size: 22px; }
+
+/* Tag wählen (Punkt 18) */
+.day-pick { display: flex; flex-direction: column; gap: 8px; }
+.day-pick .pills { align-items: center; }
+.day-pick-date { width: auto; min-height: 44px; padding: 8px 12px; color-scheme: dark; }
+.day-pick-date:not(.is-set) { color: var(--muted); }
+.day-pick-date.is-set { border-color: var(--text); color: var(--text); }
+
+/* Bearbeiten-Bogen (Punkt 20) */
+.edit-sheet {
+  width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); overflow: auto;
+  margin: auto; padding: 0; border: 1px solid var(--line-soft); border-radius: var(--radius-card);
+  background: var(--card); color: var(--text);
+}
+.edit-sheet::backdrop { background: color-mix(in srgb, var(--bg) 75%, transparent); }
+.edit-sheet-body { display: flex; flex-direction: column; gap: 14px; padding: 20px; }
+.edit-sheet-body h2 { margin: 0; }
+.edit-sheet-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.edit-sheet-delete { color: var(--warn); align-self: center; }
+.edit-row { width: 100%; background: none; border: 0; padding: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; min-height: 44px; }
+.edit-row .edit-icon { color: var(--muted); flex: none; }
+.edit-row-end { display: inline-flex; align-items: center; gap: 10px; }
+.edit-row.edit-row-inline { width: auto; }
+
+/* Anzeichen auf Heute (Punkt 19): Amber steht für Symptome, immer mit Wort */
+.sign-hint { display: flex; flex-direction: column; gap: 10px; border: 1px solid var(--warn-mid); }
+.sign-hint-eyebrow { color: var(--warn-fg); }
+.sign-hint-text { margin: 0; font-size: 16px; line-height: 1.4; }
+.sign-hint-ask { display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid var(--line-soft); }
+
+/* Neue Version (Konzept Datenaktualisierung A7): hell auf dunkel wie der Hauptbutton */
+.update-note {
+  display: block; width: 100%; min-height: 44px; margin: 0; padding: 10px 14px;
+  border: 0; border-radius: var(--radius-control); background: var(--text); color: var(--bg);
+  font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+}
