@@ -2,7 +2,7 @@
 // Reine Berechnungen ohne Netzwerk. Alle Bereiche kommen aus lib/baseline.ts (30 Tage, mittlere Hälfte).
 // Die Regeln für den Schlafbedarf sind Startwerte zum Kalibrieren, keine medizinische Empfehlung.
 
-import { baselineFor, metricBaseline, metricRangeSeries, middleHalf, seriesOf, type Baseline, type Range } from "@/lib/baseline";
+import { baselineFor, metricBaseline, positionIn, metricRangeSeries, middleHalf, seriesOf, type Baseline, type Range } from "@/lib/baseline";
 import { badStreak } from "@/lib/korridor";
 import { METRICS, type Activity, type Daily, type MetricKey } from "@/lib/garmin";
 import { loadPercent, type Data } from "@/lib/insights";
@@ -108,7 +108,7 @@ const today = (key: MetricKey, day: string, daily: Daily[]) => {
   return d ? METRICS[key].value(d) : null;
 };
 
-function metricRow(key: MetricKey, day: string, data: Data, label = METRICS[key].label): Row {
+export function metricRow(key: MetricKey, day: string, data: Data, label = METRICS[key].label): Row {
   return { key, label, value: today(key, day, data.daily), fmt: METRICS[key].fmt, base: metricBaseline(key, data.daily, { diary: data.diary, sick: data.sick }, day), href: `/verlauf?m=${key}` };
 }
 
@@ -162,4 +162,26 @@ export function offStreaks(day: string, data: Data, keys: MetricKey[] = ["hrv", 
     if (n >= STREAK_MIN) out.push({ key, label: key === "temperatur" ? "Hauttemperatur" : m.label, days: n, side: m.higherIsBetter ? "unter" : "über" });
   }
   return out.sort((a, b) => b.days - a.days);
+}
+
+// ---------- Satz zur Readiness (Heute und Detailseite)
+
+const joinDe = (parts: string[]) => (parts.length <= 1 ? parts.join("") : `${parts.slice(0, -1).join(", ")} und ${parts[parts.length - 1]}`);
+
+// Ein Satz, warum die Readiness so ist: welche Faktoren über, unter oder in deinem Bereich liegen
+export function readinessWhy(factors: Row[], label: string): string | null {
+  const over: string[] = [];
+  const under: string[] = [];
+  const typical: string[] = [];
+  for (const f of factors) {
+    if (f.value === null || !f.base.active) continue;
+    const p = positionIn(f.value, f.base.active);
+    (p === "über" ? over : p === "unter" ? under : typical).push(f.label);
+  }
+  if (!over.length && !under.length && !typical.length) return null;
+  const s: string[] = [];
+  if (over.length) s.push(`${joinDe(over)} ${over.length > 1 ? "liegen" : "liegt"} über deinem Bereich`);
+  if (under.length) s.push(`${joinDe(under)} ${under.length > 1 ? "liegen" : "liegt"} unter deinem Bereich`);
+  if (typical.length) s.push(`${joinDe(typical)} ${typical.length > 1 ? "sind" : "ist"} typisch`);
+  return `${s.join(", ")}. Darum heute „${label}“.`;
 }

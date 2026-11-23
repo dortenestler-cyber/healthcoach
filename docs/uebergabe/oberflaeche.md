@@ -10,7 +10,7 @@ Sammelliste (13 Punkte) und Web-App am Computer umgesetzt (PR #77).
 - Keine offene Arbeit. PR #77 (Zweig `claude/kind-keller-hmdy0s`): Sammelliste `docs/sammelliste-oberflaeche.md` komplett, Web-App nach `docs/konzept-web-app.md`.
   Neu: `components/SideNav.tsx`, `components/CoachPanel.tsx`, `components/ui/TwoCol.tsx`, `lib/layout.ts` (Breiten, Coach-Spalte), `components/charts/pick.tsx` (Antippen in Charts), `components/heute/ActivityQuestion.tsx`, `lib/ovulation.ts`. Eisprung ist jetzt eigene `PhaseGroup`. `sportOf(a)` statt `sportOfGarmin(a.type_key)` (eigene Zuordnung zuerst). PIN nur iPhone (`pinRequired`).
   Nächster Schritt: Rückmeldung der Nutzerin; danach evtl. zwei Spalten für Training › Kalender und Gesundheit › Überblick/Medikamente.
-- Heute-Detailseiten näher an Whoop (Faktorliste mit Pfeilen, 3-Stufen-Balken Schlaf, Stress-Halbbogen) und Stift zum Wählen von Ringen und Kacheln stehen noch aus.
+- Detailseiten nach Whoop sind mit PR #78 gemergt (`FactorList`, `ReadinessCard`/`HrvCard`/`StressCard` entfernt). Stift zum Wählen von Ringen und Kacheln: noch nicht freigegeben, nur vorgeschlagen.
 
 ## Wartet auf
 - Daten: Spalten `garmin_activities.sport_override/sport_label` und `diary_entries.ovulation_signs` (siehe unten). Bis dahin blendet die Oberfläche beides aus.

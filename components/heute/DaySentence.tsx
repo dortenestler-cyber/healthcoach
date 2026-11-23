@@ -1,7 +1,6 @@
 import ExplainCard from "@/components/ui/ExplainCard";
-import { why } from "@/components/heute/ReadinessCard";
 import { PHASES, type DayRule } from "@/lib/cycle";
-import type { Row } from "@/lib/today";
+import { readinessWhy, type Row } from "@/lib/today";
 
 const de1 = (v: number) => v.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
@@ -18,7 +17,7 @@ export default function DaySentence({ rule, factors, showLoad }: { rule: DayRule
   }
 
   const { value, label } = rule.readiness;
-  const reason = why(factors, label)?.replace(/ Darum heute „[^“]+“\.$/, "") ?? null;
+  const reason = readinessWhy(factors, label)?.replace(/ Darum heute „[^“]+“\.$/, "") ?? null;
   const t = rule.target;
   const phase = rule.cycle.phase ? PHASES[rule.cycle.phase] : null;
 

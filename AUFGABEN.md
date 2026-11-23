@@ -81,6 +81,7 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 - [x] Entwurf ansehen und die fünf Fragen beantworten
 - [ ] Nach dem Merge Heute auf dem iPhone ansehen: Gruß, fünf Ringe (seitlich wischen), Satz zum Tag, vier Kacheln, Heute steht an, Letzte Aktivitäten
 - [ ] Einen Ring antippen: Die Detailseite öffnet sich, der Pfeil oben links führt zurück
+- [ ] Detailseiten im Whoop-Stil ansehen: Readiness (Faktoren mit Pfeil), Schlaf (drei Stufen je Wert), Stress (Halbbogen, Aufteilung), Energie (Ring und Kurve)
 - [ ] Am Seitenanfang nach unten ziehen und loslassen: Garmin wird synchronisiert
 - [ ] Mit ‹ einen früheren Tag ansehen, „Zurück zu heute“ führt zurück
 

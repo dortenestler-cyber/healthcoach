@@ -99,6 +99,6 @@ Schritte 1 und 2 gehen zuerst, danach ist die App am Computer schon gut benutzba
 - PIN: nur iPhone mit App vom Home-Bildschirm (`pinRequired` in `lib/pin.ts`). Den Schalter „PIN auch im Browser“ gibt es nicht, er war nicht gewünscht.
 - Zwei Spalten (`components/ui/TwoCol.tsx`) ab 1360 px mit Coach-Spalte, ab 1024 px wenn der Coach eingeklappt oder aus ist. Darunter eine Spalte in der Reihenfolge wie auf dem iPhone.
 - Seitenleiste: 768–1199 px nur Symbole, ab 1200 px mit Namen (auch iPad quer, wenn es so breit ist).
-- Zwei Spalten haben: Heute, Readiness-Detail, Tagebuch, Zyklus, Training › Auswertung, Gesundheit › Krank & verletzt und Körper. Eine Spalte bleiben vorerst: Training › Kalender und die Sport-Reiter, Gesundheit › Überblick und Medikamente, die übrigen Detailseiten.
+- Zwei Spalten haben: Heute, Tagebuch, Zyklus, Training › Auswertung, Gesundheit › Krank & verletzt und Körper. Eine Spalte bleiben vorerst: Training › Kalender und die Sport-Reiter, Gesundheit › Überblick und Medikamente, die Detailseiten hinter den Ringen (neu nach Whoop, PR #78).
 - Einstellungen: höchstens 640 px breit (`app/einstellungen/layout.tsx`).
 - Heute am Computer: Knopf „Aktualisieren“, ← → wechselt den Tag; das Zahnrad steht in der Seitenleiste, dort auch der Garmin-Punkt.
