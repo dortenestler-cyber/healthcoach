@@ -1,16 +1,18 @@
 # Übergabe · Oberfläche (OF)
-Zuletzt aktualisiert: 2026-11-22 · Sitzung: https://claude.ai/code/session_014pVPWf2XSUGddL6eBy4poY
+Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014pVPWgFCDga2xCp5RSJGTU
 
 Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/design-*`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
 ## Stand in einem Satz
-Korridore sind komplett: Schritt 4 (A3 weitere Korridore, A4 Hinweis auf Heute) im PR, danach bleibt nichts offen aus dem Konzept.
+Konzept „Heute als Einstiegsseite“ liegt zur Sichtung vor (nur Doku und Entwurf, kein Code).
 
 ## In Arbeit
-- Korridore Schritt 4, Zweig `claude/confident-fermat-wy3iur`: neue Werte in `METRICS` (`tiefschlaf`, `rem`, `einschlafen`, `bb_aufgeladen`, `stress_hoch`, `belastung`, `alltagsschritte`), im Verlauf nur sichtbar mit Daten (`OPTIONAL_METRICS`). Heute: `offStreaks` in `lib/today.ts`, Zeile „X seit n Tagen über/unter deinem Bereich“ in „Deine Werte“, ab 5 Tagen Ruhepuls oder Temperatur der Hinweis auf ärztliche Abklärung.
-  Nächster Schritt: nichts aus dem Konzept offen. Rückmeldung der Nutzerin abwarten.
+- Konzept Heute als Einstiegsseite, Zweig `claude/determined-davinci-s4e3l7`: `docs/konzept-heute-einstieg.md`, Entwurf `docs/entwurf-heute-einstieg.html` (veröffentlicht: https://claude.ai/artifact/HtFtkHrKKDQJaBQmiuLHEQ), Prompt `docs/prompt-heute-einstieg.md`. Fünf Ringe (Energie, Schlaf, Readiness, Belastung, Stress), eine Erklärkarte, Kacheln „Auf einen Blick“, Heute steht an, Letzte Aktivitäten; Detailseiten je Ring.
+  Nächster Schritt: Antworten auf die fünf offenen Fragen, nach Freigabe ein PR für Heute, dann Detailseiten.
+- Korridore Schritt 4 (Zweig `claude/confident-fermat-wy3iur`): nichts aus dem Konzept offen, Rückmeldung abwarten.
 
 ## Wartet auf
+- Nutzerin: Sichtung und Antworten zum Konzept Heute (`AUFGABEN.md` Abschnitt „Heute als Einstiegsseite“)
 - Nutzerin: Rückmeldung zu Heute, Zyklus und Training im Design „dunkel 2“ (`AUFGABEN.md` Abschnitt 10)
 - Nutzerin: Rückmeldung zur Seite Zyklus (`AUFGABEN.md` Abschnitt 6)
 

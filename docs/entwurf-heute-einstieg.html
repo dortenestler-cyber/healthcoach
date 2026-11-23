@@ -1,0 +1,645 @@
+<title>Heute als Einstieg</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: Konzeptseite, links Telefon 360 px, rechts Erklärungen; darunter Detailseiten als waagerechte Reihe. Farben der App aus CLAUDE.md. */
+:root {
+  /* Seite (dunkel zuerst) */
+  --bg: #0b0d10; --panel: #15181d; --panel-2: #1c2026; --line: #2c323b;
+  --fg: #f2f4f7; --fg-2: #c9cfd6; --muted: #9aa3ae; --accent: #52b788; --note: #f0a24a;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) { --bg: #f2f2f7; --panel: #ffffff; --panel-2: #f7f7fa; --line: #e2e2e8; --fg: #1c1c1e; --fg-2: #3c4043; --muted: #5f6368; --accent: #2d6a4f; --note: #b45309; color-scheme: light; }
+}
+:root[data-theme="light"] { --bg: #f2f2f7; --panel: #ffffff; --panel-2: #f7f7fa; --line: #e2e2e8; --fg: #1c1c1e; --fg-2: #3c4043; --muted: #5f6368; --accent: #2d6a4f; --note: #b45309; color-scheme: light; }
+
+/* App-Farben im Telefon (aus app/globals.css) */
+.app-dark {
+  --a-bg: #0b0d10; --a-card: #15181d; --a-fill: #262b33; --a-line: #3a414b; --a-line-soft: #22272e;
+  --a-text: #f2f4f7; --a-text-2: #c9cfd6; --a-muted: #9aa3ae; --a-primary: #f2f4f7;
+  --a-rec: #52b788; --a-rec-bg: #173326; --a-rec-fg: #8fd5b0;
+  --a-cyc: #e8845a; --a-cyc-bg: #3a2318; --a-cyc-fg: #f2b193;
+  --a-tr: #7c9ae0; --a-tr-bg: #1b2438; --a-tr-fg: #afc2ee; --a-tr-zone: #3b5998; --a-tr-alltag: #c3d1f2;
+  --a-warn: #f0a24a; --a-warn-bg: #3a2a12;
+  --a-sleep: #e5e7eb;
+  --a-st: #45c4c0; --a-st-bg: #12302f; --a-st-fg: #9fe3e0; --a-st-1: #2f6e6c; --a-st-2: #3c9e9a; --a-st-3: #6fd8d4;
+  --a-glow-heute: #173326; --a-glow-tr: #1b2438; --a-glow-st: #12302f; --a-glow-g: #262b33;
+  --a-brand: #a3234f; --a-hatch: #2a3038; --a-frame: #000000;
+}
+.app-light {
+  --a-bg: #f2f2f7; --a-card: #ffffff; --a-fill: #e9e9ee; --a-line: #e5e5ea; --a-line-soft: #efeff4;
+  --a-text: #1c1c1e; --a-text-2: #3c4043; --a-muted: #5f6368; --a-primary: #1c1c1e;
+  --a-rec: #2d6a4f; --a-rec-bg: #e3f1e8; --a-rec-fg: #1e5a3f;
+  --a-cyc: #b4491f; --a-cyc-bg: #fbe9e2; --a-cyc-fg: #8f3a18;
+  --a-tr: #3b5998; --a-tr-bg: #e4eaf7; --a-tr-fg: #2b4378; --a-tr-zone: #c9d5ee; --a-tr-alltag: #8ea4d6;
+  --a-warn: #b45309; --a-warn-bg: #fdf0d5;
+  --a-sleep: #48505a;
+  --a-st: #0e7470; --a-st-bg: #ddf2f1; --a-st-fg: #0b5a57; --a-st-1: #a9dcd9; --a-st-2: #4fa9a5; --a-st-3: #0e7470;
+  --a-glow-heute: #e3f1e8; --a-glow-tr: #e4eaf7; --a-glow-st: #ddf2f1; --a-glow-g: #e9e9ee;
+  --a-brand: #a3234f; --a-hatch: #dcdce2; --a-frame: #1c1c1e;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5; margin: 0; font-variant-numeric: tabular-nums; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 80px; }
+h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.1; margin: 0 0 10px; letter-spacing: -0.02em; text-wrap: balance; }
+h2 { font-size: 24px; margin: 0 0 6px; letter-spacing: -0.01em; text-wrap: balance; }
+h3 { font-size: 16px; margin: 0 0 4px; }
+p { margin: 0 0 10px; max-width: 68ch; }
+.lead { color: var(--fg-2); font-size: 17px; }
+.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.tag { display: inline-block; font-size: 12px; font-weight: 600; color: var(--note); border: 1px solid var(--note); border-radius: 999px; padding: 2px 10px; }
+section.block { margin-top: 56px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 20px 0 0; }
+.seg { display: inline-flex; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.seg button { font: inherit; font-size: 14px; font-weight: 600; color: var(--muted); background: transparent; border: 0; border-radius: 999px; padding: 0 16px; min-height: 40px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.seg button:focus-visible, .phone button:focus-visible, .phone a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.split { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 40px; align-items: start; margin-top: 24px; }
+@media (max-width: 820px) { .split { grid-template-columns: minmax(0, 1fr); } }
+.notes { display: grid; gap: 14px; }
+.note { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; min-width: 0; }
+.note .num { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 999px; background: var(--fg); color: var(--bg); font-size: 13px; font-weight: 700; margin-right: 8px; vertical-align: 1px; }
+.note dl { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 4px 12px; margin: 10px 0 0; font-size: 14px; }
+.note dt { color: var(--muted); }
+.note dd { margin: 0; color: var(--fg-2); }
+
+.gallery { display: flex; gap: 28px; overflow-x: auto; padding: 8px 2px 18px; margin-top: 20px; scroll-snap-type: x mandatory; }
+.gallery > figure { margin: 0; flex: 0 0 auto; width: 340px; scroll-snap-align: start; }
+.gallery figcaption { margin-top: 14px; font-size: 14px; color: var(--fg-2); }
+.gallery figcaption h3 { color: var(--fg); }
+.gallery figcaption ul { margin: 6px 0 0; padding-left: 18px; }
+.gallery figcaption li { margin-bottom: 4px; }
+
+.tbl-wrap { overflow-x: auto; margin-top: 16px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14px; }
+th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+tr:last-child td { border-bottom: 0; }
+td.ok { color: var(--accent); font-weight: 600; white-space: nowrap; }
+td.mod { color: var(--note); font-weight: 600; white-space: nowrap; }
+td.no { color: var(--muted); font-weight: 600; white-space: nowrap; }
+ol.questions { padding-left: 22px; display: grid; gap: 10px; max-width: 72ch; }
+ol.questions li::marker { font-weight: 700; }
+pre.prompt { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; font-size: 12.5px; line-height: 1.55; white-space: pre-wrap; color: var(--fg-2); margin-top: 14px; }
+details.p > summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+
+/* ===== Telefon ===== */
+.phone { width: 100%; max-width: 360px; border-radius: 46px; padding: 10px; background: var(--a-frame); box-shadow: 0 0 0 1px var(--line), 0 30px 60px -30px rgba(0,0,0,.6); position: relative; }
+.screen { position: relative; height: 760px; border-radius: 38px; overflow: hidden; background: var(--a-bg); color: var(--a-text); font-family: var(--font); font-size: 14px; line-height: 1.4; }
+.scroll { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; padding: 0 16px 110px; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+.glow { position: absolute; inset: 0 0 auto; height: 300px; pointer-events: none; }
+.glow-heute { background: linear-gradient(180deg, var(--a-glow-heute), transparent); }
+.glow-tr { background: linear-gradient(180deg, var(--a-glow-tr), transparent); }
+.glow-st { background: linear-gradient(180deg, var(--a-glow-st), transparent); }
+.glow-g { background: linear-gradient(180deg, var(--a-glow-g), transparent); }
+.status { position: relative; display: flex; justify-content: space-between; padding: 14px 10px 0; font-size: 14px; font-weight: 600; }
+.status .isl { width: 96px; height: 26px; border-radius: 999px; background: #000; }
+.hdr { position: relative; display: flex; justify-content: space-between; align-items: flex-start; margin-top: 18px; }
+.hello { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+.datebar { display: inline-flex; align-items: center; gap: 2px; margin-top: 6px; color: var(--a-muted); font-size: 14px; }
+.datebar button, .icon-btn { background: transparent; border: 0; color: inherit; min-width: 44px; min-height: 44px; display: inline-grid; place-items: center; cursor: pointer; padding: 0; font: inherit; }
+.datebar button:first-child { margin-left: -14px; }
+.datebar .dis { opacity: .35; }
+.gear { width: 44px; height: 44px; border-radius: 999px; background: var(--a-fill); display: grid; place-items: center; border: 0; color: var(--a-text); cursor: pointer; }
+.sec-h { position: relative; display: flex; align-items: center; justify-content: space-between; margin: 26px 0 10px; }
+.sec-h h4 { margin: 0; font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.sec-h .pen { color: var(--a-muted); }
+.sec-h a, .linky { color: var(--a-text); font-size: 13px; font-weight: 600; text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
+.badge { position: absolute; left: -16px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; border-radius: 999px; background: var(--a-warn); color: #111; font-size: 9.5px; font-weight: 800; display: grid; place-items: center; z-index: 3; }
+.show-nums-off .badge { display: none; }
+
+/* Ringreihe */
+.rings { display: flex; align-items: flex-end; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -16px; padding: 4px 16px 6px; scrollbar-width: none; }
+.rings::-webkit-scrollbar { display: none; }
+.rcell { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 6px; background: transparent; border: 0; padding: 0; color: inherit; cursor: pointer; scroll-snap-align: center; font: inherit; }
+.rcell .rl { font-size: 12px; font-weight: 600; color: var(--a-text-2); }
+.rcell .rw { font-size: 12px; color: var(--a-muted); }
+.rcell.main .rl { font-size: 13px; color: var(--a-text); }
+.ring-num { font-weight: 800; letter-spacing: -0.02em; }
+
+/* Erklärkarte */
+.explain { position: relative; border-radius: 18px; padding: 14px 16px 6px; margin-top: 14px; background: linear-gradient(var(--a-bg), var(--a-bg)) padding-box, linear-gradient(135deg, var(--ex-a, var(--a-rec)), var(--a-line) 55%, var(--ex-b, var(--a-tr))) border-box; border: 1.5px solid transparent; font-size: 14.5px; line-height: 1.45; }
+.explain b { font-weight: 700; }
+.explain .more { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--a-text); min-height: 40px; text-decoration: none; }
+
+/* Kacheln */
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tile { background: var(--a-card); border-radius: 18px; padding: 12px; display: flex; gap: 10px; align-items: center; min-height: 72px; border: 0; color: inherit; text-align: left; font: inherit; cursor: pointer; min-width: 0; }
+.tile .ic { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 12px; background: var(--a-fill); display: grid; place-items: center; color: var(--a-text); }
+.tile .ic.cyc { background: var(--a-cyc-bg); color: var(--a-cyc); }
+.tile .tx { min-width: 0; display: grid; }
+.tile .tl { font-size: 12.5px; color: var(--a-text-2); font-weight: 600; }
+.tile .tv { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+.tile .tv small { font-size: 12px; font-weight: 500; color: var(--a-muted); }
+.tile .ts { font-size: 11.5px; color: var(--a-muted); line-height: 1.3; }
+.tile .ts.up { color: var(--a-warn); }
+
+/* Listen */
+.card { background: var(--a-card); border-radius: 24px; padding: 4px 14px; }
+.lrow { display: flex; align-items: center; gap: 12px; min-height: 64px; border-bottom: 1px solid var(--a-line-soft); text-decoration: none; color: inherit; }
+.lrow:last-child { border-bottom: 0; }
+.lrow .ic { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 12px; background: var(--a-fill); display: grid; place-items: center; color: var(--a-text); }
+.lrow .ic.tr { background: var(--a-tr-bg); color: var(--a-tr); }
+.lrow .ic.warn { background: var(--a-warn-bg); color: var(--a-warn); }
+.lrow .tx { flex: 1; min-width: 0; display: grid; }
+.lrow .t1 { font-weight: 600; font-size: 14.5px; }
+.lrow .t2 { font-size: 12.5px; color: var(--a-muted); }
+.lrow .chev { color: var(--a-muted); }
+.lrow .pill { font-size: 12px; font-weight: 600; color: var(--a-text); background: var(--a-fill); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+
+/* Tab-Leiste und Coach */
+.tabbar { position: absolute; left: 0; right: 0; bottom: 0; height: 82px; background: color-mix(in srgb, var(--a-card) 92%, transparent); backdrop-filter: blur(12px); border-top: 1px solid var(--a-line-soft); display: grid; grid-template-columns: repeat(5, 1fr); padding: 8px 4px 0; z-index: 5; }
+.tabbar span { display: grid; justify-items: center; gap: 3px; font-size: 10.5px; color: var(--a-muted); font-weight: 600; }
+.tabbar span.on { color: var(--a-text); }
+.fab { position: absolute; right: 16px; bottom: 96px; width: 56px; height: 56px; border-radius: 999px; background: var(--a-brand); color: #fff; display: grid; place-items: center; z-index: 6; box-shadow: 0 8px 20px -6px rgba(0,0,0,.5); }
+
+/* Detailseiten */
+.dhead { position: relative; display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; margin-top: 12px; }
+.dhead .ttl { text-align: center; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.dayswitch { position: relative; display: flex; justify-content: center; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--a-text); }
+.dayswitch .dis { opacity: .35; }
+.hero { position: relative; display: grid; justify-items: center; margin: 8px 0 6px; }
+.metrics { background: var(--a-card); border-radius: 24px; padding: 6px 16px 12px; margin-top: 10px; }
+.mrow { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 10px; padding: 12px 0; border-bottom: 1px solid var(--a-line-soft); }
+.mrow:last-of-type { border-bottom: 0; }
+.mrow .ml { font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--a-text-2); }
+.mrow .mw { font-size: 12px; color: var(--a-muted); grid-column: 1; }
+.mrow .mv { font-size: 17px; font-weight: 700; grid-row: 1 / span 2; grid-column: 2; display: flex; align-items: center; gap: 6px; }
+.mrow .arr { font-size: 11px; color: var(--a-text-2); width: 12px; text-align: center; }
+.legend { margin-top: 6px; background: var(--a-bg); border-radius: 12px; padding: 8px 12px; font-size: 12px; color: var(--a-text-2); display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.seg3 { display: flex; gap: 3px; width: 66px; }
+.seg3 i { flex: 1; height: 4px; border-radius: 2px; background: var(--a-fill); }
+.seg3 i.on { background: var(--a-sleep); }
+.stages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 8px; }
+.stages div { display: grid; gap: 4px; justify-items: center; font-size: 11px; color: var(--a-muted); }
+.stages div i { width: 100%; height: 5px; border-radius: 3px; background: var(--a-rec-bg); }
+.stages div.on i { background: var(--a-rec); }
+.stages div.on { color: var(--a-text); font-weight: 700; }
+.suggest { margin-top: 12px; background: var(--a-cyc-bg); color: var(--a-cyc-fg); border-radius: 16px; padding: 12px 14px; font-size: 13.5px; }
+.suggest b { display: block; color: var(--a-text); margin-bottom: 2px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.kt { background: var(--a-card); border-radius: 18px; padding: 12px 14px; }
+.kt .kl { font-size: 12.5px; color: var(--a-text-2); }
+.kt .kv { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+.kt .kv small { font-size: 13px; font-weight: 500; color: var(--a-muted); }
+.kt .kbar { height: 4px; border-radius: 2px; margin-top: 6px; }
+.tabs2 { position: relative; display: flex; justify-content: center; gap: 26px; margin-top: 6px; font-size: 14px; }
+.tabs2 span { color: var(--a-muted); padding-bottom: 6px; }
+.tabs2 span.on { color: var(--a-text); font-weight: 600; box-shadow: inset 0 -2px 0 var(--a-text); }
+.split-bars { display: grid; gap: 10px; margin-top: 6px; }
+.sb { display: grid; grid-template-columns: 64px 1fr 74px; gap: 10px; align-items: center; font-size: 12.5px; }
+.sb .bar { height: 10px; border-radius: 5px; background: var(--a-fill); overflow: hidden; }
+.sb .bar i { display: block; height: 100%; border-radius: 5px; }
+.sb .v { text-align: right; color: var(--a-text-2); }
+.chart-card { background: var(--a-card); border-radius: 24px; padding: 14px 14px 10px; margin-top: 12px; }
+.chart-card .h { font-weight: 700; font-size: 15px; margin-bottom: 2px; }
+.chart-card .s { font-size: 12.5px; color: var(--a-muted); }
+.need { background: var(--a-card); border-radius: 24px; padding: 14px 16px; margin-top: 12px; display: grid; gap: 4px; }
+.need .big { font-size: 22px; font-weight: 800; }
+.need ul { margin: 4px 0 0; padding-left: 18px; color: var(--a-text-2); font-size: 13px; }
+.stagebar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; margin-top: 8px; gap: 2px; }
+.meta { font-size: 11.5px; color: var(--a-muted); margin-top: 12px; display: block; }
+.sample { position: absolute; bottom: 92px; left: 16px; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--a-warn); background: var(--a-warn-bg); border-radius: 999px; padding: 2px 8px; z-index: 7; white-space: nowrap; }
+
+.view { position: absolute; inset: 0; transition: transform .28s ease; }
+.view.off-right { transform: translateX(100%); }
+.view.off-left { transform: translateX(-24%); }
+@media (prefers-reduced-motion: reduce) { .view { transition: none; } }
+</style>
+
+<div class="wrap">
+  <span class="eyebrow">Health Coach · Konzept zur Sichtung · 23.11.2026</span>
+  <h1>Heute als ruhige Einstiegsseite</h1>
+  <p class="lead">Oben fünf Ringe für deinen Tag, darunter vier Abschnitte. Alles Weitere liegt einen Tipp tiefer, auf Detailseiten im Stil von Whoop. Der Aufbau folgt der Startseite von Sonar (dein letzter Screenshot).</p>
+  <p><span class="tag">Alle Zahlen sind Beispieldaten</span></p>
+
+  <div class="toolbar">
+    <div class="seg" role="group" aria-label="Darstellung im Telefon">
+      <button type="button" id="th-dark" aria-pressed="true">Dunkel</button>
+      <button type="button" id="th-light" aria-pressed="false">Hell</button>
+    </div>
+    <div class="seg" role="group" aria-label="Nummern im Telefon">
+      <button type="button" id="nums-on" aria-pressed="true">Nummern zeigen</button>
+      <button type="button" id="nums-off" aria-pressed="false">Ohne Nummern</button>
+    </div>
+  </div>
+
+  <section class="block">
+    <h2>Die Seite Heute</h2>
+    <p>Probier es aus: Ringe seitlich wischen, einen Ring antippen öffnet seine Detailseite, der Pfeil oben links führt zurück.</p>
+    <div class="split">
+      <div class="phone app-dark" id="live"></div>
+      <div class="notes">
+        <div class="note"><h3><span class="num">1</span>Kopf mit Gruß und Datum</h3>
+          <p>Gruß nach Tageszeit wie auf dem Sperrbildschirm, darunter das Datum mit ‹ › zum Blättern. Zurückblättern zeigt den ganzen Tag von gestern oder vorgestern mit denselben Ringen. Zahnrad öffnet die Einstellungen.</p>
+          <dl><dt>Vorlage</dt><dd>Sonar „Hello, Olivia“ mit Datum und Pfeilen</dd><dt>Farbe</dt><dd>Sage-Verlauf im Kopf wie bisher (Heute)</dd></dl>
+        </div>
+        <div class="note"><h3><span class="num">2</span>Dein Tag: fünf Ringe</h3>
+          <p>Die wichtigsten Tageswerte in einer Reihe. Wort über dem Ring, Zahl im Ring, Zustand darunter. Die Readiness steht groß in der Mitte, links und rechts schauen Ringe am Rand hervor, damit klar ist: hier lässt sich wischen. Mit dem Stift legst du Reihenfolge und Mitte fest.</p>
+          <dl>
+            <dt>Energie</dt><dd>Body Battery jetzt (0–100). Ring = Füllstand. Tipp: Kurve über den Tag.</dd>
+            <dt>Schlaf</dt><dd>Letzte Nacht in % vom Schlafbedarf. Tipp: Schlaf-Detail.</dd>
+            <dt>Readiness</dt><dd>0–10 aus HRV, Ruhepuls, Schlaf, Last. Wort = Stufe. Tipp: Faktoren.</dd>
+            <dt>Belastung</dt><dd>Heute in %, Zielbogen außen. Wort = unter / im / über dem Ziel. Tipp: Halbbogen.</dd>
+            <dt>Stress</dt><dd>Garmin-Stress im Tagesschnitt (0–100), Türkis, höher = heller. Tipp: Aufteilung.</dd>
+          </dl>
+        </div>
+        <div class="note"><h3><span class="num">3</span>Ein Satz zum Tag</h3>
+          <p>Genau eine Erklärkarte bündelt, was heute zählt: Stufe, warum, Vorschlag zum Training und Belastungsziel. Ersetzt die heutige Readiness-Karte, den Satz unter den Ringen und die Belastungszeile. „Mehr dazu im Coach“ legt die Frage nur vor, gesendet wird erst nach dem Tippen.</p>
+          <dl><dt>Vorlage</dt><dd>Whoop-Erklärkarte mit Verlaufsrand</dd><dt>Warnzeichen</dt><dd>Steht ein Warnzeichen an, wird diese Karte zum Hinweis auf ärztliche Abklärung, die Readiness zeigt „–“.</dd></dl>
+        </div>
+        <div class="note"><h3><span class="num">4</span>Auf einen Blick: sechs Kacheln</h3>
+          <p>Die Werte der Nacht und dein Zyklus, je Kachel ein Symbol, Name, Zahl und ein Wort zur Einordnung (im Bereich, über deinem Bereich). Über der Gruppe ein Satz: „4 von 4 Werten in deinem Bereich.“ Tipp auf eine Kachel öffnet den Verlauf. Mit dem Stift wählst du, welche Kacheln erscheinen (auch Schritte, Tiefschlaf, Gewicht-Trend).</p>
+          <dl><dt>Ersetzt</dt><dd>„Deine Werte“ mit Bereichsbalken und den Reitern Schlaf, HRV, Stress. Die Bereichsbalken wandern in den Verlauf und auf die Readiness-Seite.</dd><dt>Hinweis</dt><dd>Liegt ein Wert seit 3 Tagen außerhalb, steht das Wort in Amber („seit 3 Tagen über“). Ab 5 Tagen Ruhepuls oder Temperatur zusätzlich der Satz zur ärztlichen Abklärung.</dd></dl>
+        </div>
+        <div class="note"><h3><span class="num">5</span>Heute steht an</h3>
+          <p>Nur, was heute zu tun ist, je eine Zeile: geplantes Training, Medikamente mit Anzahl, offener Check-in, Krankheit oder Verletzung. Erledigtes verschwindet. Ist nichts offen, steht dort „Für heute ist alles erledigt“.</p>
+          <dl><dt>Vorlage</dt><dd>Zeilen wie „Recent Activity“ bei Sonar</dd></dl>
+        </div>
+        <div class="note"><h3><span class="num">6</span>Letzte Aktivitäten</h3>
+          <p>Die letzten zwei Einheiten mit Sport-Symbol, Dauer und Last. Tipp öffnet die Einheit, „Alle“ den Reiter Training.</p>
+          <dl><dt>Vorlage</dt><dd>Sonar „Recent Activity“</dd></dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Eine Ebene tiefer: fünf Detailseiten</h2>
+    <p>Jeder Ring öffnet eine Seite im Aufbau von Whoop: oben der große Wert, darunter die Einflussgrößen, dann ein Satz. Die Reihe lässt sich seitlich wischen.</p>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <section class="block">
+    <h2>Was von der heutigen Seite wohin wandert</h2>
+    <p>Heute hat jetzt 5 Karten mit vielen Zeilen. Nichts geht verloren, es liegt nur einen Tipp tiefer.</p>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Heute bisher</th><th>Neu</th><th>Wo</th></tr></thead>
+      <tbody>
+        <tr><td>Drei Ringe (Schlaf, Readiness, Belastung)</td><td>Fünf Ringe, Energie und Stress neu dabei</td><td>Heute, Dein Tag</td></tr>
+        <tr><td>Schlafbedarf mit Herleitung, Schlafschuld</td><td>Kachel „Schlafbedarf“ und Abschnitt auf der Schlaf-Seite</td><td>Heute + Schlaf</td></tr>
+        <tr><td>Readiness-Karte mit großem Ring, Stufenleiste, Faktoren</td><td>Satz in der Erklärkarte, alles andere auf der Readiness-Seite</td><td>Readiness</td></tr>
+        <tr><td>Belastungszeile in „Heute steht an“</td><td>Ring Belastung, Ziel im Satz</td><td>Heute + Belastung</td></tr>
+        <tr><td>Deine Werte: Bereichsbalken, Reiter Schlaf · HRV · Stress</td><td>Kacheln „Auf einen Blick“, Balken im Verlauf</td><td>Heute + Verlauf</td></tr>
+        <tr><td>Synchronisieren-Knopf</td><td>Nach unten ziehen zum Aktualisieren, Stand unter dem Datum, Knopf in Einstellungen › Garmin</td><td>Heute</td></tr>
+        <tr><td>Energie über den Tag (Kurve, Rhythmus)</td><td>Ring Energie, Kurve auf der Energie-Seite</td><td>Energie</td></tr>
+        <tr><td>Zyklustag und Periodenfenster (Fußzeile)</td><td>Kachel „Zyklus“ mit Tag und Phase, Periodenfenster beim Tipp auf der Seite Zyklus</td><td>Heute + Zyklus</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="block">
+    <h2>Vorlage und Umsetzung</h2>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Muster aus der Vorlage</th><th>Umgesetzt</th><th>Wie und warum</th></tr></thead>
+      <tbody>
+        <tr><td>Sonar: Gruß und Datum mit Pfeilen</td><td class="ok">ja</td><td>Gruß nach Tageszeit, kein Name nötig (eine Nutzerin)</td></tr>
+        <tr><td>Sonar: Ziel-Ringe in einer wischbaren Reihe, Wort über dem Ring, Mitte größer</td><td class="ok">ja</td><td>Fünf Ringe mit fester Bedeutungsfarbe statt weißer Ringe, darunter ein Zustandswort</td></tr>
+        <tr><td>Sonar: „At a Glance“ 2 × 2 Kacheln mit Symbol und Stift</td><td class="mod">abgewandelt</td><td>2 × 3, zusätzlich ein Wort zur Einordnung, weil eine Zahl ohne Bereich wenig sagt</td></tr>
+        <tr><td>Sonar: „Recent Activity“</td><td class="ok">ja</td><td>Zwei Einheiten, Last statt Kalorien</td></tr>
+        <tr><td>Sonar: Landschaftsfoto als Hintergrund</td><td class="no">nein</td><td>Unruhig, schlechter Kontrast; Sage-Verlauf bleibt</td></tr>
+        <tr><td>Sonar: Schritte, Stehstunden, Kalorien als Tagesziel</td><td class="no">nein</td><td>Keine Kalorienziele; Schritte als wählbare Kachel ohne Ziel</td></tr>
+        <tr><td>Whoop Erholung: großer Ring, Liste mit Pfeil gegen 30 Tage, Legende, Erklärkarte</td><td class="ok">ja</td><td>Readiness-Seite, dazu Stufenleiste und Vorschlag aus der App</td></tr>
+        <tr><td>Whoop Schlaf: Ring, Faktoren mit 3-Stufen-Balken</td><td class="mod">abgewandelt</td><td>Balken einfarbig (unter · im · über deinem Bereich) statt Orange/Grau/Grün, keine Ampel</td></tr>
+        <tr><td>Bevel Belastung: Halbbogen mit Ziel, zwei Kacheln, Erklärung mit Tipp</td><td class="mod">abgewandelt</td><td>Kacheln Training und Alltag statt aktiver Zeit und Kalorien</td></tr>
+        <tr><td>Whoop Stress: Halbbogen, Tagesverlauf, Satz zur längsten Phase</td><td class="mod">abgewandelt</td><td>Garmin liefert keinen Stressverlauf (404). Stattdessen Aufteilung in Ruhe · niedrig · mittel · hoch und Vergleich mit dem üblichen Wochentag</td></tr>
+        <tr><td>Whoop Logbuch, Zyklus, Coach</td><td class="no">nicht hier</td><td>Gibt es schon unter Gesundheit, Zyklus und Coach</td></tr>
+        <tr><td>Whoop Gesundheitsspanne (biologisches Alter)</td><td class="no">nein</td><td>Gilt seit Konzept dunkel 2</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="block">
+    <h2>Offene Fragen an dich</h2>
+    <ol class="questions">
+      <li><b>Energie über den Tag:</b> In <code>CLAUDE.md</code> steht, die Kurve gehört auf Heute. Ich schlage vor, auf Heute nur den Ring zu zeigen und die Kurve auf der Energie-Seite. Einverstanden?</li>
+      <li><b>Mitte der Ringreihe:</b> Readiness groß in der Mitte (Vorschlag) oder immer der Ring, den du zuletzt angetippt hast?</li>
+      <li><b>Sechs oder vier Kacheln</b> bei „Auf einen Blick“? Vier wie bei Sonar wäre ruhiger, dann rutschen Atemfrequenz und Hauttemperatur auf die Readiness-Seite.</li>
+      <li><b>Gruß statt „Heute“</b> als großer Titel? Der Reiter unten heißt weiter „Heute“.</li>
+      <li><b>Synchronisieren:</b> Knopf von Heute weg (Ziehen zum Aktualisieren genügt), oder soll er sichtbar bleiben?</li>
+    </ol>
+  </section>
+
+  <section class="block">
+    <h2>Der Prompt, nach dem ich gearbeitet habe</h2>
+    <details class="p"><summary>Prompt anzeigen</summary>
+<pre class="prompt">Entwirf die Seite „Heute“ neu als ruhige Einstiegsseite. Ziel: In 5 Sekunden weiß die
+Nutzerin, wie es ihr geht und was heute ansteht. Alles Weitere liegt einen Tipp tiefer.
+
+Aufbau 1:1 nach Sonar: Gruß + Datum mit ‹ › · „Dein Tag“ als wischbare Ringreihe
+(Wort über dem Ring, Zahl im Ring, Mitte größer) · „Auf einen Blick“ als Kacheln mit
+Symbol · „Letzte Aktivitäten“. Dazwischen genau EINE Erklärkarte (Whoop).
+Detailseiten 1:1 nach Whoop (Erholung, Schlaf, Stress) und Bevel (Belastung).
+
+Regeln:
+1. Bündeln statt stapeln: höchstens 5 Abschnitte, jeder Wert genau einmal auf Heute.
+2. Kein Ring ohne Zahl und Wort, kein Ring ohne Ziel per Tipp.
+3. Farben nur mit fester Bedeutung, keine Ampel (3-Stufen-Balken einfarbig + Wort).
+4. Nicht übernehmen: Markennamen, Bild-Hintergrund, Kalorien- und Schrittziele,
+   „Top x %“, Alter, Blutzucker, Bettzeit, Neon.
+5. Deutsch, kurz, Zusammenhänge statt Ursachen, keine Diagnose, Beispieldaten kennzeichnen.
+6. Tap-Ziele ≥ 44 px, Kontrast AA, 390 px ohne waagerechtes Scrollen.
+7. Erst Konzept zur Sichtung, Code erst nach Freigabe.
+
+Abgabe: Telefon-Entwurf dunkel und hell, Funktion jeder Grafik, Tabelle Vorlage →
+Umsetzung, Liste „was wandert wohin“, höchstens fünf offene Fragen.</pre>
+    </details>
+    <p style="margin-top:10px;color:var(--muted);font-size:14px">Im Repo: <code>docs/prompt-heute-einstieg.md</code> und <code>docs/konzept-heute-einstieg.md</code>.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  const C = (n) => `var(--a-${n})`;
+  const de = (v, d = 0) => v.toLocaleString("de-DE", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+  // ---------- Symbole (Linien, 1.8 px) ----------
+  const I = {
+    gear: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+    pen: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+    back: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>',
+    l: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>',
+    r: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>',
+    cal: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+    info: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 11v6M12 7.5v.5"/></svg>',
+    arrow: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+    hrv: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l2-5 3 10 2-5h7"/></svg>',
+    heart: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+    lung: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v8M12 11l-3 2M12 11l3 2"/><path d="M8.5 7C5 8 4 13 4 17c0 2 1 3 2.5 3S9 19 9 17v-6"/><path d="M15.5 7C19 8 20 13 20 17c0 2-1 3-2.5 3S15 19 15 17v-6"/></svg>',
+    temp: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z"/></svg>',
+    cycle: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 8 8" stroke-width="3.2"/></svg>',
+    moon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
+    kb: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8.5 9a3.5 3.5 0 1 1 7 0"/><circle cx="12" cy="15" r="6"/></svg>',
+    climb: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l6-9 3 3 3-6 4 12z"/></svg>',
+    pill: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="18" height="8" rx="4" transform="rotate(-35 12 12)"/><path d="M9.5 8.5l5 7"/></svg>',
+    note: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h11l3 3v13H5z"/><path d="M9 11h6M9 15h4"/></svg>',
+    chev: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg>',
+    coach: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 5h16v11H9l-5 4z"/><path d="M7 11h2.5l1.5-3 2 5 1.5-2H17"/></svg>',
+    t_heute: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7v9H3z"/></svg>',
+    t_tb: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v18"/></svg>',
+    t_tr: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8.5 9a3.5 3.5 0 1 1 7 0"/><rect x="6" y="9" width="12" height="12" rx="5"/></svg>',
+    t_zy: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    t_ge: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/></svg>',
+  };
+
+  // ---------- Ring: Fortschritt, optional Zielbogen und Anteil Alltag ----------
+  function ring({ size, pct, color, center, unit, target, split, stroke }) {
+    const sw = stroke || Math.round(size * 0.085);
+    const r = size / 2 - sw - (target ? 6 : 0);
+    const c = 2 * Math.PI * r;
+    const cx = size / 2;
+    const p = Math.max(0, Math.min(1, pct));
+    let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">`;
+    svg += `<circle cx="${cx}" cy="${cx}" r="${r - sw / 2 - 2}" fill="${C("card")}"/>`;
+    svg += `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${C("fill")}" stroke-width="${sw}"/>`;
+    if (split != null) {
+      // Training (voll) + Alltag (heller) hintereinander
+      svg += `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${C("tr-alltag")}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c * p} ${c}" transform="rotate(-90 ${cx} ${cx})"/>`;
+      svg += `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c * split} ${c}" transform="rotate(-90 ${cx} ${cx})"/>`;
+    } else {
+      svg += `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c * p} ${c}" transform="rotate(-90 ${cx} ${cx})"/>`;
+    }
+    if (target) {
+      const rt = r + sw / 2 + 4;
+      const ct = 2 * Math.PI * rt;
+      svg += `<circle cx="${cx}" cy="${cx}" r="${rt}" fill="none" stroke="${C("tr-zone")}" stroke-width="3" stroke-linecap="round" stroke-dasharray="0 ${ct * target[0]} ${ct * (target[1] - target[0])} ${ct}" transform="rotate(-90 ${cx} ${cx})"/>`;
+    }
+    const len = String(center).length;
+    const fs = Math.round(size * (size > 150 ? 0.22 : 0.24) * Math.min(1, 4.2 / Math.max(len, 1)));
+    const us = size > 150 ? 13 : Math.max(9.5, Math.round(size * 0.1));
+    svg += `<text x="${cx}" y="${cx + (unit ? -fs * 0.12 : fs * 0.06)}" text-anchor="middle" dominant-baseline="middle" fill="${C("text")}" font-size="${fs}" font-weight="800" font-family="Inter, system-ui, sans-serif" letter-spacing="-0.5">${center}</text>`;
+    if (unit) svg += `<text x="${cx}" y="${cx + fs * 0.5 + us}" text-anchor="middle" fill="${C(size > 150 ? "text-2" : "muted")}" font-size="${us}" font-weight="${size > 150 ? 700 : 600}" letter-spacing="${size > 150 ? 1.5 : 0}" font-family="Inter, system-ui, sans-serif">${unit}</text>`;
+    return svg + "</svg>";
+  }
+
+  // ---------- Halbbogen ----------
+  function gauge({ w, pct, color, target, center, word, wordColor, sub, lo, hi, grad }) {
+    const cx = w / 2, cy = w * 0.5, r = w * 0.38, sw = 14, h = cy + r * Math.sin(Math.PI * 0.15) + 8;
+    const a0 = Math.PI * 0.85, a1 = Math.PI * 2.15; // 0 → 1
+    const pt = (t) => { const a = a0 + (a1 - a0) * t; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+    const arc = (t0, t1, rr = r) => { const s = [cx + rr * Math.cos(a0 + (a1 - a0) * t0), cy + rr * Math.sin(a0 + (a1 - a0) * t0)], e = [cx + rr * Math.cos(a0 + (a1 - a0) * t1), cy + rr * Math.sin(a0 + (a1 - a0) * t1)]; const large = (t1 - t0) * (a1 - a0) > Math.PI ? 1 : 0; return `M${s[0].toFixed(1)} ${s[1].toFixed(1)} A${rr} ${rr} 0 ${large} 1 ${e[0].toFixed(1)} ${e[1].toFixed(1)}`; };
+    let s = `<svg width="${w}" height="${h + 26}" viewBox="0 0 ${w} ${h + 26}" aria-hidden="true">`;
+    if (grad) s += `<defs><linearGradient id="${grad.id}" x1="0" x2="1"><stop offset="0" stop-color="${grad.from}"/><stop offset="1" stop-color="${grad.to}"/></linearGradient></defs>`;
+    s += `<path d="${arc(0, 1)}" fill="none" stroke="${C("fill")}" stroke-width="${sw}" stroke-linecap="round"/>`;
+    s += `<path d="${arc(0, Math.max(0.001, pct))}" fill="none" stroke="${grad ? `url(#${grad.id})` : color}" stroke-width="${sw}" stroke-linecap="round"/>`;
+    if (target) s += `<path d="${arc(target[0], target[1], r + sw / 2 + 7)}" fill="none" stroke="${C("tr")}" stroke-width="4" stroke-linecap="round"/>`;
+    const [mx, my] = pt(pct);
+    s += `<circle cx="${mx}" cy="${my}" r="9" fill="${C("text")}" stroke="${C("bg")}" stroke-width="3"/>`;
+    s += `<text x="${cx}" y="${cy - 4}" text-anchor="middle" fill="${C("text")}" font-size="50" font-weight="800" font-family="Inter, system-ui, sans-serif" letter-spacing="-1">${center}</text>`;
+    s += `<text x="${cx}" y="${cy + 24}" text-anchor="middle" fill="${wordColor}" font-size="14" font-weight="800" letter-spacing="2" font-family="Inter, system-ui, sans-serif">${word}</text>`;
+    if (sub) s += `<text x="${cx}" y="${cy + 44}" text-anchor="middle" fill="${C("muted")}" font-size="12" font-family="Inter, system-ui, sans-serif">${sub}</text>`;
+    const [lx, ly] = pt(0), [hx, hy] = pt(1);
+    s += `<text x="${lx}" y="${ly + 24}" text-anchor="middle" fill="${C("muted")}" font-size="12" font-family="Inter, system-ui, sans-serif">${lo}</text>`;
+    s += `<text x="${hx}" y="${hy + 24}" text-anchor="middle" fill="${C("muted")}" font-size="12" font-family="Inter, system-ui, sans-serif">${hi}</text>`;
+    return s + "</svg>";
+  }
+
+  // ---------- Bausteine ----------
+  const statusbar = () => `<div class="status"><span>9:41</span><span class="isl"></span><span>100 %</span></div>`;
+  const tabbar = (on) => `<div class="tabbar">${[["t_heute","Heute"],["t_tb","Tagebuch"],["t_tr","Training"],["t_zy","Zyklus"],["t_ge","Gesundheit"]].map(([k,l]) => `<span class="${l===on?"on":""}">${I[k]}${l}</span>`).join("")}</div><div class="fab" aria-label="Coach">${I.coach}</div>`;
+  const sample = `<span class="sample">Beispieldaten</span>`;
+  const badge = (n) => `<span class="badge">${n}</span>`;
+  const explain = (html, more, a, b) => `<div class="explain" style="--ex-a:${a || C("rec")};--ex-b:${b || C("tr")}">${html}<br><a class="more" href="#" onclick="return false">${more} ${I.arrow}</a></div>`;
+  const dhead = (title, glowCls) => `<div class="glow ${glowCls}"></div>${statusbar()}<div class="dhead"><button class="icon-btn" data-back aria-label="Zurück">${I.back}</button><div class="ttl">${title}</div><span class="icon-btn" style="color:var(--a-muted)">${I.info}</span></div>`;
+  const dayswitch = () => `<div class="dayswitch"><button class="icon-btn" aria-label="Vortag">${I.l}</button>Heute<span class="icon-btn dis">${I.r}</span></div>`;
+
+  // ---------- Bildschirm: Heute ----------
+  const RINGS = [
+    { k: "energie", label: "Energie", word: "jetzt", pct: 0.64, color: C("rec"), center: "64", unit: "von 100" },
+    { k: "schlaf", label: "Schlaf", word: "vom Bedarf", pct: 1, color: C("sleep"), center: "102 %", unit: "7 h 39" },
+    { k: "readiness", label: "Readiness", word: "Bereit", pct: 0.78, color: C("rec"), center: "7,8", unit: "von 10", main: true },
+    { k: "belastung", label: "Belastung", word: "im Ziel", pct: 0.63, color: C("tr"), center: "63 %", unit: "heute", target: [0.4, 0.7], split: 0.48 },
+    { k: "stress", label: "Stress", word: "niedrig", pct: 0.28, color: C("st"), center: "28", unit: "von 100" },
+  ];
+
+  function heute() {
+    const rings = RINGS.map((r) => `<button class="rcell${r.main ? " main" : ""}" data-open="${r.k}" aria-label="${r.label} ${r.center} ${r.word}, Details öffnen"><span class="rl">${r.label}</span>${ring({ size: r.main ? 112 : 84, pct: r.pct, color: r.color, center: r.center, unit: r.unit, target: r.target, split: r.split })}<span class="rw">${r.word}</span></button>`).join("");
+    const tiles = [
+      ["hrv", "HRV", "44", "ms", "im Bereich"],
+      ["heart", "Ruhepuls", "60", "bpm", "im Bereich"],
+      ["lung", "Atemfrequenz", "14,5", "/min", "im Bereich"],
+      ["temp", "Hauttemperatur", "+0,3", "°C", "im Bereich"],
+      ["cycle", "Zyklus", "Tag 19", "", "Lutealphase", true],
+      ["moon", "Schlafbedarf", "7 h 32", "", "heute Nacht"],
+    ].map(([ic, l, v, u, s, cyc]) => `<button class="tile"><span class="ic${cyc ? " cyc" : ""}">${I[ic]}</span><span class="tx"><span class="tl">${l}</span><span class="tv">${v}${u ? ` <small>${u}</small>` : ""}</span><span class="ts">${s}</span></span></button>`).join("");
+    return `<div class="glow glow-heute"></div>${statusbar()}${sample}
+      <div class="hdr">${badge(1)}<div><div class="hello">Guten Morgen</div>
+        <div class="datebar"><button aria-label="Vortag">${I.l}</button>${I.cal}&nbsp;Montag, 23. November<span class="icon-btn dis">${I.r}</span></div>
+        <div style="font-size:11.5px;color:var(--a-muted);margin-top:-6px">Garmin · Stand 9:12</div></div>
+        <button class="gear" aria-label="Einstellungen">${I.gear}</button></div>
+      <div class="sec-h">${badge(2)}<h4>Dein Tag <span class="pen">${I.pen}</span></h4></div>
+      <div class="rings" data-rings>${rings}</div>
+      <div style="position:relative">${badge(3)}${explain("Heute <b>Bereit</b>. Dein Schlaf liegt über deinem Bereich, HRV und Ruhepuls sind typisch. Ein normaler Trainingstag passt, dein Belastungsziel: <b>40–70 %</b>.", "Mehr dazu im Coach")}</div>
+      <div class="sec-h">${badge(4)}<h4>Auf einen Blick <span class="pen">${I.pen}</span></h4><span style="font-size:12px;color:var(--a-muted)">4 von 4 im Bereich</span></div>
+      <div class="tiles">${tiles}</div>
+      <div class="sec-h">${badge(5)}<h4>Heute steht an</h4></div>
+      <div class="card">
+        <a class="lrow" href="#" onclick="return false"><span class="ic tr">${I.kb}</span><span class="tx"><span class="t1">Kettlebell · 18:00</span><span class="t2">geplant, passt zu deinem Ziel</span></span><span class="chev">${I.chev}</span></a>
+        <a class="lrow" href="#" onclick="return false"><span class="ic">${I.pill}</span><span class="tx"><span class="t1">Medikamente</span><span class="t2">abends noch 1 offen</span></span><span class="pill">1 von 2</span></a>
+        <a class="lrow" href="#" onclick="return false"><span class="ic">${I.note}</span><span class="tx"><span class="t1">Morgen-Check-in</span><span class="t2">noch offen, im Tagebuch</span></span><span class="chev">${I.chev}</span></a>
+      </div>
+      <div class="sec-h">${badge(6)}<h4>Letzte Aktivitäten</h4><a href="#" onclick="return false">Alle ›</a></div>
+      <div class="card">
+        <a class="lrow" href="#" onclick="return false"><span class="ic tr">${I.kb}</span><span class="tx"><span class="t1">Kettlebell</span><span class="t2">gestern · 45 min · Last 112</span></span><span class="chev">${I.chev}</span></a>
+        <a class="lrow" href="#" onclick="return false"><span class="ic tr">${I.climb}</span><span class="tx"><span class="t1">Klettern</span><span class="t2">Samstag · 1 h 30 · Last 140</span></span><span class="chev">${I.chev}</span></a>
+      </div>`;
+  }
+
+  // ---------- Detail: Readiness ----------
+  function readiness() {
+    const rows = [["HRV", "44 ms", "▲", "über dem Schnitt, im Bereich"], ["Ruhepuls", "60 bpm", "•", "typisch"], ["Schlaf", "7 h 39", "▲", "über deinem Bereich"], ["Last 7 Tage", "270", "•", "typisch"]];
+    return `${dhead("Readiness", "glow-heute")}${sample}${dayswitch()}
+      <div class="hero">${ring({ size: 210, pct: 0.78, color: C("rec"), center: "7,8", unit: "BEREIT", stroke: 16 })}</div>
+      <div class="stages">${["Erholen", "Behutsam", "Bereit", "Volle Kraft"].map((s) => `<div class="${s === "Bereit" ? "on" : ""}"><i></i>${s}</div>`).join("")}</div>
+      <div class="metrics">${rows.map(([l, v, a, w]) => `<div class="mrow"><span class="ml">${l}</span><span class="mv">${v}<span class="arr">${a}</span></span><span class="mw">${w}</span></div>`).join("")}
+        <div class="legend">▲ ▼ Heute gegen deine letzten 30 Tage</div></div>
+      ${explain("Dein <b>Schlaf</b> liegt über deinem Bereich, <b>HRV</b>, Ruhepuls und Last sind typisch. Darum heute „Bereit“.", "Mehr dazu im Coach")}
+      <div class="suggest"><b>Normal trainieren</b>Zyklustag 19, frühe Lutealphase (geschätzt). Eine etwas niedrigere HRV ist in dieser Phase üblich.</div>
+      <span class="meta">Vorschlag, keine Diagnose. Du entscheidest.</span>`;
+  }
+
+  // ---------- Detail: Schlaf ----------
+  function schlaf() {
+    const rows = [["Stunden vs. Bedarf", "102 %", 2], ["Tiefschlaf", "1 h 12", 1], ["REM-Schlaf", "1 h 38", 1], ["Einschlafen", "14 min", 1], ["Wach", "22 min", 0]];
+    const words = ["unter deinem Bereich", "im Bereich", "über deinem Bereich"];
+    return `${dhead("Schlaf", "glow-g")}${sample}${dayswitch()}
+      <div class="hero">${ring({ size: 210, pct: 1, color: C("sleep"), center: "102 %", unit: "VOM BEDARF", stroke: 16 })}</div>
+      <div class="metrics">${rows.map(([l, v, s]) => `<div class="mrow" style="grid-template-columns:1fr auto auto"><span class="ml">${l}</span><span class="seg3" style="grid-row:1/span 2;grid-column:2">${[0,1,2].map((i) => `<i class="${i === s ? "on" : ""}"></i>`).join("")}</span><span class="mv" style="grid-column:3;min-width:62px;justify-content:flex-end">${v}</span><span class="mw">${words[s]}</span></div>`).join("")}
+        <div class="legend"><span class="seg3" style="width:40px"><i class="on"></i><i></i><i></i></span> unter · im · über deinem Bereich</div></div>
+      <div class="chart-card"><div class="h">Schlafphasen</div><div class="s">22:58 bis 6:37</div>
+        <div class="stagebar"><i style="flex:22;background:var(--a-sleep);opacity:.45"></i><i style="flex:72;background:var(--a-sleep)"></i><i style="flex:98;background:var(--a-sleep);opacity:.7"></i><i style="flex:247;background:var(--a-fill)"></i></div>
+        <div class="legend" style="background:transparent;padding:6px 0 0">Wach 22 · Tief 72 · REM 98 · Leicht 247 min</div></div>
+      <div class="need"><span class="eyebrow" style="font-size:11px;letter-spacing:.12em;color:var(--a-muted);font-weight:700">SCHLAFBEDARF HEUTE NACHT</span><span class="big">etwa 7 h 32</span>
+        <span style="font-size:13px;color:var(--a-text-2)">Diese Woche etwa 1 h 27 unter deinem Grundbedarf.</span>
+        <ul><li>Grundbedarf 7 h 15 (deine letzten 30 Nächte)</li><li>+ 12 min wegen Schlafschuld</li><li>+ 5 min nach deiner Belastung heute</li></ul></div>
+      ${explain("Du hast etwas mehr geschlafen als nötig. <b>Tiefschlaf</b> und <b>REM</b> liegen in deinem Bereich.", "Mehr dazu im Coach", C("sleep"), C("rec"))}`;
+  }
+
+  // ---------- Detail: Belastung ----------
+  function belastung() {
+    return `${dhead("Belastung", "glow-tr")}${sample}
+      <div class="tabs2"><span>Gestern</span><span class="on">Heute</span></div>
+      <div class="hero" style="margin-top:6px">${gauge({ w: 300, pct: 0.63, color: C("tr"), target: [0.4, 0.7], center: "63 %", word: "IM ZIEL", wordColor: C("tr"), sub: "Ziel 40–70 % · Stand 16:38", lo: "0", hi: "100" })}</div>
+      <div class="two">
+        <div class="kt"><div class="kl">Training</div><div class="kv">48 <small>%</small></div><div class="kbar" style="background:var(--a-tr)"></div></div>
+        <div class="kt"><div class="kl">Alltag</div><div class="kv">15 <small>%</small></div><div class="kbar" style="background:var(--a-tr-alltag)"></div></div>
+      </div>
+      ${explain("Mit <b>63 %</b> liegst du im Ziel von <b>40–70 %</b>. Bis zum oberen Rand ist noch Platz für eine lockere Einheit.<br><span style='color:var(--a-muted);font-size:13px'>Tipp: Ein ruhiger Spaziergang hält dich im Ziel.</span>", "Mehr dazu im Coach", C("tr"), C("tr-alltag"))}
+      <div class="chart-card"><div class="h">Diese Woche im Korridor</div><div class="s">Last 7 Tage 270, Korridor 240–310 · im Reiter Training</div></div>`;
+  }
+
+  // ---------- Detail: Stress ----------
+  function stress() {
+    const parts = [["Ruhe", 0.58, "9 h 10", C("line")], ["niedrig", 0.27, "4 h 20", C("st-1")], ["mittel", 0.11, "1 h 50", C("st-2")], ["hoch", 0.04, "38 min", C("st-3")]];
+    return `${dhead("Stress", "glow-st")}${sample}${dayswitch()}
+      <div class="hero" style="margin-top:6px">${gauge({ w: 300, pct: 0.28, center: "28", word: "NIEDRIG", wordColor: C("st"), sub: "Tagesschnitt · Stand 15:05", lo: "0", hi: "100", grad: { id: "stg" + Math.random().toString(36).slice(2, 7), from: C("st-1"), to: C("st-3") } })}</div>
+      ${explain("Du warst die meiste Zeit <b>in Ruhe</b>. Hoher Stress insgesamt <b>38 Minuten</b>, etwas weniger als an einem üblichen Montag.", "Mehr dazu im Coach", C("st"), C("st-1"))}
+      <div class="chart-card"><div class="h">So verteilt sich dein Tag</div><div class="s">Garmin-Stress, Ruhe = unter 26</div>
+        <div class="split-bars" style="margin-top:10px">${parts.map(([l, p, d, c]) => `<div class="sb"><span>${l}</span><span class="bar"><i style="width:${p * 100}%;background:${c}"></i></span><span class="v">${d}</span></div>`).join("")}</div></div>
+      <div class="chart-card"><div class="h">Tag gesamt</div><div class="s">Mo 23. Nov gegen einen üblichen Montag</div>
+        <div class="split-bars" style="margin-top:10px"><div class="sb"><span>heute</span><span class="bar"><i style="width:28%;background:var(--a-st)"></i></span><span class="v">28</span></div><div class="sb"><span>üblich</span><span class="bar"><i style="width:33%;background:var(--a-st-1)"></i></span><span class="v">33</span></div></div></div>
+      <span class="meta">Der Verlauf über den Tag fehlt, weil Garmin ihn nicht liefert.</span>`;
+  }
+
+  // ---------- Detail: Energie ----------
+  function energie() {
+    const W = 300, H = 140, n = 96, now = 60;
+    const usual = [], today = [];
+    for (let i = 0; i < n; i++) {
+      const h = i / 4;
+      let u = h < 6.5 ? 22 + (h / 6.5) * 62 : 84 - (h - 6.5) * 4.1;
+      usual.push(Math.max(8, Math.min(100, u)));
+      let t = h < 6.75 ? 18 + (h / 6.75) * 64 : 82 - (h - 6.75) * 3.6 - (h > 12 && h < 13 ? (h - 12) * 6 : h >= 13 ? 6 : 0);
+      today.push(Math.max(8, Math.min(100, t)));
+    }
+    const x = (i) => 28 + (i / (n - 1)) * (W - 36), y = (v) => 10 + (1 - v / 100) * (H - 30);
+    const line = (arr, a, b) => arr.slice(a, b).map((v, j) => `${(j ? "L" : "M")}${x(a + j).toFixed(1)} ${y(v).toFixed(1)}`).join(" ");
+    const proj = today[now - 1];
+    const projArr = []; for (let i = now - 1; i < n; i++) projArr.push(proj + (usual[i] - usual[now - 1]));
+    let s = `<svg width="100%" viewBox="0 0 ${W} ${H}" aria-label="Body Battery heute, jetzt 64, üblich 70, um 22 Uhr etwa 38" role="img">`;
+    s += `<rect x="${x(0)}" y="10" width="${x(27) - x(0)}" height="${H - 30}" fill="${C("fill")}" opacity=".55"/>`;
+    s += `<text x="${x(13)}" y="22" text-anchor="middle" fill="${C("muted")}" font-size="10" font-family="Inter, system-ui, sans-serif">Schlaf</text>`;
+    s += `<rect x="${x(50)}" y="10" width="${x(53) - x(50)}" height="${H - 30}" fill="${C("tr-bg")}"/>`;
+    [0, 50, 100].forEach((v) => { s += `<line x1="28" x2="${W - 8}" y1="${y(v)}" y2="${y(v)}" stroke="${C("line-soft")}"/><text x="22" y="${y(v) + 3}" text-anchor="end" fill="${C("muted")}" font-size="10" font-family="Inter, system-ui, sans-serif">${v}</text>`; });
+    s += `<path d="${line(usual, 0, n)}" fill="none" stroke="${C("muted")}" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+    s += `<path d="${projArr.map((v, j) => `${j ? "L" : "M"}${x(now - 1 + j).toFixed(1)} ${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${C("rec")}" stroke-width="2" stroke-dasharray="1 4" stroke-linecap="round"/>`;
+    s += `<path d="${line(today, 0, now)}" fill="none" stroke="${C("rec")}" stroke-width="2.5"/>`;
+    s += `<circle cx="${x(now - 1)}" cy="${y(today[now - 1])}" r="5" fill="${C("rec")}" stroke="${C("card")}" stroke-width="2"/>`;
+    ["0", "6", "12", "18", "24"].forEach((l, k) => { s += `<text x="${x(Math.min(n - 1, k * 24))}" y="${H - 4}" text-anchor="middle" fill="${C("muted")}" font-size="10" font-family="Inter, system-ui, sans-serif">${l}</text>`; });
+    s += `</svg>`;
+    return `${dhead("Energie", "glow-heute")}${sample}${dayswitch()}
+      <div class="hero">${ring({ size: 190, pct: 0.64, color: C("rec"), center: "64", unit: "BODY BATTERY", stroke: 15 })}</div>
+      <div class="chart-card"><div class="h">Deine Energie liegt 6 Punkte unter deinem üblichen Tag.</div><div class="s">Hochgerechnet bist du um 22 Uhr bei etwa 38.</div>${s}
+        <div class="legend" style="background:transparent;padding:4px 0 0"><span>━ heute</span><span>┅ üblich (30 Tage)</span><span>··· Hochrechnung</span></div></div>
+      <div class="two"><div class="kt"><div class="kl">Aufgeladen</div><div class="kv">+64</div></div><div class="kt"><div class="kl">Verbraucht</div><div class="kv">−18</div></div></div>
+      ${explain("Am meisten Energie hast du meist zwischen <b>8 und 10 Uhr</b>, am stärksten sinkt sie zwischen <b>17 und 19 Uhr</b>.", "Mehr dazu im Coach")}
+      <span class="meta">Die Hochrechnung folgt deinem üblichen Verlauf. Ein Richtwert, keine Vorhersage.</span>`;
+  }
+
+  const DETAIL = { readiness, schlaf, belastung, stress, energie };
+  const NAMES = { energie: "Energie", schlaf: "Schlaf", readiness: "Readiness", belastung: "Belastung", stress: "Stress" };
+
+  function centerRings(root) {
+    const row = root.querySelector("[data-rings]");
+    const main = row && row.querySelector(".main");
+    if (row && main) row.scrollLeft = main.offsetLeft - (row.clientWidth - main.offsetWidth) / 2;
+  }
+
+  // ---------- Live-Telefon ----------
+  const live = document.getElementById("live");
+  function renderLive() {
+    live.innerHTML = `<div class="screen"><div class="view" id="v-home"><div class="scroll">${heute()}</div>${tabbar("Heute")}</div><div class="view off-right" id="v-detail"></div></div>`;
+    centerRings(live);
+    live.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", () => openDetail(b.dataset.open)));
+  }
+  function openDetail(k) {
+    const d = live.querySelector("#v-detail"), h = live.querySelector("#v-home");
+    d.innerHTML = `<div class="scroll" style="background:var(--a-bg)">${DETAIL[k]()}</div>${tabbar("Heute")}`;
+    d.style.background = "var(--a-bg)";
+    requestAnimationFrame(() => { d.classList.remove("off-right"); h.classList.add("off-left"); });
+    d.querySelector("[data-back]").addEventListener("click", () => { d.classList.add("off-right"); h.classList.remove("off-left"); });
+  }
+
+  // ---------- Galerie ----------
+  const DESC = {
+    readiness: ["Readiness", "Vorlage: Whoop „Erholung“", ["Großer Ring 0–10 mit Stufenwort, Sage.", "Stufenleiste Erholen · Behutsam · Bereit · Volle Kraft.", "Vier Faktoren mit Pfeil: ▲ über, ▼ unter deinem 30-Tage-Schnitt, • typisch. Darunter das Wort.", "Satz, warum, und Vorschlag zur Zyklusphase.", "‹ Heute › blättert zu früheren Tagen."]],
+    schlaf: ["Schlaf", "Vorlage: Whoop „Schlafleistung“", ["Ring: letzte Nacht in % vom Bedarf, neutral wie alle Schlafwerte.", "Fünf Faktoren mit 3-Stufen-Balken. Ein Feld leuchtet: unter, im oder über deinem Bereich. Einfarbig, das Wort steht darunter.", "Schlafphasen als ein Balken mit Minuten.", "Schlafbedarf heute Nacht mit Herleitung und Schlafschuld als Satz."]],
+    belastung: ["Belastung", "Vorlage: Bevel „Strain“", ["Halbbogen 0–100 % mit Zielbereich als äußerem Bogen und Wort (unter / im / über dem Ziel).", "Zwei Kacheln: Anteil Training und Alltag, gleiche Farben wie im Ring.", "Erklärung mit Tipp, was heute noch passt.", "Verweis auf die Woche im Reiter Training."]],
+    stress: ["Stress", "Vorlage: Whoop „Stress-Monitor“", ["Halbbogen 0–100, Türkis, je höher desto heller.", "Satz zur Ruhe und zur Dauer mit hohem Stress.", "Aufteilung Ruhe · niedrig · mittel · hoch mit Dauer.", "Tag gesamt gegen deinen üblichen Wochentag.", "Ohne Tagesverlauf, Garmin liefert ihn nicht."]],
+    energie: ["Energie", "Vorlage: Whoop Stress-Verlauf, Muster 6", ["Ring: Body Battery jetzt.", "Kurve über den Tag: heute (Linie), üblicher Tag (gestrichelt), Hochrechnung (gepunktet). Schlaf grau, Training blau hinterlegt.", "Aufgeladen und verbraucht als Kacheln.", "Tagesrhythmus als Satz."]],
+  };
+  const gallery = document.getElementById("gallery");
+  function renderGallery(theme) {
+    gallery.innerHTML = Object.keys(DETAIL).map((k) => `<figure><div class="phone ${theme}"><div class="screen"><div class="scroll">${DETAIL[k]()}</div>${tabbar("Heute")}</div></div><figcaption><h3>${DESC[k][0]}</h3><span style="color:var(--muted)">${DESC[k][1]}</span><ul>${DESC[k][2].map((t) => `<li>${t}</li>`).join("")}</ul></figcaption></figure>`).join("");
+  }
+
+  // ---------- Umschalter ----------
+  let theme = "app-dark";
+  function setTheme(t) {
+    theme = t;
+    live.className = "phone " + t + (document.getElementById("nums-off").getAttribute("aria-pressed") === "true" ? " show-nums-off" : "");
+    document.getElementById("th-dark").setAttribute("aria-pressed", t === "app-dark");
+    document.getElementById("th-light").setAttribute("aria-pressed", t === "app-light");
+    renderGallery(t);
+  }
+  function setNums(on) {
+    document.getElementById("nums-on").setAttribute("aria-pressed", on);
+    document.getElementById("nums-off").setAttribute("aria-pressed", !on);
+    live.classList.toggle("show-nums-off", !on);
+  }
+  document.getElementById("th-dark").addEventListener("click", () => setTheme("app-dark"));
+  document.getElementById("th-light").addEventListener("click", () => setTheme("app-light"));
+  document.getElementById("nums-on").addEventListener("click", () => setNums(true));
+  document.getElementById("nums-off").addEventListener("click", () => setNums(false));
+
+  renderLive();
+  renderGallery(theme);
+  window.addEventListener("load", () => centerRings(live));
+})();
+</script>

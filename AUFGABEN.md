@@ -61,6 +61,10 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 - [x] PR #14 geschlossen, er ist durch #47 ersetzt
 - [ ] Am nächsten Morgen nach 6:15 Uhr die App öffnen: Die Daten sollten schon da sein. Steht auf Heute ein Hinweis zum Morgen-Abruf, Claude Bescheid geben
 
+### Heute als Einstiegsseite (Konzept, noch kein Code)
+- [ ] Entwurf ansehen: `docs/entwurf-heute-einstieg.html` (auch als Seite in Claude), Konzept `docs/konzept-heute-einstieg.md`
+- [ ] Die fünf offenen Fragen am Ende des Konzepts beantworten, dann „Freigabe“ sagen
+
 ### Aufräumen
 - [ ] Auf GitHub den Zweig `heute-neu` löschen (versehentlich angelegt, gleicher Inhalt wie PR #38)
 
