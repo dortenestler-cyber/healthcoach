@@ -71,7 +71,8 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Künftig gibt es überall vier Phasen: Menstruation · Follikel · Eisprung · Luteal. Das gilt für die Charts (Punkt 8), Werte und Symptome nach Phase, Gewohnheiten je Phase, „Weitere Muster“, Wadenzucken nach Phase und die Gewohnheits-Detailseiten. Farbe: Terracotta mittel wie im Kalender.
    Der Eisprung dauert nur etwa 3 Tage je Zyklus. Vergleiche stehen deshalb erst, wenn genug Tage zusammenkommen, vorher „noch zu wenige Tage“.
    Die Readiness rechnet ihren Bereich je Phase. Ob der Eisprung dort eigenständig zählt oder bei Follikel bleibt, entscheide ich beim Umsetzen nach Datenlage. Die Uhr muss dann gleich rechnen `[DA]`.
-   Offen: Willst du den Eisprung auch selbst eintragen können (z. B. Test positiv, Mittelschmerz)? Dann bräuchte das Tagebuch ein neues Feld, und das wäre eine Migration durch Daten `[DA]`.
+   **Eisprung selbst eintragen** (Nutzerin: ja): Im Tagebuch gibt es beim Zyklus eine Zeile „Eisprung-Zeichen“ zum Antippen, mehrere sind möglich: Test positiv · Mittelschmerz · Zervixschleim spinnbar · Temperaturanstieg. Ein eingetragenes Zeichen ersetzt für diesen Zyklus die Schätzung: Eisprung-Phase und Lutealphase richten sich danach. Ring, Kalender und Vorschau auf die nächste Periode (Punkt 2) werden genauer. Im Kalender bekommt der Tag ein kleines Zeichen.
+   Braucht Daten `[DA]`: ein neues Feld im Tagebuch (Migration, wartet auf Freigabe).
    Dateien: `lib/cycle.ts`, `lib/muster.ts`, `lib/zyklusSeite.ts`, `lib/habitStats.ts`, betroffene Komponenten
 
 11. ☐ **App-Symbol passend zum getönten Home-Bildschirm** (23.11.)
@@ -80,5 +81,11 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Entwurf: `docs/bilder/entwuerfe/app-symbol-getoent.png`, Vorlage `docs/bilder/entwuerfe/app-symbol-vorschlag.svg`.
    Danach: alle PNG-Größen neu erzeugen und `CLAUDE.md` (App-Symbol-Farbe) anpassen. Auf dem iPhone muss die App einmal vom Home-Bildschirm gelöscht und neu hinzugefügt werden, sonst bleibt das alte Symbol (→ `AUFGABEN.md`).
    Dateien: `public/icons/*`, `CLAUDE.md`
+
+12. ☐ **Weitere übliche Zyklus-Symptome im Tagebuch** (23.11.)
+   Die Symptome werden schon flexibel gespeichert, deshalb ist keine Änderung an der Datenbank nötig. Vorschlag zum Auswählen, jeweils leicht · mittel · stark:
+   Unterleibskrämpfe · Brustspannen · Blähbauch/Wassereinlagerungen · Heißhunger · Rückenschmerzen · Hautunreinheiten · Übelkeit · Ängstlichkeit/innere Unruhe · Schwindel · Libido verändert · Schmierblutung (als Hinweis, getrennt von der Blutung).
+   Damit das Tagebuch nicht länger wird, gilt Punkt 5e: Oben stehen die eingetragenen und häufig genutzten, der Rest liegt unter „Weitere anzeigen“. Auswertungen nach Zyklusphase (mit Eisprung, Punkt 10) zeigen die neuen Symptome automatisch mit.
+   Dateien: `lib/catalog.ts`, Tagebuch-Komponenten
 
 ## Erledigt

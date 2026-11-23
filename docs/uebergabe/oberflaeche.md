@@ -23,6 +23,7 @@ Farbsystem „Nacht“ und Heute als Einstiegsseite umgesetzt.
 - Nutzerin: Rückmeldung zur Seite Zyklus (`AUFGABEN.md` Abschnitt 6)
 
 ## Für die andere Rolle
+- Daten: Sammelliste Punkt 10 braucht ein Feld im Tagebuch für Eisprung-Zeichen (Test positiv, Mittelschmerz, Zervixschleim, Temperaturanstieg; mehrere möglich). Erst nach Freigabe der Nutzerin.
 - Daten: Sammelliste Punkt 6 (`docs/sammelliste-oberflaeche.md`) braucht eine Spalte für die eigene Sportart-Zuordnung in `garmin_activities`, die `garmin-sync` nicht überschreibt. Erst nach Freigabe der Nutzerin.
 - Daten: Laut Nutzerin kommt die Hauttemperatur nicht in der App an (`skin_temp_delta` leer). Bitte in `garmin-sync` prüfen. Die Readiness-Seite zeigt solange „Hauttemperatur kommt noch nicht von Garmin an“.
 - Daten: Teil B des Konzepts `docs/konzept-korridore-alltagslast.md` (Migration und `garmin-sync` für die Alltagslast). Freigegeben am 22.11.
