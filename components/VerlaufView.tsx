@@ -9,14 +9,18 @@ import { sickDays } from "@/lib/baseline";
 import { DEFAULT_HABITS, loadHabits, type Habit } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
 import VerlaufDetail, { HISTORY } from "@/components/verlauf/VerlaufDetail";
+import VerlaufGroup, { GROUPS, groupOfMetric, type GroupKey } from "@/components/verlauf/VerlaufGroup";
 import { SPANS, spanOf, type Span } from "@/lib/verlauf";
 import type { Diary } from "@/lib/insights";
 import { loadGarminCycles, mergeGarminCycles } from "@/lib/garminZyklus";
 
-// Detailansicht eines Garmin-Werts: Zeitraum T · W · M · 6M · J, fester persönlicher Bereich als Band,
-// Zyklusphasen getönt, Vergleich nach Zyklusphase und Highlights. Ab 6M Wochenmittel.
-export default function VerlaufView({ initial }: { initial: string }) {
-  const [metric, setMetric] = useState<MetricKey>((initial in METRICS ? initial : "hrv") as MetricKey);
+// Verlauf: vier Gruppen mit kleinen Charts (Sammelliste Punkt 16), Tippen öffnet die Detailansicht eines Werts:
+// Zeitraum T · W · M · 6M · J, persönlicher Bereich als Band, Zyklusphasen, Vergleich nach Zyklusphase und Highlights. Ab 6M Wochenmittel.
+// Mit ?m=<Wert> öffnet die Seite direkt die Detailansicht (Links von Heute, Zyklus usw.).
+export default function VerlaufView({ initial }: { initial: string | null }) {
+  const start = initial && initial in METRICS ? (initial as MetricKey) : null;
+  const [metric, setMetric] = useState<MetricKey | null>(start);
+  const [group, setGroup] = useState<GroupKey>(start ? groupOfMetric(start) : "herz");
   const [span, setSpan] = useState<Span>("M");
   const [rows, setRows] = useState<Daily[]>([]);
   const [diary, setDiary] = useState<Diary[]>([]);
@@ -70,6 +74,9 @@ export default function VerlaufView({ initial }: { initial: string }) {
     load();
   };
 
+  // Werte ohne Daten (z. B. Atemfrequenz, Schritte im Alltag) nur zeigen, wenn es sie gibt
+  const available = (list: MetricKey[]) => list.filter((k) => !OPTIONAL_METRICS.includes(k) || metric === k || rows.some((r) => METRICS[k].value(r) !== null));
+
   const oldest = rows[0]?.day;
   const missingHistory = spanOf(span).days > 30 && (!oldest || oldest > isoDay(daysAgo(spanOf(span).days - 8)));
 
@@ -79,13 +86,23 @@ export default function VerlaufView({ initial }: { initial: string }) {
       <PageHead title="Verlauf" sub="Deine Werte über die Zeit" />
       {error && <p className="alert" role="alert">{error}</p>}
 
-      <div className="pills scroll">
-        {(Object.keys(METRICS) as MetricKey[]).filter((k) => !OPTIONAL_METRICS.includes(k) || metric === k || rows.some((r) => METRICS[k].value(r) !== null)).map((k) => (
-          <button key={k} type="button" className="pill" aria-pressed={metric === k} onClick={() => setMetric(k)}>
-            {METRICS[k].label}
+      <div className="segmented" role="group" aria-label="Gruppe">
+        {GROUPS.map((g) => (
+          <button key={g.key} type="button" aria-pressed={group === g.key && !metric} aria-label={g.name} onClick={() => { setGroup(g.key); setMetric(null); }}>
+            {g.label}
           </button>
         ))}
       </div>
+
+      {metric && (
+        <div className="pills scroll">
+          {available(GROUPS.find((g) => g.key === group)!.metrics).map((k) => (
+            <button key={k} type="button" className="pill" aria-pressed={metric === k} onClick={() => setMetric(k)}>
+              {METRICS[k].label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="segmented segmented-5" role="group" aria-label="Zeitraum">
         {SPANS.map((s) => (
@@ -95,7 +112,14 @@ export default function VerlaufView({ initial }: { initial: string }) {
         ))}
       </div>
 
-      <VerlaufDetail metric={metric} span={span} rows={rows} diary={diary} acts={acts} sick={sick} habits={habits} />
+      {metric ? (
+        <>
+          <button type="button" className="back-link" onClick={() => setMetric(null)}>‹ Alle Werte · {GROUPS.find((g) => g.key === group)!.name}</button>
+          <VerlaufDetail metric={metric} span={span} rows={rows} diary={diary} acts={acts} sick={sick} habits={habits} />
+        </>
+      ) : (
+        <VerlaufGroup group={group} span={span} rows={rows} diary={diary} sick={sick} metrics={available(GROUPS.find((g) => g.key === group)!.metrics)} onOpen={(k) => { setMetric(k); window.scrollTo({ top: 0 }); }} />
+      )}
 
       {missingHistory && (
         <section className="card">

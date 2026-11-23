@@ -10,8 +10,12 @@ import { W } from "@/components/charts/scale";
 const HIDE_AFTER_MS = 4000;
 
 // w: Breite der Zeichnung (viewBox), damit Zeiger und Tage zusammenpassen
-export function usePick(n: number, x0: number, step: number, w: number = W) {
-  const [sel, setSel] = useState<number | null>(null);
+// shared: von außen gesteuerter Tag, damit mehrere Charts denselben Tag zeigen (Verlauf in Gruppen, Punkt 16)
+export type SharedPick = { sel: number | null; setSel: (i: number | null | ((s: number | null) => number | null)) => void };
+export function usePick(n: number, x0: number, step: number, w: number = W, shared?: SharedPick) {
+  const [ownSel, setOwnSel] = useState<number | null>(null);
+  const sel = shared ? shared.sel : ownSel;
+  const setSel = shared ? shared.setSel : setOwnSel;
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
 

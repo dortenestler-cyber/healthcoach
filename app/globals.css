@@ -2887,3 +2887,20 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
 .factor-legend-steps { display: inline-flex; align-items: center; gap: 10px; }
 .factor-legend-steps .factor-steps { width: 40px; }
 .cb-stress .cb-gauge-caption { fill: var(--stress-fg); }
+
+/* Verlauf in Gruppen (Sammelliste Punkt 16): kleine Charts, am Computer zwei nebeneinander */
+button.back-link { background: none; border: 0; padding: 0; color: var(--text); cursor: pointer; font: inherit; font-size: 14px; font-weight: 500; min-height: 44px; text-align: left; }
+.verlauf-group-note { margin: 0; }
+.verlauf-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.verlauf-grid > .card { margin-top: 0; }
+@media (min-width: 1024px) {
+  .verlauf-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+}
+.verlauf-mini { display: flex; flex-direction: column; gap: 10px; }
+.verlauf-mini-head {
+  display: grid; grid-template-columns: 1fr auto; column-gap: 8px; row-gap: 2px; align-items: center;
+  background: none; border: 0; padding: 0; margin: 0; color: var(--text); text-align: left; cursor: pointer; min-height: 44px; font: inherit;
+}
+.verlauf-mini-head .meta { grid-column: 1; }
+.verlauf-mini-sentence { grid-column: 1; font-size: 15px; font-weight: 600; line-height: 1.3; }
+.verlauf-mini-more { grid-column: 2; grid-row: 1 / span 2; color: var(--muted); font-size: 22px; }

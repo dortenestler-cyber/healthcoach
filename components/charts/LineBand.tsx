@@ -10,7 +10,7 @@ import type { Range } from "@/lib/baseline";
 import { PHASE_GROUP_LABEL, type PhaseGroup } from "@/lib/cycle";
 import { extent, grownHeight, linear, niceTicks, segments, smoothBand, type Tone } from "@/components/charts/scale";
 import { useChartWidth } from "@/components/charts/useChartWidth";
-import { ChartTip, tipDate, usePick } from "@/components/charts/pick";
+import { ChartTip, tipDate, usePick, type SharedPick } from "@/components/charts/pick";
 
 type Props = {
   values: (number | null)[]; // ein Wert pro Tag, ältester zuerst
@@ -29,6 +29,7 @@ type Props = {
   xLabels?: { index: number; text: string }[];
   markers?: boolean[]; // Markierung oben am Tag, z. B. Nachtschweiß (Legende steht in der Karte)
   height?: number;
+  shared?: SharedPick; // gemeinsamer Tag mehrerer Charts
 };
 
 const PAD_L = 4;
@@ -71,7 +72,7 @@ function bandPath(run: { i: number; r: Range }[], x0: number, step: number, y: (
   return smoothBand(xs, run.map(({ r }) => y(r.hi)), run.map(({ r }) => y(r.lo)), step / 2);
 }
 
-export default function LineBand({ values, fmt, label, tone = "recovery", band, phaseBand, bands, phases, dates, tipNote, futureFrom, todayIndex, zeroLine, xLabels = [], markers, height: baseHeight = 170 }: Props) {
+export default function LineBand({ values, fmt, label, tone = "recovery", band, phaseBand, bands, phases, dates, tipNote, futureFrom, todayIndex, zeroLine, xLabels = [], markers, height: baseHeight = 170, shared }: Props) {
   const { ref, w } = useChartWidth();
   const height = grownHeight(baseHeight, w);
   const n = Math.max(values.length, 1);
@@ -94,7 +95,7 @@ export default function LineBand({ values, fmt, label, tone = "recovery", band, 
   const lastV = last !== undefined ? (values[last] as number) : null;
   const hasStrip = !!phases?.some(Boolean);
   const total = height + (hasStrip ? STRIP : 0);
-  const pick = usePick(n, x0, step, w);
+  const pick = usePick(n, x0, step, w, shared);
   const sel = pick.sel;
 
   // Zweite Zeile im Schild: Lage zum Bereich und Phase

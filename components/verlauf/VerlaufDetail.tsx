@@ -15,7 +15,7 @@ export const HISTORY = 180; // Phasenvergleich: immer die letzten 6 Monate
 const SLEEP: MetricKey[] = ["schlaf", "tiefschlaf", "rem", "einschlafen"];
 const TRAINING: MetricKey[] = ["schritte", "bb", "bb_aufgeladen", "belastung", "alltagsschritte"];
 // Farbfamilien nach docs/farb-und-designkonzept.md: Energie und Ruhepuls Sage hell, Atemfrequenz neutral
-const tone = (k: MetricKey) =>
+export const metricTone = (k: MetricKey) =>
   SLEEP.includes(k) ? "sleep" : k === "temperatur" ? "cycle" : k === "stress" || k === "stress_hoch" ? "stress" : TRAINING.includes(k) ? "training" : k === "bb" || k === "bb_aufgeladen" || k === "ruhepuls" ? "energy" : k === "atem" ? "neutral" : "recovery";
 
 const KORRIDOR_DAYS = 181; // Abschnitt „Dein Bereich“: letztes Halbjahr
@@ -126,14 +126,14 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
         >
           {span === "T" ? (
             <>
-              <RangeRow label={m.label} value={value(today)} fmt={m.fmt} range={base.range} phase={base.phase} phaseName={phaseName} tone={tone(metric)} />
+              <RangeRow label={m.label} value={value(today)} fmt={m.fmt} range={base.range} phase={base.phase} phaseName={phaseName} tone={metricTone(metric)} />
               {stages && <SleepStagesBar minutes={stages} />}
             </>
           ) : (
             <LineBand
               values={points.map((p) => p.value)}
               fmt={m.fmt}
-              tone={tone(metric)}
+              tone={metricTone(metric)}
               label={`${m.label}, ${spanOf(span).name}${weekly ? " als Wochenmittel" : ""}, mit deinem Bereich${moving ? ", wie er jeweils galt" : ""}`}
               band={base.range}
               phaseBand={weekly ? null : base.phase}
@@ -147,7 +147,7 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
             />
           )}
         </ValueHeader>
-        <div className={`legend cb-${tone(metric)}`}>
+        <div className={`legend cb-${metricTone(metric)}`}>
           {moving ? (
             <span><i className="legend-band" />Dein Bereich, wie er jeweils galt</span>
           ) : (
@@ -220,7 +220,7 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
         {cycles >= 2 ? (
           <>
             <h2>{phaseSentence ?? `${m.label}: noch zu wenige Tage je Phase für einen Vergleich.`}</h2>
-            <PhaseCompare means={pm} range={base.range} ranges={phaseRanges} fmt={m.fmt} label={m.label} tone={tone(metric)} />
+            <PhaseCompare means={pm} range={base.range} ranges={phaseRanges} fmt={m.fmt} label={m.label} tone={metricTone(metric)} />
             <span className="meta">
               {cycles} Zyklen. Mindestens 3 Tage je Phase, sonst steht ein Strich.{phaseRanges && Object.values(phaseRanges).some(Boolean) ? " Band = dein Bereich in dieser Phase." : ""} Phasen sind geschätzt. Ein Zusammenhang, keine Diagnose.
             </span>
