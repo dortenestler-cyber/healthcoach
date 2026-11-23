@@ -25,6 +25,26 @@ export const SYMPTOMS: { key: string; label: string }[] = [
   { key: "schmier", label: "Schmierblutung" },
 ];
 
+// Leichte Anzeichen, ohne gleich krank zu sein (Sammelliste Punkt 19). Gespeichert wie Symptome, eigene Schlüssel.
+export const SIGNS: { key: string; label: string }[] = [
+  { key: "hals_rau", label: "Rauer Hals" },
+  { key: "halsweh", label: "Halsschmerzen" },
+  { key: "nase_zu", label: "Verstopfte Nase" },
+  { key: "schnupfen", label: "Schnupfen" },
+  { key: "niesen", label: "Niesen" },
+  { key: "husten", label: "Husten" },
+  { key: "froesteln", label: "Frösteln" },
+  { key: "glieder", label: "Gliederschmerzen" },
+  { key: "abgeschlagen", label: "Abgeschlagen" },
+  { key: "nebenhoehlen", label: "Druck im Kopf, Nebenhöhlen" },
+  { key: "lippen", label: "Lippenbläschen" },
+];
+export const SIGN_KEYS = new Set(SIGNS.map((s) => s.key));
+
+// Symptome und Anzeichen zusammen, z. B. für Auswertungen und den Coach
+export const ALL_SYMPTOMS = [...SYMPTOMS, ...SIGNS];
+export const symptomLabel = (key: string) => ALL_SYMPTOMS.find((s) => s.key === key)?.label ?? key;
+
 // Wie viele Knöpfe im Tagebuch ohne „Weitere anzeigen“ sichtbar sind (mindestens)
 export const VISIBLE_MIN = 6;
 

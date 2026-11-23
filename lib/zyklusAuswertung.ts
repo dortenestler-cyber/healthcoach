@@ -2,7 +2,7 @@
 // Symptome nach Zyklustag. Reine Berechnungen ohne Netzwerk, Zusammenhänge statt Ursachen.
 
 import { middleHalf, type Range } from "@/lib/baseline";
-import { SYMPTOMS } from "@/lib/catalog";
+import { symptomLabel } from "@/lib/catalog";
 import { periodStarts, type Diary } from "@/lib/insights";
 
 const DAY_MS = 864e5;
@@ -78,7 +78,7 @@ export function symptomHeat(diary: Diary[], muscle?: Map<string, number>): { row
   let top = [...totals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([k]) => k);
   // Wadenkrämpfe immer zeigen, sobald es Einträge gibt
   if (totals.has(MUSCLE_KEY) && !top.includes(MUSCLE_KEY)) top = [...top.slice(0, 4), MUSCLE_KEY];
-  const label = (k: string) => (k === MUSCLE_KEY ? "Wadenkrämpfe" : SYMPTOMS.find((s) => s.key === k)?.label ?? k);
+  const label = (k: string) => (k === MUSCLE_KEY ? "Wadenkrämpfe" : symptomLabel(k));
   return {
     rows: top.map((k) => ({ label: label(k), values: counts.get(k)!.map((c, i) => (reach[i] ? c / reach[i] : null)) })),
     columns: Array.from({ length: len }, (_, i) => String(i + 1)),

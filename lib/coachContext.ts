@@ -8,7 +8,7 @@ import { cycleToday, PHASES } from "@/lib/cycle";
 import { METRICS, stats } from "@/lib/garmin";
 import { SPOTS, type Injury, type Medication } from "@/lib/health";
 import { SPORTS, type Session } from "@/lib/training";
-import { SYMPTOMS } from "@/lib/catalog";
+import { ALL_SYMPTOMS } from "@/lib/catalog";
 
 // Kompakte Zusammenfassung für den Coach: Kennzahlen und Hinweise, keine Rohdaten
 export async function buildCoachContext(): Promise<string> {
@@ -40,8 +40,8 @@ export async function buildCoachContext(): Promise<string> {
 
   // Symptome der letzten 7 Tage
   const recent = data.diary.filter((d) => d.day >= isoDay(daysAgo(6)));
-  const sym = SYMPTOMS.map((s) => ({ s, n: recent.filter((d) => (d.symptoms?.[s.key] ?? 0) > 0).length, max: Math.max(0, ...recent.map((d) => d.symptoms?.[s.key] ?? 0)) })).filter((x) => x.n);
-  if (sym.length) lines.push("Symptome letzte 7 Tage: " + sym.map((x) => `${x.s.label} an ${x.n} Tagen (bis ${["", "leicht", "mittel", "stark"][x.max]})`).join(", ") + ".");
+  const sym = ALL_SYMPTOMS.map((s) => ({ s, n: recent.filter((d) => (d.symptoms?.[s.key] ?? 0) > 0).length, max: Math.max(0, ...recent.map((d) => d.symptoms?.[s.key] ?? 0)) })).filter((x) => x.n);
+  if (sym.length) lines.push("Symptome und Anzeichen letzte 7 Tage: " + sym.map((x) => `${x.s.label} an ${x.n} Tagen (bis ${["", "leicht", "mittel", "stark"][x.max]})`).join(", ") + ".");
   const flashes = await sb.from("hot_flashes").select("at", { count: "exact", head: true }).gte("at", daysAgo(6).toISOString());
   if (flashes.count) lines.push(`Hitzewallungen letzte 7 Tage: ${flashes.count}.`);
 

@@ -10,6 +10,7 @@ import GlanceTiles from "@/components/heute/GlanceTiles";
 import TodayAgenda from "@/components/heute/TodayAgenda";
 import RecentActivities from "@/components/heute/RecentActivities";
 import ActivityQuestion from "@/components/heute/ActivityQuestion";
+import SignHintCard from "@/components/heute/SignHintCard";
 import TwoCol, { useTwoCols } from "@/components/ui/TwoCol";
 import PullToRefresh from "@/components/ui/PullToRefresh";
 import { readinessFactors } from "@/lib/today";
@@ -82,6 +83,7 @@ export default function HeuteView() {
       {data && rule && <RingRow day={day} data={data} rule={rule} nowMinute={nowMinute} showLoad={feat.tagesziel} showGarmin={feat.garmin} />}
 
       {data && rule && <DaySentence rule={rule} factors={readinessFactors(day, data)} showLoad={feat.tagesziel} />}
+      {isToday && data && <SignHintCard data={data} today={day} onSaved={loadData} />}
 
       {twoCols ? (
         <TwoCol

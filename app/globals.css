@@ -2927,3 +2927,9 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .edit-row .edit-icon { color: var(--muted); flex: none; }
 .edit-row-end { display: inline-flex; align-items: center; gap: 10px; }
 .edit-row.edit-row-inline { width: auto; }
+
+/* Anzeichen auf Heute (Punkt 19): Amber steht für Symptome, immer mit Wort */
+.sign-hint { display: flex; flex-direction: column; gap: 10px; border: 1px solid var(--warn-mid); }
+.sign-hint-eyebrow { color: var(--warn-fg); }
+.sign-hint-text { margin: 0; font-size: 16px; line-height: 1.4; }
+.sign-hint-ask { display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid var(--line-soft); }
