@@ -198,12 +198,13 @@ function ZonesCard({ unit }: { unit: Unit }) {
 }
 
 const W = 320;
-const H = 168;
+const H = 190;
 const L = 30;
-const R = 8;
-const T = 12;
+const R = 34;
+const T = 26;
 const B = 22;
 
+// Zwei Werte, zwei Achsen: Balken = Puls (links, bpm), Linie = Belastung bis zu diesem Zeitpunkt (rechts, 0 bis Summe).
 function TimelineCard({ t }: { t: Timeline | null }) {
   const [pick, setPick] = useState<number | null>(null);
   if (!t) {
@@ -219,58 +220,64 @@ function TimelineCard({ t }: { t: Timeline | null }) {
   const lo = Math.max(40, Math.floor((Math.min(...hrs) - 10) / 20) * 20);
   const hi = Math.ceil((Math.max(...hrs) + 5) / 20) * 20;
   const bw = (W - L - R) / n;
-  const yHr = (v: number) => H - B - ((v - lo) / (hi - lo)) * (H - B - T);
-  const yCum = (v: number) => H - B - (t.total ? (v / t.total) * (H - B - T) : 0);
+  const bottom = H - B;
+  const yHr = (v: number) => bottom - ((v - lo) / (hi - lo)) * (bottom - T);
+  const yCum = (v: number) => bottom - (t.total ? (v / t.total) * (bottom - T) : 0);
   const ticks = [lo, (lo + hi) / 2, hi];
-  const labelsAt = [0, Math.floor(n / 2), n - 1];
+  const total = Math.round(t.total);
+  const end = t.segs[n - 1].from + SERIES_STEP;
   const sel = pick !== null ? t.segs[pick] : null;
-  const line = t.segs.map((s, i) => `${(L + (i + 0.5) * bw).toFixed(1)},${yCum(s.cum).toFixed(1)}`).join(" ");
+  const line = [`${L},${bottom}`, ...t.segs.map((s, i) => `${(L + (i + 1) * bw).toFixed(1)},${yCum(s.cum).toFixed(1)}`)].join(" ");
+  const peakX = t.peak ? L + ((t.peak.from - t.segs[0].from) / SERIES_STEP) * bw : 0;
+  const peakW = t.peak ? ((t.peak.to - t.peak.from) / SERIES_STEP) * bw : 0;
   return (
     <section className="card detail-card">
       <span className="eyebrow">Zeitstrahl</span>
       <h3 className="card-title-lg unit-sentence">{t.sentence}</h3>
-      <svg className="unit-timeline" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Puls je ${SERIES_STEP} Minuten und aufgebaute Belastung. ${t.sentence}`}>
+      <div className="tl-legend" aria-hidden="true">
+        <span><i className="tl-key-bar" /> Puls je {SERIES_STEP} Min (links, bpm)</span>
+        <span><i className="tl-key-line" /> Belastung bis dahin (rechts)</span>
+      </div>
+      <svg className="unit-timeline" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Puls je ${SERIES_STEP} Minuten in bpm und aufgebaute Belastung von 0 bis ${total}. ${t.sentence}`}>
+        {t.peak && (
+          <g>
+            <rect x={peakX} width={peakW} y={T - 4} height={bottom - T + 4} className="tl-peak" />
+            <text x={peakX + peakW / 2} y={T - 9} textAnchor="middle" className="tl-peak-label">härteste 25 Min</text>
+          </g>
+        )}
         {ticks.map((v) => (
           <g key={v}>
             <line x1={L} x2={W - R} y1={yHr(v)} y2={yHr(v)} className="tl-grid" />
             <text x={L - 4} y={yHr(v) + 3} textAnchor="end" className="tl-axis">{Math.round(v)}</text>
           </g>
         ))}
-        {t.peak && (
-          <rect
-            x={L + ((t.peak.from - t.segs[0].from) / SERIES_STEP) * bw}
-            width={((t.peak.to - t.peak.from) / SERIES_STEP) * bw}
-            y={T - 4}
-            height={H - B - T + 4}
-            className="tl-peak"
-          />
-        )}
+        {[0, total].map((v) => (
+          <text key={"r" + v} x={W - R + 6} y={yCum(v) + 3} className="tl-axis tl-axis-load">{v}</text>
+        ))}
         {t.segs.map((s, i) =>
           s.hr === null ? null : (
-            <rect key={i} x={L + i * bw + 0.75} width={Math.max(1, bw - 1.5)} y={yHr(s.hr)} height={H - B - yHr(s.hr)} rx={Math.min(3, bw / 3)} className={`zone-fill-${s.zone ?? 0}${pick === i ? " tl-picked" : ""}`} />
+            <rect key={i} x={L + i * bw + 0.75} width={Math.max(1, bw - 1.5)} y={yHr(s.hr)} height={bottom - yHr(s.hr)} rx={Math.min(3, bw / 3)} className={`zone-fill-${s.zone ?? 0}${pick === i ? " tl-picked" : ""}`} />
           ),
         )}
         <polyline points={line} className="tl-cum" />
-        <circle cx={L + (n - 0.5) * bw} cy={yCum(t.segs[n - 1].cum)} r={3.5} className="tl-cum-dot" />
-        {labelsAt.map((i) => (
-          <text key={i} x={L + (i + 0.5) * bw} y={H - 6} textAnchor={i === 0 ? "start" : i === n - 1 ? "end" : "middle"} className="tl-axis">
-            {clockOf(t.segs[i].from)}
-          </text>
-        ))}
+        <circle cx={W - R} cy={yCum(t.segs[n - 1].cum)} r={3.5} className="tl-cum-dot" />
+        <text x={L} y={H - 6} textAnchor="start" className="tl-axis">{clockOf(t.segs[0].from)}</text>
+        <text x={L + (W - L - R) / 2} y={H - 6} textAnchor="middle" className="tl-axis">{clockOf((t.segs[0].from + end) / 2)}</text>
+        <text x={W - R} y={H - 6} textAnchor="end" className="tl-axis">{clockOf(end)}</text>
         {t.segs.map((s, i) => (
-          <rect key={"h" + i} x={L + i * bw} width={bw} y={T} height={H - B - T} className="tl-hit" onClick={() => setPick(pick === i ? null : i)} onMouseEnter={() => setPick(i)}>
+          <rect key={"h" + i} x={L + i * bw} width={bw} y={T} height={bottom - T} className="tl-hit" onClick={() => setPick(pick === i ? null : i)} onMouseEnter={() => setPick(i)}>
             <title>{`${clockOf(s.from)}: ${s.hr ? s.hr + " bpm" : "keine Messung"}`}</title>
           </rect>
         ))}
       </svg>
       <p className="meta tl-readout" aria-live="polite">
         {sel
-          ? `${clockOf(sel.from)}–${clockOf(sel.from + SERIES_STEP)}: ${sel.hr ? `Puls ${sel.hr} bpm, ${sel.zone ? "Zone " + sel.zone + " " + ZONE_NAMES[sel.zone] : "Ruhe"}` : "keine Messung"} · Belastung bis hier ${Math.round(sel.cum)}`
+          ? `${clockOf(sel.from)}–${clockOf(sel.from + SERIES_STEP)}: ${sel.hr ? `Puls ${sel.hr} bpm, ${sel.zone ? "Zone " + sel.zone + " " + ZONE_NAMES[sel.zone] : "Ruhe"}` : "keine Messung"} · Belastung bis hier ${Math.round(sel.cum)} von ${total}`
           : "Tipp auf eine Stelle zeigt Uhrzeit, Puls und Belastung bis dahin."}
       </p>
       <span className="meta">
-        Balken: Puls je {SERIES_STEP} Minuten, Farbe nach Zone. Linie: aufgebaute Belastung bis {Math.round(t.total)}.{" "}
-        {t.usesGarmin ? "Die Verteilung ist aus den Pulszonen geschätzt, die Summe ist die Garmin-Belastung." : "Ohne Garmin-Belastung in Pulspunkten."}
+        Je höher der Puls, desto steiler steigt die Linie. Sie endet bei {total}
+        {t.usesGarmin ? ", der Garmin-Belastung der Einheit. Wie sie sich über die Zeit verteilt, schätzt die App aus den Pulszonen." : " Pulspunkten, Garmin hat für diese Einheit keine Belastung geliefert."}
       </span>
     </section>
   );

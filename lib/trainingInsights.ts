@@ -166,7 +166,7 @@ export function timeline(u: Unit, data: Data | null): Timeline | null {
     peak = { from: start + at * SERIES_STEP, to: start + (at + win) * SERIES_STEP, share: best / sum };
   }
   const sentence = peak
-    ? `${Math.round(peak.share * 100)} % der Belastung kamen zwischen ${clockOf(peak.from)} und ${clockOf(peak.to)}.`
+    ? `Die härtesten 25 Minuten (${clockOf(peak.from)}–${clockOf(peak.to)}) brachten ${Math.round(peak.share * 100)} % der Belastung.`
     : "So hat sich die Belastung über die Einheit aufgebaut.";
   return { segs, total, usesGarmin, peak, sentence };
 }
