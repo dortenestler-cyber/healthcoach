@@ -14,9 +14,11 @@ type Props = {
   onBufori?: (taken: boolean) => void; // Hinweis „Mund ausspülen“ nach einem Inhalator
 };
 
-// Regelmäßige Einnahmen eines Tages: jede einzeln, jede Uhrzeit-Gruppe mit „Alle abhaken“, oben „Alles abhaken“
+// Regelmäßige Einnahmen eines Tages: jede einzeln, jede Uhrzeit-Gruppe mit „Alle abhaken“, oben „Alles abhaken“.
+// Ist alles abgehakt, klappt die Liste zu einer Zeile zusammen (Tipp klappt wieder auf).
 export default function IntakeChecklist({ day, meds, intakes, onChanged, onError, onBufori }: Props) {
   const [busy, setBusy] = useState(false);
+  const [open, setOpen] = useState(false);
   const groups = groupsFor(meds, intakes);
   const all = groups.flatMap((g) => g.items);
   const done = all.filter((i) => i.done).length;
@@ -37,14 +39,31 @@ export default function IntakeChecklist({ day, meds, intakes, onChanged, onError
   const undo = (items: Item[]) => run(() => uncheck(supabase()!, items), items, false);
   const toggle = (i: Item) => (i.done ? undo([i]) : take([i]));
 
+  if (done === all.length && !open) {
+    return (
+      <button type="button" className="card-row fold-row" onClick={() => setOpen(true)} aria-expanded={false}>
+        <span className="row-label"><span className="fold-ok" aria-hidden="true">✓</span> Alles genommen · {done} von {all.length}</span>
+        <span className="link-small">Anzeigen ⌄</span>
+      </button>
+    );
+  }
+
   return (
     <div className="intakes" aria-busy={busy}>
+      {done === all.length && (
+        <button type="button" className="card-row fold-row" onClick={() => setOpen(false)} aria-expanded={true}>
+          <span className="meta">Alles erledigt</span>
+          <span className="link-small">Zuklappen ⌃</span>
+        </button>
+      )}
+      {done < all.length && (
       <div className="card-row intake-all">
         <span className="meta">{done === all.length ? "Alles erledigt" : `${done} von ${all.length} erledigt`}</span>
         <button type="button" className="btn btn-soft btn-44" disabled={busy || done === all.length} onClick={() => take(all)}>
           Alles abhaken
         </button>
       </div>
+      )}
       {groups.map((g) =>
         g.bundled ? (
           <div key={g.key} className="intake-group">

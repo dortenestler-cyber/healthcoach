@@ -15,6 +15,7 @@ export default function TodayPlan({ children }: { children?: ReactNode }) {
   const [acts, setActs] = useState<Activity[]>([]);
   const [illness, setIllness] = useState<Illness | null>(null);
   const [injuries, setInjuries] = useState<Injury[]>([]);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     const sb = supabase();
@@ -41,6 +42,26 @@ export default function TodayPlan({ children }: { children?: ReactNode }) {
 
   if (sessions === null) return null;
   const open = sessions.filter((s) => s.status !== "ausgelassen");
+  const isDone = (s: Session) => s.status === "erledigt" || acts.some((a) => sportOfGarmin(a.type_key) === s.sport);
+
+  // Alles Geplante erledigt: eine Zeile mit ✓, Tipp klappt auf
+  if (open.length && open.every(isDone) && !expanded) {
+    const text = open
+      .map((s) => {
+        const a = acts.find((x) => sportOfGarmin(x.type_key) === s.sport);
+        return SPORTS[s.sport].label + (a ? " · " + durationText(a.duration_s) : "");
+      })
+      .join(", ");
+    return (
+      <div className="agenda-part">
+        <button type="button" className="card-row fold-row" onClick={() => setExpanded(true)} aria-expanded={false}>
+          <span className="row-label"><span className="fold-ok" aria-hidden="true">✓</span> Training erledigt · {text}</span>
+          <span className="link-small">Anzeigen ⌄</span>
+        </button>
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div className="agenda-part">
@@ -50,7 +71,7 @@ export default function TodayPlan({ children }: { children?: ReactNode }) {
       </div>
       {!open.length && !acts.length && <p>Heute ist frei. Gehen oder Mobilität tun trotzdem gut.</p>}
       {open.map((s) => {
-        const done = s.status === "erledigt" || acts.some((a) => sportOfGarmin(a.type_key) === s.sport);
+        const done = isDone(s);
         const eff = done ? null : healthEffect(s.sport, s.day, illness, injuries);
         return (
           <div key={s.id} className="stack list-line">
