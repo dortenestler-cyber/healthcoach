@@ -17,3 +17,7 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-22 · DA · Nutzerin: Alltagslast ohne Schrittverlauf: Zone 1 zählt, wenn sie mindestens 10 Minuten am Stück anhält, Zone 2 und höher immer · Garmin liefert keinen Schrittverlauf (404)
 2026-11-22 · DA · Nutzerin: Stresskurve über den Tag reparieren
 2026-11-23 · OF · Nutzerin: App auf dem iPhone immer dunkel, dazu ein vollständiges Farb- und Designkonzept · Umsetzung nach Freigabe von `docs/farb-und-designkonzept.md`
+2026-11-23 · OF · Nutzerin: immer dunkel auch im Browser, nicht nur auf dem iPhone · nur ein Design zu pflegen
+2026-11-23 · OF · Nutzerin: Energie (Body Battery) in Sage hell `#8FD5B0`, Familie Erholung
+2026-11-23 · OF · Nutzerin: Rand der Erklärkarte läuft zur Beere aus, als Zeichen für den Coach · Farbkonzept „Nacht“ damit freigegeben
+2026-11-23 · OF · Nutzerin: Ringe dezenter und schmaler (Strich 5 statt 9 von 104, Halbbogen 8 statt 14, Spur dunkler)

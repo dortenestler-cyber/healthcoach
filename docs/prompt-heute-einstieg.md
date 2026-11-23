@@ -41,7 +41,7 @@ Regeln:
 7. Erst Konzept und Entwurf zur Sichtung, Code erst nach Freigabe.
 
 Abgabe:
-- Entwurf als Seite mit Telefon-Rahmen 390 × 844, dunkel (Standard) und hell umschaltbar,
+- Entwurf als Seite mit Telefon-Rahmen 390 × 844, immer dunkel,
   Ringe antippbar, Detailseiten erreichbar.
 - Zu jeder Grafik: was sie zeigt, woher die Zahl kommt, was ein Tipp öffnet.
 - Tabelle Vorlage → übernommen / abgewandelt / weggelassen, mit Grund.

@@ -15,7 +15,7 @@
   --wa-g: #3a2a12; --wa: #f0a24a; --wa-t: #f6c98e;
   --mo-g: #2a2140; --mo: #a98be0; --mo-t: #cdb9f0;
   --beere: #a3234f; --beere-h: #e0527f;
-  --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ring-track: #20252c; --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -222,25 +222,25 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
 (function () {
   const v = (n) => `var(--${n})`;
   function ring({ size, pct, color, center, unit, target, split, stroke, track }) {
-    const sw = stroke || Math.round(size * 0.085), r = size / 2 - sw - (target ? 6 : 0), c = 2 * Math.PI * r, cx = size / 2;
+    const sw = stroke || Math.max(4, Math.round(size * 0.05)), r = size / 2 - sw - (target ? 6 : 0), c = 2 * Math.PI * r, cx = size / 2;
     let s = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true"><circle cx="${cx}" cy="${cx}" r="${r - sw / 2 - 2}" fill="${v("card")}"/>`;
-    s += `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${track || v("fill")}" stroke-width="${sw}"/>`;
+    s += `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${track || v("ring-track")}" stroke-width="${sw}"/>`;
     if (split != null) s += `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${v("tr-alltag")}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c * pct} ${c}" transform="rotate(-90 ${cx} ${cx})"/>`;
     s += `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c * (split ?? pct)} ${c}" transform="rotate(-90 ${cx} ${cx})"/>`;
-    if (target) { const rt = r + sw / 2 + 4, ct = 2 * Math.PI * rt; s += `<circle cx="${cx}" cy="${cx}" r="${rt}" fill="none" stroke="${v("tr-ziel")}" stroke-width="3" stroke-linecap="round" stroke-dasharray="0 ${ct * target[0]} ${ct * (target[1] - target[0])} ${ct}" transform="rotate(-90 ${cx} ${cx})"/>`; }
+    if (target) { const rt = r + sw / 2 + 4, ct = 2 * Math.PI * rt; s += `<circle cx="${cx}" cy="${cx}" r="${rt}" fill="none" stroke="${v("tr-ziel")}" stroke-width="2" stroke-linecap="round" stroke-dasharray="0 ${ct * target[0]} ${ct * (target[1] - target[0])} ${ct}" transform="rotate(-90 ${cx} ${cx})"/>`; }
     const len = String(center).length, fs = Math.round(size * (size > 150 ? 0.22 : 0.24) * Math.min(1, 4.2 / len)), us = size > 150 ? 13 : Math.max(9.5, Math.round(size * 0.1));
     s += `<text x="${cx}" y="${cx + (unit ? -fs * 0.12 : fs * 0.06)}" text-anchor="middle" dominant-baseline="middle" fill="${v("text")}" font-size="${fs}" font-weight="800" font-family="Inter, system-ui, sans-serif">${center}</text>`;
     if (unit) s += `<text x="${cx}" y="${cx + fs * 0.5 + us}" text-anchor="middle" fill="${v(size > 150 ? "text-2" : "muted")}" font-size="${us}" font-weight="${size > 150 ? 700 : 600}" letter-spacing="${size > 150 ? 1.5 : 0}" font-family="Inter, system-ui, sans-serif">${unit}</text>`;
     return s + "</svg>";
   }
   function gauge({ w, pct, center, word, wordColor, sub, target, grad, color }) {
-    const cx = w / 2, cy = w * 0.5, r = w * 0.38, sw = 14, h = cy + r * Math.sin(Math.PI * 0.15) + 8, a0 = Math.PI * 0.85, a1 = Math.PI * 2.15;
+    const cx = w / 2, cy = w * 0.5, r = w * 0.38, sw = 8, h = cy + r * Math.sin(Math.PI * 0.15) + 8, a0 = Math.PI * 0.85, a1 = Math.PI * 2.15;
     const P = (t, rr = r) => [cx + rr * Math.cos(a0 + (a1 - a0) * t), cy + rr * Math.sin(a0 + (a1 - a0) * t)];
     const arc = (t0, t1, rr = r) => { const s = P(t0, rr), e = P(t1, rr); return `M${s[0].toFixed(1)} ${s[1].toFixed(1)} A${rr} ${rr} 0 ${(t1 - t0) * (a1 - a0) > Math.PI ? 1 : 0} 1 ${e[0].toFixed(1)} ${e[1].toFixed(1)}`; };
     let s = `<svg width="100%" style="max-width:${w}px" viewBox="0 0 ${w} ${h + 26}" aria-hidden="true">`;
     if (grad) s += `<defs><linearGradient id="${grad[0]}" x1="0" x2="1"><stop offset="0" stop-color="${grad[1]}"/><stop offset="1" stop-color="${grad[2]}"/></linearGradient></defs>`;
-    s += `<path d="${arc(0, 1)}" fill="none" stroke="${v("fill")}" stroke-width="${sw}" stroke-linecap="round"/><path d="${arc(0, pct)}" fill="none" stroke="${grad ? `url(#${grad[0]})` : color}" stroke-width="${sw}" stroke-linecap="round"/>`;
-    if (target) s += `<path d="${arc(target[0], target[1], r + sw / 2 + 7)}" fill="none" stroke="${v("tr")}" stroke-width="4" stroke-linecap="round"/>`;
+    s += `<path d="${arc(0, 1)}" fill="none" stroke="${v("ring-track")}" stroke-width="${sw}" stroke-linecap="round"/><path d="${arc(0, pct)}" fill="none" stroke="${grad ? `url(#${grad[0]})` : color}" stroke-width="${sw}" stroke-linecap="round"/>`;
+    if (target) s += `<path d="${arc(target[0], target[1], r + sw / 2 + 7)}" fill="none" stroke="${v("tr")}" stroke-width="3" stroke-linecap="round"/>`;
     const [mx, my] = P(pct); s += `<circle cx="${mx}" cy="${my}" r="9" fill="${v("text")}" stroke="${v("card")}" stroke-width="3"/>`;
     s += `<text x="${cx}" y="${cy - 4}" text-anchor="middle" fill="${v("text")}" font-size="50" font-weight="800" font-family="Inter, system-ui, sans-serif">${center}</text><text x="${cx}" y="${cy + 24}" text-anchor="middle" fill="${wordColor}" font-size="14" font-weight="800" letter-spacing="2" font-family="Inter, system-ui, sans-serif">${word}</text><text x="${cx}" y="${cy + 44}" text-anchor="middle" fill="${v("muted")}" font-size="12" font-family="Inter, system-ui, sans-serif">${sub}</text>`;
     const [lx, ly] = P(0), [hx, hy] = P(1);
@@ -297,9 +297,9 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
   document.getElementById("map").innerHTML = MAP.map(([w, f, c, d, h]) => `<tr><td>${w}</td><td>${f}</td><td class="num"><span class="dot" style="background:var(--${c})"></span>${d}</td><td>${h}</td></tr>`).join("");
 
   const KIT = [
-    [`<div class="ringrow">${[["Energie", .64, "sage-h", "64", "jetzt", 84], ["Readiness", .78, "sage", "7,8", "von 10", 112], ["Stress", .28, "st", "28", "von 100", 84]].map(([l, p, c, n, u, s]) => `<div class="rc"><span class="w">${l}</span>${ring({ size: s, pct: p, color: v(c), center: n, unit: u })}</div>`).join("")}</div>`, "Ring klein 84 · mittel 112 px. Strich 8,5 %, Spur Fläche, runde Enden, Start oben. Wort darüber, Zahl darin."],
-    [`<div style="display:grid;justify-items:center">${ring({ size: 210, pct: 1, color: v("moon"), center: "102 %", unit: "VOM BEDARF", stroke: 16 })}</div>`, "Ring groß 210 px, Strich 16, für Detailseiten. Wort in Großbuchstaben unter der Zahl."],
-    [`<div style="display:grid;justify-items:center">${gauge({ w: 300, pct: .63, center: "63 %", word: "IM ZIEL", wordColor: v("tr"), sub: "Ziel 40–70 % · Stand 16:38", target: [.4, .7], color: v("tr") })}</div>`, "Halbbogen 234°, Strich 14, Punkt am Wert, Ziel als Bogen außen. 0 und Maximum beschriftet."],
+    [`<div class="ringrow">${[["Energie", .64, "sage-h", "64", "jetzt", 84], ["Readiness", .78, "sage", "7,8", "von 10", 112], ["Stress", .28, "st", "28", "von 100", 84]].map(([l, p, c, n, u, s]) => `<div class="rc"><span class="w">${l}</span>${ring({ size: s, pct: p, color: v(c), center: n, unit: u })}</div>`).join("")}</div>`, "Ring klein 84 · mittel 112 px. Strich 5 %, dezente Spur, runde Enden, Start oben. Wort darüber, Zahl darin."],
+    [`<div style="display:grid;justify-items:center">${ring({ size: 210, pct: 1, color: v("moon"), center: "102 %", unit: "VOM BEDARF", stroke: 9 })}</div>`, "Ring groß 210 px, Strich 9, für Detailseiten. Wort in Großbuchstaben unter der Zahl."],
+    [`<div style="display:grid;justify-items:center">${gauge({ w: 300, pct: .63, center: "63 %", word: "IM ZIEL", wordColor: v("tr"), sub: "Ziel 40–70 % · Stand 16:38", target: [.4, .7], color: v("tr") })}</div>`, "Halbbogen 234°, Strich 8, Punkt am Wert, Ziel als Bogen außen. 0 und Maximum beschriftet."],
     [`<div style="display:grid;justify-items:center">${gauge({ w: 300, pct: .28, center: "28", word: "NIEDRIG", wordColor: v("st"), sub: "Tagesschnitt · Stand 15:05", grad: ["g1", "var(--st-1)", "var(--st-3)"] })}</div>`, "Halbbogen mit Verlauf: nur bei Stress, dunkles Türkis nach hellem Türkis (mehr ist heller)."],
     [`<div class="explain">Heute <b>Bereit</b>. Dein Schlaf liegt über deinem Bereich, HRV und Ruhepuls sind typisch.<br><span class="more">Mehr dazu im Coach →</span></div><div class="suggest"><b>Normal trainieren</b>Frühe Lutealphase (geschätzt): eine etwas niedrigere HRV ist üblich.</div>`, "Erklärkarte: Rand-Verlauf von der Familienfarbe zur Beere (Coach). Darunter Vorschlag auf Familien-Grund."],
     [`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${[["HRV", "44", "ms", "im Bereich"], ["Ruhepuls", "60", "bpm", "seit 3 Tagen über", true]].map(([l, n, u, w, h]) => `<div class="tile"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l2-5 3 10 2-5h7"/></svg></span><span><span class="tl">${l}</span><br><span class="tv">${n} <small>${u}</small></span><br><span class="ts" style="${h ? "color:var(--wa)" : ""}">${w}</span></span></div>`).join("")}</div>`, "Kachel: Symbolfeld neutral, Zahl weiß, Wort gedämpft. Nur ein Hinweis wird Amber."],

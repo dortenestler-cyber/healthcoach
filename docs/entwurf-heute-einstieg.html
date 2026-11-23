@@ -28,7 +28,7 @@
   --a-st: #45c4c0; --a-st-bg: #12302f; --a-st-fg: #9fe3e0; --a-st-1: #2f6e6c; --a-st-2: #3c9e9a; --a-st-3: #6fd8d4;
   --a-glow-heute: #173326; --a-glow-tr: #1b2438; --a-glow-st: #12302f; --a-glow-g: #262b33;
   --a-brand: #a3234f; --a-hatch: #2a3038; --a-frame: #000000;
-  --a-rec-h: #8fd5b0; --a-beere-h: #e0527f; --a-st-ruhe: #5c6571; --a-rem: #aeb6c2; --a-leicht: #7d8794; --a-wach: #626b78; --a-axis: #7a838f;
+  --a-rec-h: #8fd5b0; --a-beere-h: #e0527f; --a-st-ruhe: #5c6571; --a-rem: #aeb6c2; --a-leicht: #7d8794; --a-wach: #626b78; --a-axis: #7a838f; --a-ring-track: #20252c;
 }
 
 * { box-sizing: border-box; }
@@ -375,14 +375,14 @@ Umsetzung, Liste „was wandert wohin“, höchstens fünf offene Fragen.</pre>
 
   // ---------- Ring: Fortschritt, optional Zielbogen und Anteil Alltag ----------
   function ring({ size, pct, color, center, unit, target, split, stroke }) {
-    const sw = stroke || Math.round(size * 0.085);
+    const sw = stroke || Math.max(4, Math.round(size * 0.05));
     const r = size / 2 - sw - (target ? 6 : 0);
     const c = 2 * Math.PI * r;
     const cx = size / 2;
     const p = Math.max(0, Math.min(1, pct));
     let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">`;
     svg += `<circle cx="${cx}" cy="${cx}" r="${r - sw / 2 - 2}" fill="${C("card")}"/>`;
-    svg += `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${C("fill")}" stroke-width="${sw}"/>`;
+    svg += `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${C("ring-track")}" stroke-width="${sw}"/>`;
     if (split != null) {
       // Training (voll) + Alltag (heller) hintereinander
       svg += `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${C("tr-alltag")}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c * p} ${c}" transform="rotate(-90 ${cx} ${cx})"/>`;
@@ -393,7 +393,7 @@ Umsetzung, Liste „was wandert wohin“, höchstens fünf offene Fragen.</pre>
     if (target) {
       const rt = r + sw / 2 + 4;
       const ct = 2 * Math.PI * rt;
-      svg += `<circle cx="${cx}" cy="${cx}" r="${rt}" fill="none" stroke="${C("tr-zone")}" stroke-width="3" stroke-linecap="round" stroke-dasharray="0 ${ct * target[0]} ${ct * (target[1] - target[0])} ${ct}" transform="rotate(-90 ${cx} ${cx})"/>`;
+      svg += `<circle cx="${cx}" cy="${cx}" r="${rt}" fill="none" stroke="${C("tr-zone")}" stroke-width="2" stroke-linecap="round" stroke-dasharray="0 ${ct * target[0]} ${ct * (target[1] - target[0])} ${ct}" transform="rotate(-90 ${cx} ${cx})"/>`;
     }
     const len = String(center).length;
     const fs = Math.round(size * (size > 150 ? 0.22 : 0.24) * Math.min(1, 4.2 / Math.max(len, 1)));
@@ -405,15 +405,15 @@ Umsetzung, Liste „was wandert wohin“, höchstens fünf offene Fragen.</pre>
 
   // ---------- Halbbogen ----------
   function gauge({ w, pct, color, target, center, word, wordColor, sub, lo, hi, grad }) {
-    const cx = w / 2, cy = w * 0.5, r = w * 0.38, sw = 14, h = cy + r * Math.sin(Math.PI * 0.15) + 8;
+    const cx = w / 2, cy = w * 0.5, r = w * 0.38, sw = 8, h = cy + r * Math.sin(Math.PI * 0.15) + 8;
     const a0 = Math.PI * 0.85, a1 = Math.PI * 2.15; // 0 → 1
     const pt = (t) => { const a = a0 + (a1 - a0) * t; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
     const arc = (t0, t1, rr = r) => { const s = [cx + rr * Math.cos(a0 + (a1 - a0) * t0), cy + rr * Math.sin(a0 + (a1 - a0) * t0)], e = [cx + rr * Math.cos(a0 + (a1 - a0) * t1), cy + rr * Math.sin(a0 + (a1 - a0) * t1)]; const large = (t1 - t0) * (a1 - a0) > Math.PI ? 1 : 0; return `M${s[0].toFixed(1)} ${s[1].toFixed(1)} A${rr} ${rr} 0 ${large} 1 ${e[0].toFixed(1)} ${e[1].toFixed(1)}`; };
     let s = `<svg width="${w}" height="${h + 26}" viewBox="0 0 ${w} ${h + 26}" aria-hidden="true">`;
     if (grad) s += `<defs><linearGradient id="${grad.id}" x1="0" x2="1"><stop offset="0" stop-color="${grad.from}"/><stop offset="1" stop-color="${grad.to}"/></linearGradient></defs>`;
-    s += `<path d="${arc(0, 1)}" fill="none" stroke="${C("fill")}" stroke-width="${sw}" stroke-linecap="round"/>`;
+    s += `<path d="${arc(0, 1)}" fill="none" stroke="${C("ring-track")}" stroke-width="${sw}" stroke-linecap="round"/>`;
     s += `<path d="${arc(0, Math.max(0.001, pct))}" fill="none" stroke="${grad ? `url(#${grad.id})` : color}" stroke-width="${sw}" stroke-linecap="round"/>`;
-    if (target) s += `<path d="${arc(target[0], target[1], r + sw / 2 + 7)}" fill="none" stroke="${C("tr")}" stroke-width="4" stroke-linecap="round"/>`;
+    if (target) s += `<path d="${arc(target[0], target[1], r + sw / 2 + 7)}" fill="none" stroke="${C("tr")}" stroke-width="3" stroke-linecap="round"/>`;
     const [mx, my] = pt(pct);
     s += `<circle cx="${mx}" cy="${my}" r="9" fill="${C("text")}" stroke="${C("bg")}" stroke-width="3"/>`;
     s += `<text x="${cx}" y="${cy - 4}" text-anchor="middle" fill="${C("text")}" font-size="50" font-weight="800" font-family="Inter, system-ui, sans-serif" letter-spacing="-1">${center}</text>`;
@@ -480,7 +480,7 @@ Umsetzung, Liste „was wandert wohin“, höchstens fünf offene Fragen.</pre>
   function readiness() {
     const rows = [["HRV", "44 ms", "▲", "über dem Schnitt, im Bereich"], ["Ruhepuls", "60 bpm", "•", "typisch"], ["Schlaf", "7 h 39", "▲", "über deinem Bereich"], ["Last 7 Tage", "270", "•", "typisch"]];
     return `${dhead("Readiness", "glow-heute")}${sample}${dayswitch()}
-      <div class="hero">${ring({ size: 210, pct: 0.78, color: C("rec"), center: "7,8", unit: "BEREIT", stroke: 16 })}</div>
+      <div class="hero">${ring({ size: 210, pct: 0.78, color: C("rec"), center: "7,8", unit: "BEREIT", stroke: 9 })}</div>
       <div class="stages">${["Erholen", "Behutsam", "Bereit", "Volle Kraft"].map((s) => `<div class="${s === "Bereit" ? "on" : ""}"><i></i>${s}</div>`).join("")}</div>
       <div class="metrics">${rows.map(([l, v, a, w]) => `<div class="mrow"><span class="ml">${l}</span><span class="mv">${v}<span class="arr">${a}</span></span><span class="mw">${w}</span></div>`).join("")}
         <div class="legend">▲ ▼ Heute gegen deine letzten 30 Tage</div></div>
@@ -494,7 +494,7 @@ Umsetzung, Liste „was wandert wohin“, höchstens fünf offene Fragen.</pre>
     const rows = [["Stunden vs. Bedarf", "102 %", 2], ["Tiefschlaf", "1 h 12", 1], ["REM-Schlaf", "1 h 38", 1], ["Einschlafen", "14 min", 1], ["Wach", "22 min", 0]];
     const words = ["unter deinem Bereich", "im Bereich", "über deinem Bereich"];
     return `${dhead("Schlaf", "glow-g")}${sample}${dayswitch()}
-      <div class="hero">${ring({ size: 210, pct: 1, color: C("sleep"), center: "102 %", unit: "VOM BEDARF", stroke: 16 })}</div>
+      <div class="hero">${ring({ size: 210, pct: 1, color: C("sleep"), center: "102 %", unit: "VOM BEDARF", stroke: 9 })}</div>
       <div class="metrics">${rows.map(([l, v, s]) => `<div class="mrow" style="grid-template-columns:1fr auto auto"><span class="ml">${l}</span><span class="seg3" style="grid-row:1/span 2;grid-column:2">${[0,1,2].map((i) => `<i class="${i === s ? "on" : ""}"></i>`).join("")}</span><span class="mv" style="grid-column:3;min-width:62px;justify-content:flex-end">${v}</span><span class="mw">${words[s]}</span></div>`).join("")}
         <div class="legend"><span class="seg3" style="width:40px"><i class="on"></i><i></i><i></i></span> unter · im · über deinem Bereich</div></div>
       <div class="chart-card"><div class="h">Schlafphasen</div><div class="s">22:58 bis 6:37</div>
@@ -559,7 +559,7 @@ Umsetzung, Liste „was wandert wohin“, höchstens fünf offene Fragen.</pre>
     ["0", "6", "12", "18", "24"].forEach((l, k) => { s += `<text x="${x(Math.min(n - 1, k * 24))}" y="${H - 4}" text-anchor="middle" fill="${C("muted")}" font-size="10" font-family="Inter, system-ui, sans-serif">${l}</text>`; });
     s += `</svg>`;
     return `${dhead("Energie", "glow-heute")}${sample}${dayswitch()}
-      <div class="hero">${ring({ size: 190, pct: 0.64, color: C("rec-h"), center: "64", unit: "BODY BATTERY", stroke: 15 })}</div>
+      <div class="hero">${ring({ size: 190, pct: 0.64, color: C("rec-h"), center: "64", unit: "BODY BATTERY", stroke: 9 })}</div>
       <div class="chart-card"><div class="h">Deine Energie liegt 6 Punkte unter deinem üblichen Tag.</div><div class="s">Hochgerechnet bist du um 22 Uhr bei etwa 38.</div>${s}
         <div class="legend" style="background:transparent;padding:4px 0 0"><span>━ heute</span><span>┅ üblich (30 Tage)</span><span>··· Hochrechnung</span></div></div>
       <div class="two"><div class="kt"><div class="kl">Aufgeladen</div><div class="kv">+64</div></div><div class="kt"><div class="kl">Verbraucht</div><div class="kv">−18</div></div></div>

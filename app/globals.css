@@ -1,93 +1,93 @@
-/* Health Coach · Designgrundlage
-   Hell: angelehnt an Apple Health, große weiße Karten auf hellgrauem Grund. Dunkel: siehe docs/design-konzept-dunkel.md.
-   Inter, große Zahlen.
-   Jede Farbe hat eine feste Bedeutung und steht nie allein, immer mit Text.
-   Beere bleibt nur Markenfarbe (App-Symbol und Coach-Knopf). */
+/* Health Coach · Designgrundlage „Nacht“ (docs/farb-und-designkonzept.md)
+   Immer dunkel, auf dem iPhone und im Browser. Inter, große Zahlen.
+   Sechs Farbfamilien mit fester Bedeutung, innerhalb einer Familie gilt: mehr ist heller.
+   Jede Farbe steht nie allein, immer mit Zahl oder Wort.
+   Beere ist Markenfarbe (App-Symbol, Coach-Knopf, Rand der Erklärkarte). */
 
 :root {
   /* Flächen und Text */
-  --bg: #f2f2f7;
-  --card: #ffffff;
-  --fill: #e9e9ee;
-  --line: #e5e5ea;
-  --line-soft: #efeff4;
-  --line-strong: #c7c7cc;
-  --text: #1c1c1e;
-  --text-2: #3c4043;
-  --muted: #5f6368;
+  --bg: #0b0d10;
+  --card: #15181d;
+  --fill: #262b33;
+  --line: #3a414b;
+  --line-soft: #22272e;
+  --line-strong: #4f5864;
+  --text: #f2f4f7;
+  --text-2: #c9cfd6;
+  --muted: #9aa3ae;
 
   /* Hauptbutton, aktive Auswahl, Links */
-  --primary: #1c1c1e;
-  --on-primary: #ffffff;
+  --primary: #f2f4f7;
+  --on-primary: #0b0d10;
 
-  /* Marke: nur App-Symbol und Coach-Knopf */
+  /* Marke: App-Symbol und Coach-Knopf */
   --brand: #a3234f;
 
   /* Erholung und Readiness */
-  --recovery: #2d6a4f;
-  --recovery-bg: #e3f1e8;
-  --recovery-fg: #1e5a3f;
+  --recovery: #52b788;
+  --recovery-bg: #173326;
+  --recovery-fg: #8fd5b0;
 
   /* Zyklus und Perimenopause */
-  --cycle: #b4491f;
-  --cycle-bg: #fbe9e2;
-  --cycle-fg: #8f3a18;
-  --phase-follikel: #fdf4ef;
+  --cycle: #e8845a;
+  --cycle-bg: #3a2318;
+  --cycle-fg: #f2b193;
+  --phase-follikel: #1d232b;
 
   /* Menstruation */
-  --menses-bg: #f6dada;
-  --menses-fg: #7f1d1d;
+  --menses-bg: #3b1e22;
+  --menses-fg: #f28b8b;
 
   /* Training und Garmin */
-  --training: #3b5998;
-  --training-bg: #e4eaf7;
-  --training-fg: #2b4378;
+  --training: #7c9ae0;
+  --training-bg: #1b2438;
+  --training-fg: #afc2ee;
 
   /* Symptome und Warnung (Stufe 1 bis 3 für Stärke) */
-  --warn: #b45309;
-  --warn-bg: #fdf0d5;
-  --warn-mid: #f3c77e;
-  --warn-fg: #7a4306;
+  --warn: #f0a24a;
+  --warn-bg: #3a2a12;
+  --warn-mid: #6a4412;
+  --warn-fg: #f6c98e;
 
   /* Mobility */
-  --mobility: #6d4aa8;
+  --mobility: #a98be0;
 
   /* Zyklusphasen als Fläche hinter Diagrammen */
-  --phase-luteal: #fbe9e2;
+  --phase-luteal: #3a2318;
 
-  /* Sportarten (Familie Training, Ausdauer Petrol), immer mit Text */
-  --sport-karate: #2b4378;
-  --sport-kettlebell: #3b5998;
-  --sport-klettern: #7c93c9;
-  --sport-ausdauer: #1e2f57;
-  --sport-sonstiges: #8a8a8f;
+  /* Sportarten (Familie Training, Ausdauer sehr hell), immer mit Text */
+  --sport-karate: #a9bdf0;
+  --sport-kettlebell: #7c9ae0;
+  --sport-klettern: #5b78c4;
+  --sport-ausdauer: #d3ddf7;
+  --sport-sonstiges: #9aa3ae;
 
   /* Zielbereich Training (Fläche hinter Säulen und Skalen) */
-  --training-zone: #c9d5ee;
-  --training-alltag: #8ea4d6; /* Belastung aus dem Alltag: heller als Training */
+  --training-zone: #3b5998;
+  --training-alltag: #c3d1f2; /* Belastung aus dem Alltag: heller als Training */
 
   /* Schlaf: neutral, keine eigene Bedeutungsfarbe */
-  --sleep: #48505a;
+  --sleep: #e5e7eb;
 
-  /* Stress: Türkis, höher = kräftiger. Nie allein, immer mit Zahl und Wort */
-  --stress: #0e7470;
-  --stress-bg: #ddf2f1;
-  --stress-fg: #0b5a57;
-  --stress-1: #a9dcd9;
-  --stress-2: #4fa9a5;
-  --stress-3: #0e7470;
+  /* Stress: Türkis, höher = heller. Nie allein, immer mit Zahl und Wort */
+  --stress: #45c4c0;
+  --stress-bg: #12302f;
+  --stress-fg: #9fe3e0;
+  --stress-1: #2f6e6c;
+  --stress-2: #3c9e9a;
+  --stress-3: #6fd8d4;
 
   /* Seitenkopf mit Farbverlauf in der Bereichsfarbe */
-  --glow-heute: #e3f1e8;
-  --glow-zyklus: #fbe9e2;
-  --glow-training: #e4eaf7;
-  --glow-gesundheit: #e9e9ee;
-  --hatch: #dcdce2;
+  --glow-heute: #173326;
+  --glow-zyklus: #3a2318;
+  --glow-training: #1b2438;
+  --glow-gesundheit: #262b33;
+  --hatch: #2a3038;
   /* Schrift auf Sportfarben, damit der Kontrast reicht */
-  --ink-karate: #ffffff;
-  --ink-kettlebell: #ffffff;
+  --ink-karate: #0b0d10;
+  --ink-kettlebell: #0b0d10;
   --ink-klettern: #0b0d10;
-  --ink-ausdauer: #ffffff;
+  --ink-ausdauer: #0b0d10;
   --ink-sonstiges: #0b0d10;
 
   /* Alte Namen, damit nichts bricht */
@@ -101,132 +101,31 @@
   --tabbar-h: 72px;
 
   /* Kleine Hilfsflächen */
-  --spot-bg: rgba(255, 255, 255, 0.9);
-  --future-veil: rgba(255, 255, 255, 0.5);
-
-  color-scheme: light;
-}
-
-
-/* Dunkles Design (Konzept docs/design-konzept-dunkel.md): gleiche Bedeutung der Farben, aufgehellt für dunklen Grund.
-   Gilt nach Systemeinstellung und immer bei data-theme="dark" auf <html>. Kontrast mindestens AA. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0b0d10;
-    --card: #15181d;
-    --fill: #262b33;
-    --line: #3a414b;
-    --line-soft: #22272e;
-    --line-strong: #4f5864;
-    --text: #f2f4f7;
-    --text-2: #c9cfd6;
-    --muted: #9aa3ae;
-    --primary: #f2f4f7;
-    --on-primary: #0b0d10;
-    --recovery: #52b788;
-    --recovery-bg: #173326;
-    --recovery-fg: #8fd5b0;
-    --cycle: #e8845a;
-    --cycle-bg: #3a2318;
-    --cycle-fg: #f2b193;
-    --phase-follikel: #1d232b;
-    --phase-luteal: #3a2318;
-    --menses-bg: #3b1e22;
-    --menses-fg: #f28b8b;
-    --training: #7c9ae0;
-    --training-bg: #1b2438;
-    --training-fg: #afc2ee;
-    --training-zone: #3b5998;
-  --training-alltag: #c3d1f2;
-    --training-alltag: #c3d1f2;
-    --warn: #f0a24a;
-    --warn-bg: #3a2a12;
-    --warn-mid: #6a4412;
-    --warn-fg: #f6c98e;
-    --mobility: #a98be0;
-    --sleep: #e5e7eb;
-    --sport-karate: #a9bdf0;
-    --sport-kettlebell: #7c9ae0;
-    --sport-klettern: #5b78c4;
-    --sport-ausdauer: #d3ddf7;
-    --stress: #45c4c0;
-    --stress-bg: #12302f;
-    --stress-fg: #9fe3e0;
-    --stress-1: #2f6e6c;
-    --stress-2: #3c9e9a;
-    --stress-3: #6fd8d4;
-    --glow-heute: #173326;
-    --glow-zyklus: #3a2318;
-    --glow-training: #1b2438;
-    --glow-gesundheit: #262b33;
-    --hatch: #2a3038;
-    --ink-karate: #0b0d10;
-    --ink-kettlebell: #0b0d10;
-    --ink-klettern: #0b0d10;
-    --ink-ausdauer: #0b0d10;
-    --ink-sonstiges: #0b0d10;
-    --sport-sonstiges: #9aa3ae;
-    --spot-bg: rgba(21, 24, 29, 0.9);
-    --future-veil: rgba(11, 13, 16, 0.5);
-    color-scheme: dark;
-  }
-}
-
-:root[data-theme="dark"] {
-  --bg: #0b0d10;
-  --card: #15181d;
-  --fill: #262b33;
-  --line: #3a414b;
-  --line-soft: #22272e;
-  --line-strong: #4f5864;
-  --text: #f2f4f7;
-  --text-2: #c9cfd6;
-  --muted: #9aa3ae;
-  --primary: #f2f4f7;
-  --on-primary: #0b0d10;
-  --recovery: #52b788;
-  --recovery-bg: #173326;
-  --recovery-fg: #8fd5b0;
-  --cycle: #e8845a;
-  --cycle-bg: #3a2318;
-  --cycle-fg: #f2b193;
-  --phase-follikel: #1d232b;
-  --phase-luteal: #3a2318;
-  --menses-bg: #3b1e22;
-  --menses-fg: #f28b8b;
-  --training: #7c9ae0;
-  --training-bg: #1b2438;
-  --training-fg: #afc2ee;
-  --training-zone: #3b5998;
-  --warn: #f0a24a;
-  --warn-bg: #3a2a12;
-  --warn-mid: #6a4412;
-  --warn-fg: #f6c98e;
-  --mobility: #a98be0;
-  --sleep: #e5e7eb;
-  --sport-karate: #a9bdf0;
-  --sport-kettlebell: #7c9ae0;
-  --sport-klettern: #5b78c4;
-  --sport-ausdauer: #d3ddf7;
-  --stress: #45c4c0;
-  --stress-bg: #12302f;
-  --stress-fg: #9fe3e0;
-  --stress-1: #2f6e6c;
-  --stress-2: #3c9e9a;
-  --stress-3: #6fd8d4;
-  --glow-heute: #173326;
-  --glow-zyklus: #3a2318;
-  --glow-training: #1b2438;
-  --glow-gesundheit: #262b33;
-  --hatch: #2a3038;
-  --ink-karate: #0b0d10;
-  --ink-kettlebell: #0b0d10;
-  --ink-klettern: #0b0d10;
-  --ink-ausdauer: #0b0d10;
-  --ink-sonstiges: #0b0d10;
-  --sport-sonstiges: #9aa3ae;
   --spot-bg: rgba(21, 24, 29, 0.9);
   --future-veil: rgba(11, 13, 16, 0.5);
+
+  /* Farbsystem „Nacht“ (docs/farb-und-designkonzept.md): Ergänzungen */
+  --card-2: #1c2026; /* Kachel in einer Karte */
+  --axis: #7a838f; /* Achsenstriche und Hilfslinien-Beschriftung */
+  --ring-track: #20252c; /* Spur der Ringe, dezenter als --fill */
+  --energy: #8fd5b0; /* Energie (Body Battery): Sage hell, Familie Erholung */
+  --recovery-1: #34775a; /* Readiness-Stufen, mehr ist heller */
+  --recovery-2: #3f9068;
+  --recovery-3: #52b788;
+  --recovery-4: #8fd5b0;
+  --sleep-rem: #aeb6c2; /* Schlafphasen: tief hell, wach dunkel */
+  --sleep-leicht: #7d8794;
+  --sleep-wach: #626b78;
+  --stress-ruhe: #5c6571;
+  --zone-1: #5a73a8; /* Pulszonen, mehr ist heller */
+  --zone-2: #6b86c4;
+  --zone-3: #7c9ae0;
+  --zone-4: #a9bdf0;
+  --zone-5: #d3ddf7;
+  --mobility-bg: #2a2140;
+  --mobility-fg: #cdb9f0;
+  --brand-light: #e0527f; /* Beere hell: Rand der Erklärkarte (Coach) */
+
   color-scheme: dark;
 }
 
@@ -1565,8 +1464,14 @@ button {
 .stage span {
   height: 6px;
   border-radius: 99px;
-  background: var(--recovery-bg);
+  background: var(--stage-c, var(--recovery));
+  opacity: 0.35;
 }
+/* Readiness-Stufen: vier Sage-Töne, mehr ist heller */
+.stage:nth-child(1) { --stage-c: var(--recovery-1); }
+.stage:nth-child(2) { --stage-c: var(--recovery-2); }
+.stage:nth-child(3) { --stage-c: var(--recovery-3); }
+.stage:nth-child(4) { --stage-c: var(--recovery-4); }
 
 .stage small {
   font-size: 11px;
@@ -1575,7 +1480,7 @@ button {
 }
 
 .stage[data-on="true"] span {
-  background: var(--recovery);
+  opacity: 1;
 }
 
 .stage[data-on="true"] small {
@@ -1853,6 +1758,7 @@ button.settings-row {
 }
 
 .cb-recovery { --c: var(--recovery); }
+.cb-energy { --c: var(--energy); }
 .cb-cycle { --c: var(--cycle); }
 .cb-menses { --c: var(--menses-fg); }
 .cb-training { --c: var(--training); }
@@ -1898,9 +1804,9 @@ button.settings-row {
 
 .cb-sleepbar { border-radius: 10px; overflow: hidden; }
 .cb-sleep-tief { fill: var(--sleep); }
-.cb-sleep-rem { fill: var(--sleep); opacity: 0.7; }
-.cb-sleep-leicht { fill: var(--sleep); opacity: 0.42; }
-.cb-sleep-wach { fill: var(--line-strong); }
+.cb-sleep-rem { fill: var(--sleep-rem); }
+.cb-sleep-leicht { fill: var(--sleep-leicht); }
+.cb-sleep-wach { fill: var(--sleep-wach); }
 
 .cb-heat--1 { fill: none; stroke: var(--line); stroke-width: 1; }
 .cb-heat-0 { fill: var(--fill); }
@@ -1910,7 +1816,7 @@ button.settings-row {
 .cb-heat-4 { fill: var(--c, var(--text-2)); }
 
 .cb-ring { overflow: visible; }
-.cb-ring-track { stroke: var(--fill); }
+.cb-ring-track { stroke: var(--ring-track); }
 .cb-ring-value { stroke: var(--c, var(--text-2)); }
 .cb-ring-target { stroke: var(--text-2); }
 .cb-ring-center { fill: var(--text); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
@@ -2256,7 +2162,7 @@ body { overflow-x: clip; }
 /* Erklärkarte mit feinem Verlaufsrand (Muster 3) */
 .explain {
   --a: var(--recovery);
-  --b: var(--training);
+  --b: var(--brand-light); /* Beere am Ende: der Satz kommt vom Coach */
   border: 1px solid transparent;
   border-radius: var(--radius-tile);
   padding: 14px 16px;
@@ -2265,10 +2171,10 @@ body { overflow-x: clip; }
   flex-direction: column;
   gap: 6px;
 }
-.explain[data-tone="training"] { --a: var(--training); --b: var(--mobility); }
-.explain[data-tone="cycle"] { --a: var(--cycle); --b: var(--menses-fg); }
-.explain[data-tone="stress"] { --a: var(--stress); --b: var(--training); }
-.explain[data-tone="sleep"] { --a: var(--sleep); --b: var(--training); }
+.explain[data-tone="training"] { --a: var(--training); }
+.explain[data-tone="cycle"] { --a: var(--cycle); }
+.explain[data-tone="stress"] { --a: var(--stress); }
+.explain[data-tone="sleep"] { --a: var(--sleep); }
 .card .explain-text { font-size: 15px; line-height: 1.5; color: var(--text); }
 .explain-text strong { font-weight: 700; }
 .card .explain-tip { font-size: 13px; color: var(--muted); }

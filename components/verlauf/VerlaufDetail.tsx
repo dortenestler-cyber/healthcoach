@@ -13,7 +13,9 @@ import { axisLabels, buildPoints, spanDays, spanOf, summarize, type Span } from 
 export const HISTORY = 180; // Phasenvergleich: immer die letzten 6 Monate
 const SLEEP: MetricKey[] = ["schlaf", "tiefschlaf", "rem", "einschlafen"];
 const TRAINING: MetricKey[] = ["schritte", "bb", "bb_aufgeladen", "belastung", "alltagsschritte"];
-const tone = (k: MetricKey) => (SLEEP.includes(k) ? "sleep" : k === "temperatur" ? "cycle" : k === "stress" || k === "stress_hoch" ? "stress" : TRAINING.includes(k) ? "training" : "recovery");
+// Farbfamilien nach docs/farb-und-designkonzept.md: Energie und Ruhepuls Sage hell, Atemfrequenz neutral
+const tone = (k: MetricKey) =>
+  SLEEP.includes(k) ? "sleep" : k === "temperatur" ? "cycle" : k === "stress" || k === "stress_hoch" ? "stress" : TRAINING.includes(k) ? "training" : k === "bb" || k === "bb_aufgeladen" || k === "ruhepuls" ? "energy" : k === "atem" ? "neutral" : "recovery";
 
 const KORRIDOR_DAYS = 181; // Abschnitt „Dein Bereich“: letztes Halbjahr
 const NIGHT: MetricKey[] = ["schlaf", "hrv", "ruhepuls", "atem", "temperatur", "bb", "tiefschlaf", "rem", "einschlafen", "bb_aufgeladen"]; // Werte der Nacht, dem Aufwachtag zugeordnet

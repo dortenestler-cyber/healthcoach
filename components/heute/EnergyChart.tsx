@@ -19,7 +19,7 @@ export default function EnergyChart({ e, label }: { e: EnergyDay; label: string 
   const projEnd = [...e.projection.keys()].reverse().find((i) => e.projection[i] !== null);
 
   return (
-    <figure className="cb-figure cb-recovery">
+    <figure className="cb-figure cb-energy">
       <svg className="cb" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
         {e.sleep && (
           <g>

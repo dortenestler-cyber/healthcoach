@@ -1,6 +1,6 @@
 # Farb- und Designkonzept „Nacht“
 
-Stand 23.11.2026 · Entwurf zur Sichtung, noch nicht umgesetzt. Ansicht mit allen Farben und Bausteinen: `docs/entwurf-farbkonzept.html`.
+Stand 23.11.2026 · freigegeben. Ansicht mit allen Farben und Bausteinen: `docs/entwurf-farbkonzept.html`.
 Baut auf `docs/design-konzept-dunkel.md` (Konzept dunkel 2) auf und ersetzt dessen Farbteil. Alle Werte in den Beispielen sind Beispieldaten.
 
 ## 1. Immer dunkel
@@ -152,8 +152,8 @@ Inter, Ziffern in gleicher Breite (`tabular-nums`). Eine feste Skala, nichts daz
 
 | Baustein | Maße | Regeln |
 | --- | --- | --- |
-| Ring klein / mittel / groß | 84 / 112 / 210 px, Strich 8,5 % (groß 16 px) | Spur `--fill`, runde Enden, Start oben, Innenfläche Karte. Zahl im Ring, Wort darüber oder darunter. Ziel als dünner Bogen außen (3 px, Ziel-Farbe). |
-| Halbbogen | 300 px, 234°, Strich 14 | Punkt in Text-Farbe am Wert, 0 und Maximum beschriftet, Ziel außen 4 px |
+| Ring klein / mittel / groß | 84 / 112 / 210 px, Strich 5 % (groß 9 px) | dezent: schmaler Strich, Spur `--ring-track` `#20252C` (dunkler als Fläche), runde Enden, Start oben. Zahl im Ring, Wort darüber oder darunter. Ziel als dünner Bogen außen (2 px). |
+| Halbbogen | 300 px, 234°, Strich 8 | Punkt in Text-Farbe am Wert, 0 und Maximum beschriftet, Ziel außen 3 px |
 | Erklärkarte | Radius 18, Rand 1,5 px | Rand-Verlauf von Familienfarbe zu Beere hell, Satz mit fetten Zahlen, „Mehr dazu im Coach →“ |
 | Kachel | 2 Spalten, min. 72 hoch | Symbolfeld 40 px links, Name, Wert, Wort |
 | Liste | Zeile min. 64 hoch | Symbolfeld, zwei Zeilen Text, Pfeil oder Pille rechts |
@@ -180,12 +180,13 @@ Inter, Ziffern in gleicher Breite (`tabular-nums`). Eine feste Skala, nichts daz
 | Erklärkarte Rand in Bereichsfarbe | Verlauf zur Beere als Zeichen für den Coach |
 | Karte ohne Ebene darin | neue Ebene „Karte hoch“ `#1C2026` |
 | Achsen gedämpft | eigene Achsenfarbe `#7A838F` |
+| Ringe mit breitem Strich (9 von 104) | schmal (5 von 104), Halbbogen 8 statt 14, Spur dunkler (Wunsch 23.11.) |
 
-## Offene Fragen
+## Entschieden (23.11.2026)
 
-1. Immer dunkel auch im Browser auf dem Mac, oder nur auf dem iPhone? (Vorschlag: überall.)
-2. Energie in Sage hell (Familie Erholung) oder eine eigene Farbe?
-3. Beere im Rand der Erklärkarte als Zeichen für den Coach: ja oder nein?
+1. Immer dunkel auch im Browser, nicht nur auf dem iPhone.
+2. Energie in Sage hell (Familie Erholung).
+3. Rand der Erklärkarte läuft zur Beere aus.
 
 ## Umsetzung nach Freigabe
 

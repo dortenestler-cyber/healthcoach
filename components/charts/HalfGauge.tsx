@@ -26,11 +26,11 @@ export default function HalfGauge({ value, split, target, center, caption, label
   return (
     <svg className={`cb cb-gauge cb-${tone}`} viewBox="0 0 260 150" role="img" aria-label={label}>
       {target && (
-        <path d={arc(RT)} fill="none" strokeWidth={4} strokeLinecap="round" className="cb-gauge-target" style={{ strokeDasharray: `0 ${target.lo * TLEN} ${Math.max(0.01, target.hi - target.lo) * TLEN} ${TLEN * 2}` }} />
+        <path d={arc(RT)} fill="none" strokeWidth={3} strokeLinecap="round" className="cb-gauge-target" style={{ strokeDasharray: `0 ${target.lo * TLEN} ${Math.max(0.01, target.hi - target.lo) * TLEN} ${TLEN * 2}` }} />
       )}
-      <path d={arc(R)} fill="none" strokeWidth={14} strokeLinecap="round" className="cb-ring-track" />
-      {v > 0 && split != null && split < v && <path d={arc(R)} fill="none" strokeWidth={14} strokeLinecap="round" className="cb-ring-value-alltag" style={{ strokeDasharray: `${Math.max(0.01, v) * LEN} ${LEN * 2}` }} />}
-      {v > 0 && (split == null || split > 0) && <path d={arc(R)} fill="none" strokeWidth={14} strokeLinecap="round" className="cb-ring-value" style={{ strokeDasharray: `${Math.max(0.01, split == null ? v : Math.min(split, v)) * LEN} ${LEN * 2}` }} />}
+      <path d={arc(R)} fill="none" strokeWidth={8} strokeLinecap="round" className="cb-ring-track" />
+      {v > 0 && split != null && split < v && <path d={arc(R)} fill="none" strokeWidth={8} strokeLinecap="round" className="cb-ring-value-alltag" style={{ strokeDasharray: `${Math.max(0.01, v) * LEN} ${LEN * 2}` }} />}
+      {v > 0 && (split == null || split > 0) && <path d={arc(R)} fill="none" strokeWidth={8} strokeLinecap="round" className="cb-ring-value" style={{ strokeDasharray: `${Math.max(0.01, split == null ? v : Math.min(split, v)) * LEN} ${LEN * 2}` }} />}
       <text x={CX} y={104} textAnchor="middle" className="cb-gauge-center">{center}</text>
       <text x={CX} y={128} textAnchor="middle" className="cb-gauge-caption">{caption}</text>
     </svg>

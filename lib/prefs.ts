@@ -43,40 +43,7 @@ function usePref<T>(get: () => T, initial: T): T {
   return value;
 }
 
-/* ---------- Darstellung ---------- */
-
-export type Theme = "auto" | "light" | "dark";
-export { THEME_KEY } from "@/lib/themeBoot";
-import { THEME_KEY } from "@/lib/themeBoot";
-export const THEME_LABEL: Record<Theme, string> = { auto: "Automatisch", light: "Hell", dark: "Dunkel" };
-
-export function getTheme(): Theme {
-  try {
-    const t = localStorage.getItem(THEME_KEY);
-    return t === "light" || t === "dark" ? t : "auto";
-  } catch {
-    return "auto";
-  }
-}
-
-export function applyTheme(t: Theme): void {
-  const root = document.documentElement;
-  if (t === "auto") root.removeAttribute("data-theme");
-  else root.setAttribute("data-theme", t);
-}
-
-export function setTheme(t: Theme): void {
-  try {
-    if (t === "auto") localStorage.removeItem(THEME_KEY);
-    else localStorage.setItem(THEME_KEY, t);
-  } catch {
-    // nichts zu tun
-  }
-  applyTheme(t);
-  window.dispatchEvent(new Event(EVENT));
-}
-
-export const useTheme = () => usePref<Theme>(getTheme, "auto");
+/* Darstellung: immer dunkel (docs/farb-und-designkonzept.md), keine Wahl mehr. */
 
 /* ---------- Funktionen ein- und ausblenden ---------- */
 

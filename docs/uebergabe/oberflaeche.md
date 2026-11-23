@@ -4,17 +4,17 @@ Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014p
 Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/design-*`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
 ## Stand in einem Satz
-Konzept „Heute als Einstiegsseite“ liegt zur Sichtung vor (nur Doku und Entwurf, kein Code).
+Farbsystem „Nacht“ umgesetzt (immer dunkel, schmale Ringe). Konzept „Heute als Einstiegsseite“ wartet auf Antworten.
 
 ## In Arbeit
 - Konzept Heute als Einstiegsseite, Zweig `claude/determined-davinci-s4e3l7`: `docs/konzept-heute-einstieg.md`, Entwurf `docs/entwurf-heute-einstieg.html` (veröffentlicht: https://claude.ai/artifact/HtFtkHrKKDQJaBQmiuLHEQ), Prompt `docs/prompt-heute-einstieg.md`. Fünf Ringe (Energie, Schlaf, Readiness, Belastung, Stress), eine Erklärkarte, Kacheln „Auf einen Blick“, Heute steht an, Letzte Aktivitäten; Detailseiten je Ring.
   Nächster Schritt: Antworten auf die fünf offenen Fragen, nach Freigabe ein PR für Heute, dann Detailseiten.
 - Farb- und Designkonzept „Nacht“, gleicher Zweig: `docs/farb-und-designkonzept.md`, Ansicht `docs/entwurf-farbkonzept.html` (https://claude.ai/artifact/JAF54suDGLf1afKAyjjNQN). Immer dunkel, sechs Farbfamilien, „mehr ist heller“, Energie in Sage hell, neue Variablen `--card-2`, `--axis`, Stufen für Readiness, Pulszonen, Schlafphasen. Heute-Entwurf nutzt die Farben schon.
-  Nächster Schritt nach Freigabe: PR „Immer dunkel“ (helles Thema, `lib/themeBoot.ts`, Einstellung Darstellung entfernen, `CLAUDE.md` anpassen), dann PR „Farben Nacht“, dann Heute.
+  Umgesetzt in PR #72: helles Thema, `lib/themeBoot.ts` und Einstellung Darstellung entfernt, `CLAUDE.md` angepasst, neue Variablen in `app/globals.css` (`--card-2`, `--axis`, `--ring-track`, `--energy`, `--recovery-1..4`, `--sleep-rem/-leicht/-wach`, `--stress-ruhe`, `--zone-1..5`, `--brand-light`), Ringe schmal (`ValueRing` Strich 5, `HalfGauge` 8), Ton `energy` für Body Battery und Ruhepuls im Verlauf, Erklärkarte mit Beere am Rand-Ende.
+  Nächster Schritt: Heute nach `docs/konzept-heute-einstieg.md`, sobald die fünf Fragen dort beantwortet sind. Pulszonen-Farben `--zone-*` sind vorbereitet, aber noch nirgends benutzt.
 - Korridore Schritt 4 (Zweig `claude/confident-fermat-wy3iur`): nichts aus dem Konzept offen, Rückmeldung abwarten.
 
 ## Wartet auf
-- Nutzerin: Sichtung und Antworten zum Farbkonzept „Nacht“
 - Nutzerin: Sichtung und Antworten zum Konzept Heute (`AUFGABEN.md` Abschnitt „Heute als Einstiegsseite“)
 - Nutzerin: Rückmeldung zu Heute, Zyklus und Training im Design „dunkel 2“ (`AUFGABEN.md` Abschnitt 10)
 - Nutzerin: Rückmeldung zur Seite Zyklus (`AUFGABEN.md` Abschnitt 6)
