@@ -7,6 +7,11 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Coach mit Verlauf vergangener Chats (PR #86)
+- [x] PR #86 gemergt (23. Nov.), Migration und Upload der Funktion grün (geprüft von Claude). Er enthält die Migration `supabase/migrations/20261126090000_coach_chats.sql` (neue Tabelle `coach_chats`). Deine bisherigen Coach-Nachrichten landen dabei im Chat „Frühere Fragen“
+- [ ] Im Coach auf **Verlauf** tippen: Die Liste zeigt deine Chats nach Tagen. Mit **Neuer Chat** beginnt ein leerer Chat, nach 6 Stunden ohne Nachricht passiert das von selbst
+- [x] Claude Bescheid gegeben, Läufe grün
+
 ### Wadenzucken und Wadenkrämpfe erfassen (PR #49)
 - [x] PR #49 gemergt (22. Nov.), Migration grün (geprüft von Claude). Er enthält die Migration `supabase/migrations/20261123110000_muskeln.sql` (neue Tabelle `muscle_events`). Dein Merge ist die Freigabe, danach legt GitHub die Tabelle automatisch an (das Secret `SUPABASE_DB_URL` ist eingerichtet)
 - [ ] Magnesium unter **Gesundheit › Medikamente** als Supplement eintragen (falls noch nicht geschehen) und täglich abhaken, damit die spätere Auswertung Tage mit und ohne Einnahme vergleichen kann
@@ -133,6 +138,11 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 - [x] Readiness auf der Uhr passt zur App (23. Nov., von dir bestätigt)
 - [x] PR #73 gemergt (23. Nov.), Upload grün
 - [ ] Nichts weiter tun: Jeder Abruf füllt bis zu 21 ältere Tage nach, nach etwa einer Woche Morgen-Abrufen sind die letzten 90 Tage berechnet
+
+### 15. Schlafphasen mit Uhrzeit und Hauttemperatur, Daten (PR #84, DA)
+Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst du ihn selbst. In der App ist noch nichts Neues zu sehen, die Zeitachse baut danach die Rolle Oberfläche.
+- [x] PR #84 gemergt und synchronisiert (23. Nov.), Migration und Upload grün. Ergebnis: Garmin gibt einzelne Nächte unter den bekannten Adressen nicht heraus (404)
+- [x] PR #87 gemergt und synchronisiert (23. Nov.). Ergebnis: Garmin liefert über diese Schnittstelle weder Hauttemperatur noch Schlafphasen mit Uhrzeit, nur Summen und die Anzahl der Wachphasen
 
 ## Erledigt
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)

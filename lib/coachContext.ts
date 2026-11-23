@@ -22,6 +22,16 @@ export async function buildCoachContext(): Promise<string> {
   lines.push(`Tagesziel: ${t.pause ? "Pause" : `${t.label} ${t.lo}–${t.hi} %`}, Belastung bisher ${(() => { const dl = dayLoad(day, data.daily, data.acts); return `${dl.pct} % (Training ${dl.pctTraining} %, Alltag ${dl.pctAlltag} %)`; })()}.`);
   for (const f of t.factors) lines.push(`- ${f.name}${f.value ? " " + f.value : ""}: ${f.note} (${f.effect >= 0 ? "+" : ""}${f.effect})`);
 
+  // Garmin: Werte von heute (letzte Nacht), damit der Coach keine Zahlen raten muss
+  const todayRow = data.daily.find((d) => d.day === day);
+  if (todayRow) {
+    const vals = (["schlaf", "hrv", "ruhepuls", "bb", "stress", "temperatur"] as const)
+      .map((k) => { const v = METRICS[k].value(todayRow); return v === null ? null : `${METRICS[k].label} ${METRICS[k].fmt(v)}`; })
+      .filter(Boolean);
+    if (todayRow.sleep_score !== null) vals.unshift(`Schlafwert ${todayRow.sleep_score} von 100`);
+    lines.push(vals.length ? `Heute (Garmin): ${vals.join(", ")}.` : "Heute: noch keine Garmin-Werte.");
+  } else lines.push("Heute: noch keine Garmin-Werte synchronisiert.");
+
   // Garmin: letzte 7 Tage gegen 30 Tage
   const last7 = data.daily.filter((d) => d.day >= isoDay(daysAgo(6)));
   const last30 = data.daily.filter((d) => d.day >= isoDay(daysAgo(29)));

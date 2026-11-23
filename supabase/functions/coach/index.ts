@@ -47,7 +47,17 @@ So antwortest du:
 - Muster benennst du vorsichtig als Zusammenhang, nie als Beweis. Wenn Daten fehlen, sagst du das.
 - Du stellst keine Diagnosen und nennst keine Medikamentendosierungen. Bei Fragen zu Dosierung oder Wechselwirkungen verweist du an Apotheke oder Arztpraxis.
 - Bei Warnzeichen empfiehlst du ärztliche Abklärung: sehr starke oder anhaltende Blutungen, Blutungen nach dem Sex, Brustschmerz, starkes Herzrasen mit Schwindel, anhaltende Niedergeschlagenheit, Atemnot trotz Inhalator (dann Notruf 112), Fieber über mehrere Tage.
-- Du erfindest keine Werte. Was nicht in der Zusammenfassung steht, weißt du nicht.`;
+- Du erfindest keine Werte. Was nicht in der Zusammenfassung steht, weißt du nicht.
+- Für heutige Zahlen gilt nur die Zusammenfassung unten, sie ist immer aktuell. Zahlen aus früheren Antworten im Verlauf können veraltet sein. Du korrigierst frühere Antworten nicht, entschuldigst dich nicht dafür und beginnst ohne Vorrede direkt mit der Antwort.
+- Formatierung sparsam: höchstens **fett** für ein Stichwort und Listen mit „- “. Keine Überschriften, keine Tabellen.`;
+
+// Titel eines neuen Chats: die erste Frage, gekürzt auf etwa 60 Zeichen an einer Wortgrenze
+function chatTitle(q: string): string {
+  const t = q.replace(/\s+/g, " ").trim();
+  if (t.length <= 60) return t;
+  const cut = t.slice(0, 60);
+  return (cut.lastIndexOf(" ") > 30 ? cut.slice(0, cut.lastIndexOf(" ")) : cut) + " …";
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -78,9 +88,27 @@ Deno.serve(async (req) => {
     const limit = Number.isFinite(wanted) && wanted > 0 ? Math.min(Math.round(wanted), DAILY_LIMIT) : DAILY_LIMIT;
     if ((count ?? 0) >= limit) return json(429, { error: `Für heute sind ${limit} Fragen erreicht. Morgen geht es weiter. Das Limit stellst du in den Einstellungen ein.` });
 
-    // Bisheriger Verlauf
-    const { data: hist } = await sb.from("coach_messages").select("role, content").order("created_at", { ascending: false }).limit(HISTORY);
-    const messages = ((hist ?? []) as { role: "user" | "assistant"; content: string }[]).reverse();
+    // Chat: bestehenden fortsetzen oder (erst nach der Antwort) neuen anlegen, Titel aus der ersten Frage.
+    // Fehlt die Tabelle coach_chats noch (Migration nicht gelaufen), gilt der alte Verlauf über alle Nachrichten.
+    let chatId: string | null = typeof body?.chat_id === "string" ? body.chat_id : null;
+    let chats = true;
+    if (chatId) {
+      const { data: c, error: cErr } = await sb.from("coach_chats").select("id").eq("id", chatId).maybeSingle();
+      if (cErr) chats = false;
+      else if (!c) chatId = null;
+    } else {
+      const { error: cErr } = await sb.from("coach_chats").select("id", { count: "exact", head: true });
+      if (cErr) chats = false;
+    }
+
+    // Bisheriger Verlauf: nur der aktuelle Chat, ein neuer Chat beginnt leer
+    let hist: { role: "user" | "assistant"; content: string }[] = [];
+    if (!chats || chatId) {
+      let hq = sb.from("coach_messages").select("role, content").order("created_at", { ascending: false }).limit(HISTORY);
+      if (chats && chatId) hq = hq.eq("chat_id", chatId);
+      hist = ((await hq).data ?? []) as typeof hist;
+    }
+    const messages = [...hist].reverse();
     // Die API verlangt, dass das Gespräch mit der Nutzerin beginnt und sich die Rollen abwechseln
     while (messages.length && messages[0].role !== "user") messages.shift();
     const merged: { role: "user" | "assistant"; content: string }[] = [];
@@ -95,7 +123,9 @@ Deno.serve(async (req) => {
       headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
       body: JSON.stringify({
         model,
-        max_tokens: 900,
+        // Das Modell denkt vor der Antwort nach; das zählt zu max_tokens. Mit 900 brachen Antworten mitten im Satz ab.
+        max_tokens: 6000,
+        output_config: { effort: "low" },
         system: `${SYSTEM}\n\nZusammenfassung von heute (aus der App):\n${context || "Keine Daten mitgeschickt."}`,
         messages: merged,
       }),
@@ -105,12 +135,15 @@ Deno.serve(async (req) => {
       return json(502, { error: `Claude antwortet mit ${res.status}. ${res.status === 401 ? "Ist der ANTHROPIC_API_KEY richtig?" : res.status === 400 && t.includes("credit") ? "Ist noch Guthaben vorhanden?" : ""}`.trim() });
     }
     const out = await res.json();
+    if (out?.stop_reason === "refusal") return json(502, { error: "Claude hat diese Frage nicht beantwortet. Bitte anders formulieren." });
     const answer = ((out?.content ?? []) as { type: string; text?: string }[])
       .filter((c) => c.type === "text")
       .map((c) => c.text)
       .join("\n")
       .trim();
     if (!answer) return json(502, { error: "Claude hat keine Antwort geliefert." });
+    // Abgeschnittene Antworten nicht speichern, sonst landen sie im Verlauf und verwirren die nächsten Antworten
+    if (out?.stop_reason === "max_tokens") return json(502, { error: "Die Antwort wurde zu lang und abgeschnitten. Bitte noch einmal fragen." });
 
     const inTok = Number(out?.usage?.input_tokens ?? 0);
     const outTok = Number(out?.usage?.output_tokens ?? 0);
@@ -118,18 +151,25 @@ Deno.serve(async (req) => {
     const cost = (inTok * pIn + outTok * pOut) / 1_000_000;
 
     const now = Date.now();
+    if (chats && !chatId) {
+      const { data: c, error: cErr } = await sb.from("coach_chats").insert({ title: chatTitle(question), created_at: new Date(now).toISOString() }).select("id").single();
+      if (cErr) return json(500, { error: "Chat konnte nicht angelegt werden: " + cErr.message, answer });
+      chatId = c.id as string;
+    }
+    const chatCol = chats && chatId ? { chat_id: chatId } : {};
     const rows = [
-      { role: "user", content: question, created_at: new Date(now).toISOString() },
-      { role: "assistant", content: answer, created_at: new Date(now + 1).toISOString(), input_tokens: inTok, output_tokens: outTok, cost_usd: cost },
+      { role: "user", content: question, created_at: new Date(now).toISOString(), ...chatCol },
+      { role: "assistant", content: answer, created_at: new Date(now + 1).toISOString(), input_tokens: inTok, output_tokens: outTok, cost_usd: cost, ...chatCol },
     ];
     let { error: insErr } = await sb.from("coach_messages").insert(rows);
     // Migration „coach_kosten“ noch nicht ausgeführt: ohne Kostenspalten speichern
     if (insErr && /input_tokens|output_tokens|cost_usd/.test(insErr.message)) {
-      ({ error: insErr } = await sb.from("coach_messages").insert(rows.map(({ role, content, created_at }) => ({ role, content, created_at }))));
+      ({ error: insErr } = await sb.from("coach_messages").insert(rows.map(({ role, content, created_at }) => ({ role, content, created_at, ...chatCol }))));
     }
     if (insErr) return json(500, { error: "Verlauf konnte nicht gespeichert werden: " + insErr.message, answer });
+    if (chats && chatId) await sb.from("coach_chats").update({ updated_at: new Date(now + 1).toISOString() }).eq("id", chatId);
 
-    return json(200, { answer, used_today: (count ?? 0) + 1, limit, cost_usd: cost });
+    return json(200, { answer, chat_id: chats ? chatId : null, used_today: (count ?? 0) + 1, limit, cost_usd: cost });
   } catch (e) {
     return json(500, { error: e instanceof Error ? e.message : String(e) });
   }
