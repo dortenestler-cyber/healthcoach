@@ -8,7 +8,7 @@ import type { Activity } from "@/lib/garmin";
 import { METRICS } from "@/lib/garmin";
 import { readLoadDay, LOAD_ZONES } from "@/lib/alltagslast";
 import { metricBaseline, positionIn, type Position } from "@/lib/baseline";
-import { computeTarget, type Data, type Pattern } from "@/lib/insights";
+import { computeTarget, FULL_DAY_LOAD, type Data, type Pattern } from "@/lib/insights";
 import { cycleToday, groupOf, PHASES, PHASE_GROUP_LABEL, readinessFrom, type PhaseGroup } from "@/lib/cycle";
 import { shiftDay } from "@/lib/dates";
 import { SPORTS, sportOf, type Sport } from "@/lib/training";
@@ -372,8 +372,68 @@ function eveningSleepPattern(data: Data): Pattern {
   };
 }
 
+// Ruhetage zwischen harten Tagen und die Readiness am Morgen des nächsten harten Tages.
+// Harter Tag: Garmin-Belastung der Trainings ab 70 % eines vollen Tages (wie „Harter Trainingstag“, hier nur Training).
+// Ruhetag: kein Sport, gleiche Regel wie im Tagebuch (keine Garmin-Aktivität ab 20 Minuten).
+export const HARD_DAY_LOAD = FULL_DAY_LOAD * 0.7;
+const SPORT_MIN_S = 20 * 60;
+const daysBetween = (a: string, b: string) => Math.round((Date.parse(b + "T12:00:00Z") - Date.parse(a + "T12:00:00Z")) / 864e5);
+
+export function restDaysPattern(data: Data): Pattern {
+  const load = new Map<string, number>();
+  const sport = new Set<string>();
+  for (const a of data.acts) {
+    if (sportOf(a) === "sonstiges" && a.sport_override === "ignorieren") continue;
+    const d = unitDay(a);
+    if (!d) continue;
+    load.set(d, (load.get(d) ?? 0) + (a.training_load ?? 0));
+    if ((a.duration_s ?? 0) >= SPORT_MIN_S) sport.add(d);
+  }
+  const hard = [...load].filter(([, v]) => v >= HARD_DAY_LOAD).map(([d]) => d).sort();
+  const groups: Record<"0" | "1" | "2", number[]> = { "0": [], "1": [], "2": [] };
+  const gaps: number[] = [];
+  for (let i = 1; i < hard.length; i++) {
+    const prev = hard[i - 1];
+    const day = hard[i];
+    const span = daysBetween(prev, day);
+    if (span > 10) continue; // lange Pause (Urlaub, krank): kein Abstand zwischen zwei Einheiten
+    let rest = 0;
+    for (let k = 1; k < span; k++) if (!sport.has(shiftDay(prev, k))) rest++;
+    gaps.push(rest);
+    const t = computeTarget(day, data);
+    if (!t.enoughData || data.sick?.has(day)) continue;
+    groups[rest >= 2 ? "2" : rest === 1 ? "1" : "0"].push(readinessFrom(t).value);
+  }
+  const LABEL = { "0": "ohne Ruhetag", "1": "nach 1 Ruhetag", "2": "nach 2 und mehr Ruhetagen" } as const;
+  const SHORT = { "0": "kein Ruhetag", "1": "1 Ruhetag", "2": "2 und mehr" } as const;
+  const rows = (Object.keys(groups) as ("0" | "1" | "2")[]).filter((g) => groups[g].length >= MIN_UNITS).map((g) => ({ g, m: mean(groups[g]) as number, n: groups[g].length }));
+  const base = {
+    key: "training-ruhetage",
+    title: "Ruhetage zwischen harten Tagen",
+    need: `Erscheint, sobald es in zwei Gruppen (ohne Ruhetag, 1 Ruhetag, 2 und mehr) je ${MIN_UNITS} harte Tage gibt. Harte Tage bisher: ${hard.length}.`,
+  };
+  if (rows.length < 2) return { ...base, ready: false, text: "", bars: [], basis: "" };
+  const best = rows.reduce((a, b) => (b.m > a.m ? b : a));
+  const worst = rows.reduce((a, b) => (b.m < a.m ? b : a));
+  const d = best.m - worst.m;
+  const fmt = (v: number) => v.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const counts = [0, 1, 2].map((k) => gaps.filter((g) => (k === 2 ? g >= 2 : g === k)).length);
+  const usual = counts.indexOf(Math.max(...counts));
+  const usualText = usual === 0 ? "Meist folgt ein harter Tag ohne Ruhetag auf den nächsten." : usual === 1 ? "Meist liegt ein Ruhetag dazwischen." : "Meist liegen zwei oder mehr Ruhetage dazwischen.";
+  return {
+    ...base,
+    ready: true,
+    text:
+      d >= 0.5
+        ? `${LABEL[best.g].replace(/^./, (c) => c.toUpperCase())} startest du mit einer Readiness von ${fmt(best.m)} in den harten Tag, ${LABEL[worst.g]} mit ${fmt(worst.m)}. ${usualText}`
+        : `Deine Readiness am Morgen eines harten Tages ist etwa gleich, egal wie viele Ruhetage davor lagen. ${usualText}`,
+    bars: rows.map((r) => ({ label: `${SHORT[r.g]} (${r.n})`, value: r.m, display: fmt(r.m), highlight: d >= 0.5 && r.g === best.g })),
+    basis: `Readiness (0–10) am Morgen von ${rows.reduce((a, r) => a + r.n, 0)} harten Tagen; hart ab Belastung ${Math.round(HARD_DAY_LOAD)} aus Training, Ruhetag ohne Garmin-Aktivität ab 20 Minuten`,
+  };
+}
+
 export function trainingPatterns(data: Data): Pattern[] {
-  return [hrvAfterPattern(data), hrByPhasePattern(data), eveningSleepPattern(data)];
+  return [hrvAfterPattern(data), hrByPhasePattern(data), eveningSleepPattern(data), restDaysPattern(data)];
 }
 
 // ---------- Coach
