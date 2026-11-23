@@ -63,6 +63,10 @@ export function previousSame(u: Unit, all: Unit[], n = COMPARE_UNITS): Unit[] {
 }
 
 export function compareUnit(u: Unit, all: Unit[]): Compare {
+  // „Sonstiges“ ohne eigenen Namen ist ein Sammeltopf (Spazieren, Yoga …): kein Vergleich, erst zuordnen
+  if (sportOf(u) === "sonstiges" && !u.sport_label) {
+    return { n: 0, duration: null, avgHr: null, maxHr: null, load: null, verdict: null, sentence: "Ordne die Sportart oben zu, dann vergleicht die App mit deinen früheren Einheiten." };
+  }
   const prev = previousSame(u, all);
   const label = sportName(sportOf(u));
   const c = {
