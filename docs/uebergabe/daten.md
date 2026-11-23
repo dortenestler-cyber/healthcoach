@@ -15,10 +15,12 @@ Korridore Teil B Daten ist fertig und läuft (PR #63–#73): Alltagslast aus dem
 - Tagespuls: `/wellness-service/wellness/dailyHeartRate?date=` ✓
 - Schrittverlauf (`dailySummaryChart`), Stressverlauf (`dailyStress/{Tag}`, `dailyStress?date=`), Profil (`socialProfile`): alle 404. `garmin-sync` versucht Stress je Lauf noch einmal (zwei Abrufe), falls Garmin ihn freischaltet.
 - Tageszusammenfassung: `calories.burnedActive` ✓, keine aktive Zeit (`active_s`, `highly_active_s` bleiben leer).
+- Hauttemperatur: „Daten prüfen“ 23.11.: 0 von 71 Tagen mit `skin_temp_delta`, noch nie gefunden. Weder die Schlafübersicht (`dailySleepSummariesByDate`) noch der Rückgriff auf einzelne Nächte (`dailySleepData?date=`) liefern ein bekanntes Feld. Die gefundenen Feldnamen mit „temp“ (`sleepTempKeys`) gehen nur an die App und werden nirgends angezeigt oder gespeichert. Vorschlag an die Nutzerin: Feldnamen (ohne Werte) in `garmin_sync_runs` schreiben und `skinTempDataExists` auswerten.
 - Schritte je Aktivität: bisher keine (`garmin_activities.steps` leer), Feldname ungeklärt.
 - Alltagslast Version 2: ohne Bewegungsdaten zählt Zone 1 ab 10 Minuten am Stück, Zone 2 und höher immer (`bewegung: "dauer"`). Ältere Tage (v1) rechnet jeder Abruf nach.
 
 ## Wartet auf
+- Nutzerin: Zeigt Garmin Connect auf dem Handy unter Schlaf eine Hauttemperatur? Und Freigabe für die Fehlersuche in `garmin-sync` (Hauttemperatur, siehe „Was Garmin liefert“)
 
 ## Für die andere Rolle
 - Oberfläche: Dein Wunsch „Readiness der Uhr angleichen“ ist mit PR #70 erledigt (gemergt). Die Stresskurve (`stress_curve`) bleibt leer, Garmin liefert sie nicht: Karte „Stress im Tagesverlauf“ entsprechend erklären. `lib/alltagslast.ts`: `v` kann 1 oder 2 sein, `bewegung` neu „stress“ oder „dauer“ (Zone 1 ab 10 Minuten am Stück).
