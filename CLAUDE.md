@@ -38,7 +38,7 @@ Zwei Claude-Instanzen arbeiten parallel, Regeln in `docs/konzept-zwei-instanzen.
 - Jedes Diagramm bekommt eine Überschrift mit einem Satz, der das Ergebnis nennt.
 - Farben und Abstände kommen aus den Variablen in `app/globals.css`, keine festen Farbwerte in Komponenten.
 - Tap-Ziele mindestens 44 px, Kontrast mindestens AA.
-- Navigation: Heute, Tagebuch, Training, Zyklus, Gesundheit. Der Coach ist ein schwebender Knopf auf jeder Seite.
+- Navigation: Heute, Tagebuch, Training, Zyklus, Gesundheit. Auf dem iPhone Leiste unten und der Coach als schwebender Knopf; am Computer und iPad Seitenleiste links und der Coach als Spalte rechts (`docs/konzept-web-app.md`). PIN nur auf dem iPhone.
 - Heute ist eine ruhige Einstiegsseite (`docs/konzept-heute-einstieg.md`): Gruß und Datum mit ‹ ›, fünf Ringe „Dein Tag“ (Energie, Schlaf, Readiness in der Mitte, Belastung, Stress), ein Satz zum Tag, vier Kacheln „Auf einen Blick“, Heute steht an, Letzte Aktivitäten. Jeder Ring öffnet eine Detailseite (`/heute/…`), dort stehen Kurven und Faktoren, auch „Energie über den Tag“. Aktualisieren durch Ziehen nach unten.
 - Die Seite Zyklus stellt den Zyklus in den Mittelpunkt: Ring mit Phasen, was in der heutigen Phase üblich ist, Werte und Symptome nach Zyklustag, Gewohnheiten je Phase.
 - Gesundheit hat die Reiter Überblick · Medikamente · Krank & verletzt · Körper. Der Überblick zeigt heute auf einen Blick, was dir guttut, Gewohnheiten im Monat und die Muster ohne Zyklusbezug („Weitere Muster“).

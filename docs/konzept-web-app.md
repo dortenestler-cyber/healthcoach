@@ -1,6 +1,6 @@
 # Konzept · Health Coach im Browser am Computer
 
-Stand: 23.11.2026 · Rolle Oberfläche `[OF]` · Fragen beantwortet, wartet auf Freigabe zur Umsetzung
+Stand: 23.11.2026 · Rolle Oberfläche `[OF]` · freigegeben und umgesetzt (PR #77)
 Entwurf mit Beispieldaten: `docs/bilder/entwuerfe/web-heute.png`
 
 ## Ausgangslage
@@ -93,3 +93,12 @@ Schritte 1 und 2 gehen zuerst, danach ist die App am Computer schon gut benutzba
 1. Coach am Computer als feste Spalte rechts, einklappbar.
 2. Vorerfasst bleiben nur die Anmeldedaten.
 3. iPad wie Computer: keine PIN. Querformat (ab 1024 px) mit dem Computer-Aufbau inklusive Coach-Spalte; im Hochformat (768–1023 px) Seitenleiste mit Symbolen und der Coach als Fenster, das von rechts hereinkommt, weil die Breite für drei Spalten nicht reicht.
+
+## Umgesetzt (23.11.) und Abweichungen
+
+- PIN: nur iPhone mit App vom Home-Bildschirm (`pinRequired` in `lib/pin.ts`). Den Schalter „PIN auch im Browser“ gibt es nicht, er war nicht gewünscht.
+- Zwei Spalten (`components/ui/TwoCol.tsx`) ab 1360 px mit Coach-Spalte, ab 1024 px wenn der Coach eingeklappt oder aus ist. Darunter eine Spalte in der Reihenfolge wie auf dem iPhone.
+- Seitenleiste: 768–1199 px nur Symbole, ab 1200 px mit Namen (auch iPad quer, wenn es so breit ist).
+- Zwei Spalten haben: Heute, Readiness-Detail, Tagebuch, Zyklus, Training › Auswertung, Gesundheit › Krank & verletzt und Körper. Eine Spalte bleiben vorerst: Training › Kalender und die Sport-Reiter, Gesundheit › Überblick und Medikamente, die übrigen Detailseiten.
+- Einstellungen: höchstens 640 px breit (`app/einstellungen/layout.tsx`).
+- Heute am Computer: Knopf „Aktualisieren“, ← → wechselt den Tag; das Zahnrad steht in der Seitenleiste, dort auch der Garmin-Punkt.

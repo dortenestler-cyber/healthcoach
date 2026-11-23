@@ -1,23 +1,20 @@
 # Übergabe · Oberfläche (OF)
-Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014pVPWgFCDga2xCp5RSJGTU
+Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014pVPWewGvc4fmfts8C73m8
 
 Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/design-*`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
 ## Stand in einem Satz
-Farbsystem „Nacht“ und Heute als Einstiegsseite umgesetzt.
+Sammelliste (13 Punkte) und Web-App am Computer umgesetzt (PR #77).
 
 ## In Arbeit
-- Sammelliste Anpassungen (Entwurfs-PR #77, Zweig `claude/kind-keller-hmdy0s`): `docs/sammelliste-oberflaeche.md`. Punkt 1 Coach-Eingabe vorbereitet, Punkt 2 Perioden-Vorschau im Zyklus-Kalender gesammelt.
-  Nächster Schritt: weitere Wünsche eintragen, nach Freigabe alles umsetzen und mergen.
-- Heute als Einstiegsseite umgesetzt (PR #76, Zweig `claude/determined-davinci-s4e3l7`): `HeuteView` neu aus `DayHead`, `RingRow`, `DaySentence`, `GlanceTiles`, `TodayAgenda`, `RecentActivities`; Detailseiten `app/heute/[wert]` (`HeuteDetail`, Schlüssel in `lib/heuteDetails.ts`). Synchronisieren in `lib/useGarminSync.ts`, Ziehen in `components/ui/PullToRefresh.tsx`. Entfernt: `ValuesCard`, `TodayRings`.
-  Nächster Schritt: Detailseiten näher an Whoop (Faktorliste mit Pfeilen statt Bereichsbalken, 3-Stufen-Balken beim Schlaf, Stress-Halbbogen). Stift zum Wählen von Ringen und Kacheln steht noch aus.
-- Farb- und Designkonzept „Nacht“, gleicher Zweig: `docs/farb-und-designkonzept.md`, Ansicht `docs/entwurf-farbkonzept.html` (https://claude.ai/artifact/JAF54suDGLf1afKAyjjNQN). Immer dunkel, sechs Farbfamilien, „mehr ist heller“, Energie in Sage hell, neue Variablen `--card-2`, `--axis`, Stufen für Readiness, Pulszonen, Schlafphasen. Heute-Entwurf nutzt die Farben schon.
-  Umgesetzt in PR #72: helles Thema, `lib/themeBoot.ts` und Einstellung Darstellung entfernt, `CLAUDE.md` angepasst, neue Variablen in `app/globals.css` (`--card-2`, `--axis`, `--ring-track`, `--energy`, `--recovery-1..4`, `--sleep-rem/-leicht/-wach`, `--stress-ruhe`, `--zone-1..5`, `--brand-light`), Ringe schmal (`ValueRing` Strich 5, `HalfGauge` 8), Ton `energy` für Body Battery und Ruhepuls im Verlauf, Erklärkarte mit Beere am Rand-Ende.
-  Nächster Schritt: Heute nach `docs/konzept-heute-einstieg.md`, sobald die fünf Fragen dort beantwortet sind. Pulszonen-Farben `--zone-*` sind vorbereitet, aber noch nirgends benutzt.
-- Korridore Schritt 4 (Zweig `claude/confident-fermat-wy3iur`): nichts aus dem Konzept offen, Rückmeldung abwarten.
+- Keine offene Arbeit. PR #77 (Zweig `claude/kind-keller-hmdy0s`): Sammelliste `docs/sammelliste-oberflaeche.md` komplett, Web-App nach `docs/konzept-web-app.md`.
+  Neu: `components/SideNav.tsx`, `components/CoachPanel.tsx`, `components/ui/TwoCol.tsx`, `lib/layout.ts` (Breiten, Coach-Spalte), `components/charts/pick.tsx` (Antippen in Charts), `components/heute/ActivityQuestion.tsx`, `lib/ovulation.ts`. Eisprung ist jetzt eigene `PhaseGroup`. `sportOf(a)` statt `sportOfGarmin(a.type_key)` (eigene Zuordnung zuerst). PIN nur iPhone (`pinRequired`).
+  Nächster Schritt: Rückmeldung der Nutzerin; danach evtl. zwei Spalten für Training › Kalender und Gesundheit › Überblick/Medikamente.
+- Heute-Detailseiten näher an Whoop (Faktorliste mit Pfeilen, 3-Stufen-Balken Schlaf, Stress-Halbbogen) und Stift zum Wählen von Ringen und Kacheln stehen noch aus.
 
 ## Wartet auf
-- Nutzerin: Freigabe der Sammelliste (PR #77)
+- Daten: Spalten `garmin_activities.sport_override/sport_label` und `diary_entries.ovulation_signs` (siehe unten). Bis dahin blendet die Oberfläche beides aus.
+- Nutzerin: Rückmeldung zu PR #77 (`AUFGABEN.md` Abschnitt „Sammelliste Anpassungen“)
 - Nutzerin: Rückmeldung zur neuen Seite Heute (`AUFGABEN.md` Abschnitt „Heute als Einstiegsseite“)
 - Nutzerin: Rückmeldung zu Heute, Zyklus und Training im Design „dunkel 2“ (`AUFGABEN.md` Abschnitt 10)
 - Nutzerin: Rückmeldung zur Seite Zyklus (`AUFGABEN.md` Abschnitt 6)
@@ -32,6 +29,8 @@ Farbsystem „Nacht“ und Heute als Einstiegsseite umgesetzt.
 - Daten: Die Readiness der Uhr (`supabase/functions/watch/target.ts`) nutzt noch nur den Luteal-Bereich. Die App misst jetzt je Zyklusphase, Schlaf zählt auch als zyklusabhängig, und Krankheitstage zählen nicht. Bitte angleichen, damit Uhr und App dasselbe zeigen.
 
 ## Fallstricke
+- Bildschirmfotos mit Beispieldaten am Computer: Bau mit `NEXT_PUBLIC_SUPABASE_URL=https://beispiel.supabase.co`, Sitzung als `sb-beispiel-auth-token` in localStorage, REST-Anfragen abfangen (Filter `eq/gte/lte/not.is.null`). Breiten 390, 1024, 1440 prüfen.
+- Abstände zwischen Abschnitten kommen aus `.app-content > * + *` (früher `.shell > * + *`). Inhalte in `TwoCol` haben eigene Abstände.
 - Bildschirmfotos mit Beispieldaten: Skript-Muster siehe PR #76 (Supabase-Anfragen abfangen, Sitzung und PIN in localStorage/sessionStorage setzen, Filter `eq/gte/lt` nachbauen).
 - Bildschirmfotos ohne echte Daten: mit `NEXT_PUBLIC_SUPABASE_URL=https://beispiel.supabase.co` bauen und die Anfragen in Playwright abfangen (Beispieldaten kennzeichnen). Vorher alte `next-server`-Prozesse beenden, sonst liefert ein alter Server veraltete Dateien.
 - Vor jedem Umbau eines Bildschirms den Prompt in `docs/prompt-designkonzept.md` befolgen.
