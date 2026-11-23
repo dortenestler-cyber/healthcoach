@@ -92,7 +92,7 @@ export function hrvByPhase(data: Data, key: string, from?: string): PhaseEffectR
     const v = hrv.get(d);
     return typeof v === "number" ? v : null;
   };
-  return (["menstruation", "follikel", "luteal"] as PhaseGroup[]).map((group) => ({
+  return (["menstruation", "follikel", "eisprung", "luteal"] as PhaseGroup[]).map((group) => ({
     group,
     c: compare(
       withD.filter((d) => groupAt(d) === group),

@@ -2698,3 +2698,9 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
   background: var(--muted);
 }
 .sync-dot[data-level="veraltet"] { background: var(--warn); }
+
+/* Zyklus-Kalender: Vorschau und Eisprung-Zeichen (Sammelliste Punkt 2 und 10) */
+.cal-forecast { margin: 0 0 10px; font-size: 14px; color: var(--cycle-fg); }
+.cal-ov { position: absolute; top: 2px; right: 4px; font-size: 10px; color: var(--cycle-fg); line-height: 1; }
+.cal-ov-key { color: var(--cycle-fg); margin-right: 4px; font-size: 11px; }
+.ov-label { display: block; margin: 14px 0 6px; }

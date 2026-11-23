@@ -69,10 +69,13 @@ export const PHASES: Record<Phase, { label: string; inPhase: string; pattern: st
 // Grenzen passen sich der eigenen Zykluslänge an:
 // Tag 1–5 Menstruation, Eisprung etwa 14 Tage vor der nächsten Periode (3-Tage-Fenster),
 // letzte 7 Tage späte Lutealphase. Länger als üblich: weiter späte Lutealphase.
-export function phaseFor(cycleDay: number, length: number): Phase {
-  const ov = length - 14;
+// Hat die Nutzerin ein Eisprung-Zeichen eingetragen (ovDay = Zyklustag), gilt dieser Tag statt der Schätzung,
+// die Lutealphase dauert dann etwa 14 Tage ab dem Eisprung.
+export function phaseFor(cycleDay: number, length: number, ovDay?: number | null): Phase {
+  const ov = ovDay ?? length - 14;
+  const end = ovDay ? ovDay + 14 : length;
   if (cycleDay <= 5) return "menstruation";
-  if (cycleDay > length - 7) return "luteal-spaet";
+  if (cycleDay > end - 7 && cycleDay > ov + 1) return "luteal-spaet";
   if (cycleDay < ov - 1) return "follikel";
   if (cycleDay <= ov + 1) return "eisprung";
   return "luteal-frueh";
@@ -109,14 +112,28 @@ export function windowText(w: PeriodWindow, day: string): string {
   return a === b ? `Nächste Periode in etwa ${a} ${a === 1 ? "Tag" : "Tagen"}` : `Nächste Periode in etwa ${a}–${b} Tagen`;
 }
 
-export type CycleToday = { cycleDay: number | null; length: number; phase: Phase | null; window: PeriodWindow | null; cycles: number; fromGarmin: boolean };
+export type CycleToday = { cycleDay: number | null; length: number; phase: Phase | null; window: PeriodWindow | null; cycles: number; fromGarmin: boolean; ovDay: number | null };
+
+// Erstes eingetragenes Eisprung-Zeichen im Zyklus, der am Tag `start` begann (als Zyklustag), sonst null.
+// Gesucht wird ab Zyklustag 6 bis zum nächsten Periodenbeginn.
+export function ovulationDay(start: string, diary: Diary[]): number | null {
+  const next = periodStarts(diary).find((s) => s > start);
+  const from = addDays(start, 5);
+  const hit = diary
+    .filter((d) => d.ovulation?.length && d.day >= from && (!next || d.day < next))
+    .map((d) => d.day)
+    .sort()[0];
+  return hit ? daysBetween(start, hit) + 1 : null;
+}
 
 export function cycleToday(day: string, diary: Diary[]): CycleToday {
   const ci = cycleInfo(day, diary);
+  const ovDay = ci.cycleDay !== null ? ovulationDay(addDays(day, -(ci.cycleDay - 1)), diary) : null;
   return {
     cycleDay: ci.cycleDay,
     length: ci.length,
-    phase: ci.cycleDay !== null ? phaseFor(ci.cycleDay, ci.length) : null,
+    ovDay,
+    phase: ci.cycleDay !== null ? phaseFor(ci.cycleDay, ci.length, ovDay) : null,
     window: nextPeriodWindow(diary, day),
     cycles: ci.cycles,
     fromGarmin: ci.fromGarmin,
@@ -279,18 +296,21 @@ export function hrvInsight(day: string, data: Data): string {
 
 // ---------- Vergleich zwischen Phasen (Verlauf und Muster-Karte)
 
-export type PhaseGroup = "menstruation" | "follikel" | "luteal";
+// Vier Phasen für Auswertungen und Charts (Sammelliste Punkt 10: Eisprung eigenständig)
+export type PhaseGroup = "menstruation" | "follikel" | "eisprung" | "luteal";
 export const PHASE_GROUPS: [PhaseGroup, string][] = [
   ["menstruation", "Menstruation"],
   ["follikel", "Follikel"],
+  ["eisprung", "Eisprung"],
   ["luteal", "Luteal"],
 ];
+export const PHASE_GROUP_LABEL: Record<PhaseGroup, string> = { menstruation: "Menstruation", follikel: "Follikel", eisprung: "Eisprung", luteal: "Luteal" };
 export const groupOf = (p: Phase | null): PhaseGroup | null =>
-  p === "menstruation" ? "menstruation" : p === "follikel" || p === "eisprung" ? "follikel" : p ? "luteal" : null;
+  p === "menstruation" ? "menstruation" : p === "follikel" ? "follikel" : p === "eisprung" ? "eisprung" : p ? "luteal" : null;
 
 // Schnitt eines Werts je Phasengruppe, nur Tage mit Wert
 export function phaseMeans(values: { day: string; value: number | null }[], diary: Diary[]): Record<PhaseGroup, { mean: number | null; n: number }> {
-  const acc: Record<PhaseGroup, number[]> = { menstruation: [], follikel: [], luteal: [] };
+  const acc: Record<PhaseGroup, number[]> = { menstruation: [], follikel: [], eisprung: [], luteal: [] };
   for (const v of values) {
     if (v.value === null) continue;
     const g = groupOf(cycleToday(v.day, diary).phase);
@@ -312,4 +332,37 @@ export function phaseInsight(label: string, values: { day: string; value: number
   const diff = l.mean - f.mean;
   if (Math.abs(diff) < 0.25 * spread || diff === 0) return `${label}: in Follikel- und Lutealphase etwa gleich.`;
   return `${label} liegt in der Lutealphase im Schnitt ${fmtDiff(Math.abs(diff))} ${diff > 0 ? "höher" : "niedriger"} als in der Follikelphase.`;
+}
+
+// ---------- Vorschau (Sammelliste Punkt 2)
+
+// Geschätzter Beginn der nächsten Periode: letzter Beginn + übliche Länge, frühestens morgen.
+export function nextStartEstimate(today: string, diary: Diary[]): string | null {
+  const ci = cycleInfo(today, diary);
+  if (ci.cycleDay === null) return null;
+  const last = addDays(today, -(ci.cycleDay - 1));
+  const est = addDays(last, ci.length);
+  return est > today ? est : addDays(today, 1);
+}
+
+// Phase eines Tages, für Tage nach dem geschätzten nächsten Beginn mit der üblichen Länge weitergerechnet.
+// predicted = Tag liegt in einem vorausgeschätzten Zyklus (nicht im aktuellen).
+export function projectedPhase(day: string, today: string, diary: Diary[]): { phase: Phase | null; predicted: boolean } {
+  const next = day > today ? nextStartEstimate(today, diary) : null;
+  if (!next || day < next) return { phase: cycleToday(day, diary).phase, predicted: false };
+  const length = cycleInfo(today, diary).length;
+  const cd = (daysBetween(next, day) % length) + 1;
+  return { phase: phaseFor(cd, length), predicted: true };
+}
+
+// Satz über dem Kalender: „Nächste Periode etwa 24.–29. Dez.“
+export function nextPeriodText(today: string, diary: Diary[]): string | null {
+  const fmt = (iso: string) => new Date(iso + "T12:00:00").toLocaleDateString("de-DE", { day: "numeric", month: "short" });
+  const w = nextPeriodWindow(diary, today);
+  if (w && w.latest >= today) {
+    const a = w.earliest > today ? w.earliest : addDays(today, 1);
+    return a === w.latest ? `Nächste Periode etwa am ${fmt(a)}` : `Nächste Periode etwa ${fmt(a)} bis ${fmt(w.latest)}`;
+  }
+  const est = nextStartEstimate(today, diary);
+  return est ? `Nächste Periode etwa ab ${fmt(est)} (noch wenige Zyklen, grobe Schätzung)` : null;
 }

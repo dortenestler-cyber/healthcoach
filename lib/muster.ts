@@ -56,6 +56,7 @@ export function conditions(data: Data, extra: MusterExtra): Condition[] {
   out.push({ key: "vor_periode", group: "zyklus", label: "die 5 Tage vor der Periode", has: (d) => cycleInfo(d, data.diary).beforePeriod });
   out.push({ key: "menstruation", group: "zyklus", label: "Tage der Menstruation", has: (d) => group(d) === "menstruation" });
   out.push({ key: "follikel", group: "zyklus", label: "Tage der Follikelphase", has: (d) => group(d) === "follikel" });
+  out.push({ key: "eisprung", group: "zyklus", label: "Tage um den Eisprung", has: (d) => group(d) === "eisprung" });
   out.push({ key: "luteal", group: "zyklus", label: "Tage der Lutealphase", has: (d) => group(d) === "luteal" });
 
   // Training am selben Tag (der Krampf kommt meist am Abend danach)
@@ -213,7 +214,7 @@ export function muscleByPhase(data: Data, extra: MusterExtra, today: string): { 
   const ev = muscleEventDays(extra.muscle);
   const first = [...ev].sort()[0];
   if (!first) return [];
-  const rows: Record<PhaseGroup, { days: number; events: number }> = { menstruation: { days: 0, events: 0 }, follikel: { days: 0, events: 0 }, luteal: { days: 0, events: 0 } };
+  const rows: Record<PhaseGroup, { days: number; events: number }> = { menstruation: { days: 0, events: 0 }, follikel: { days: 0, events: 0 }, eisprung: { days: 0, events: 0 }, luteal: { days: 0, events: 0 } };
   const start = first > addDays(today, -179) ? first : addDays(today, -179);
   for (let d = start; d <= today; d = addDays(d, 1)) {
     const g = groupOf(cycleToday(d, data.diary).phase);
@@ -221,7 +222,7 @@ export function muscleByPhase(data: Data, extra: MusterExtra, today: string): { 
     rows[g].days++;
     if (ev.has(d)) rows[g].events++;
   }
-  const labels: Record<PhaseGroup, string> = { menstruation: "Menstruation", follikel: "Follikel", luteal: "Luteal" };
+  const labels: Record<PhaseGroup, string> = { menstruation: "Menstruation", follikel: "Follikel", eisprung: "Eisprung", luteal: "Luteal" };
   return (Object.keys(rows) as PhaseGroup[]).map((g) => ({ group: g, label: labels[g], ...rows[g] }));
 }
 

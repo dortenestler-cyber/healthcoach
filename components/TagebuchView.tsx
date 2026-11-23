@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, longDate, shortDate } from "@/lib/dates";
 import { BLEEDING, GRID_ROWS, LEVELS, splitFrequent, SYMPTOMS } from "@/lib/catalog";
+import { OVULATION_SIGNS } from "@/lib/ovulation";
 import { DEFAULT_HABITS, loadHabits, SAUNA_GAENGE, SAUNA_WANN, WANN_LABEL, type Habit, type HabitDetails, type SaunaDetails } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
 import CheckinCard from "@/components/tagebuch/CheckinCard";
@@ -44,6 +45,8 @@ export default function TagebuchView({ initial }: { initial?: string }) {
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState("");
   const [moreSym, setMoreSym] = useState(false);
+  const [ovSigns, setOvSigns] = useState<string[]>([]);
+  const [ovReady, setOvReady] = useState(false); // Spalte ovulation_signs vorhanden
   const [moreHab, setMoreHab] = useState(false);
 
   const load = useCallback(async () => {
@@ -66,6 +69,10 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     loadHabits(sb).then(setHabits).catch(() => undefined);
     const det = await sb.from("diary_entries").select("habit_details").eq("day", day).maybeSingle();
     setDetails(det.error ? {} : (((det.data as { habit_details?: HabitDetails } | null)?.habit_details ?? {}) as HabitDetails));
+    // Eisprung-Zeichen erst nach der Migration (Daten), sonst ausgeblendet
+    const ov = await sb.from("diary_entries").select("ovulation_signs").eq("day", day).maybeSingle();
+    setOvReady(!ov.error);
+    setOvSigns(ov.error ? [] : ((ov.data as { ovulation_signs?: string[] } | null)?.ovulation_signs ?? []));
     setSaved(!!t);
     setDirty(false);
   }, [day]);
@@ -117,8 +124,12 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     // Details nur für eingetragene Gewohnheiten speichern. Fehlt die Spalte noch, bleibt der Eintrag trotzdem gespeichert.
     const keep: HabitDetails = Object.fromEntries(Object.entries(details).filter(([k]) => influences.includes(k)));
     const d2 = await sb.from("diary_entries").update({ habit_details: keep }).eq("day", day);
-    setDetailsNote(d2.error ? "Die Sauna-Details werden gespeichert, sobald die Datenbank aktualisiert ist (PR mit Migration)." : "");
     setError("");
+    if (ovReady) {
+      const o2 = await sb.from("diary_entries").update({ ovulation_signs: ovSigns }).eq("day", day);
+      if (o2.error) setError("Eisprung-Zeichen konnten nicht gespeichert werden: " + o2.error.message);
+    }
+    setDetailsNote(d2.error ? "Die Sauna-Details werden gespeichert, sobald die Datenbank aktualisiert ist (PR mit Migration)." : "");
     setSaved(true);
     setDirty(false);
     load();
@@ -168,6 +179,21 @@ export default function TagebuchView({ initial }: { initial?: string }) {
             </button>
           ))}
         </div>
+        {feat.zyklus && ovReady && (
+          <>
+            <span className="meta ov-label">Eisprung-Zeichen (wenn du eines bemerkst)</span>
+            <div className="pills wrap">
+              {OVULATION_SIGNS.map((o) => {
+                const on = ovSigns.includes(o.key);
+                return (
+                  <button key={o.key} type="button" className="pill" aria-pressed={on} onClick={() => { setOvSigns(on ? ovSigns.filter((x) => x !== o.key) : [...ovSigns, o.key]); changed(); }}>
+                    {o.label}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
       </section>
 
       <section className="card">
