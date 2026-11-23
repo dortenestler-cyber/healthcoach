@@ -8,8 +8,8 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 ## Jetzt
 
 ### Sport und Stress automatisch im Tagebuch (PR #108)
-- [ ] PR #108 ansehen und mergen. Er enthält die Migration `supabase/migrations/20261127110000_gewohnheiten_auto.sql` (drei Spalten im Tagebuch: von Garmin gesetzt, von dir abgewählt, eigener Eintrag) und eine Änderung an `garmin-sync`. Dein Merge ist die Freigabe
-- [ ] Claude Bescheid geben, dann prüft Claude die Läufe
+- [x] PR #108 gemergt (23. Nov.), Migration und Upload der Funktion grün (geprüft von Claude). Er enthält die Migration `supabase/migrations/20261127110000_gewohnheiten_auto.sql` (drei Spalten im Tagebuch: von Garmin gesetzt, von dir abgewählt, eigener Eintrag) und eine Änderung an `garmin-sync`. Dein Merge ist die Freigabe
+- [x] Claude Bescheid gegeben, Läufe grün
 - [ ] Einmal synchronisieren (auf Heute nach unten ziehen). Beim ersten Mal setzt die App Sport und Stress rückwirkend für alle Tage mit Garmin-Daten
 - [ ] Im Tagebuch einen Tag mit Training öffnen: „Sport · aus Garmin“ ist ausgewählt. Abwählen und speichern gilt nur für diesen Tag
 
