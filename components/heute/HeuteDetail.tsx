@@ -156,6 +156,7 @@ function SleepDetail({ day, data }: { day: string; data: Data }) {
   const slept = sleepAchieved(day, data);
   const need = sleepNeed(day, data.daily, data.acts);
   const pct = slept.ratio === null ? null : Math.round(slept.ratio * 100);
+  const night = data.daily.find((d) => d.day === day);
   const rows = [metricRow("schlaf", day, data, "Dauer"), metricRow("tiefschlaf", day, data), metricRow("rem", day, data)].filter((r, i) => i === 0 || r.value !== null);
   const count = countInRange(rows.map((r) => ({ value: r.value, range: r.base.active })));
   const deep = rows.find((r) => r.key === "tiefschlaf");
@@ -180,6 +181,20 @@ function SleepDetail({ day, data }: { day: string; data: Data }) {
       <ExplainCard tone="sleep" question="Wie kann ich meinen Schlaf verbessern?">
         {sentence} {count.total ? `${count.inRange} von ${count.total} Werten in deinem Bereich.` : ""}
       </ExplainCard>
+
+      {night && (night.awake_count != null || night.sleep_awake_s || night.spo2_avg != null) && (
+        <section className="card">
+          <span className="eyebrow">Wach und Sauerstoff in der Nacht</span>
+          <p className="value-big">
+            {night.awake_count != null ? (night.awake_count === 0 ? "Nicht aufgewacht" : `${night.awake_count}× wach`) : night.sleep_awake_s ? duration(night.sleep_awake_s) : "–"}
+          </p>
+          <ul className="derive-list">
+            {night.awake_count != null && night.sleep_awake_s ? <li>Wachzeit zusammen {duration(night.sleep_awake_s)}</li> : null}
+            {night.spo2_avg != null && <li>Sauerstoff im Schlaf im Schnitt {Math.round(night.spo2_avg)} %{night.spo2_low != null ? `, niedrigster Wert ${Math.round(night.spo2_low)} %` : ""}</li>}
+          </ul>
+          <span className="meta">Garmin liefert nur die Anzahl und die Summe, keine Uhrzeiten. Bei Auffälligkeiten sprich mit deiner Ärztin oder deinem Arzt, die App stellt keine Diagnose.</span>
+        </section>
+      )}
 
       <section className="card">
         <span className="eyebrow">Schlafbedarf heute Nacht</span>

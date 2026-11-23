@@ -161,6 +161,10 @@ Enthält eine Migration und ändert die Funktionen `garmin-sync` und `watch`, de
 - [ ] Entscheiden, ob der Farbmodus (Einfarbig, Bedeutung, Nacht) die 9 Farbregler ersetzt
 - [ ] PR #93 mergen, wenn der Lauf `watch-build` grün ist; danach die Uhr-App neu installieren und den Glance prüfen
 
+### Temperatur entfernt, Wachphasen und Sauerstoff (PR #97, OF)
+- [ ] Nach dem Merge: Heute › Schlaf ansehen, dort steht die Karte „Wach und Sauerstoff in der Nacht“ (ab der ersten Nacht mit Werten)
+- [ ] Prüfen, dass nirgends mehr Hauttemperatur auftaucht (Verlauf, Zyklus, Gewohnheiten, Readiness)
+
 ## Erledigt
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)
 - [x] PR #34, #35, #36, #37 gemergt (Konzept, `CLAUDE.md`, Fundament, Merge-Regel)
