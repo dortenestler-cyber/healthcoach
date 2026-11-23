@@ -66,4 +66,12 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Einmal gebaut für alle Charts: Linien (`LineBand`), Balken (`DayBars`, `DivergingBars`), Schlafphasen (`SleepStagesBar`), Heatmap.
    Dateien: `components/charts/*`, `app/globals.css`
 
+10. ☐ **Eisprung als eigene Phase überall** (23.11.)
+   Ring und Kalender zeigen den Eisprung schon. In allen Auswertungen zählt er bisher aber zur Follikelphase (`groupOf` in `lib/cycle.ts`).
+   Künftig gibt es überall vier Phasen: Menstruation · Follikel · Eisprung · Luteal. Das gilt für die Charts (Punkt 8), Werte und Symptome nach Phase, Gewohnheiten je Phase, „Weitere Muster“, Wadenzucken nach Phase und die Gewohnheits-Detailseiten. Farbe: Terracotta mittel wie im Kalender.
+   Der Eisprung dauert nur etwa 3 Tage je Zyklus. Vergleiche stehen deshalb erst, wenn genug Tage zusammenkommen, vorher „noch zu wenige Tage“.
+   Die Readiness rechnet ihren Bereich je Phase. Ob der Eisprung dort eigenständig zählt oder bei Follikel bleibt, entscheide ich beim Umsetzen nach Datenlage. Die Uhr muss dann gleich rechnen `[DA]`.
+   Offen: Willst du den Eisprung auch selbst eintragen können (z. B. Test positiv, Mittelschmerz)? Dann bräuchte das Tagebuch ein neues Feld, und das wäre eine Migration durch Daten `[DA]`.
+   Dateien: `lib/cycle.ts`, `lib/muster.ts`, `lib/zyklusSeite.ts`, `lib/habitStats.ts`, betroffene Komponenten
+
 ## Erledigt
