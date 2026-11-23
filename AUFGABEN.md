@@ -27,14 +27,14 @@ Der automatische Upload nach PR #33 ist gescheitert (GitHub hatte zu viele Anfra
 
 ### 3. Secrets für Push-Mitteilungen
 In Supabase unter **Edge Functions → Secrets** anlegen:
-- [ ] `VAPID_PUBLIC_KEY` und `VAPID_PRIVATE_KEY`: auf einem Rechner mit `npx web-push generate-vapid-keys` erzeugen
-- [ ] `VAPID_SUBJECT`: `mailto:` und deine E-Mail-Adresse
-- [ ] `PUSH_CRON_SECRET`: ein langes, beliebiges Passwort (brauchst du gleich noch einmal)
+- [x] `VAPID_PUBLIC_KEY` und `VAPID_PRIVATE_KEY` angelegt (23. Nov., von Claude erzeugt)
+- [x] `VAPID_SUBJECT` angelegt (23. Nov.)
+- [x] `PUSH_CRON_SECRET` angelegt (23. Nov.)
 
 ### 4. Zeitplan für die Check-in-Erinnerung
 Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch an (pg_cron und pg_net schaltet sie selbst ein). Es fehlt nur das Passwort im Tresor:
-- [ ] In Supabase unter **Integrations → Vault** (oder **Project Settings → Vault**) einen Eintrag mit dem Namen `push_cron_secret` anlegen. Wert: dasselbe Passwort wie `PUSH_CRON_SECRET` aus Schritt 3
-- [ ] In der App unter **Einstellungen** die Erinnerung einschalten und eine Testmitteilung schicken
+- [x] Eintrag `push_cron_secret` im Tresor angelegt, gleiches Passwort wie `PUSH_CRON_SECRET` (23. Nov.)
+- [x] Erinnerung in der App eingeschaltet, Testmitteilung ist angekommen (23. Nov., von dir bestätigt)
 
 ### 5. Heute im neuen Design (PR #38)
 - [x] PR #38 ansehen und mergen
