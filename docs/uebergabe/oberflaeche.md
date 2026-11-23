@@ -7,6 +7,8 @@ Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/desig
 Farbsystem „Nacht“ und Heute als Einstiegsseite umgesetzt.
 
 ## In Arbeit
+- Sammelliste Anpassungen (Entwurfs-PR #77, Zweig `claude/kind-keller-hmdy0s`): `docs/sammelliste-oberflaeche.md`. Punkt 1 Coach-Eingabe vorbereitet, Punkt 2 Perioden-Vorschau im Zyklus-Kalender gesammelt.
+  Nächster Schritt: weitere Wünsche eintragen, nach Freigabe alles umsetzen und mergen.
 - Heute als Einstiegsseite umgesetzt (PR #76, Zweig `claude/determined-davinci-s4e3l7`): `HeuteView` neu aus `DayHead`, `RingRow`, `DaySentence`, `GlanceTiles`, `TodayAgenda`, `RecentActivities`; Detailseiten `app/heute/[wert]` (`HeuteDetail`, Schlüssel in `lib/heuteDetails.ts`). Synchronisieren in `lib/useGarminSync.ts`, Ziehen in `components/ui/PullToRefresh.tsx`. Entfernt: `ValuesCard`, `TodayRings`.
   Nächster Schritt: Detailseiten näher an Whoop (Faktorliste mit Pfeilen statt Bereichsbalken, 3-Stufen-Balken beim Schlaf, Stress-Halbbogen). Stift zum Wählen von Ringen und Kacheln steht noch aus.
 - Farb- und Designkonzept „Nacht“, gleicher Zweig: `docs/farb-und-designkonzept.md`, Ansicht `docs/entwurf-farbkonzept.html` (https://claude.ai/artifact/JAF54suDGLf1afKAyjjNQN). Immer dunkel, sechs Farbfamilien, „mehr ist heller“, Energie in Sage hell, neue Variablen `--card-2`, `--axis`, Stufen für Readiness, Pulszonen, Schlafphasen. Heute-Entwurf nutzt die Farben schon.
@@ -15,6 +17,7 @@ Farbsystem „Nacht“ und Heute als Einstiegsseite umgesetzt.
 - Korridore Schritt 4 (Zweig `claude/confident-fermat-wy3iur`): nichts aus dem Konzept offen, Rückmeldung abwarten.
 
 ## Wartet auf
+- Nutzerin: Freigabe der Sammelliste (PR #77)
 - Nutzerin: Rückmeldung zur neuen Seite Heute (`AUFGABEN.md` Abschnitt „Heute als Einstiegsseite“)
 - Nutzerin: Rückmeldung zu Heute, Zyklus und Training im Design „dunkel 2“ (`AUFGABEN.md` Abschnitt 10)
 - Nutzerin: Rückmeldung zur Seite Zyklus (`AUFGABEN.md` Abschnitt 6)
