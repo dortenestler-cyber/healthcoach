@@ -150,8 +150,8 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 
 ### 16. Wachphasen und Sauerstoff im Schlaf, Temperatur entfernt, Daten (PR #90, DA)
 Enthält eine Migration und ändert die Funktionen `garmin-sync` und `watch`, deshalb mergst du ihn selbst.
-- [ ] PR #90 ansehen und mergen. Danach laufen die Migration `20261125100000_nacht_ohne_temperatur.sql` und der Upload der Funktionen automatisch
-- [ ] Etwa eine Minute warten, dann unter **Einstellungen › Garmin** synchronisieren und Claude Bescheid geben. Claude prüft dann, ob Wachphasen und Sauerstoff ankommen
+- [x] PR #90 gemergt (23. Nov.), Migration und Upload grün (geprüft von Claude)
+- [x] Synchronisiert. Geprüft von Claude: Wachphasen und Sauerstoff kommen an (3 Nächte aus dem Abrufzeitraum, jede neue Nacht kommt automatisch dazu)
 - [ ] Falls auf dem Zifferblatt ein Feld „Hauttemperatur“ gewählt war: Es bleibt jetzt leer. In Garmin Connect unter den Einstellungen des Zifferblatts einen anderen Wert wählen
 - [ ] Die Anzeige der Temperatur in der App entfernt die Rolle Oberfläche in einer eigenen Sitzung, die Bitte steht in ihrer Übergabe
 
