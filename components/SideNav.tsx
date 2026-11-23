@@ -67,7 +67,7 @@ export default function SideNav() {
       </Link>
       <span className="sidenav-sync" title={sync.text}>
         <span className="sidenav-dot" data-level={sync.level} aria-hidden="true" />
-        <span className="sidenav-label" aria-hidden="true">{lastSync ? sync.text.replace("Garmin-Daten von", "Garmin · Stand") : "Garmin · noch keine Daten"}</span>
+        <span className="sidenav-label" aria-hidden="true">{lastSync ? `Garmin · ${new Date(lastSync).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}` : "Garmin · keine Daten"}</span>
         <span className="sr-only">{sync.text}</span>
       </span>
       <button type="button" className="sidenav-item sidenav-out" onClick={signOut} title="Abmelden">

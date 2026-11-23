@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import TwoCol from "@/components/ui/TwoCol";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, longDate, shortDate } from "@/lib/dates";
@@ -165,6 +166,9 @@ export default function TagebuchView({ initial }: { initial?: string }) {
         <button type="button" className="btn btn-link btn-44" onClick={() => go(today)}>Zurück zu heute</button>
       )}
 
+      <TwoCol
+        left={
+          <>
       <CheckinCard key={"c" + day} day={day} isToday={day === today} />
 
       <section className="card">
@@ -283,6 +287,10 @@ export default function TagebuchView({ initial }: { initial?: string }) {
         {saved ? "Gespeichert" : day === today ? "Eintrag speichern" : "Nachtrag speichern"}
       </button>
 
+          </>
+        }
+        right={
+          <>
       <DayIntakes key={"i" + day} day={day} />
 
       {feat.muskeln && <MuscleSection key={"m" + day} day={day} onChanged={loadMuscle} />}
@@ -310,6 +318,9 @@ export default function TagebuchView({ initial }: { initial?: string }) {
           {history.length === 0 && <p>Sobald du Einträge machst, füllt sich das Raster.</p>}
         </details>
       </section>
+          </>
+        }
+      />
     </>
   );
 }

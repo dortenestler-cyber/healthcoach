@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import TwoCol from "@/components/ui/TwoCol";
 import { useCallback, useEffect, useState } from "react";
 import { RangeRow, ValueRing } from "@/components/charts";
 import ReadinessCard from "@/components/heute/ReadinessCard";
@@ -67,15 +68,19 @@ export default function HeuteDetail({ k, day: dayParam }: { k: DetailKey; day?: 
       {!data && !error && <p className="meta">Lädt …</p>}
 
       {data && rule && k === "readiness" && (
-        <>
-          <ReadinessCard rule={rule} factors={readinessFactors(day, data)} open />
-          {feat.garmin && <NightValues day={day} data={data} />}
-          {feat.garmin && (
-            <section className="card">
-              <HrvCard data={data} showPhases={feat.zyklus} />
-            </section>
-          )}
-        </>
+        <TwoCol
+          left={<ReadinessCard rule={rule} factors={readinessFactors(day, data)} open />}
+          right={
+            <>
+              {feat.garmin && <NightValues day={day} data={data} />}
+              {feat.garmin && (
+                <section className="card">
+                  <HrvCard data={data} showPhases={feat.zyklus} />
+                </section>
+              )}
+            </>
+          }
+        />
       )}
 
       {data && k === "schlaf" && <SleepDetail day={day} data={data} />}

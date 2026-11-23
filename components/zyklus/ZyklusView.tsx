@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import TwoCol from "@/components/ui/TwoCol";
 import Link from "next/link";
 import { DivergingBars } from "@/components/charts";
 import CycleRing, { arcs4, PHASE4, PHASE4_LABEL, PhaseIcon, phase4Of } from "@/components/zyklus/CycleRing";
@@ -118,6 +119,9 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         {(!phase || !ct.window) && <Link href="/tagebuch#perioden" className="settings-link">Perioden nachtragen ›</Link>}
       </div>
 
+      <TwoCol
+        left={
+          <>
       <section className="card">
         <div className="ring-hero">
           <CycleRing cycleDay={ct.cycleDay} length={ct.length} phase={p4} today={today} ovDay={ct.ovDay} start={ct.cycleDay !== null ? cycleStart(today, ct.cycleDay) : null} />
@@ -145,6 +149,11 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
       </section>
 
       <CycleCalendar today={today} diary={longDiary} />
+          </>
+        }
+        right={
+          <>
+
 
       {phase && (
         <section className="card">
@@ -232,6 +241,9 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         </span>
         <span aria-hidden="true">›</span>
       </Link>
+          </>
+        }
+      />
     </>
   );
 }

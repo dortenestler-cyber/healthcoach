@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import TwoCol from "@/components/ui/TwoCol";
 import PageHead from "@/components/PageHead";
 import { useFeatures, type Feature } from "@/lib/prefs";
 import MedsSection from "@/components/gesundheit/MedsSection";
@@ -44,16 +45,10 @@ export default function GesundheitView({ initial }: { initial: string }) {
       {shown === "ueberblick" && <OverviewSection />}
       {shown === "med" && <MedsSection />}
       {shown === "krankverl" && (
-        <>
-          {feat.krankheit && <IllnessSection />}
-          {feat.verletzung && <InjurySection />}
-        </>
+        <TwoCol left={feat.krankheit ? <IllnessSection /> : null} right={feat.verletzung ? <InjurySection /> : null} />
       )}
       {shown === "koerper" && (
-        <>
-          {feat.muskeln && <WadenSection />}
-          <BodySection />
-        </>
+        <TwoCol left={feat.muskeln ? <WadenSection /> : null} right={<BodySection />} />
       )}
     </>
   );

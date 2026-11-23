@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import TwoCol from "@/components/ui/TwoCol";
 import PageHead from "@/components/PageHead";
 import { useFeatures, type Feature } from "@/lib/prefs";
 import TargetSection from "@/components/training/TargetSection";
@@ -90,13 +91,21 @@ export default function TrainingView({ initial }: { initial: string }) {
       </div>
       {shown === "kalender" && <CalendarSection data={data} />}
       {shown === "auswertung" && (
-        <>
-          {feat.tagesziel && data && <TargetSection data={data} />}
-          {data && <LoadTrendCard today={isoDay()} data={data} alltag={withAlltag} />}
-          <WeekLoadCard data={data} alltag={withAlltag} />
-          {data && <HabitCard today={isoDay()} data={data} />}
-          {data && <MonthReviewCard today={isoDay()} data={data} />}
-        </>
+        <TwoCol
+          left={
+            <>
+              {feat.tagesziel && data && <TargetSection data={data} />}
+              {data && <LoadTrendCard today={isoDay()} data={data} alltag={withAlltag} />}
+            </>
+          }
+          right={
+            <>
+              <WeekLoadCard data={data} alltag={withAlltag} />
+              {data && <HabitCard today={isoDay()} data={data} />}
+              {data && <MonthReviewCard today={isoDay()} data={data} />}
+            </>
+          }
+        />
       )}
       {shown === "kettlebell" && <KettlebellSection />}
       {shown === "klettern" && <ClimbSection />}
