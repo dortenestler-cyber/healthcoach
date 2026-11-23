@@ -24,7 +24,7 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Sobald alle festen Einnahmen des Tages abgehakt sind, zeigt Heute statt der Liste nur noch eine Zeile: „✓ Medikamente und Supplements · alles genommen (5 von 5)“ mit Pfeil. Tippen klappt die Liste wieder auf, z. B. um etwas rückgängig zu machen. „Bufori bei Bedarf“ mit „+ Hub“ bleibt sichtbar, weil man es jederzeit spontan braucht. „Krank oder verletzt?“ bleibt ebenfalls. Im Tagebuch bleibt die volle Liste.
    Dateien: `components/HealthToday.tsx`, evtl. `components/IntakeChecklist.tsx`
 
-5. ☐ **Generell: Was noch eingeklappt werden kann** (23.11., Vorschlag zum Auswählen)
+5. ☐ **Generell: Was noch eingeklappt werden kann** (23.11., alle Unterpunkte 5a–5h übernommen)
    Regel für alle Punkte: Erledigtes klappt zu einer Zeile mit ✓ zusammen, Offenes bleibt offen. Warnungen, Hinweise auf ärztliche Abklärung und Krankheit/Verletzung werden nie eingeklappt. Eine Zeile lässt sich immer per Tipp aufklappen. Am nächsten Tag ist alles wieder offen.
    - 5a **Heute · Geplantes Training:** Nach dem Training (Garmin-Aktivität passt zum Plan) nur noch „✓ Kettlebell erledigt · 42 min“.
    - 5b **Heute · „Krank oder verletzt?“:** Statt eigener Zeile mit zwei Knöpfen ein kleiner Link am Ende der Karte „Krank oder verletzt? ›“.
