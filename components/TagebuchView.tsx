@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, longDate, shortDate } from "@/lib/dates";
-import { BLEEDING, GRID_ROWS, LEVELS, SYMPTOMS } from "@/lib/catalog";
+import { BLEEDING, GRID_ROWS, LEVELS, splitFrequent, SYMPTOMS } from "@/lib/catalog";
 import { DEFAULT_HABITS, loadHabits, SAUNA_GAENGE, SAUNA_WANN, WANN_LABEL, type Habit, type HabitDetails, type SaunaDetails } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
 import CheckinCard from "@/components/tagebuch/CheckinCard";
@@ -43,6 +43,8 @@ export default function TagebuchView({ initial }: { initial?: string }) {
   const [saved, setSaved] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState("");
+  const [moreSym, setMoreSym] = useState(false);
+  const [moreHab, setMoreHab] = useState(false);
 
   const load = useCallback(async () => {
     const sb = supabase();
@@ -132,6 +134,12 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     return heat[e.symptoms?.[rowKey] ?? 0];
   };
 
+  // Oben die genutzten, Rest unter „Weitere anzeigen“ (Sammelliste 5e)
+  const usedSym = new Set<string>([...Object.keys(symptoms).filter((k) => symptoms[k] > 0), ...history.flatMap((e) => Object.keys(e.symptoms ?? {}).filter((k) => (e.symptoms[k] ?? 0) > 0))]);
+  const symSplit = splitFrequent(SYMPTOMS, usedSym);
+  const usedHab = new Set<string>([...influences, ...history.flatMap((e) => e.influences ?? [])]);
+  const habSplit = splitFrequent(habits.filter((h) => h.on || influences.includes(h.key)), usedHab);
+
   return (
     <>
       <PageHead title="Tagebuch" sub={(day === today ? "Eintrag für " : "Nachtrag für ") + longDate(new Date(day + "T12:00:00"))} />
@@ -168,7 +176,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
           <span className="meta">Tippen: leicht, mittel, stark</span>
         </div>
         <div className="pills wrap">
-          {SYMPTOMS.map((s) => {
+          {[...symSplit.top, ...(moreSym ? symSplit.rest : [])].map((s) => {
             const v = symptoms[s.key] ?? 0;
             return (
               <button
@@ -182,6 +190,11 @@ export default function TagebuchView({ initial }: { initial?: string }) {
             );
           })}
         </div>
+        {symSplit.rest.length > 0 && (
+          <button type="button" className="btn btn-link more-link" onClick={() => setMoreSym(!moreSym)} aria-expanded={moreSym}>
+            {moreSym ? "Weniger anzeigen" : `Weitere anzeigen (${symSplit.rest.length})`}
+          </button>
+        )}
       </section>
 
       {feat.perimenopause && <FlashCounter key={"f" + day} day={day} />}
@@ -192,9 +205,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
           <Link href="/einstellungen/gewohnheiten" className="settings-link">Verwalten ›</Link>
         </div>
         <div className="pills wrap">
-          {habits
-            .filter((h) => h.on || influences.includes(h.key))
-            .map((f) => {
+          {[...habSplit.top, ...(moreHab ? habSplit.rest : [])].map((f) => {
               const on = influences.includes(f.key);
               return (
                 <button
@@ -209,6 +220,11 @@ export default function TagebuchView({ initial }: { initial?: string }) {
               );
             })}
         </div>
+        {habSplit.rest.length > 0 && (
+          <button type="button" className="btn btn-link more-link" onClick={() => setMoreHab(!moreHab)} aria-expanded={moreHab}>
+            {moreHab ? "Weniger anzeigen" : `Weitere anzeigen (${habSplit.rest.length})`}
+          </button>
+        )}
         {influences.includes("sauna") && (
           <div className="habit-detail">
             <span className="row-strong">Sauna · Details (freiwillig)</span>

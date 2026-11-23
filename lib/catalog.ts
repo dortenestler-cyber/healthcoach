@@ -11,7 +11,34 @@ export const SYMPTOMS: { key: string; label: string }[] = [
   { key: "reiz", label: "Reizbarkeit" },
   { key: "fog", label: "Brain Fog" },
   { key: "erschoepf", label: "Erschöpfung" },
+  // Übliche Zyklus-Symptome (Sammelliste Punkt 12)
+  { key: "kraempfe", label: "Unterleibskrämpfe" },
+  { key: "brust", label: "Brustspannen" },
+  { key: "blaeh", label: "Blähbauch, Wassereinlagerungen" },
+  { key: "heisshunger", label: "Heißhunger" },
+  { key: "ruecken", label: "Rückenschmerzen" },
+  { key: "haut", label: "Hautunreinheiten" },
+  { key: "uebel", label: "Übelkeit" },
+  { key: "unruhe", label: "Ängstlichkeit, innere Unruhe" },
+  { key: "schwindel", label: "Schwindel" },
+  { key: "libido", label: "Libido verändert" },
+  { key: "schmier", label: "Schmierblutung" },
 ];
+
+// Wie viele Knöpfe im Tagebuch ohne „Weitere anzeigen“ sichtbar sind (mindestens)
+export const VISIBLE_MIN = 6;
+
+// Oben: heute eingetragen oder in den letzten Wochen genutzt, aufgefüllt in Listenreihenfolge bis VISIBLE_MIN. Rest unter „Weitere“.
+export function splitFrequent<T extends { key: string }>(items: T[], used: Set<string>): { top: T[]; rest: T[] } {
+  const top = items.filter((i) => used.has(i.key));
+  for (const i of items) {
+    if (top.length >= VISIBLE_MIN) break;
+    if (!top.includes(i)) top.push(i);
+  }
+  const order = new Map(items.map((i, n) => [i.key, n]));
+  top.sort((a, b) => order.get(a.key)! - order.get(b.key)!);
+  return { top, rest: items.filter((i) => !top.includes(i)) };
+}
 
 export const LEVELS = ["", "leicht", "mittel", "stark"];
 
