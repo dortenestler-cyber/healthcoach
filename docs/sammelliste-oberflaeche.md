@@ -20,4 +20,8 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Mit der Maus über einen Bogen fahren oder auf einen Bogen tippen zeigt die Phase mit Zeitraum, z. B. „Eisprung · 18.–20. Nov. · Tag 13–15“. Die Anzeige erscheint in der Mitte des Rings anstelle von „Tag 18“. Noch einmal tippen oder daneben tippen führt zurück. Geschätzte Tage sind als „etwa“ gekennzeichnet. Jeder Bogen bekommt eine Tippfläche von mindestens 44 px und eine Beschriftung für den Screenreader.
    Dateien: `components/zyklus/CycleRing.tsx`
 
+4. ☐ **Heute: Medikamente und Supplements zusammenklappen, wenn alles abgehakt ist** (23.11.)
+   Sobald alle festen Einnahmen des Tages abgehakt sind, zeigt Heute statt der Liste nur noch eine Zeile: „✓ Medikamente und Supplements · alles genommen (5 von 5)“ mit Pfeil. Tippen klappt die Liste wieder auf, z. B. um etwas rückgängig zu machen. „Bufori bei Bedarf“ mit „+ Hub“ bleibt sichtbar, weil man es jederzeit spontan braucht. „Krank oder verletzt?“ bleibt ebenfalls. Im Tagebuch bleibt die volle Liste.
+   Dateien: `components/HealthToday.tsx`, evtl. `components/IntakeChecklist.tsx`
+
 ## Erledigt
