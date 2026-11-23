@@ -38,3 +38,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-23 · OF · Nutzerin: Sammelliste Runde 2 (Punkte 14–21) komplett freigegeben, auch Konzept Datenaktualisierung (Teil A und B)
 2026-11-23 · OF · Nutzerin: „Last“ heißt künftig „Belastung“ (nicht „Trainingsbelastung“), mit Zusatz „mit Alltag“ bzw. „nur Training“
 2026-11-23 · DA · Nutzerin: Garmin-Abruf tagsüber alle 2 Stunden (8–22 Uhr wie vorgeschlagen), B2 schneller nach dem Training ja
+2026-11-23 · DA · Nutzerin: Wachphasen (Anzahl) und Sauerstoffsättigung im Schlaf speichern (Migration freigegeben). Hauttemperatur vollständig aus App, Uhr und Datenbank entfernen, weil Garmin sie über die Personal API nicht liefert. Schlafphasen mit Uhrzeit gibt es ebenfalls nicht (PR #84, #87, #90)

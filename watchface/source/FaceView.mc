@@ -250,7 +250,7 @@ class FaceView extends WatchUi.WatchFace {
     // Feld = [Icon, Geisterziffern, Wert, Farbe] oder null bei "Leer"
     function cell(i, hc, ctx, color) {
         var t = slots[i];
-        if (t == null || t <= 0 || t >= Fields.ICON.size()) {
+        if (t == null || t <= 0 || t >= Fields.ICON.size() || t == 31) { // 31: frühere Hauttemperatur, gilt als leer
             return null;
         }
         return [Fields.ICON[t], Fields.GHOST[t], Fields.value(t, hc, ctx), color];

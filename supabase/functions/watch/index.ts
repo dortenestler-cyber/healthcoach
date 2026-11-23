@@ -139,7 +139,6 @@ Deno.serve(async (req) => {
           phase: t.phase,
           hrv: t.hrv,
           sleep: t.sleep,
-          skin: t.skin,
           fa: t.fitnessAge,
           rhr: t.rhr,
         });
@@ -163,7 +162,7 @@ async function today(sb: Any, uid: string, day: string) {
     sb.from("planned_sessions").select("sport, time, status").eq("user_id", uid).eq("day", day).neq("status", "ausgelassen"),
     sb.from("illnesses").select("label, kind, severity, fever, below_neck").eq("user_id", uid).is("ended_on", null).limit(1),
     sb.from("injuries").select("spot").eq("user_id", uid).is("ended_on", null),
-    // Alle Spalten, damit neue Spalten (Hauttemperatur, Fitness-Alter) fehlen dürfen, ohne dass die Abfrage scheitert
+    // Alle Spalten, damit neue Spalten (z. B. Fitness-Alter) fehlen dürfen, ohne dass die Abfrage scheitert
     sb.from("garmin_daily").select("*").eq("user_id", uid).gte("day", addDays(day, -179)).order("day"),
     sb.from("kb_plans").select("id, name, weeks, step_kg, step_every_weeks, start_date").eq("user_id", uid).eq("active", true).order("created_at", { ascending: false }).limit(1),
     sb.from("diary_entries").select("day, bleeding, symptoms").eq("user_id", uid).gte("day", addDays(day, -179)).order("day"),
@@ -261,7 +260,6 @@ async function today(sb: Any, uid: string, day: string) {
     goal: target.score,
     fitnessAge: fa,
     rhr: g?.resting_hr ?? null,
-    skin: typeof g?.skin_temp_delta === "number" ? g.skin_temp_delta : null,
     bb: g?.bb_max ?? null,
     hrv: g?.hrv_last_night ?? null,
     sleep: g?.sleep_score ?? null,
