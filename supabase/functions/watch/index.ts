@@ -51,6 +51,22 @@ const SPORT_LABEL: Record<string, string> = { karate: "KARATE", kettlebell: "KET
 // deno-lint-ignore no-explicit-any
 type Any = any;
 
+// 100 % entspricht grob einem harten Trainingstag (FULL_DAY_LOAD in lib/insights.ts)
+const FULL_DAY_LOAD = 150;
+function dayLoadPct(day: string, g: Any, acts: Any[]): number {
+  const tl = acts.filter((a) => String(a.start_local ?? "").slice(0, 10) === day).reduce((s, a) => s + (Number(a.training_load) || 0), 0);
+  const pctOf = (v: number) => (v / FULL_DAY_LOAD) * 100;
+  const ld = g?.load_daily_min;
+  const ok = ld && typeof ld === "object" && (ld.v === 1 || ld.v === 2) && Array.isArray(ld.training) && Array.isArray(ld.alltag);
+  if (!ok) {
+    const im = g?.intensity_minutes ?? 0;
+    return Math.round(Math.min(100, Math.max((im / 60) * 100, pctOf(tl))));
+  }
+  const training = tl || ld.last_training || 0;
+  const alltag = Math.max(0, ld.last_alltag ?? 0);
+  return Math.round(Math.min(100, pctOf(training + alltag)));
+}
+
 Deno.serve(async (req) => {
   try {
     if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
@@ -171,7 +187,7 @@ async function today(sb: Any, uid: string, day: string) {
     // Für das eigene Fitness-Alter: Geburtsjahr, Bauchumfang, Einheiten der letzten 4 Wochen, Krankheiten
     sb.from("settings").select("data").eq("user_id", uid).maybeSingle(),
     sb.from("body_measurements").select("day, waist_cm").eq("user_id", uid).gte("day", addDays(day, -179)).order("day"),
-    sb.from("garmin_activities").select("start_local, duration_s, avg_hr").eq("user_id", uid).gte("start_local", addDays(day, -28)),
+    sb.from("garmin_activities").select("start_local, duration_s, avg_hr, training_load").eq("user_id", uid).gte("start_local", addDays(day, -28)),
     // Krankheiten: für das Fitness-Alter (4 Wochen) und damit kranke Tage nicht in die Bereiche der Readiness zählen (150 Tage)
     sb.from("illnesses").select("started_on, ended_on").eq("user_id", uid).or(`ended_on.is.null,ended_on.gte.${addDays(day, -179)}`),
   ]);
@@ -249,6 +265,8 @@ async function today(sb: Any, uid: string, day: string) {
     day,
   });
   const fa = fit?.fitnessAge ?? null;
+  // Belastung bisher in Prozent, wie dayLoad in der App (lib/insights.ts)
+  const load = dayLoadPct(day, g, (acts.data ?? []) as Any[]);
 
   return {
     day,
@@ -258,6 +276,9 @@ async function today(sb: Any, uid: string, day: string) {
     cycleDay,
     phase: phaseShort(cycleDay, cyc.length),
     goal: target.score,
+    load,
+    band: [target.lo, target.hi],
+    factors: target.factors,
     fitnessAge: fa,
     rhr: g?.resting_hr ?? null,
     bb: g?.bb_max ?? null,

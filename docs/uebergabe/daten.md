@@ -1,5 +1,5 @@
 # Übergabe · Daten (DA)
-Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014pVPWfbWZKGBYgAAtBghby
+Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014pVPWghKapPifGTJZo8ABF
 
 Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`, `.github/`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
@@ -8,6 +8,8 @@ Korridore Teil B Daten ist fertig und läuft (PR #63–#73): Alltagslast aus dem
 
 ## In Arbeit
 - PR #90 (gemergt 23.11., „Daten prüfen“ 12:36: `awake_count` und `spo2_avg` an 3 von 14 Nächten, also alle aus dem Abrufzeitraum; ältere Nächte nur über „Ein Jahr laden“ im Verlauf): `awake_count`, `spo2_avg`, `spo2_low` aus der Schlafübersicht. `skin_temp_delta`, `sleep_levels`, `sleep_detail_diag` per Migration entfernt, Nacht-Abfrage (`dailySleep`) und Fehlersuche aus `garmin-sync` entfernt, `skin` aus `watch`, Zifferblatt-Feld 31 entfernt (Nummer bleibt frei, gilt als leer), `lib/backup.ts` lässt entfernte Spalten beim Einspielen weg. Nach Merge und Synchronisieren „Daten prüfen“ (Abschnitt „Nachtwerte“).
+- PR #93 (Entwurf, wartet auf Freigabe zum Merge, ändert die Funktion `watch`): Glance nach Vorlage (`docs/bilder/vorlagen/18-uhr-glance.png`): Tagesziel bisher in Segmentziffern, Zielbereich, Faktoren mit Abzug, nächste Einheit. `watch` liefert dafür `load` (wie `dayLoad`), `band` [lo, hi] und `factors` [{k, e}]; `targetScore` in `watch/target.ts` gibt dazu Bereich und Faktoren zurück. Monkey C nur über den Lauf `watch-build` geprüft.
+- Konzept Zifferblatt Fenix 9 Pro 47 mm (454 px): `docs/entwurf-zifferblatt.html`, veröffentlicht unter https://claude.ai/artifact/QT4fgePZ9sizxoYyygED86. Vorlagen aus dem Klick-Dummy: `docs/bilder/vorlagen/17-uhr-zifferblatt.png`, `18-uhr-glance.png`. Nächster Schritt nach Freigabe: Maße für 454 px, Ordner `resources-round-454x454`, Farbmodus statt 9 Farbreglern, gewählte Layouts (Vorschläge 15–20).
 - Ergebnis PR #87 (23.11. 12:12): Einzelne Nacht nur über `/wellness-service/wellness/dailySleep?date=`, liefert dieselben Felder wie die Übersicht. Weder Hauttemperatur (kein Feld mit „temp“, kein `skinTempDataExists`) noch `sleepLevels`. Vorhanden und noch ungenutzt: `awakeCount`, `avgSleepStress`, `averageSpO2Value`/`lowestSpO2Value`, `lowestRespirationValue`/`highestRespirationValue`, `avgHeartRate`, `breathingDisruptionSeverity`, `sleepAlignment.*`, `sleepNeed.*`. Nächster Schritt nach Entscheidung der Nutzerin: Nacht-Abfrage und `sleep_detail_diag` entfernen (bringt nichts Neues, kostet Abrufe), ggf. `awakeCount` speichern.
 - Ergebnis PR #84 (23.11. 12:00): `dailySleepData` unter allen vier Pfaden 404 (wie `dailyStress`). Hauttemperatur weiter 0 Nächte, obwohl Garmin Connect sie zeigt. PR #87: Feldnamen der Schlafübersicht (`keyPaths`, nur Namen) in `sleep_detail_diag.uebersicht_felder`, Zeitachse auch aus der Übersicht lesen, zwei weitere Pfade (`dailySleep?date=`).
 - PR #84 (gemergt): je Nacht `dailySleepData` (Pfade `SLEEP_PATHS`), Zeitachse in `sleep_levels`, Hauttemperatur aus der Nacht, Fehlersuche in `sleep_detail_diag` (nur Feldnamen). Nach Merge und Synchronisieren „Daten prüfen“ starten: Abschnitte „Einzelne Nächte“ und „Fehlersuche Schlaf-Detail“. Je nach Ergebnis Feldnamen in `findSkinTemp`/`sleepLevels` anpassen, danach `sleep_detail_diag` wieder entfernen (Spalte bleibt leer oder per Migration löschen).
@@ -24,6 +26,7 @@ Korridore Teil B Daten ist fertig und läuft (PR #63–#73): Alltagslast aus dem
 - Alltagslast Version 2: ohne Bewegungsdaten zählt Zone 1 ab 10 Minuten am Stück, Zone 2 und höher immer (`bewegung: "dauer"`). Ältere Tage (v1) rechnet jeder Abruf nach.
 
 ## Wartet auf
+- Nutzerin: Freigabe zum Merge von PR #93 (Glance, ändert `watch`). Entscheidung: Farbmodus „Einfarbig/Bedeutung/Nacht“ statt 9 Farbreglern?
 
 ## Für die andere Rolle
 - Oberfläche: Entscheidung der Nutzerin (23.11., Logbuch): **Temperatur vollständig aus der App entfernen.** Ab PR #90 gibt es `garmin_daily.skin_temp_delta` nicht mehr (Abfragen mit `select("*")` laufen weiter, der Wert fehlt einfach). Bitte entfernen: Kachel und Hinweise in `components/heute/GlanceTiles.tsx` und `HeuteDetail.tsx` (auch Serie „temperatur“ ab 5 Tagen), `components/verlauf/VerlaufDetail.tsx`, `components/charts/LineBand.tsx`, `components/zyklus/ZyklusView.tsx`, `components/gesundheit/HabitDetail.tsx`, in `lib/` `garmin.ts` (Typ, Kennzahl), `baseline.ts`, `today.ts`, `cycle.ts`, `ovulation.ts`, `zyklusSeite.ts`, `habitStats.ts`, `coachContext.ts`, `useGarminSync.ts` (`skinTempNights`, `skinNote` kommen nicht mehr). Konzepte in `docs/` anpassen (Heute-Einstieg: vierte Kachel statt Hauttemperatur).

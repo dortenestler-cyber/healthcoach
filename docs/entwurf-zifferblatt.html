@@ -1,0 +1,687 @@
+<title>Zifferblatt Fenix 9 Pro</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap">
+<style>
+/* Layout: eine Spalte mit Abschnitten, Zifferblatt groß links, Steuerung rechts, Vorschläge im Raster */
+:root {
+  color-scheme: dark;
+  --bg: #0B0D10;
+  --card: #15181D;
+  --card-2: #1C2026;
+  --fill: #262B33;
+  --line: #3A414B;
+  --line-soft: #22272E;
+  --text: #F2F4F7;
+  --text-2: #C9CFD6;
+  --muted: #9AA3AE;
+  --sage: #52B788;
+  --sage-hell: #8FD5B0;
+  --terra: #E8845A;
+  --slate: #7C9AE0;
+  --amber: #F0A24A;
+  --tuerkis: #45C4C0;
+  --schlaf: #E5E7EB;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Share Tech Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.5;
+  font-variant-numeric: tabular-nums; margin: 0;
+}
+.wrap {
+  max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px; display: flex; flex-direction: column; gap: 28px;
+}
+header { display: flex; flex-direction: column; gap: 8px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1 { font-size: 34px; line-height: 1.15; margin: 0; letter-spacing: -.02em; text-wrap: balance; }
+h2 { font-size: 22px; margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+h3 { font-size: 16px; margin: 0; }
+p { margin: 0; max-width: 68ch; color: var(--text-2); }
+.tag { display: inline-flex; align-self: flex-start; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--fill); color: var(--text-2); }
+section.card { background: var(--card); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.fact { background: var(--card-2); border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fact b { font-size: 22px; letter-spacing: -.01em; }
+.fact span { font-size: 13px; color: var(--muted); }
+.stage { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 24px; align-items: start; }
+.facebox { display: flex; flex-direction: column; gap: 12px; align-items: center; min-width: 0; }
+.facebox svg { width: 100%; max-width: 520px; height: auto; display: block; }
+.seg { display: inline-flex; background: var(--card-2); border-radius: 999px; padding: 4px; gap: 4px; flex-wrap: wrap; }
+.seg button {
+  font: inherit; font-size: 13px; font-weight: 600; border: 0; border-radius: 999px; min-height: 44px; padding: 0 16px;
+  background: transparent; color: var(--text-2); cursor: pointer;
+}
+.seg button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+.seg button:focus-visible, select:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.ctl { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.ctl-row { display: flex; flex-direction: column; gap: 6px; }
+.ctl-row > .lbl { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.slot { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.slot label { font-size: 13px; color: var(--muted); }
+select {
+  font: inherit; font-size: 14px; color: var(--text); background: var(--card-2); border: 1px solid var(--line);
+  border-radius: 12px; min-height: 44px; padding: 0 10px; width: 100%;
+}
+.group { display: flex; flex-direction: column; gap: 8px; }
+.group > .lbl { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.note { font-size: 13px; color: var(--muted); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+th { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+td.num { font-family: var(--mono); font-size: 15px; white-space: nowrap; }
+.tbl { overflow-x: auto; }
+.sw { display: inline-flex; align-items: center; gap: 8px; }
+.dot { width: 14px; height: 14px; border-radius: 50%; flex: 0 0 auto; }
+.modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.mode { background: var(--card-2); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.mode .rec { font-size: 12px; font-weight: 600; color: var(--sage-hell); }
+.props { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.prop { background: var(--card-2); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.prop svg { width: 100%; max-width: 320px; height: auto; align-self: center; display: block; }
+.prop h3 { display: flex; gap: 8px; align-items: baseline; }
+.prop h3 .nr { font-family: var(--mono); color: var(--muted); font-weight: 400; }
+.prop dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; font-size: 13px; }
+.prop dt { color: var(--muted); }
+.prop dd { margin: 0; color: var(--text-2); }
+ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; flex-direction: column; gap: 6px; max-width: 76ch; }
+.decide { border: 1px solid var(--line); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+@media (max-width: 860px) {
+  .stage { grid-template-columns: minmax(0, 1fr); }
+  h1 { font-size: 28px; }
+  section.card { padding: 18px; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Health Coach · Uhr</p>
+    <h1>Zifferblatt für die Fenix 9 Pro 47 mm</h1>
+    <p>Konzept für das Zifferblatt „Datenraster“ nach der Vorlage aus dem Klick-Dummy, gerechnet für das 454-Pixel-Display. Dazu austauschbare Werte, ein Farbkonzept mit fester Bedeutung und sechs neue Vorschläge, digital und minimalistisch.</p>
+    <span class="tag">Alle Werte sind Beispieldaten</span>
+  </header>
+
+  <section class="card" aria-labelledby="h-geraet">
+    <h2 id="h-geraet">Das Display</h2>
+    <p>Die 47-mm-Pro mit AMOLED hat 454 × 454 Pixel. Die Vorlage ist für einen Kreis von 344 px gezeichnet, also wird alles um den Faktor 1,32 vergrößert und auf ganze Pixel gerundet, damit Linien und Segmente scharf bleiben.</p>
+    <div class="facts">
+      <div class="fact"><b>454 × 454</b><span>Pixel, rund, 1,4 Zoll</span></div>
+      <div class="fact"><b>AMOLED</b><span>Schwarz leuchtet nicht und spart Akku</span></div>
+      <div class="fact"><b>× 1,32</b><span>Vorlage 344 px → 454 px</span></div>
+      <div class="fact"><b>≤ 10 %</b><span>leuchtende Pixel im Modus „Immer an“</span></div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-raster">
+    <h2 id="h-raster">Datenraster in 454 Pixeln</h2>
+    <p>So sieht das Zifferblatt auf der Uhr aus. Tippe unten auf einen Modus. Rechts tauschst du jeden der 14 Werte und die beiden Strich-Anzeigen aus, so wie später in Garmin Connect.</p>
+    <div class="stage">
+      <div class="facebox">
+        <svg id="face" viewBox="-20 -20 494 494" role="img" aria-label="Zifferblatt Datenraster mit Beispieldaten"></svg>
+        <div class="seg" role="group" aria-label="Anzeige">
+          <button type="button" id="m-active" aria-pressed="true">Aktiv</button>
+          <button type="button" id="m-aod" aria-pressed="false">Immer an</button>
+        </div>
+        <div class="seg" role="group" aria-label="Farbmodus">
+          <button type="button" id="c-mono" aria-pressed="true">Einfarbig</button>
+          <button type="button" id="c-meaning" aria-pressed="false">Bedeutung</button>
+          <button type="button" id="c-night" aria-pressed="false">Nacht</button>
+        </div>
+      </div>
+      <div class="ctl" id="ctl"></div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-farbe">
+    <h2 id="h-farbe">Farbkonzept</h2>
+    <p>Bisher kann jeder der 9 Bereiche eine beliebige Farbe bekommen. Dann steht zum Beispiel Beere neben dem Puls, und eine Farbe verliert ihre Bedeutung. Vorschlag: statt 9 Farbreglern gibt es einen Farbmodus. Die Farbe kommt immer aus dem Wert, nie aus dem Platz.</p>
+    <div class="modes">
+      <div class="mode">
+        <h3>Einfarbig</h3>
+        <p class="note">Wie die Vorlage: Hellgrau auf Schwarz, Geisterziffern in Dunkelgrau. Ruhig und überall lesbar.</p>
+        <span class="rec">Standard</span>
+      </div>
+      <div class="mode">
+        <h3>Bedeutung</h3>
+        <p class="note">Icon und Zahl in der Farbe ihrer Familie aus dem Farbsystem „Nacht“. Uhrzeit, Linien und neutrale Werte bleiben grau. Jede Farbe steht mit Icon und Zahl.</p>
+      </div>
+      <div class="mode">
+        <h3>Nacht</h3>
+        <p class="note">Alles auf etwa 55 % gedimmt, keine Farben. Schaltet sich auf Wunsch zur Schlafenszeit aus Garmin von selbst ein.</p>
+      </div>
+    </div>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Familie</th><th>Farbe auf der Uhr</th><th>Werte</th></tr></thead>
+        <tbody id="fam"></tbody>
+      </table>
+    </div>
+    <p class="note">Die Farben sind die Hauptfarben der App. Auf reinem Schwarz erreichen alle mindestens Kontrast 7:1. Türkis gehört nur zum Stress. Rot kommt nicht vor, auch nicht bei hohem Stress.</p>
+  </section>
+
+  <section class="card" aria-labelledby="h-vor">
+    <h2 id="h-vor">Neue Vorschläge, digital und minimalistisch</h2>
+    <p>Sechs Zifferblätter mit weniger Werten, alle in der Schrift und den Segmentziffern der Vorlage. Jedes hat einen eigenen Modus „Immer an“, und die Werte bleiben austauschbar.</p>
+    <div class="props" id="props"></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-umbau">
+    <h2 id="h-umbau">Was sich im Code ändert</h2>
+    <ul class="plain">
+      <li>Eigene Maße für 454 px (ganze Pixel) statt der freien Skalierung: Segmente 66 × 58 px mit 10 px Strich, Linien 1 px, Striche der Anzeigen 3 px.</li>
+      <li>Eigener Ordner <code>resources-round-454x454</code> mit Share Tech Mono in 22 px und Icons im 20-px-Raster, damit sie nicht verschwimmen.</li>
+      <li>Hintergrund reines Schwarz (#000) statt Dunkelgrau. Auf AMOLED verschmilzt das mit dem Rand und spart Akku.</li>
+      <li>Modus „Immer an“: nur Uhrzeit ohne Geisterziffern und Datum, gedimmt, verschiebt sich jede Minute um ein paar Pixel gegen Einbrennen.</li>
+      <li>Garmin Connect: 14 Felder und 2 Strich-Anzeigen bleiben wählbar. Die 9 Farbregler werden durch „Farbmodus“ und „Nacht automatisch“ ersetzt.</li>
+      <li>Neue Zifferblätter werden als Auswahl „Layout“ im selben Zifferblatt gebaut, nicht als eigene Apps. So bleiben Uhr-Schlüssel und Daten gleich.</li>
+    </ul>
+    <div class="decide">
+      <h3>Zu entscheiden</h3>
+      <ul class="plain">
+        <li>Welche Vorschläge sollen als Layout dazukommen? (Nummer nennen)</li>
+        <li>Farbmodus „Bedeutung“ und „Nacht“ so übernehmen, statt der 9 Farbregler?</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var NS = "http://www.w3.org/2000/svg";
+  var K = 454 / 344;
+  function S(v) { return Math.round(v * K * 10) / 10; }
+
+  // Farben auf der Uhr (Vorlage) und Familien aus „Nacht“
+  var C = { bg: "#000000", ghost: "#2A2B2F", line: "#2C2D31", ring: "#25262A", ring2: "#1F2023", bright: "#CFD0CB", muted: "#7E8085",
+    time: "#E4E5DF", segOff: "#202125", sec: "#9C9EA3", bezel: "#F2F2EE", barOn: "#E8E8E4", cornerOn: "#9C9EA3", barOff: "#2A2B2F" };
+  var FAM = {
+    erholung: { name: "Erholung", col: "#52B788" },
+    energie: { name: "Energie", col: "#8FD5B0" },
+    schlaf: { name: "Schlaf", col: "#E5E7EB" },
+    zyklus: { name: "Zyklus", col: "#E8845A" },
+    symptom: { name: "Symptome", col: "#F0A24A" },
+    training: { name: "Training", col: "#7C9AE0" },
+    alltag: { name: "Alltag", col: "#C3D1F2" },
+    stress: { name: "Stress", col: "#45C4C0" },
+    neutral: { name: "Neutral", col: null }
+  };
+
+  // Icons wie im Zifferblatt-Code (watchface/source/Icons.mc, 16er-Raster): Flächen f, Aussparungen h in Schwarz
+  var ICON = {"bb": [["f", "M1 4h12v8h-12z"], ["h", "M2.5 5.5h9v5h-9z"], ["f", "M13 6h2v4h-2z"], ["f", "M8 5.5L5.5 8.5L7.5 8.5L6.5 10.5L9.5 7.5L7.5 7.5z"]], "batt": [["f", "M1 4h12v8h-12z"], ["h", "M2.5 5.5h9v5h-9z"], ["f", "M13 6h2v4h-2z"], ["f", "M3.5 6.5h5v3h-5z"]], "cy": [["f", "M5 1L11 1L15 5L15 11L11 15L5 15L1 11L1 5z"], ["h", "M5.6 2.5L10.4 2.5L13.5 5.6L13.5 10.4L10.4 13.5L5.6 13.5L2.5 10.4L2.5 5.6z"], ["f", "M4.5 9h3v3h-3z"]], "phase": [["f", "M5 1L11 1L15 5L15 11L11 15L5 15L1 11L1 5z"], ["h", "M5.6 2.5L10.4 2.5L13.5 5.6L13.5 10.4L10.4 13.5L5.6 13.5L2.5 10.4L2.5 5.6z"], ["f", "M8 4h4v8h-4z"]], "su": [["f", "M2 12h12v1.5h-12z"], ["f", "M4.5 12L4.5 10L6 8.5L10 8.5L11.5 10L11.5 12z"], ["f", "M8 1.5L10.5 4.5L9 4.5L9 7L7 7L7 4.5L5.5 4.5z"]], "sd": [["f", "M2 12h12v1.5h-12z"], ["f", "M4.5 12L4.5 10L6 8.5L10 8.5L11.5 10L11.5 12z"], ["f", "M8 7L5.5 4L7 4L7 1.5L9 1.5L9 4L10.5 4z"]], "cl": [["f", "M1.5 12.5L1.5 9.5L3.5 7.5L5.5 7.5L7.5 5L11 5L13 7L13 8.5L14.5 10L14.5 12.5z"]], "dr": [["f", "M8 1L13 8L11 14L5 14L3 8z"]], "spo2": [["f", "M8 1L13 8L11 14L5 14L3 8z"], ["h", "M8 5L10.5 8.5L9.5 11.5L6.5 11.5L5.5 8.5z"]], "he": [["f", "M2 4L4 2L6 2L8 4L10 2L12 2L14 4L14 7.5L8 13.5L2 7.5z"]], "rhr": [["f", "M2 4L4 2L6 2L8 4L10 2L12 2L14 4L14 7.5L8 13.5L2 7.5z"], ["h", "M4 6.5h8v1.5h-8z"]], "hrv": [["f", "M2 4L4 2L6 2L8 4L10 2L12 2L14 4L14 7.5L8 13.5L2 7.5z"], ["h", "M3 6.5L5.5 6.5L7 4L9 9L10.5 6.5L13 6.5L13 7.8L11.2 7.8L9 11.5L7 6.7L6.2 7.8L3 7.8z"]], "fl": [["f", "M8 1L11 5L10 7.5L12 6.5L13 10L10.5 14.5L5.5 14.5L3 10L4 6.5L6 8.5z"]], "kcal": [["f", "M8 1L11 5L10 7.5L12 6.5L13 10L10.5 14.5L5.5 14.5L3 10L4 6.5L6 8.5z"], ["h", "M8 8L10 11L9 13L7 13L6 11z"]], "st": [["f", "M2.5 2h4v6.5h-4z"], ["f", "M3 10h3v2.5h-3z"], ["f", "M9.5 4.5h4v6.5h-4z"], ["f", "M10 12.5h3v2.5h-3z"]], "ta": [["f", "M1 1h14v14h-14z"], ["h", "M2.5 2.5h11v11h-11z"], ["f", "M4.5 4.5h7v7h-7z"], ["h", "M6 6h4v4h-4z"], ["f", "M7.25 7.25h1.5v1.5h-1.5z"]], "ready": [["f", "M1 1h14v14h-14z"], ["h", "M2.5 2.5h11v11h-11z"], ["f", "M4 8L5.5 6.5L7.5 8.5L11 4L12.5 5.5L7.5 11.5z"]], "be": [["f", "M4 11L4 6L6 3L10 3L12 6L12 11L13.5 12.5L2.5 12.5z"], ["f", "M6.5 13.5h3v1.5h-3z"]], "alarm": [["f", "M4 11L4 6L6 3L10 3L12 6L12 11L13.5 12.5L2.5 12.5z"], ["f", "M6.5 13.5h3v1.5h-3z"], ["f", "M0.5 4h1.5v4h-1.5z"], ["f", "M14 4h1.5v4h-1.5z"]], "hg": [["f", "M3 1L13 1L13 3.5L9.5 8L13 12.5L13 15L3 15L3 12.5L6.5 8L3 3.5z"]], "recov": [["f", "M5 1L11 1L15 5L15 11L11 15L5 15L1 11L1 5z"], ["h", "M5.6 2.5L10.4 2.5L13.5 5.6L13.5 10.4L10.4 13.5L5.6 13.5L2.5 10.4L2.5 5.6z"], ["f", "M7.25 4.5h1.5v4h-1.5z"], ["f", "M7.25 7.25h4v1.5h-4z"]], "kb": [["f", "M5 1h6v1.5h-6z"], ["f", "M3.5 2.5h1.5v3.5h-1.5z"], ["f", "M11 2.5h1.5v3.5h-1.5z"], ["f", "M5 6L11 6L13.5 8.5L13.5 12.5L11 15L5 15L2.5 12.5L2.5 8.5z"]], "in": [["f", "M5.5 1h3.5v4.5h-3.5z"], ["f", "M3.5 6h7.5v8.5h-7.5z"], ["f", "M11 10h3.5v4.5h-3.5z"]], "pill": [["f", "M5 1L11 1L13 3L13 13L11 15L5 15L3 13L3 3z"], ["h", "M4.5 8.5L11.5 8.5L11.5 12.5L10.5 13.5L5.5 13.5L4.5 12.5z"]], "stress": [["f", "M10 1L4 9L7.5 9L6 15L12.5 6.5L9 6.5z"]], "floors": [["f", "M1 15L1 11L5 11L5 7L9 7L9 3L15 3L15 15z"]], "intens": [["f", "M2 8L8 2L14 8L14 10.5L8 4.5L2 10.5z"], ["f", "M2 13L8 7L14 13L14 15.5L8 9.5L2 15.5z"]], "dist": [["f", "M8 1L13 4L13 8L8 15L3 8L3 4z"], ["h", "M6.5 4.5h3v3h-3z"]], "resp": [["f", "M7.25 1h1.5v6h-1.5z"], ["f", "M2 6L4 4L6.5 4L6.5 14L2 14z"], ["f", "M9.5 4L12 4L14 6L14 14L9.5 14z"]], "alt": [["f", "M1 14L6 5L9 10L11 7L15 14z"]], "press": [["f", "M1 12L2 7L5 3.5L8 2.5L11 3.5L14 7L15 12z"], ["h", "M3.5 12L4.3 8L6.2 5.6L8 5L9.8 5.6L11.7 8L12.5 12z"], ["f", "M7.3 12L10.5 6L8.7 12z"]], "move": [["f", "M1 11h2v4h-2z"], ["f", "M4 9h2v6h-2z"], ["f", "M7 7h2v8h-2z"], ["f", "M10 5h2v10h-2z"], ["f", "M13 3h2v12h-2z"]], "sleep": [["f", "M9 1L5 2.5L2.5 6L2.5 10L5 13.5L9 15L13 13.5L15 10.5L11 11L8 9L7 5.5z"]], "temp": [["f", "M6.5 1h3v9h-3z"], ["f", "M4.5 10.5L6 9L10 9L11.5 10.5L11.5 13.5L10 15L6 15L4.5 13.5z"]], "cross": [["f", "M6 2L10 2L10 6L14 6L14 10L10 10L10 14L6 14L6 10L2 10L2 6L6 6z"]]};
+
+  // Wählbare Werte, Nummern wie in settings.xml (Beispieldaten)
+  var VALUES = [
+    null,
+    { n: "Body Battery", v: "54", g: "88", i: "bb", f: "energie", grp: "Health Coach und Körper" },
+    { n: "Zyklustag", v: "18", g: "88", i: "cy", f: "zyklus", grp: "Health Coach und Körper" },
+    { n: "Sonnenaufgang", v: "0744", g: "8888", i: "su", f: "neutral", grp: "Umgebung" },
+    { n: "Sonnenuntergang", v: "1612", g: "8888", i: "sd", f: "neutral", grp: "Umgebung" },
+    { n: "Temperatur", v: "8°", g: "8°", i: "cl", f: "neutral", grp: "Umgebung" },
+    { n: "Regenwahrscheinlichkeit", v: "30", g: "88", i: "dr", f: "neutral", grp: "Umgebung" },
+    { n: "Puls", v: "62", g: "88", i: "he", f: "neutral", grp: "Health Coach und Körper" },
+    { n: "Hitzewallungen (24 h)", v: "2", g: "8", i: "fl", f: "symptom", grp: "Health Coach und Körper" },
+    { n: "Schritte", v: "6420", g: "8888", i: "st", f: "alltag", grp: "Aktivität" },
+    { n: "Tagesziel bisher", v: "18", g: "88", i: "ta", f: "training", grp: "Health Coach und Körper" },
+    { n: "Benachrichtigungen", v: "3", g: "8", i: "be", f: "neutral", grp: "Uhr" },
+    { n: "Fitness-Alter", v: "36", g: "88", i: "hg", f: "training", grp: "Health Coach und Körper" },
+    { n: "Nächste Einheit", v: "18:00", g: "88:88", i: "kb", f: "training", grp: "Health Coach und Körper" },
+    { n: "Bufori-Hübe heute", v: "1", g: "8", i: "in", f: "symptom", grp: "Health Coach und Körper" },
+    { n: "Stress", v: "24", g: "88", i: "stress", f: "stress", grp: "Health Coach und Körper" },
+    { n: "Ruhepuls", v: "58", g: "88", i: "rhr", f: "erholung", grp: "Health Coach und Körper" },
+    { n: "Etagen", v: "6", g: "88", i: "floors", f: "alltag", grp: "Aktivität" },
+    { n: "Intensitätsminuten (Woche)", v: "110", g: "888", i: "intens", f: "training", grp: "Aktivität" },
+    { n: "Kalorien", v: "1840", g: "8888", i: "kcal", f: "neutral", grp: "Aktivität" },
+    { n: "Distanz (km)", v: "4,8", g: "88,8", i: "dist", f: "alltag", grp: "Aktivität" },
+    { n: "Sauerstoffsättigung", v: "96", g: "88", i: "spo2", f: "neutral", grp: "Health Coach und Körper" },
+    { n: "Atemfrequenz", v: "14", g: "88", i: "resp", f: "neutral", grp: "Health Coach und Körper" },
+    { n: "Höhe (m)", v: "312", g: "8888", i: "alt", f: "neutral", grp: "Umgebung" },
+    { n: "Luftdruck (hPa)", v: "1013", g: "8888", i: "press", f: "neutral", grp: "Umgebung" },
+    { n: "Akku", v: "72", g: "88", i: "batt", f: "neutral", grp: "Uhr" },
+    { n: "Wecker", v: "1", g: "8", i: "alarm", f: "neutral", grp: "Uhr" },
+    { n: "Bewegungsbalken", v: "2", g: "8", i: "move", f: "alltag", grp: "Aktivität" },
+    { n: "Erholungszeit (h)", v: "14", g: "88", i: "recov", f: "training", grp: "Aktivität" },
+    { n: "HRV", v: "38", g: "88", i: "hrv", f: "erholung", grp: "Health Coach und Körper" },
+    { n: "Schlafwert", v: "74", g: "88", i: "sleep", f: "schlaf", grp: "Health Coach und Körper" },
+    { n: "Hauttemperatur", v: "+0,3", g: "+8,8", i: "temp", f: "zyklus", grp: "Health Coach und Körper" },
+    { n: "Readiness", v: "7,4", g: "8,8", i: "ready", f: "erholung", grp: "Health Coach und Körper" },
+    { n: "Zyklusphase", v: "LUT", g: "888", i: "phase", f: "zyklus", grp: "Health Coach und Körper" },
+    { n: "Offene Einnahmen", v: "1", g: "8", i: "pill", f: "neutral", grp: "Health Coach und Körper" }
+  ];
+  var GAUGES = [
+    { n: "Leer", v: null, f: "neutral" },
+    { n: "Tagesziel bisher", v: 0.18, f: "training" },
+    { n: "Akku", v: 0.8, f: "neutral" },
+    { n: "Body Battery", v: 0.54, f: "energie" },
+    { n: "Schrittziel", v: 0.64, f: "alltag" },
+    { n: "Stress", v: 0.24, f: "stress" },
+    { n: "Bewegungsbalken", v: 0.4, f: "alltag" },
+    { n: "Intensitätsminuten-Ziel", v: 0.73, f: "training" },
+    { n: "Etagen-Ziel", v: 0.6, f: "alltag" },
+    { n: "Readiness", v: 0.74, f: "erholung" }
+  ];
+  var SLOTS = [
+    { k: "a1", n: "Oben links", def: 1, row: "Obere Zeile" }, { k: "a2", n: "Oben rechts", def: 2, row: "Obere Zeile" },
+    { k: "b1", n: "Links", def: 3, row: "Wetterzeile" }, { k: "b2", n: "Mitte links", def: 5, row: "Wetterzeile" },
+    { k: "b3", n: "Mitte rechts", def: 6, row: "Wetterzeile" }, { k: "b4", n: "Rechts", def: 4, row: "Wetterzeile" },
+    { k: "c1", n: "1", def: 7, row: "Unter der Uhrzeit" }, { k: "c2", n: "2", def: 8, row: "Unter der Uhrzeit" },
+    { k: "c3", n: "3", def: 9, row: "Unter der Uhrzeit" }, { k: "c4", n: "4", def: 10, row: "Unter der Uhrzeit" },
+    { k: "d1", n: "Links", def: 11, row: "Untere Zeile" }, { k: "d2", n: "Rechts", def: 12, row: "Untere Zeile" },
+    { k: "e1", n: "Links", def: 13, row: "Ganz unten" }, { k: "e2", n: "Rechts", def: 14, row: "Ganz unten" }
+  ];
+
+  var state = { mode: "active", color: "mono", slots: {}, gL: 1, gR: 2 };
+  SLOTS.forEach(function (s) { state.slots[s.k] = s.def; });
+
+  // ---------- Zeichen-Helfer
+  function el(name, attrs, parent) {
+    var e = document.createElementNS(NS, name);
+    for (var a in attrs) e.setAttribute(a, attrs[a]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  var cv = document.createElement("canvas").getContext("2d");
+  function textW(str, size, ls) {
+    cv.font = size + 'px "Share Tech Mono", monospace';
+    return cv.measureText(str).width + ls * size * str.length;
+  }
+  function txt(g, x, top, size, ls, str, col, anchor) {
+    var w = textW(str, size, ls);
+    var x0 = anchor === "middle" ? x - w / 2 : anchor === "end" ? x - w : x;
+    var t = el("text", { x: x0, y: top + size * 0.82, fill: col, "font-family": "Share Tech Mono, monospace", "font-size": size, "letter-spacing": (ls * size) + "px" }, g);
+    t.textContent = str;
+    return w;
+  }
+  // Wert mit Geisterziffern dahinter
+  function ghostTxt(g, x, top, size, ls, val, ghost, col, ghostCol) {
+    if (ghostCol) txt(g, x, top, size, ls, ghost, ghostCol);
+    return txt(g, x, top, size, ls, val, col);
+  }
+  function icon(g, key, x, top, size, col) {
+    var layers = ICON[key];
+    if (!layers) return;
+    var gg = el("g", { transform: "translate(" + x + " " + top + ") scale(" + size / 16 + ")" }, g);
+    layers.forEach(function (l) { el("path", { d: l[1], fill: l[0] === "h" ? "#000" : col }, gg); });
+  }
+  // Feld = Icon + Wert; gibt Breite zurück, zeichnet nur wenn draw
+  function fieldW(id, size, ls) {
+    var v = VALUES[id];
+    if (!v) return 0;
+    var isz = size * 0.88;
+    return isz + size * 0.3 + textW(v.g.length >= v.v.length ? v.g : v.v, size, ls);
+  }
+  function field(g, id, x, top, size, ls, defCol) {
+    var v = VALUES[id];
+    if (!v) return;
+    var col = colorFor(v.f, defCol);
+    var isz = size * 0.88;
+    icon(g, v.i, x, top + (size - isz) / 2 + 0.5, isz, col);
+    var tx = x + isz + size * 0.3;
+    ghostTxt(g, tx, top, size, ls, v.v, v.g, col, state.mode === "aod" ? null : ghostCol());
+  }
+  function ghostCol() { return state.color === "night" ? "#17181B" : C.ghost; }
+  function dim(hex) {
+    if (state.color !== "night") return hex;
+    var n = parseInt(hex.slice(1), 16), f = 0.55;
+    var r = Math.round(((n >> 16) & 255) * f), gg = Math.round(((n >> 8) & 255) * f), b = Math.round((n & 255) * f);
+    return "#" + ((1 << 24) + (r << 16) + (gg << 8) + b).toString(16).slice(1);
+  }
+  function grey(hex) {
+    var n = parseInt(hex.slice(1), 16);
+    var l = Math.round(0.3 * ((n >> 16) & 255) + 0.59 * ((n >> 8) & 255) + 0.11 * (n & 255));
+    return "#" + ((1 << 24) + (l << 16) + (l << 8) + l).toString(16).slice(1);
+  }
+  function colorFor(fam, defCol) {
+    if (state.color === "meaning" && FAM[fam] && FAM[fam].col) return FAM[fam].col;
+    return dim(defCol);
+  }
+  function seg7(g, str, x, top, w, h, t, gap, on, off) {
+    var map = { "0": "abcdef", "1": "bc", "2": "abged", "3": "abgcd", "4": "fgbc", "5": "afgcd", "6": "afgedc", "7": "abc", "8": "abcdefg", "9": "abcdfg", "-": "g", " ": "" };
+    var hv = h / 2;
+    var pos = { a: [0, 0, w, t], b: [w - t, 0, t, hv + t / 2], c: [w - t, hv - t / 2, t, hv + t / 2], d: [0, h - t, w, t], e: [0, hv - t / 2, t, hv + t / 2], f: [0, 0, t, hv + t / 2], g: [0, hv - t / 2, w, t] };
+    var cx = x;
+    str.split("").forEach(function (ch) {
+      if (ch === ":") {
+        el("rect", { x: cx, y: top + h * 0.26, width: t, height: t, fill: on }, g);
+        el("rect", { x: cx, y: top + h * 0.66, width: t, height: t, fill: on }, g);
+        cx += t + gap;
+        return;
+      }
+      var lit = map[ch] || "";
+      ["a", "b", "c", "d", "e", "f", "g"].forEach(function (k) {
+        var isOn = lit.indexOf(k) >= 0;
+        if (!isOn && !off) return;
+        var p = pos[k];
+        el("rect", { x: cx + p[0], y: top + p[1], width: p[2], height: p[3], fill: isOn ? on : off }, g);
+      });
+      cx += w + gap;
+    });
+    return cx - gap - x;
+  }
+  function segWidth(str, w, t, gap) {
+    var n = 0;
+    str.split("").forEach(function (ch) { n += (ch === ":" ? t : w) + gap; });
+    return n - gap;
+  }
+  function ticks(g, x, top, n, lit, w, h, gap, on, off, up) {
+    for (var i = 0; i < n; i++) {
+      var y = up ? top + (n - 1 - i) * (h + gap) : top + i * (h + gap);
+      el("rect", { x: x, y: y, width: w, height: h, fill: i < lit ? on : off }, g);
+    }
+  }
+  function hline(g, x1, x2, y, col) { el("rect", { x: x1, y: y, width: x2 - x1, height: 1, fill: col }, g); }
+  function vline(g, x, y1, y2, col) { el("rect", { x: x, y: y1, width: 1, height: y2 - y1, fill: col }, g); }
+  function bezel(svg, r) {
+    var c = r + 20;
+    el("circle", { cx: 227, cy: 227, r: c - 6, fill: "#1A1B1E", stroke: "#2A2B2F", "stroke-width": 2 }, svg);
+    el("circle", { cx: 227, cy: 227, r: 227, fill: "#000" }, svg);
+  }
+
+  // ---------- Datenraster (Maße der Vorlage × 1,32)
+  function drawRaster(svg) {
+    svg.innerHTML = "";
+    bezel(svg, 227);
+    var g = el("g", {}, svg);
+    var aod = state.mode === "aod";
+    var on = dim(C.time);
+    if (aod) {
+      // Nur Uhrzeit und Datum, gedimmt, ohne Geisterziffern
+      var col = "#8E9095";
+      var w = segWidth("10:56", S(50), S(8), S(10));
+      seg7(g, "10:56", 227 - w / 2, S(146), S(50), S(44), S(8), S(10), col, null);
+      txt(g, 227, S(40), S(17), 0.12, "20 11 2026", "#6E7075", "middle");
+      return;
+    }
+    // Rahmen, Kreise und Markierungen
+    el("rect", { x: S(170), y: S(2), width: 4, height: S(14), fill: dim(C.bezel) }, g);
+    [[16, 104, -20, 0], [344 - 16 - 14, 104, 20, 0], [14, 236, 20, 0], [344 - 14 - 14, 236, -20, 0]].forEach(function (m) {
+      var x = S(m[0]), y = S(m[1]), w = S(14), h = 4;
+      el("rect", { x: x, y: y, width: w, height: h, fill: dim(C.bezel), transform: "rotate(" + m[2] + " " + (x + w / 2) + " " + (y + h / 2) + ")" }, g);
+    });
+    el("circle", { cx: 227, cy: 227, r: S(68), fill: "none", stroke: C.ring, "stroke-width": 1 }, g);
+    el("circle", { cx: S(170), cy: S(84), r: S(24), fill: "none", stroke: C.ring2, "stroke-width": 1 }, g);
+    var lc = state.color === "night" ? "#1E1F22" : C.line;
+    hline(g, S(36), S(308), S(66), lc); vline(g, S(171), S(66), S(100), lc);
+    hline(g, S(18), S(326), S(100), lc);
+    hline(g, S(18), S(326), S(248), lc); vline(g, S(171), S(248), S(282), lc);
+    hline(g, S(36), S(308), S(282), lc);
+
+    // Datum
+    ghostTxt(g, 227 - textW("88 88 8888", S(17), 0.12) / 2, S(40), S(17), 0.12, "20 11 2026", "88 88 8888", dim(C.bright), ghostCol());
+
+    var sl = state.slots;
+    function cell(id, cx, top, size, ls, col) {
+      var w = fieldW(id, size, ls);
+      field(g, id, cx - w / 2, top, size, ls, col);
+    }
+    // Obere Zeile
+    cell(sl.a1, S(118), S(73), S(17), 0.1, C.bright);
+    cell(sl.a2, S(226), S(73), S(17), 0.1, C.bright);
+    // Wetterzeile: außen gedämpft, Mitte hell
+    var wy = S(107), ws = S(16), wl = 0.08;
+    field(g, sl.b1, S(28), wy, ws, wl, C.muted);
+    var wb4 = fieldW(sl.b4, ws, wl);
+    field(g, sl.b4, S(316) - wb4, wy, ws, wl, C.muted);
+    var w2 = fieldW(sl.b2, ws, wl), w3 = fieldW(sl.b3, ws, wl), gp = S(8);
+    var mx = 227 - (w2 + gp + w3) / 2;
+    field(g, sl.b2, mx, wy, ws, wl, C.bright);
+    field(g, sl.b3, mx + w2 + gp, wy, ws, wl, C.bright);
+
+    // Uhrzeit mit Geistersegmenten, Sekunden darunter
+    var tw = segWidth("10:56", S(50), S(8), S(10));
+    seg7(g, "10:56", 227 - tw / 2, S(146), S(50), S(44), S(8), S(10), on, state.color === "night" ? "#121316" : C.segOff);
+    var sw = segWidth("36", S(13), S(3), S(4));
+    seg7(g, "36", 227 - sw / 2, S(206), S(13), S(12), S(3), S(4), dim(C.sec), state.color === "night" ? "#121316" : C.segOff);
+
+    // Zeile unter der Uhrzeit: vier Werte mit gleichen Abständen
+    var my = S(226), ms = S(16), ml = 0.06;
+    var ids = [sl.c1, sl.c2, sl.c3, sl.c4];
+    var ws4 = ids.map(function (id) { return fieldW(id, ms, ml); });
+    var left = S(28), right = S(316);
+    var free = right - left - ws4.reduce(function (a, b) { return a + b; }, 0);
+    var x = left;
+    ids.forEach(function (id, i) { field(g, id, x, my, ms, ml, C.muted); x += ws4[i] + free / 3; });
+
+    // Untere Zeile und ganz unten
+    cell(sl.d1, S(118), S(255), S(17), 0.1, C.bright);
+    cell(sl.d2, S(226), S(255), S(17), 0.1, C.bright);
+    var e1 = fieldW(sl.e1, S(17), 0.12), e2 = fieldW(sl.e2, S(17), 0.12), eg = S(16);
+    var ex = 227 - (e1 + eg + e2) / 2;
+    field(g, sl.e1, ex, S(289), S(17), 0.12, C.bright);
+    field(g, sl.e2, ex + e1 + eg, S(289), S(17), 0.12, C.bright);
+
+    // Eck-Blöcke und seitliche Strich-Anzeigen
+    var cOn = dim(C.cornerOn), off = state.color === "night" ? "#17181B" : C.barOff;
+    ticks(g, S(42), S(72), 5, 3, S(12), 3, S(3), cOn, off, false);
+    ticks(g, S(290), S(72), 5, 5, S(12), 3, S(3), cOn, off, false);
+    ticks(g, S(38), S(254), 5, 2, S(12), 3, S(3), cOn, off, false);
+    ticks(g, S(294), S(254), 5, 4, S(12), 3, S(3), cOn, off, false);
+    [[state.gL, S(10)], [state.gR, S(318)]].forEach(function (gg) {
+      var gv = GAUGES[gg[0]];
+      if (!gv || gv.v === null) return;
+      var col = colorFor(gv.f, C.barOn);
+      ticks(g, gg[1], S(148), 10, Math.round(gv.v * 10), S(16), 3, S(3), col, off, true);
+    });
+  }
+
+  // ---------- Steuerung
+  function buildControls() {
+    var ctl = document.getElementById("ctl");
+    var rows = {};
+    SLOTS.forEach(function (s) { (rows[s.row] = rows[s.row] || []).push(s); });
+    Object.keys(rows).forEach(function (r) {
+      var grp = document.createElement("div"); grp.className = "group";
+      var l = document.createElement("span"); l.className = "lbl"; l.textContent = r; grp.appendChild(l);
+      var box = document.createElement("div"); box.className = "slots";
+      rows[r].forEach(function (s) { box.appendChild(selectFor("sel-" + s.k, s.n, VALUES, state.slots[s.k], function (v) { state.slots[s.k] = v; drawRaster(face); })); });
+      grp.appendChild(box); ctl.appendChild(grp);
+    });
+    var grp = document.createElement("div"); grp.className = "group";
+    var l = document.createElement("span"); l.className = "lbl"; l.textContent = "Strich-Anzeigen"; grp.appendChild(l);
+    var box = document.createElement("div"); box.className = "slots";
+    box.appendChild(selectFor("sel-gl", "Links", GAUGES, state.gL, function (v) { state.gL = v; drawRaster(face); }, true));
+    box.appendChild(selectFor("sel-gr", "Rechts", GAUGES, state.gR, function (v) { state.gR = v; drawRaster(face); }, true));
+    grp.appendChild(box); ctl.appendChild(grp);
+  }
+  function selectFor(id, label, list, cur, onChange, isGauge) {
+    var wrap = document.createElement("div"); wrap.className = "slot";
+    var l = document.createElement("label"); l.setAttribute("for", id); l.textContent = label;
+    var s = document.createElement("select"); s.id = id;
+    if (isGauge) {
+      list.forEach(function (o, i) { var op = document.createElement("option"); op.value = i; op.textContent = o.n; s.appendChild(op); });
+    } else {
+      var empty = document.createElement("option"); empty.value = 0; empty.textContent = "Leer"; s.appendChild(empty);
+      var groups = {};
+      list.forEach(function (o, i) { if (!o) return; (groups[o.grp] = groups[o.grp] || []).push([i, o]); });
+      Object.keys(groups).forEach(function (gname) {
+        var og = document.createElement("optgroup"); og.label = gname;
+        groups[gname].forEach(function (p) { var op = document.createElement("option"); op.value = p[0]; op.textContent = p[1].n; og.appendChild(op); });
+        s.appendChild(og);
+      });
+    }
+    s.value = cur;
+    s.addEventListener("change", function () { onChange(parseInt(s.value, 10)); });
+    wrap.appendChild(l); wrap.appendChild(s);
+    return wrap;
+  }
+  function toggle(ids, key, val) {
+    ids.forEach(function (i) { document.getElementById(i).setAttribute("aria-pressed", i === val ? "true" : "false"); });
+  }
+  var face = document.getElementById("face");
+  ["m-active", "m-aod"].forEach(function (id) {
+    document.getElementById(id).addEventListener("click", function () {
+      state.mode = id === "m-aod" ? "aod" : "active"; toggle(["m-active", "m-aod"], "mode", id); drawRaster(face); drawProps();
+    });
+  });
+  ["c-mono", "c-meaning", "c-night"].forEach(function (id) {
+    document.getElementById(id).addEventListener("click", function () {
+      state.color = id.slice(2); toggle(["c-mono", "c-meaning", "c-night"], "color", id); drawRaster(face); drawProps();
+    });
+  });
+
+  // ---------- Farbfamilien-Tabelle
+  function buildFamilies() {
+    var tb = document.getElementById("fam");
+    Object.keys(FAM).forEach(function (k) {
+      var vals = VALUES.filter(function (v) { return v && v.f === k; }).map(function (v) { return v.n; });
+      var gs = GAUGES.filter(function (g) { return g.v !== null && g.f === k; }).map(function (g) { return g.n + " (Anzeige)"; });
+      var tr = document.createElement("tr");
+      var col = FAM[k].col;
+      tr.innerHTML = '<td>' + FAM[k].name + '</td><td><span class="sw"><span class="dot" style="background:' + (col || "#CFD0CB") + '"></span><span class="num" style="font-family:var(--mono)">' + (col || "#CFD0CB / #7E8085") + '</span></span></td><td>' + vals.concat(gs).join(", ") + (k === "neutral" ? " (bleiben grau wie in der Vorlage)" : "") + '</td>';
+      tb.appendChild(tr);
+    });
+  }
+
+  // ---------- Neue Vorschläge (alle 454 px, Beispieldaten)
+  function arc(g, r, a0, a1, col, w, cap) {
+    var rad = function (a) { return (a - 90) * Math.PI / 180; };
+    var x0 = 227 + r * Math.cos(rad(a0)), y0 = 227 + r * Math.sin(rad(a0));
+    var x1 = 227 + r * Math.cos(rad(a1)), y1 = 227 + r * Math.sin(rad(a1));
+    var large = (a1 - a0) % 360 > 180 ? 1 : 0;
+    el("path", { d: "M" + x0 + " " + y0 + " A" + r + " " + r + " 0 " + large + " 1 " + x1 + " " + y1, fill: "none", stroke: col, "stroke-width": w, "stroke-linecap": cap || "butt" }, g);
+  }
+  function famCol(f, def) { return colorFor(f, def); }
+
+  var PROPS = [
+    {
+      nr: "15", name: "Monolith",
+      idea: "Nur die Uhrzeit, so groß wie möglich, mit Geistersegmenten. Darunter Datum und ein einziger Wert.",
+      swap: "1 Feld unten",
+      aodText: "Uhrzeit ohne Geistersegmente",
+      draw: function (g, aod) {
+        var w = segWidth("10:56", 80, 13, 14);
+        seg7(g, "10:56", 227 - w / 2, 170, 80, 106, 13, 14, aod ? "#8E9095" : dim(C.time), aod ? null : (state.color === "night" ? "#121316" : C.segOff));
+        txt(g, 227, 112, 24, 0.14, "MO 23 11", aod ? "#6E7075" : dim(C.bright), "middle");
+        if (!aod) {
+          var fw = fieldW(10, 24, 0.1);
+          field(g, 10, 227 - fw / 2, 310, 24, 0.1, C.bright);
+        }
+      }
+    },
+    {
+      nr: "16", name: "Ziel-Bogen",
+      idea: "Ein schmaler Bogen am Rand zeigt das Tagesziel: der Zielbereich als dunkle Spur, die Belastung bisher hell darüber. Mitte nur Uhrzeit und ein Satz.",
+      swap: "Bogen: Tagesziel, Body Battery, Schritte · 2 Felder",
+      aodText: "Uhrzeit und dünner Bogen",
+      draw: function (g, aod) {
+        arc(g, 212, 0, 359.9, state.color === "night" ? "#121316" : "#1A1D22", 6);
+        arc(g, 212, 0.45 * 360, 0.65 * 360, famCol("training", "#4A4C51") === "#7C9AE0" ? "#3B5998" : dim("#4A4C51"), 6);
+        arc(g, 212, 0, 0.18 * 360, famCol("training", C.time), 6, "round");
+        el("text", { x: 227, y: 52, fill: dim(C.muted), "font-family": "Share Tech Mono, monospace", "font-size": 18, "text-anchor": "middle", "letter-spacing": "2px" }, g).textContent = aod ? "" : "TAGESZIEL";
+        txt(g, 227, 150, 104, 0.02, "10:56", aod ? "#8E9095" : dim(C.time), "middle");
+        if (!aod) {
+          txt(g, 227, 272, 26, 0.08, "18 % VON 45–65", famCol("training", C.bright), "middle");
+          txt(g, 227, 312, 20, 0.1, "NÄCHSTES KB 18:00", dim(C.muted), "middle");
+        }
+      }
+    },
+    {
+      nr: "17", name: "Zyklus-Spur",
+      idea: "28 Punkte am Rand sind die Zyklustage. Periodentage in Rosé, heute ein größerer Punkt in Terracotta. Innen Uhrzeit, Zyklustag und Phase.",
+      swap: "2 Felder unten",
+      aodText: "Uhrzeit und Punkt für heute",
+      draw: function (g, aod) {
+        var n = 28, today = 18;
+        for (var i = 0; i < n; i++) {
+          var a = (i / n) * 2 * Math.PI - Math.PI / 2;
+          var isToday = i + 1 === today, per = i < 5;
+          if (aod && !isToday) continue;
+          var col = isToday ? famCol("zyklus", C.time) : per ? (state.color === "meaning" ? "#F28B8B" : dim("#6E7075")) : (state.color === "night" ? "#1E1F22" : "#34373D");
+          el("circle", { cx: 227 + 205 * Math.cos(a), cy: 227 + 205 * Math.sin(a), r: isToday ? 9 : 5, fill: col }, g);
+        }
+        txt(g, 227, 140, 104, 0.02, "10:56", aod ? "#8E9095" : dim(C.time), "middle");
+        if (!aod) {
+          txt(g, 227, 268, 28, 0.1, "ZT 18 · LUTEAL", famCol("zyklus", C.bright), "middle");
+          var w1 = fieldW(1, 22, 0.1), w2 = fieldW(29, 22, 0.1);
+          field(g, 1, 227 - w1 - 18, 320, 22, 0.1, C.muted);
+          field(g, 29, 227 + 18, 320, 22, 0.1, C.muted);
+          vline(g, 227, 318, 346, state.color === "night" ? "#1E1F22" : C.line);
+        }
+      }
+    },
+    {
+      nr: "18", name: "Dein Tag",
+      idea: "Die fünf Ringe von „Heute“ aus der App in klein: Energie, Schlaf, Readiness, Belastung, Stress. Jeder Ring mit Zahl und Icon, darüber die Uhrzeit.",
+      swap: "5 Ringe in fester Reihenfolge, Uhrzeit-Stil",
+      aodText: "nur Uhrzeit",
+      draw: function (g, aod) {
+        txt(g, 227, 100, 96, 0.02, "10:56", aod ? "#8E9095" : dim(C.time), "middle");
+        if (aod) return;
+        var rings = [["bb", 54, 0.54, "energie"], ["sleep", 74, 0.74, "schlaf"], ["ready", "7,4", 0.74, "erholung"], ["ta", 18, 0.18, "training"], ["stress", 24, 0.24, "stress"]];
+        rings.forEach(function (r, i) {
+          var cx = 227 + (i - 2) * 72, cy = 290, rr = i === 2 ? 30 : 26;
+          el("circle", { cx: cx, cy: cy, r: rr, fill: "none", stroke: state.color === "night" ? "#121316" : "#20252C", "stroke-width": 4 }, g);
+          var col = famCol(r[3], C.time);
+          var a = r[2] * 2 * Math.PI, sx = cx, sy = cy - rr, ex = cx + rr * Math.sin(a), ey = cy - rr * Math.cos(a);
+          el("path", { d: "M" + sx + " " + sy + " A" + rr + " " + rr + " 0 " + (r[2] > 0.5 ? 1 : 0) + " 1 " + ex + " " + ey, fill: "none", stroke: col, "stroke-width": 4, "stroke-linecap": "round" }, g);
+          txt(g, cx, cy - 10, 19, 0, String(r[1]), dim(C.time), "middle");
+          icon(g, r[0], cx - 9, cy + rr + 10, 18, colorFor(r[3], C.muted));
+        });
+        txt(g, 227, 64, 18, 0.14, "MO 23 11", dim(C.muted), "middle");
+      }
+    },
+    {
+      nr: "19", name: "Stapel",
+      idea: "Stunden über Minuten, links in großen Segmentziffern. Rechts drei Werte untereinander, durch feine Linien getrennt.",
+      swap: "3 Felder rechts",
+      aodText: "Stunden und Minuten ohne Werte",
+      draw: function (g, aod) {
+        var on = aod ? "#8E9095" : dim(C.time), off = aod ? null : (state.color === "night" ? "#121316" : C.segOff);
+        seg7(g, "10", 62, 92, 66, 120, 12, 16, on, off);
+        seg7(g, "56", 62, 242, 66, 120, 12, 16, on, off);
+        if (aod) return;
+        var lc = state.color === "night" ? "#1E1F22" : C.line;
+        vline(g, 238, 110, 344, lc);
+        [10, 1, 2].forEach(function (id, i) {
+          field(g, id, 262, 136 + i * 74, 26, 0.08, C.bright);
+          if (i < 2) hline(g, 262, 400, 136 + i * 74 + 50, lc);
+        });
+      }
+    },
+    {
+      nr: "20", name: "Eine Zeile",
+      idea: "Kleinste Fassung: Uhrzeit in Share Tech Mono, darunter eine Zeile mit drei Werten. Kein Rahmen, keine Linien, viel Schwarz.",
+      swap: "3 Felder in einer Zeile",
+      aodText: "Uhrzeit allein",
+      draw: function (g, aod) {
+        txt(g, 227, 150, 120, 0, "10:56", aod ? "#8E9095" : dim(C.time), "middle");
+        if (aod) return;
+        txt(g, 227, 108, 18, 0.14, "MO 23 11", dim(C.muted), "middle");
+        var ids = [1, 2, 10], gap = 26;
+        var ws = ids.map(function (id) { return fieldW(id, 22, 0.08); });
+        var tot = ws.reduce(function (a, b) { return a + b; }, 0) + gap * 2, x = 227 - tot / 2;
+        ids.forEach(function (id, i) { field(g, id, x, 300, 22, 0.08, C.bright); x += ws[i] + gap; });
+      }
+    }
+  ];
+  function drawProps() {
+    var box = document.getElementById("props");
+    box.innerHTML = "";
+    PROPS.forEach(function (p) {
+      var d = document.createElement("article"); d.className = "prop";
+      var h = document.createElement("h3"); h.innerHTML = '<span class="nr">' + p.nr + '</span> ' + p.name; d.appendChild(h);
+      var svg = document.createElementNS(NS, "svg");
+      svg.setAttribute("viewBox", "-20 -20 494 494"); svg.setAttribute("role", "img");
+      svg.setAttribute("aria-label", "Vorschlag " + p.nr + " " + p.name + " mit Beispieldaten");
+      bezel(svg, 227);
+      p.draw(el("g", {}, svg), state.mode === "aod");
+      d.appendChild(svg);
+      var t = document.createElement("p"); t.className = "note"; t.textContent = p.idea; d.appendChild(t);
+      var dl = document.createElement("dl");
+      dl.innerHTML = "<dt>Austauschbar</dt><dd>" + p.swap + "</dd><dt>Immer an</dt><dd>" + p.aodText + "</dd>";
+      d.appendChild(dl);
+      box.appendChild(d);
+    });
+  }
+
+  buildControls();
+  buildFamilies();
+  function all() { drawRaster(face); drawProps(); }
+  all();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(all);
+})();
+</script>

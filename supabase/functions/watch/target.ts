@@ -157,22 +157,30 @@ function rangeEffect(v: number | null, range: Range | null, higherIsBetter: bool
   return 0;
 }
 
-// Tagesziel 0–100 wie computeTarget in der App
-export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checkin: Checkin, illness: Illness, starts: string[], sick: Set<string> = new Set()): { score: number; pause: boolean } {
+// Tagesziel 0–100 wie computeTarget in der App, dazu Bereich und Faktoren (kurz für den Glance)
+export type WatchFactor = { k: string; e: number };
+const BANDS = [
+  { min: 85, lo: 65, hi: 85 },
+  { min: 65, lo: 45, hi: 65 },
+  { min: 45, lo: 25, hi: 45 },
+  { min: -999, lo: 10, hi: 25 },
+];
+export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checkin: Checkin, illness: Illness, starts: string[], sick: Set<string> = new Set()): { score: number; pause: boolean; lo: number; hi: number; factors: WatchFactor[] } {
   const today = daily.find((r) => r.day === day) ?? null;
   const phases = new Map<string, RangePhase | null>();
-  let eff = 0;
+  const factors: WatchFactor[] = [];
+  const add = (k: string, e: number) => factors.push({ k, e });
   // Schlaf, HRV und Ruhepuls sind zyklusabhängig (CYCLE_SENSITIVE in lib/baseline.ts)
-  eff += rangeEffect(today?.sleep_score ?? null, rangeFor(daily, day, (r) => r.sleep_score, starts, sick, phases), true, 10);
-  eff += rangeEffect(today?.hrv_last_night ?? null, rangeFor(daily, day, (r) => r.hrv_last_night, starts, sick, phases), true, 12);
-  eff += rangeEffect(today?.resting_hr ?? null, rangeFor(daily, day, (r) => r.resting_hr, starts, sick, phases), false, 8);
+  add("SCHLAF", rangeEffect(today?.sleep_score ?? null, rangeFor(daily, day, (r) => r.sleep_score, starts, sick, phases), true, 10));
+  add("HRV", rangeEffect(today?.hrv_last_night ?? null, rangeFor(daily, day, (r) => r.hrv_last_night, starts, sick, phases), true, 12));
+  add("PULS", rangeEffect(today?.resting_hr ?? null, rangeFor(daily, day, (r) => r.resting_hr, starts, sick, phases), false, 8));
   if (today?.bb_max !== null && today?.bb_max !== undefined) {
     const bb = today.bb_max;
-    eff += bb < 30 ? -15 : bb < 50 ? -8 : bb >= 75 ? 3 : 0;
+    add("BB", bb < 30 ? -15 : bb < 50 ? -8 : bb >= 75 ? 3 : 0);
   }
   if (checkin) {
     const avg = mean([checkin.energy, checkin.sleep, checkin.mood].filter((v): v is number => v !== null));
-    if (avg !== null) eff += avg < 1.7 ? -10 : avg < 2.4 ? -3 : 3;
+    if (avg !== null) add("CHECK-IN", avg < 1.7 ? -10 : avg < 2.4 ? -3 : 3);
   }
   const di = diary.find((d) => d.day === day) ?? diary.find((d) => d.day === addDays(day, -1));
   if (di) {
@@ -180,17 +188,20 @@ export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checki
     const strong = vals.filter((v) => v >= 3).length;
     const mid = vals.filter((v) => v === 2).length;
     const night = (di.symptoms ?? {}).nacht ?? 0;
-    eff += -Math.min(12, strong * 4 + mid * 2 + (night >= 2 ? 3 : 0));
+    add("SYMPTOME", -Math.min(12, strong * 4 + mid * 2 + (night >= 2 ? 3 : 0)));
   }
   const cyc = cycleInfo(day, starts);
   if (cyc.cycleDay !== null && cyc.beforePeriod) {
     const p = cycleBeforeDiff(new Map(daily.map((d) => [d.day, d])), starts);
-    if (p.ready && p.beforeDiff !== null && p.beforeDiff < -5) eff += -5;
+    if (p.ready && p.beforeDiff !== null && p.beforeDiff < -5) add("ZYKLUS", -5);
   }
   const pause = !!illness && (illness.fever || illness.below_neck || illness.severity >= 4);
-  if (illness) eff += pause ? -100 : -25;
-  if (pause) return { score: 0, pause };
-  return { score: Math.max(0, Math.min(100, 80 + eff)), pause };
+  if (illness) add("KRANK", pause ? -100 : -25);
+  const shown = factors.filter((f) => f.e !== 0);
+  if (pause) return { score: 0, pause, lo: 0, hi: 15, factors: shown };
+  const score = Math.max(0, Math.min(100, 80 + factors.reduce((s, f) => s + f.e, 0)));
+  const band = BANDS.find((b) => score >= b.min)!;
+  return { score, pause, lo: band.lo, hi: band.hi, factors: shown };
 }
 
 export const asDay = (r: Any): Day => ({
