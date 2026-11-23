@@ -1,5 +1,6 @@
 "use client";
 
+import { markAutoRows } from "@/lib/insights";
 import { useRefresh } from "@/lib/refresh";
 import { useCallback, useEffect, useState } from "react";
 import { loadOvulation, withOvulation } from "@/lib/ovulation";
@@ -29,7 +30,7 @@ export default function ZyklusPage() {
     if (!sb) return;
     Promise.all([
       loadInsightData(),
-      sb.from("diary_entries").select("day, bleeding, symptoms, influences").gte("day", isoDay(daysAgo(760))).order("day"),
+      sb.from("diary_entries").select("*").gte("day", isoDay(daysAgo(760))).order("day"),
       sb.from("hot_flashes").select("at").gte("at", daysAgo(90).toISOString()),
       loadGarminCycles(sb, isoDay(daysAgo(760))),
       loadMusterExtra(),
@@ -39,7 +40,7 @@ export default function ZyklusPage() {
         setExtra(x);
         if (diary.error) throw new Error(diary.error.message);
         setData(d);
-        setLongDiary(withOvulation(mergeGarminCycles(((diary.data ?? []) as Diary[]).map((e) => ({ ...e, symptoms: e.symptoms ?? {}, influences: e.influences ?? [] })), gc), ov));
+        setLongDiary(withOvulation(mergeGarminCycles(markAutoRows(((diary.data ?? []) as (Diary & { manual?: boolean })[]).map((e) => ({ ...e, symptoms: e.symptoms ?? {}, influences: e.influences ?? [] }))), gc), ov));
         setFlashes(((f.data ?? []) as { at: string }[]).map((r) => r.at));
       })
       .catch((e) => setError("Daten konnten nicht geladen werden: " + (e instanceof Error ? e.message : String(e))));

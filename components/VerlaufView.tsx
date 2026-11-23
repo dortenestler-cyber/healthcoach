@@ -1,5 +1,6 @@
 "use client";
 
+import { markAutoRows } from "@/lib/insights";
 import { useRefresh } from "@/lib/refresh";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
@@ -39,7 +40,7 @@ export default function VerlaufView({ initial }: { initial: string | null }) {
     const diaryFrom = isoDay(daysAgo(need + 60));
     const [g, d, gc, a, il, hb] = await Promise.all([
       sb.from("garmin_daily").select("*").gte("day", from).order("day"),
-      sb.from("diary_entries").select("day, bleeding, symptoms, influences").gte("day", diaryFrom).order("day"),
+      sb.from("diary_entries").select("*").gte("day", diaryFrom).order("day"),
       loadGarminCycles(sb, diaryFrom),
       sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load").gte("start_local", from),
       sb.from("illnesses").select("started_on, ended_on").or(`ended_on.is.null,ended_on.gte.${from}`),
@@ -53,7 +54,7 @@ export default function VerlaufView({ initial }: { initial: string | null }) {
     setActs((a.data ?? []) as Activity[]);
     setSick(sickDays((il.data ?? []) as { started_on: string; ended_on: string | null }[], isoDay()));
     setHabits(hb);
-    setDiary(mergeGarminCycles(((d.data ?? []) as Diary[]).map((e) => ({ ...e, symptoms: e.symptoms ?? {}, influences: e.influences ?? [] })), gc));
+    setDiary(mergeGarminCycles(markAutoRows(((d.data ?? []) as (Diary & { manual?: boolean })[]).map((e) => ({ ...e, symptoms: e.symptoms ?? {}, influences: e.influences ?? [] }))), gc));
   }, [need]);
 
   useEffect(() => {

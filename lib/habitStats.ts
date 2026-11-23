@@ -15,12 +15,13 @@ const addDays = (iso: string, n: number) => {
 };
 const mean = (v: number[]) => (v.length ? v.reduce((a, b) => a + b, 0) / v.length : null);
 
-// Tage mit und ohne Gewohnheit. „Ohne“ sind nur Tage mit Tagebuch-Eintrag, damit fehlende Einträge nicht als „nein“ zählen.
+// Tage mit und ohne Gewohnheit. „Ohne“ sind nur Tage mit eigenem Tagebuch-Eintrag, damit fehlende Einträge nicht als „nein“ zählen
+// (Tage nur aus Garmin, garminOnly, zählen nicht als „ohne“).
 export function splitDays(diary: Diary[], key: string, from?: string): { withD: string[]; withoutD: string[] } {
   const rows = from ? diary.filter((d) => d.day >= from) : diary;
   const withD = rows.filter((d) => d.influences?.includes(key)).map((d) => d.day);
   const set = new Set(withD);
-  return { withD, withoutD: rows.map((d) => d.day).filter((d) => !set.has(d)) };
+  return { withD, withoutD: rows.filter((d) => !d.garminOnly).map((d) => d.day).filter((d) => !set.has(d)) };
 }
 
 export type Compare = { with: number | null; without: number | null; nWith: number; nWithout: number; diff: number | null };

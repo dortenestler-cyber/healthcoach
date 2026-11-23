@@ -50,6 +50,10 @@ export default function TagebuchView({ initial }: { initial?: string }) {
   const [ovSigns, setOvSigns] = useState<string[]>([]);
   const [ovReady, setOvReady] = useState(false); // Spalte ovulation_signs vorhanden
   const [moreHab, setMoreHab] = useState(false);
+  // Sport und Stress aus Garmin (garmin-sync): gesetzt und von dir abgewählt, erst nach der Migration
+  const [autoSet, setAutoSet] = useState<string[]>([]);
+  const [autoOff, setAutoOff] = useState<string[]>([]);
+  const [autoReady, setAutoReady] = useState(false);
 
   const load = useCallback(async () => {
     const sb = supabase();
@@ -75,6 +79,11 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     const ov = await sb.from("diary_entries").select("ovulation_signs").eq("day", day).maybeSingle();
     setOvReady(!ov.error);
     setOvSigns(ov.error ? [] : ((ov.data as { ovulation_signs?: string[] } | null)?.ovulation_signs ?? []));
+    const au = await sb.from("diary_entries").select("auto_set, auto_off").eq("day", day).maybeSingle();
+    const ad = au.error ? null : (au.data as { auto_set?: string[]; auto_off?: string[] } | null);
+    setAutoReady(!au.error);
+    setAutoSet(ad?.auto_set ?? []);
+    setAutoOff(ad?.auto_off ?? []);
     setSaved(!!t);
     setDirty(false);
   }, [day]);
@@ -127,6 +136,11 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     const keep: HabitDetails = Object.fromEntries(Object.entries(details).filter(([k]) => influences.includes(k)));
     const d2 = await sb.from("diary_entries").update({ habit_details: keep }).eq("day", day);
     setError("");
+    if (autoReady) {
+      // Gespeichert ist es dein eigener Eintrag; abgewählte Garmin-Gewohnheiten setzt die App für diesen Tag nicht wieder
+      const a2 = await sb.from("diary_entries").update({ auto_set: autoSet.filter((k) => influences.includes(k)), auto_off: autoOff, manual: true }).eq("day", day);
+      if (a2.error) setError("Garmin-Gewohnheiten konnten nicht gespeichert werden: " + a2.error.message);
+    }
     if (ovReady) {
       const o2 = await sb.from("diary_entries").update({ ovulation_signs: ovSigns }).eq("day", day);
       if (o2.error) setError("Eisprung-Zeichen konnten nicht gespeichert werden: " + o2.error.message);
@@ -267,19 +281,25 @@ export default function TagebuchView({ initial }: { initial?: string }) {
         <div className="pills wrap">
           {[...habSplit.top, ...(moreHab ? habSplit.rest : [])].map((f) => {
               const on = influences.includes(f.key);
+              const fromGarmin = on && autoSet.includes(f.key);
+              const toggle = () => {
+                setInfluences(on ? influences.filter((x) => x !== f.key) : [...influences, f.key]);
+                if (on && autoSet.includes(f.key)) {
+                  setAutoSet(autoSet.filter((x) => x !== f.key));
+                  setAutoOff([...new Set([...autoOff, f.key])]);
+                }
+                if (!on) setAutoOff(autoOff.filter((x) => x !== f.key));
+                changed();
+              };
               return (
-                <button
-                  key={f.key}
-                  type="button"
-                  className="pill"
-                  aria-pressed={on}
-                  onClick={() => { setInfluences(on ? influences.filter((x) => x !== f.key) : [...influences, f.key]); changed(); }}
-                >
+                <button key={f.key} type="button" className="pill" aria-pressed={on} onClick={toggle}>
                   {f.label}
+                  {fromGarmin ? " · aus Garmin" : ""}
                 </button>
               );
             })}
         </div>
+        {autoReady && <span className="meta">Sport (ab 20 Minuten Garmin-Aktivität) und Stress (über deinem Bereich) setzt die App aus Garmin. Abwählen und speichern gilt für diesen Tag.</span>}
         {habSplit.rest.length > 0 && (
           <button type="button" className="btn btn-link more-link" onClick={() => setMoreHab(!moreHab)} aria-expanded={moreHab}>
             {moreHab ? "Weniger anzeigen" : `Weitere anzeigen (${habSplit.rest.length})`}

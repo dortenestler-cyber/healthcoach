@@ -14,6 +14,7 @@
 // Die Funktion läuft ohne JWT-Prüfung am Eingang (siehe Workflow), weil sie Login oder Schlüssel selbst prüft.
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { applyAuto, autoFor, AUTO_KEYS, type Row as HabitRow } from "./habits.ts";
 import { actDetailRow, type ActDetail, activityIntervals, computeDay, mergeActDetail, conversionFactor, FACTOR_START, HR_MAX_START, HR_REST_START, LOAD_VERSION, type LoadDay, MIN_COVERAGE, pointsFromSteps, type Sample } from "./alltag.ts";
 
 const GARMIN = "https://personal.connectapi.garmin.com";
@@ -400,6 +401,18 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Gewohnheiten „Sport“ und „Stress“ im Tagebuch aus Garmin: beim Abruf bis heute die letzten 14 Tage,
+    // beim ersten Mal rückwirkend. Fehler brechen den Abruf nicht ab.
+    let habitDays = 0;
+    let habitNote = "";
+    if (offset === 0) {
+      try {
+        habitDays = await syncAutoHabits(sb, userId);
+      } catch (e) {
+        habitNote = "Sport und Stress im Tagebuch nicht gesetzt: " + (e instanceof Error ? e.message : String(e));
+      }
+    }
+
     // Zyklus aus Garmin: ohne Zyklus-Tracking in Garmin oder ohne Tabelle bleibt es still beim Tagebuch
     let cycles = 0;
     let cycleNote = "";
@@ -428,6 +441,8 @@ Deno.serve(async (req) => {
       days,
       cycles,
       cycleNote,
+      habitDays,
+      habitNote,
       dailyRows: dailyRows.length,
       activities: activities.length,
       nightNote: nightMissing ? "Die Datenbank-Spalten für Wachphasen und Sauerstoff fehlen noch." : "",
@@ -679,4 +694,68 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
   const { error } = await sb.from("garmin_daily").upsert(rows, { onConflict: "user_id,day" });
   if (error) throw new Error(error.message);
   return { days: rows.length, note };
+}
+
+// ---------- Gewohnheiten aus Garmin (Konzept: Nutzerin 23.11., Rechnung in habits.ts)
+
+const HABIT_RECENT_DAYS = 14;
+
+async function syncAutoHabits(sb: Any, userId: string): Promise<number> {
+  const { day: today, minute: nowMinute } = localDayMinute(Date.now());
+  // Erstes Mal (noch nie etwas automatisch gesetzt oder abgewählt): alle Tage mit Garmin-Werten, sonst 14 Tage
+  const { count, error: cErr } = await sb
+    .from("diary_entries")
+    .select("day", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .or("auto_set.neq.{},auto_off.neq.{}");
+  if (cErr) throw new Error(cErr.message);
+  const first = count ? shiftDay(today, -(HABIT_RECENT_DAYS - 1)) : shiftDay(today, -(MAX_DAYS - 1));
+  const from = shiftDay(first, -31); // 30 Tage davor für den Stress-Bereich
+
+  const { data: dRows, error: dErr } = await sb.from("garmin_daily").select("day, stress_avg").eq("user_id", userId).gte("day", from).lte("day", today);
+  if (dErr) throw new Error(dErr.message);
+  const stressByDay = new Map<string, number>();
+  for (const r of (dRows ?? []) as Any[]) if (typeof r.stress_avg === "number") stressByDay.set(r.day, r.stress_avg);
+  const { data: aRows, error: aErr } = await sb
+    .from("garmin_activities")
+    .select("start_local, duration_s, sport_override")
+    .eq("user_id", userId)
+    .gte("start_local", first + " 00:00:00")
+    .lte("start_local", today + " 23:59:59");
+  if (aErr) throw new Error(aErr.message);
+  const acts = (aRows ?? []) as Any[];
+  const { data: eRows, error: eErr } = await sb
+    .from("diary_entries")
+    .select("day, influences, auto_set, auto_off")
+    .eq("user_id", userId)
+    .gte("day", first)
+    .lte("day", today);
+  if (eErr) throw new Error(eErr.message);
+  const entries = new Map<string, HabitRow>(((eRows ?? []) as Any[]).map((r) => [r.day, { day: r.day, influences: r.influences ?? [], auto_set: r.auto_set ?? [], auto_off: r.auto_off ?? [] }]));
+
+  // Tage, an denen etwas gelten kann oder schon automatisch gesetzt ist
+  const days = new Set<string>([...stressByDay.keys(), ...acts.map((a) => String(a.start_local ?? "").slice(0, 10))].filter((d) => d >= first && d <= today));
+  for (const [d, e] of entries) if (e.auto_set.length) days.add(d);
+
+  const inserts: Any[] = [];
+  const updates: Any[] = [];
+  for (const day of days) {
+    const row = entries.get(day) ?? null;
+    const want = autoFor(day, acts, stressByDay, today, nowMinute).filter((k) => (AUTO_KEYS as readonly string[]).includes(k));
+    if (!row && !want.length) continue;
+    const r = applyAuto(row, want);
+    if (!r.changed) continue;
+    if (row) updates.push({ user_id: userId, day, influences: r.influences, auto_set: r.auto_set });
+    else inserts.push({ user_id: userId, day, influences: r.influences, auto_set: r.auto_set, manual: false });
+  }
+  // Neue Einträge nur anlegen, wenn es den Tag noch nicht gibt (ignoreDuplicates), damit nichts Eigenes überschrieben wird
+  for (let i = 0; i < inserts.length; i += 200) {
+    const { error } = await sb.from("diary_entries").upsert(inserts.slice(i, i + 200), { onConflict: "user_id,day", ignoreDuplicates: true });
+    if (error) throw new Error(error.message);
+  }
+  for (let i = 0; i < updates.length; i += 200) {
+    const { error } = await sb.from("diary_entries").upsert(updates.slice(i, i + 200), { onConflict: "user_id,day" });
+    if (error) throw new Error(error.message);
+  }
+  return inserts.length + updates.length;
 }

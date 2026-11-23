@@ -9,6 +9,10 @@ Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/desig
 - PR #103: Zeitstrahl mit zwei Achsen (Puls links, Belastung rechts) und Legende. PR #104: `SportPicker` auf der Einheit-Seite schreibt `sport_override`/`sport_label`; „Sonstiges“ ohne Namen wird nicht verglichen.
 - Offen: Muster „Ruhetage zwischen harten Einheiten“ (Konzept).
 
+## Sport und Stress aus Garmin im Tagebuch (PR #108)
+- `TagebuchView`: Kachel zeigt „· aus Garmin“ (`auto_set`), Abwählen schreibt beim Speichern `auto_off`, Speichern setzt `manual = true`.
+- Einträge mit `manual = false` gelten als `garminOnly` (`markAutoRows` in `lib/insights.ts`, angewandt in `insightData`, `ZyklusPage`, `VerlaufView`) und zählen in „mit und ohne“ nicht als „ohne“ (`splitDays`, `insights.ts`, `zyklusSeite.ts`). Diese Loader lesen das Tagebuch jetzt mit `select("*")`.
+
 ## Stand in einem Satz
 Sammelliste Runde 2 (Punkte 14–21) umgesetzt in PR #83, inklusive Teil A der Datenaktualisierung.
 
