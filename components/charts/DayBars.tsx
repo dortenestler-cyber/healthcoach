@@ -1,10 +1,14 @@
+"use client";
+
 // Tagessäulen: ein Wert pro Tag, optional mit persönlichem Bereich, Ziellinie oder Zielkorridor.
+// Antippen oder Überfahren zeigt Datum (falls bekannt) und Wert (Sammelliste Punkt 9).
 // Markierung (z. B. Nachtschweiß) als Punkt über der Säule, immer mit Legende im Text darunter.
 
 import type { Range } from "@/lib/baseline";
 import { W, extent, linear, niceTicks, type Tone } from "@/components/charts/scale";
+import { ChartTip, tipDate, usePick } from "@/components/charts/pick";
 
-export type Bar = { label: string; value: number | null; today?: boolean; marker?: boolean; part?: number | null }; // part: kräftiger Teil unten (Training), der Rest hell (Alltag)
+export type Bar = { label: string; value: number | null; today?: boolean; marker?: boolean; part?: number | null; date?: string; tip?: string }; // part: kräftiger Teil unten (Training), der Rest hell (Alltag)
 
 type Props = {
   bars: Bar[];
@@ -41,10 +45,25 @@ export default function DayBars({ bars, fmt, label, tone = "training", band, cor
   const bw = Math.min(28, step * 0.62);
   const y = linear(0, d1, height - PAD_B, PAD_T);
   const hasMarker = bars.some((b) => b.marker);
+  const pick = usePick(n, x0, step);
+  const sel = pick.sel;
+  const tipLines = (b: Bar): string[] => {
+    if (!b.date && b.tip) return [`${b.tip} · ${b.value === null ? "kein Wert" : fmt(b.value)}`];
+    const head = `${b.date ? tipDate(b.date) : b.label} · ${b.value === null ? "kein Wert" : fmt(b.value)}`;
+    const parts: string[] = [];
+    if (b.tip) parts.push(b.tip);
+    else {
+      if (b.value !== null && b.part != null && b.part < b.value) parts.push(`Training ${fmt(b.part)} · Alltag ${fmt(b.value - b.part)}`);
+      if (b.value !== null && band) parts.push(b.value < band.lo ? "unter deinem Bereich" : b.value > band.hi ? "über deinem Bereich" : "im Bereich");
+      if (b.value !== null && corridor) parts.push(b.value < corridor.lo ? "unter dem Ziel" : b.value > corridor.hi ? "über dem Ziel" : "im Ziel");
+      if (b.marker && markerLabel) parts.push(markerLabel);
+    }
+    return parts.length ? [head, parts.join(" · ")] : [head];
+  };
 
   return (
     <figure className={`cb-figure cb-${tone}`}>
-      <svg className="cb" viewBox={`0 0 ${W} ${height}`} role="img" aria-label={label}>
+      <svg className="cb cb-pickable" viewBox={`0 0 ${W} ${height}`} role="img" aria-label={label} {...pick.handlers}>
         {ticks.map((t) => (
           <g key={t}>
             <line x1={x0} x2={x1} y1={y(t)} y2={y(t)} className="cb-grid" />
@@ -82,6 +101,12 @@ export default function DayBars({ bars, fmt, label, tone = "training", band, cor
                 {targetLabel}
               </text>
             )}
+          </g>
+        )}
+        {sel !== null && bars[sel] && (
+          <g aria-hidden="true">
+            <rect x={x0 + sel * step} y={PAD_T - 4} width={step} height={height - PAD_B - PAD_T + 4} rx={4} className="cb-pick-col" />
+            <ChartTip x={x0 + (sel + 0.5) * step} lines={tipLines(bars[sel])} />
           </g>
         )}
       </svg>

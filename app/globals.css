@@ -1564,6 +1564,7 @@ button {
 .cal-cell[data-phase="menses"] { background-color: var(--menses-bg); }
 .cal-cell[data-phase="follikel"] { background-color: var(--phase-follikel); }
 .cal-cell[data-phase="luteal"] { background-color: var(--cycle-bg); }
+.cal-cell[data-phase="eisprung"] { background-color: color-mix(in srgb, var(--cycle) 30%, var(--card)); }
 
 /* Kommende Tage sind nur geschätzt: heller */
 .cal-cell[data-future="true"][data-phase] {
@@ -2713,3 +2714,27 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
 .cycle-ring-phase { font-size: 22px; font-weight: 700; }
 .cycle-ring-range { font-size: 15px; font-weight: 600; }
 .cycle-ring-center:not(.cycle-ring-pick) { pointer-events: none; }
+
+/* Charts: Phasenleiste, Periodenbeginn, Antippen (Sammelliste Punkt 8 und 9) */
+.cb-strip-menstruation { fill: var(--menses-bg); }
+.cb-strip-follikel { fill: var(--fill); }
+.cb-strip-eisprung { fill: color-mix(in srgb, var(--cycle) 45%, var(--card)); }
+.cb-strip-luteal { fill: var(--cycle-bg); }
+.cb-strip[data-est="true"] { fill-opacity: 0.45; stroke: var(--cycle); stroke-opacity: 0.6; stroke-width: 1; stroke-dasharray: 3 3; }
+.cb-strip-text { font-size: 9.5px; font-weight: 600; }
+.cb-strip-text-menstruation { fill: var(--menses-fg); }
+.cb-strip-text-follikel { fill: var(--text-2); }
+.cb-strip-text-eisprung { fill: var(--cycle-fg); }
+.cb-strip-text-luteal { fill: var(--cycle-fg); }
+.cb-period-start line { stroke: var(--menses-fg); stroke-opacity: 0.5; stroke-width: 1; }
+.cb-period-start path { fill: var(--menses-fg); }
+.cb-pickable { cursor: crosshair; touch-action: pan-y; outline: none; }
+.cb-pickable:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 8px; }
+.cb-pick-line { stroke: var(--muted); stroke-width: 1; }
+.cb-pick-dot { fill: var(--card); stroke: var(--text); stroke-width: 2; }
+.cb-tip-box { fill: var(--fill); }
+.cb-tip-main { fill: var(--text); font-size: 11.5px; font-weight: 700; }
+.cb-tip-sub { fill: var(--muted); font-size: 10px; }
+.ph-eisprung { fill: color-mix(in srgb, var(--cycle) 30%, var(--card)); }
+.legend .ph-eisprung-bg { background: color-mix(in srgb, var(--cycle) 30%, var(--card)); }
+.cb-pick-col { fill: var(--text); fill-opacity: 0.06; }

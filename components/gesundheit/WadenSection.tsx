@@ -72,7 +72,7 @@ export default function WadenSection() {
               label={`Tage mit Zucken oder Krampf in den letzten 12 Wochen: ${weeks.map((w) => `ab ${short(w.monday)} ${w.days}`).join(", ")}`}
               target={avg}
               targetLabel={avg !== null ? `Schnitt ${de1(avg)}` : undefined}
-              bars={weeks.map((w, i) => ({ label: i % 3 === 0 || i === weeks.length - 1 ? short(w.monday) : "", value: w.days, today: i === weeks.length - 1, marker: w.strong > 0 }))}
+              bars={weeks.map((w, i) => ({ label: i % 3 === 0 || i === weeks.length - 1 ? short(w.monday) : "", value: w.days, tip: `Woche ab ${short(w.monday)}`, today: i === weeks.length - 1, marker: w.strong > 0 }))}
               markerLabel="Punkt = starker Krampf in dieser Woche"
             />
           )}

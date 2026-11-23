@@ -56,7 +56,7 @@ export default function SleepCard({ data }: { data: Data }) {
           target={need.hours}
           targetLabel={`Bedarf ${hShort(need.hours)}`}
           markerLabel="Nachtschweiß eingetragen"
-          bars={days.map((d) => ({ label: WD[new Date(d + "T12:00:00").getDay()], value: hours(d), today: d === today, marker: sweat.has(d) }))}
+          bars={days.map((d) => ({ label: WD[new Date(d + "T12:00:00").getDay()], value: hours(d), today: d === today, marker: sweat.has(d), date: d }))}
         />
       </ValueHeader>
       <Link href="/verlauf?m=schlaf" className="settings-link">Schlaf im Verlauf ›</Link>

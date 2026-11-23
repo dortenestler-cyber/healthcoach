@@ -235,6 +235,7 @@ export default function HabitDetail({ habitKey }: { habitKey: string }) {
                 zeroLine
                 markers={marks}
                 phases={tDays.map((d) => groupOf(cycleToday(d, data.diary).phase))}
+                dates={tDays}
                 label={`Hauttemperatur der letzten 28 Nächte, ${marks.filter(Boolean).length} Nächte nach ${label} markiert`}
                 xLabels={[{ index: 0, text: "vor 4 Wochen" }, { index: 27, text: "heute" }]}
               />

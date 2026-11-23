@@ -1,10 +1,15 @@
-// Linie mit Band: Verlauf eines Werts, persönlicher Bereich als Band, Zyklusphasen getönt.
+"use client";
+
+// Linie mit Band: Verlauf eines Werts, persönlicher Bereich als Band.
+// Zyklusphasen als schmale Leiste unter der Zeitachse (Sammelliste Punkt 8), Periodenbeginn als feine Linie mit Tropfen.
+// Antippen oder Überfahren zeigt Datum und Wert (Punkt 9).
 // Das Band ist entweder fest (Bereich heute) oder wandert mit (bands: Bereich, wie er an jedem Tag galt).
 // Festes Seitenverhältnis, 2–3 beschriftete Hilfslinien (Zahl links über der Linie), letzter Wert als Zahl am Punkt.
 
 import type { Range } from "@/lib/baseline";
-import type { PhaseGroup } from "@/lib/cycle";
+import { PHASE_GROUP_LABEL, type PhaseGroup } from "@/lib/cycle";
 import { W, extent, linear, niceTicks, segments, type Tone } from "@/components/charts/scale";
+import { ChartTip, tipDate, usePick } from "@/components/charts/pick";
 
 type Props = {
   values: (number | null)[]; // ein Wert pro Tag, ältester zuerst
@@ -14,7 +19,9 @@ type Props = {
   band?: Range | null; // 30-Tage-Bereich
   phaseBand?: Range | null; // Bereich der heutigen Zyklusphase, gestrichelt
   bands?: (Range | null)[]; // wandernder Bereich, ein Eintrag je Wert; ersetzt band und phaseBand
-  phases?: (PhaseGroup | null)[]; // Hintergrund je Tag
+  phases?: (PhaseGroup | null)[]; // Phase je Tag, als Leiste unter der Achse
+  dates?: string[]; // Datum je Wert (für das Schild beim Antippen)
+  tipNote?: (i: number) => string | null; // eigene zweite Zeile im Schild
   futureFrom?: number; // ab diesem Index geschätzt (heller)
   todayIndex?: number;
   zeroLine?: boolean; // Nulllinie, z. B. für die Temperatur-Abweichung
@@ -27,6 +34,20 @@ const PAD_L = 4;
 const PAD_R = 52; // Platz für die Zahl am letzten Punkt
 const PAD_T = 14;
 const PAD_B = 22;
+const STRIP = 24; // Höhe der Phasenleiste samt Abstand
+const SHORT: Record<PhaseGroup, string> = { menstruation: "Mens.", follikel: "Follikel", eisprung: "Eispr.", luteal: "Luteal" };
+
+// Zusammenhängende Abschnitte gleicher Phase
+function phaseRuns(phases: (PhaseGroup | null)[]): { p: PhaseGroup; from: number; to: number }[] {
+  const out: { p: PhaseGroup; from: number; to: number }[] = [];
+  phases.forEach((p, i) => {
+    const last = out[out.length - 1];
+    if (!p) return;
+    if (last && last.p === p && last.to === i - 1) last.to = i;
+    else out.push({ p, from: i, to: i });
+  });
+  return out;
+}
 
 // Zusammenhängende Abschnitte mit Bereich, damit Lücken frei bleiben
 function bandRuns(bands: (Range | null)[]): { i: number; r: Range }[][] {
@@ -50,7 +71,7 @@ function bandPath(run: { i: number; r: Range }[], x0: number, step: number, y: (
   return `M${[...top, ...bottom].join("L")}Z`;
 }
 
-export default function LineBand({ values, fmt, label, tone = "recovery", band, phaseBand, bands, phases, futureFrom, todayIndex, zeroLine, xLabels = [], markers, height = 170 }: Props) {
+export default function LineBand({ values, fmt, label, tone = "recovery", band, phaseBand, bands, phases, dates, tipNote, futureFrom, todayIndex, zeroLine, xLabels = [], markers, height = 170 }: Props) {
   const n = Math.max(values.length, 1);
   const moving = bands?.some(Boolean) ? bands : undefined;
   const fixed = moving ? null : band;
@@ -69,10 +90,26 @@ export default function LineBand({ values, fmt, label, tone = "recovery", band, 
   const pts = values.map((v, i) => (v === null ? null : { x: x(i), y: y(v) }));
   const last = [...values.keys()].reverse().find((i) => values[i] !== null && (futureFrom === undefined || i < futureFrom));
   const lastV = last !== undefined ? (values[last] as number) : null;
+  const hasStrip = !!phases?.some(Boolean);
+  const total = height + (hasStrip ? STRIP : 0);
+  const pick = usePick(n, x0, step);
+  const sel = pick.sel;
+
+  // Zweite Zeile im Schild: Lage zum Bereich und Phase
+  const note = (i: number): string => {
+    const own = tipNote?.(i);
+    if (own) return own;
+    const v = values[i];
+    const r = moving ? moving[i] : fixed;
+    const parts: string[] = [];
+    if (v !== null && r) parts.push(v < r.lo ? "unter deinem Bereich" : v > r.hi ? "über deinem Bereich" : "im Bereich");
+    const p = phases?.[i];
+    if (p) parts.push(PHASE_GROUP_LABEL[p] + (futureFrom !== undefined && i >= futureFrom ? " (geschätzt)" : ""));
+    return parts.join(" · ");
+  };
 
   return (
-    <svg className={`cb cb-${tone}`} viewBox={`0 0 ${W} ${height}`} role="img" aria-label={label}>
-      {phases?.map((p, i) => (p ? <rect key={i} x={x0 + i * step} y={PAD_T - 6} width={step + 0.3} height={height - PAD_B - PAD_T + 6} className={`cb-ph-${p}`} /> : null))}
+    <svg className={`cb cb-${tone} cb-pickable`} viewBox={`0 0 ${W} ${total}`} role="img" aria-label={label} {...pick.handlers}>
       {fixed && <rect x={x0} width={x1 - x0} y={y(fixed.hi)} height={Math.max(1, y(fixed.lo) - y(fixed.hi))} className="cb-band" />}
       {fixedPhase && <rect x={x0} width={x1 - x0} y={y(fixedPhase.hi)} height={Math.max(1, y(fixedPhase.lo) - y(fixedPhase.hi))} className="cb-band-luteal" />}
       {moving && bandRuns(moving).map((run, i) => (
@@ -88,6 +125,14 @@ export default function LineBand({ values, fmt, label, tone = "recovery", band, 
       ))}
       {futureFrom !== undefined && futureFrom < n && <rect x={x0 + futureFrom * step} y={PAD_T - 6} width={(n - futureFrom) * step} height={height - PAD_B - PAD_T + 6} className="cb-future" />}
       {todayIndex !== undefined && <line x1={x(todayIndex)} x2={x(todayIndex)} y1={PAD_T - 6} y2={height - PAD_B} className="cb-today" />}
+      {phases?.map((p, i) =>
+        p === "menstruation" && phases[i - 1] !== "menstruation" && i > 0 ? (
+          <g key={`ps${i}`} className="cb-period-start">
+            <line x1={x0 + i * step} x2={x0 + i * step} y1={PAD_T} y2={height - PAD_B} />
+            <path d={`M${x0 + i * step} ${PAD_T - 9}c0 0 3.6 4 3.6 6.4a3.6 3.6 0 0 1-7.2 0c0-2.4 3.6-6.4 3.6-6.4z`} />
+          </g>
+        ) : null,
+      )}
       {segments(pts).map((s, i) => (
         <polyline key={i} points={s} className="cb-line" />
       ))}
@@ -105,6 +150,33 @@ export default function LineBand({ values, fmt, label, tone = "recovery", band, 
           {l.text}
         </text>
       ))}
+      {hasStrip &&
+        phaseRuns(phases!).map((r) => {
+          const xa = x0 + r.from * step + 1;
+          const w = Math.max(2, (r.to - r.from + 1) * step - 2);
+          const est = futureFrom !== undefined && r.from >= futureFrom;
+          const text = w > 46 ? PHASE_GROUP_LABEL[r.p] : w > 34 ? SHORT[r.p] : "";
+          return (
+            <g key={`s${r.from}`}>
+              <rect x={xa} y={height + 4} width={w} height={14} rx={7} className={`cb-strip cb-strip-${r.p}`} data-est={est} />
+              {text && (
+                <text x={xa + w / 2} y={height + 14.5} textAnchor="middle" className={`cb-strip-text cb-strip-text-${r.p}`}>
+                  {text}
+                </text>
+              )}
+            </g>
+          );
+        })}
+      {sel !== null && (
+        <g aria-hidden="true">
+          <line x1={x(sel)} x2={x(sel)} y1={PAD_T - 6} y2={height - PAD_B} className="cb-pick-line" />
+          {values[sel] !== null && <circle cx={x(sel)} cy={y(values[sel] as number)} r={5} className="cb-pick-dot" />}
+          <ChartTip
+            x={x(sel)}
+            lines={[`${dates?.[sel] ? tipDate(dates[sel]) + " · " : ""}${values[sel] === null ? "kein Wert" : fmt(values[sel] as number)}`, note(sel)].filter(Boolean) as string[]}
+          />
+        </g>
+      )}
     </svg>
   );
 }

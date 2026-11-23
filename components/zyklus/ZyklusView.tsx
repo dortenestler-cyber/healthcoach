@@ -190,9 +190,6 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         <div className={`legend cb-${tone(metric)}`}>
           <span><i className="cb-key-line" />Dieser Zyklus</span>
           <span><i className="cb-key-usual" />Schnitt aus {bcd.cycles} früheren Zyklen</span>
-          <span><i className="ph-menses-bg" />Menstruation</span>
-          <span><i className="ph-follikel-bg" />Follikel</span>
-          <span><i className="ph-luteal-bg" />Luteal</span>
         </div>
         <Link href={`/verlauf?m=${metric}`} className="settings-link">{m.label} im Verlauf ›</Link>
       </section>

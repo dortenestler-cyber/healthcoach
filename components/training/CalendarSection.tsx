@@ -35,7 +35,7 @@ const FILTERS: [Filter, string][] = [
 type Filter = "alles" | "training" | "zyklus";
 
 // Drei Flächen im Kalender: Menstruation, Follikel (mit Eisprung-Fenster), Luteal
-const band = (p: Phase | null) => (p === "menstruation" ? "menses" : p === "follikel" || p === "eisprung" ? "follikel" : p ? "luteal" : undefined);
+const band = (p: Phase | null) => (p === "menstruation" ? "menses" : p === "follikel" ? "follikel" : p === "eisprung" ? "eisprung" : p ? "luteal" : undefined);
 
 export default function CalendarSection({ data }: { data: Data | null }) {
   const [filter, setFilter] = useState<Filter>("alles");
@@ -229,6 +229,7 @@ export default function CalendarSection({ data }: { data: Data | null }) {
             <>
               <span><i className="ph-menses-bg" />Menstruation</span>
               <span><i className="ph-follikel-bg" />Follikel</span>
+              <span><i className="ph-eisprung-bg" />Eisprung</span>
               <span><i className="ph-luteal-bg" />Luteal</span>
               <span><i className="legend-period" />Periode (Tagebuch oder Garmin)</span>
               <span><i className="cal-dot-symptom legend-dot" />Symptome</span>

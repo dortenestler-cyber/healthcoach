@@ -43,6 +43,7 @@ export default function HrvCard({ data, showPhases }: { data: Data; showPhases: 
           label="HRV der letzten 4 Wochen mit deinem Bereich"
           bands={bands}
           phases={hasPhase ? phases : undefined}
+          dates={days}
           todayIndex={PAST - 1}
           futureFrom={showPhases ? PAST : undefined}
           xLabels={[{ index: 0, text: "vor 4 Wochen" }, { index: PAST - 1, text: "heute" }]}
@@ -50,14 +51,11 @@ export default function HrvCard({ data, showPhases }: { data: Data; showPhases: 
       </ValueHeader>
       {hasPhase ? (
         <div className="legend">
-          <span><i className="ph-menses-bg" />Menstruation</span>
-          <span><i className="ph-follikel-bg" />Follikel</span>
-          <span><i className="ph-luteal-bg" />Luteal</span>
           <span><i className="legend-band" />Dein Bereich, wie er jeweils galt</span>
           <span>Phasen geschätzt{phase ? ` · heute ${PHASES[phase].label}` : ""}</span>
         </div>
       ) : (
-        showPhases && <span className="meta">Trag deine Periode im Tagebuch ein, dann erscheinen die Phasen im Hintergrund.</span>
+        showPhases && <span className="meta">Trag deine Periode im Tagebuch ein, dann erscheinen die Phasen unter dem Chart.</span>
       )}
       <Link href="/verlauf?m=hrv" className="settings-link">HRV im Verlauf ›</Link>
     </div>
