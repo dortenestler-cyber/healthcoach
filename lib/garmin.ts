@@ -54,7 +54,22 @@ export type Activity = {
   avg_hr: number | null;
   max_hr: number | null;
   training_load: number | null;
+  sport_override?: string | null; // eigene Zuordnung (Sammelliste Punkt 6), „ignorieren“ = nicht zuordnen
+  sport_label?: string | null; // eigener Name bei „Anderes“
 };
+
+// Eigene Zuordnungen laden. Fehlt die Spalte noch (Migration nicht gelaufen), kommt null zurück.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function loadActivityOverrides(sb: any, from: string): Promise<Map<number, { sport: string; label: string | null }> | null> {
+  const { data, error } = await sb.from("garmin_activities").select("activity_id, sport_override, sport_label").gte("start_local", from).not("sport_override", "is", null);
+  if (error) return null;
+  return new Map(((data ?? []) as { activity_id: number; sport_override: string; sport_label: string | null }[]).map((r) => [r.activity_id, { sport: r.sport_override, label: r.sport_label }]));
+}
+
+export function withOverrides(acts: Activity[], ov: Map<number, { sport: string; label: string | null }> | null): Activity[] {
+  if (!ov?.size) return acts;
+  return acts.map((a) => (ov.has(a.activity_id) ? { ...a, sport_override: ov.get(a.activity_id)!.sport, sport_label: ov.get(a.activity_id)!.label } : a));
+}
 
 export type MetricKey = "schlaf" | "hrv" | "ruhepuls" | "atem" | "temperatur" | "bb" | "stress" | "schritte" | "tiefschlaf" | "rem" | "einschlafen" | "bb_aufgeladen" | "stress_hoch" | "belastung" | "alltagsschritte";
 
@@ -177,6 +192,7 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 export function activityLabel(a: Activity): string {
+  if (a.sport_label) return a.sport_label;
   const k = a.type_key ?? "other";
   return TYPE_LABELS[k] ?? (a.name || k.replace(/_/g, " "));
 }

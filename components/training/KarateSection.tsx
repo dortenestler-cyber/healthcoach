@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, longDate } from "@/lib/dates";
 import { SPOTS, weekStart, type Injury } from "@/lib/health";
-import { fromIso, loadSettings, saveSettings, sportOfGarmin, type Settings } from "@/lib/training";
+import { fromIso, loadSettings, saveSettings, sportOf, type Settings } from "@/lib/training";
 
 type Item = { id: string; label: string; category: string; done: boolean };
 const CATEGORIES = ["Kihon", "Kata", "Kumite", "Sonstiges"];
@@ -36,7 +36,7 @@ export default function KarateSection() {
     setInjuries((inj.data ?? []) as Injury[]);
     const days = new Set<string>(((p.data ?? []) as { day: string }[]).map((r) => r.day));
     for (const r of (a.data ?? []) as { type_key: string | null; start_local: string | null }[]) {
-      if (sportOfGarmin(r.type_key) === "karate" && r.start_local) days.add(r.start_local.slice(0, 10));
+      if (sportOf(r) === "karate" && r.start_local) days.add(r.start_local.slice(0, 10));
     }
     const now = weekStart(new Date()).getTime();
     const counts = Array.from({ length: 8 }, () => 0);

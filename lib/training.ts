@@ -35,6 +35,15 @@ export function sportOfGarmin(typeKey: string | null): Sport {
   return "sonstiges";
 }
 
+// Sportart einer Aktivität: eigene Zuordnung vor der Garmin-Sportart (Sammelliste Punkt 6)
+const OWN: Sport[] = ["karate", "kettlebell", "klettern", "ausdauer", "sonstiges"];
+export function sportOf(a: { type_key: string | null; sport_override?: string | null }): Sport {
+  const o = a.sport_override;
+  if (o && (OWN as string[]).includes(o)) return o as Sport;
+  if (o === "ignorieren") return "sonstiges";
+  return sportOfGarmin(a.type_key);
+}
+
 // Wochenvorlage: Wochentag (1 = Montag … 7 = Sonntag) → Sportarten. Montag Karate ist fest.
 export type WeekTemplate = Record<string, Sport[]>;
 export const DEFAULT_WEEK: WeekTemplate = { "1": ["karate"], "3": ["kettlebell"], "5": ["kettlebell"], "6": ["klettern"] };

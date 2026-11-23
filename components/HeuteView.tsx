@@ -9,6 +9,7 @@ import DaySentence from "@/components/heute/DaySentence";
 import GlanceTiles from "@/components/heute/GlanceTiles";
 import TodayAgenda from "@/components/heute/TodayAgenda";
 import RecentActivities from "@/components/heute/RecentActivities";
+import ActivityQuestion from "@/components/heute/ActivityQuestion";
 import PullToRefresh from "@/components/ui/PullToRefresh";
 import { readinessFactors } from "@/lib/today";
 import { loadInsightData } from "@/lib/insightData";
@@ -77,6 +78,8 @@ export default function HeuteView() {
       {data && rule && <GlanceTiles day={day} data={data} rule={rule} showGarmin={feat.garmin} showCycle={feat.zyklus} />}
 
       {isToday && <TodayAgenda day={day} data={data} rule={rule} showPlan={feat.tagesplan} />}
+
+      {isToday && data && feat.garmin && <ActivityQuestion acts={data.acts} onSaved={loadData} />}
 
       {data && feat.garmin && <RecentActivities day={day} data={data} />}
 

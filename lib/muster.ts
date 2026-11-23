@@ -7,7 +7,7 @@ import { cycleToday, groupOf, type PhaseGroup } from "@/lib/cycle";
 import type { Illness } from "@/lib/health";
 import { cycleInfo, loadPercent, type Data } from "@/lib/insights";
 import { load7 } from "@/lib/today";
-import { sportOfGarmin } from "@/lib/training";
+import { sportOf } from "@/lib/training";
 
 export const MIN_EVENT_DAYS = 8; // so viele Tage mit Ereignis braucht die Auswertung
 export const MIN_GROUP_DAYS = 4; // so viele Tage braucht jede Seite eines Vergleichs
@@ -63,7 +63,7 @@ export function conditions(data: Data, extra: MusterExtra): Condition[] {
   out.push({ key: "hart", group: "training", label: "Tage mit hoher Belastung", has: (d) => loadPercent(d, data.daily, data.acts) >= 70 });
   const sportDays = new Map<string, Set<string>>();
   for (const a of data.acts) {
-    const k = a.type_key && /run/.test(a.type_key) ? "ausdauer" : sportOfGarmin(a.type_key);
+    const k = a.type_key && /run/.test(a.type_key) ? "ausdauer" : sportOf(a);
     if (!sportDays.has(k)) sportDays.set(k, new Set());
     sportDays.get(k)!.add((a.start_local ?? "").slice(0, 10));
   }

@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 import { isoDay } from "@/lib/dates";
-import { activityLabel, durationText, type Activity } from "@/lib/garmin";
+import { activityLabel, durationText, loadActivityOverrides, withOverrides, type Activity } from "@/lib/garmin";
 import type { Illness, Injury } from "@/lib/health";
-import { ensurePlanned, healthEffect, loadSettings, sportOfGarmin, SPORTS, type Session } from "@/lib/training";
+import { ensurePlanned, healthEffect, loadSettings, sportOf, SPORTS, type Session } from "@/lib/training";
 
 // Training heute: Einheiten des Tages mit Hinweis aus Gesundheit und Garmin. Teil der Karte „Heute steht an“.
 // children: z. B. die Zeile zur Belastung.
@@ -27,14 +27,15 @@ export default function TodayPlan({ children }: { children?: ReactNode }) {
         // Plan wird im Kalender erneut angelegt
       }
       const day = isoDay();
-      const [p, a, il, inj] = await Promise.all([
+      const [p, a, il, inj, so] = await Promise.all([
         sb.from("planned_sessions").select("*").eq("day", day),
         sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load").gte("start_local", day).lte("start_local", day + "T23:59:59"),
         sb.from("illnesses").select("*").is("ended_on", null).limit(1),
         sb.from("injuries").select("*").is("ended_on", null),
+        loadActivityOverrides(sb, day),
       ]);
       setSessions((p.data ?? []) as Session[]);
-      setActs((a.data ?? []) as Activity[]);
+      setActs(withOverrides((a.data ?? []) as Activity[], so));
       setIllness(((il.data ?? []) as Illness[])[0] ?? null);
       setInjuries((inj.data ?? []) as Injury[]);
     })();
@@ -42,13 +43,13 @@ export default function TodayPlan({ children }: { children?: ReactNode }) {
 
   if (sessions === null) return null;
   const open = sessions.filter((s) => s.status !== "ausgelassen");
-  const isDone = (s: Session) => s.status === "erledigt" || acts.some((a) => sportOfGarmin(a.type_key) === s.sport);
+  const isDone = (s: Session) => s.status === "erledigt" || acts.some((a) => sportOf(a) === s.sport);
 
   // Alles Geplante erledigt: eine Zeile mit ✓, Tipp klappt auf
   if (open.length && open.every(isDone) && !expanded) {
     const text = open
       .map((s) => {
-        const a = acts.find((x) => sportOfGarmin(x.type_key) === s.sport);
+        const a = acts.find((x) => sportOf(x) === s.sport);
         return SPORTS[s.sport].label + (a ? " · " + durationText(a.duration_s) : "");
       })
       .join(", ");
@@ -93,11 +94,11 @@ export default function TodayPlan({ children }: { children?: ReactNode }) {
         );
       })}
       {acts
-        .filter((a) => !open.some((s) => s.sport === sportOfGarmin(a.type_key)))
+        .filter((a) => !open.some((s) => s.sport === sportOf(a)))
         .map((a) => (
           <div key={a.activity_id} className="card-row list-line">
             <span className="row-strong">
-              <i className="dot" style={{ background: SPORTS[sportOfGarmin(a.type_key)].color }} />
+              <i className="dot" style={{ background: SPORTS[sportOf(a)].color }} />
               {activityLabel(a)}
             </span>
             <span className="meta">{durationText(a.duration_s)} · Garmin</span>

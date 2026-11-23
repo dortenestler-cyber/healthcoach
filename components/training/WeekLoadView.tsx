@@ -1,7 +1,7 @@
 import { DayBars, ValueHeader, ZoneScale } from "@/components/charts";
 import type { Data } from "@/lib/insights";
 import { weekLoad } from "@/lib/trainingLoad";
-import { SPORTS, sportOfGarmin, type Sport } from "@/lib/training";
+import { SPORTS, sportOf, type Sport } from "@/lib/training";
 import SportIcon from "@/components/ui/SportIcon";
 
 const WD = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."];
@@ -62,7 +62,7 @@ export default function WeekLoadView({ today, data, planned, done, labels, allta
         <div className="contrib">
           <span className="eyebrow">Was zur Wochenlast beitrug</span>
           {contrib.map((a) => {
-            const sp = sportOfGarmin(a.type_key);
+            const sp = sportOf(a);
             const d = (a.start_local as string).slice(0, 10);
             return (
               <div key={a.activity_id} className="contrib-row">

@@ -2738,3 +2738,10 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
 .ph-eisprung { fill: color-mix(in srgb, var(--cycle) 30%, var(--card)); }
 .legend .ph-eisprung-bg { background: color-mix(in srgb, var(--cycle) 30%, var(--card)); }
 .cb-pick-col { fill: var(--text); fill-opacity: 0.06; }
+
+/* Frage zu einer unklaren Garmin-Aktivität (Sammelliste Punkt 6) */
+.act-q-head { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
+.act-q-text { margin: 0; line-height: 1.45; }
+.act-q-own { display: flex; gap: 8px; align-items: center; }
+.act-q-own .input { flex: 1; min-width: 0; }
+.pill-quiet { color: var(--muted); }
