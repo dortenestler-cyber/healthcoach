@@ -49,4 +49,14 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Damit der Punkt nicht ohne Text steht: Die Beschriftung des Zahnrads lautet z. B. „Einstellungen · Garmin-Daten von 08:02, älter als 1 Stunde“. Unter Einstellungen › Garmin steht der Stand als Satz. Fehlermeldungen beim Abruf bleiben wie bisher auf Heute sichtbar. Ziehen zum Aktualisieren bleibt, der Hinweis darauf steht nur noch beim Ziehen selbst.
    Dateien: `components/heute/DayHead.tsx`, `app/globals.css`
 
+8. ☐ **Charts: schönere Darstellung der Zyklusphasen** (23.11.)
+   Bisher sind die Phasen als hohe, getönte Flächen hinter die ganze Kurve gelegt. Sie konkurrieren mit Linie und Bereich, die Farben wirken trüb, und der Eisprung fehlt.
+   Vorschlag (angelehnt an Whoop und Oura):
+   - **Phasenleiste unter der Zeitachse:** eine schmale, abgerundete Leiste (etwa 6 px) mit kleinen Lücken zwischen den Phasen, in denselben Farben wie Ring und Kalender: Menstruation Rosa, Follikel neutral grau, Eisprung Terracotta mittel, Luteal Terracotta. Geschätzte Tage gestrichelt bzw. heller.
+   - **Beschriftung in der Leiste**, wenn genug Platz ist („Mens.“, „Follikel“, „Luteal“), sonst nur Farbe. Die eigene Legende unter dem Chart fällt dann weg.
+   - **Diagrammfläche bleibt ruhig:** kein Hintergrund mehr. Nur am ersten Periodentag eine feine senkrechte Linie mit kleinem Tropfen oben, so sieht man die Zyklusgrenzen.
+   - **Tippen auf die Leiste** tönt die gewählte Phase kurz ganz leicht im Chart ein und nennt sie mit Datum, passend zu Punkt 3.
+   - Gilt für alle Charts mit Phasen: HRV, Schlaf, Ruhepuls, Verlauf, Detailseiten unter Heute.
+   Dateien: `components/charts/LineBand.tsx`, `components/heute/HrvCard.tsx`, `components/verlauf/VerlaufDetail.tsx`, `app/globals.css`
+
 ## Erledigt
