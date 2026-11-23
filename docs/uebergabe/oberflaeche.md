@@ -29,6 +29,7 @@ Farbsystem „Nacht“ umgesetzt (immer dunkel, schmale Ringe). Konzept „Heute
 - Keine festen Farbwerte in Komponenten, nur Variablen aus `app/globals.css`.
 
 ## Erledigt seit letzter Übergabe
+- PR #72 gemergt: Farbsystem „Nacht“ (immer dunkel, schmale Ringe, Energie Sage hell) und Konzept Heute als Einstiegsseite (nur Doku)
 - PR #65 gemergt: Korridore Schritt 3, Alltagslast in der Anzeige
 - Aufräumen abgeschlossen (`docs/aufraeumen-vorschlag.md`): PR #62 Tagebuch und Zyklus (Hitzewallungen neben Symptomen, Verlauf 4 Wochen eingeklappt, Perioden nachtragen auf Zyklus).
 - Aufräumen 1–3 gemergt: PR #56 Heute (5 Karten, Check-in ins Tagebuch), #57 Training (Reiter Auswertung, `/tagesziel` leitet weiter), #59 Einstellungen (nur Einrichtung)

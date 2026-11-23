@@ -61,7 +61,7 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 - [x] PR #14 geschlossen, er ist durch #47 ersetzt
 - [ ] Am nächsten Morgen nach 6:15 Uhr die App öffnen: Die Daten sollten schon da sein. Steht auf Heute ein Hinweis zum Morgen-Abruf, Claude Bescheid geben
 
-### Farb- und Designkonzept „Nacht“ (umgesetzt in PR #72)
+### Farb- und Designkonzept „Nacht“ (PR #72, gemergt)
 - [x] Ansehen und drei Fragen beantworten (immer dunkel überall, Energie Sage hell, Beere im Rand der Erklärkarte)
 - [ ] Nach dem Merge die App auf dem iPhone öffnen: Sie sollte dunkel sein, auch wenn das iPhone auf Hell steht. Ringe schmaler, Readiness-Stufen in vier Grüntönen. Falls die Statusleiste oben falsch aussieht: App vom Home-Bildschirm entfernen und neu hinzufügen (iOS merkt sich die alte Einstellung)
 
