@@ -16,7 +16,10 @@ class HealthCoachApp extends Application.AppBase {
     function getInitialView() {
         var menu = MainMenu.build(Store.today());
         // Beim Öffnen gleich die aktuelle Übersicht holen
-        Api.call("today", {}, new Net(null).method(:onReceive));
+        try {
+            Api.call("today", {}, new Net(null).method(:onReceive));
+        } catch (e) {
+        }
         return [menu, new MainMenuDelegate()];
     }
 

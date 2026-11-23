@@ -6,11 +6,30 @@ import Toybox.Lang;
 module Store {
 
     function today() {
-        return Application.Storage.getValue("today");
+        try {
+            return Application.Storage.getValue("today");
+        } catch (e) {
+            return null;
+        }
     }
 
     function save(t) {
-        Application.Storage.setValue("today", t);
+        // Ein einzelner Wert darf auf der Uhr nur etwa 8 KB groß sein: bei Überlauf ohne Kettlebell-Plan speichern
+        try {
+            Application.Storage.setValue("today", t);
+        } catch (e) {
+            try {
+                var slim = {};
+                var keys = t.keys();
+                for (var i = 0; i < keys.size(); i++) {
+                    if (!keys[i].equals("kb")) {
+                        slim.put(keys[i], t[keys[i]]);
+                    }
+                }
+                Application.Storage.setValue("today", slim);
+            } catch (e2) {
+            }
+        }
     }
 
     // Sicherer Zugriff auf Werte, die fehlen können

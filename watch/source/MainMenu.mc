@@ -11,23 +11,23 @@ module MainMenu {
             return menu;
         }
         if (t["illness"] != null) {
-            menu.addItem(new WatchUi.MenuItem(t["illness"], t["pause"] == true ? "TRAINING: PAUSE" : "NUR LEICHT", "info", null));
+            menu.addItem(new WatchUi.MenuItem(Store.str(t["illness"]), t["pause"] == true ? "TRAINING: PAUSE" : "NUR LEICHT", "info", null));
         }
         menu.addItem(new WatchUi.MenuItem("HITZEWALLUNG", "24 H: " + Store.str(t["flashes24h"]), "flash", null));
 
         var needed = t["needed"];
-        if (needed != null) {
+        if (needed instanceof Array) {
             for (var i = 0; i < needed.size(); i++) {
                 var n = needed[i];
-                menu.addItem(new WatchUi.MenuItem(n["label"] + " BEDARF", "HEUTE " + Store.str(n["today"]) + " · WOCHE " + Store.str(n["week"]), "need:" + i, null));
+                menu.addItem(new WatchUi.MenuItem(Store.str(n["label"]) + " BEDARF", "HEUTE " + Store.str(n["today"]) + " · WOCHE " + Store.str(n["week"]), "need:" + i, null));
             }
         }
 
         var slots = t["slots"];
-        if (slots != null) {
+        if (slots instanceof Array) {
             for (var j = 0; j < slots.size(); j++) {
                 var s = slots[j];
-                menu.addItem(new WatchUi.MenuItem(s["label"] + " " + s["slot"], s["done"] == true ? "GENOMMEN" : "ABHAKEN", "slot:" + j, null));
+                menu.addItem(new WatchUi.MenuItem(Store.str(s["label"]) + " " + Store.str(s["slot"]), s["done"] == true ? "GENOMMEN" : "ABHAKEN", "slot:" + j, null));
             }
         }
 
@@ -35,9 +35,9 @@ module MainMenu {
 
         var plan = t["plan"];
         var planSub = "FREI";
-        if (plan != null && plan.size() > 0) {
+        if (plan instanceof Array && plan.size() > 0) {
             var p = plan[0];
-            planSub = p["label"] + (p["time"] != null && p["time"] != "" ? " " + p["time"] : "");
+            planSub = Store.str(p["label"]) + (p["time"] != null && p["time"] != "" ? " " + p["time"] : "");
             if (p["done"] == true) {
                 planSub += " ✓";
             } else if (p["note"] != null && p["note"] != "") {
@@ -47,7 +47,7 @@ module MainMenu {
         menu.addItem(new WatchUi.MenuItem("HEUTE GEPLANT", planSub, "plan", null));
 
         var kb = t["kb"];
-        menu.addItem(new WatchUi.MenuItem("KETTLEBELL", kb != null ? "WOCHE " + Store.str(kb["week"]) : "KEIN PLAN", "kb", null));
+        menu.addItem(new WatchUi.MenuItem("KETTLEBELL", kb instanceof Dictionary ? "WOCHE " + Store.str(kb["week"]) : "KEIN PLAN", "kb", null));
         menu.addItem(new WatchUi.MenuItem("AKTUALISIEREN", "STAND " + Store.str(t["time"]), "refresh", null));
         return menu;
     }
