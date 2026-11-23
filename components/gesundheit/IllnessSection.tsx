@@ -125,7 +125,8 @@ export default function IllnessSection() {
 
       {list && list.filter((i) => i.ended_on).length > 0 && (
         <section className="card">
-          <h2>Verlauf</h2>
+          <details className="derive">
+          <summary>Frühere Krankheiten ({list.filter((i) => i.ended_on).length})</summary>
           {list
             .filter((i) => i.ended_on)
             .map((i) => {
@@ -139,6 +140,7 @@ export default function IllnessSection() {
                 </div>
               );
             })}
+          </details>
         </section>
       )}
 

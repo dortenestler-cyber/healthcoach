@@ -10,6 +10,7 @@ const toDate = (iso: string) => new Date(iso + "T12:00:00");
 
 export default function InjurySection() {
   const [list, setList] = useState<Injury[] | null>(null);
+  const [picking, setPicking] = useState(false);
   const [pains, setPains] = useState<Pain[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -42,6 +43,7 @@ export default function InjurySection() {
   };
 
   const activeList = (list ?? []).filter((r) => !r.ended_on);
+  const showMap = picking || activeList.length > 0;
   const current = activeList.find((r) => r.id === selected) ?? null;
   const spotInfo = current ? SPOTS[current.spot] : null;
   const myPains = current ? pains.filter((p) => p.injury_id === current.id) : [];
@@ -69,6 +71,13 @@ export default function InjurySection() {
     <>
       {error && <p className="alert" role="alert">{error}</p>}
 
+      {!showMap && (
+        <button type="button" className="btn btn-dashed" onClick={() => setPicking(true)}>
+          + Verletzung eintragen
+        </button>
+      )}
+
+      {showMap && (
       <section className="card">
         <div className="card-row">
           <h2>Wo tut es weh?</h2>
@@ -105,6 +114,7 @@ export default function InjurySection() {
           ))}
         </div>
       </section>
+      )}
 
       {current && spotInfo && (
         <>
@@ -167,15 +177,17 @@ export default function InjurySection() {
 
       {list && list.filter((r) => r.ended_on).length > 0 && (
         <section className="card">
-          <h2>Frühere Verletzungen</h2>
-          {list
-            .filter((r) => r.ended_on)
-            .map((r) => (
-              <div key={r.id} className="card-row list-line">
-                <span>{SPOTS[r.spot]?.label ?? r.spot}{r.kind ? " · " + r.kind : ""}</span>
-                <span className="meta">{shortDate(toDate(r.started_on))}</span>
-              </div>
-            ))}
+          <details className="derive">
+            <summary>Frühere Verletzungen ({list.filter((r) => r.ended_on).length})</summary>
+            {list
+              .filter((r) => r.ended_on)
+              .map((r) => (
+                <div key={r.id} className="card-row list-line">
+                  <span>{SPOTS[r.spot]?.label ?? r.spot}{r.kind ? " · " + r.kind : ""}</span>
+                  <span className="meta">{shortDate(toDate(r.started_on))}</span>
+                </div>
+              ))}
+          </details>
         </section>
       )}
 

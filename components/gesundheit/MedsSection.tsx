@@ -188,7 +188,8 @@ export default function MedsSection() {
 
       {inactive.length > 0 && (
         <section className="card">
-          <h2>Frühere Mittel</h2>
+          <details className="derive">
+          <summary>Frühere Mittel ({inactive.length})</summary>
           {inactive.map((m) => (
             <div key={m.id} className="card-row list-line">
               <span>{m.name}</span>
@@ -197,6 +198,7 @@ export default function MedsSection() {
               </button>
             </div>
           ))}
+          </details>
         </section>
       )}
 
