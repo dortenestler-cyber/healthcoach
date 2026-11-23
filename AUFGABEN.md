@@ -159,7 +159,9 @@ Enthält eine Migration und ändert die Funktionen `garmin-sync` und `watch`, de
 Ändert die Funktion `watch`, deshalb mergst du ihn selbst.
 - [x] Konzept angesehen (https://claude.ai/artifact/QT4fgePZ9sizxoYyygED86), entschieden: Layouts 15, 17, 19, 20 kommen dazu (23. Nov.)
 - [ ] Entscheiden, ob der Farbmodus (Einfarbig, Bedeutung, Nacht) die 9 Farbregler ersetzt
-- [ ] PR #93 mergen, wenn der Lauf `watch-build` grün ist; danach die Uhr-App neu installieren und den Glance prüfen
+- [x] PR #93 gemergt (23. Nov.)
+- [ ] Uhr-App neu installieren und den Glance prüfen
+- [ ] PR für die Layouts mergen, wenn die Läufe grün sind (ändert `watch`); danach Zifferblatt neu installieren und in Garmin Connect unter „Layout“ wählen
 
 ## Erledigt
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)

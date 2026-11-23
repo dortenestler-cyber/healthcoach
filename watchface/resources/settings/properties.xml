@@ -1,6 +1,8 @@
 <properties>
     <property id="token" type="string"></property>
     <property id="baseUrl" type="string">https://fkvhuxjsdvssmupewwgl.supabase.co</property>
+    <!-- Layout: 0 Datenraster, 1 Monolith, 2 Zyklus-Spur, 3 Stapel, 4 Eine Zeile -->
+    <property id="layout" type="number">0</property>
     <!-- Felder: Nummer des Werts, siehe Fields.mc -->
     <property id="s_a1" type="number">1</property>
     <property id="s_a2" type="number">2</property>
@@ -16,6 +18,10 @@
     <property id="s_d2" type="number">12</property>
     <property id="s_e1" type="number">13</property>
     <property id="s_e2" type="number">14</property>
+    <!-- Felder der schlichten Layouts (Monolith nutzt 1, Zyklus-Spur 1 und 2, Stapel und Eine Zeile 1 bis 3) -->
+    <property id="s_l1" type="number">10</property>
+    <property id="s_l2" type="number">1</property>
+    <property id="s_l3" type="number">2</property>
     <property id="g_l" type="number">1</property>
     <property id="g_r" type="number">2</property>
     <!-- Farben: 0 = Standard wie im Konzept -->

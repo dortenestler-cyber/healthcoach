@@ -83,4 +83,13 @@
     <string id="N_c_bot">Farbe: ganz unten</string>
     <string id="N_c_bars">Farbe: Strich-Anzeigen</string>
     <string id="N_c_lines">Farbe: Linien und Rahmen</string>
+    <string id="N_layout">Layout</string>
+    <string id="Y0">Datenraster</string>
+    <string id="Y1">Monolith</string>
+    <string id="Y2">Zyklus-Spur</string>
+    <string id="Y3">Stapel</string>
+    <string id="Y4">Eine Zeile</string>
+    <string id="N_s_l1">Schlichte Layouts: Feld 1</string>
+    <string id="N_s_l2">Schlichte Layouts: Feld 2</string>
+    <string id="N_s_l3">Schlichte Layouts: Feld 3</string>
 </strings>

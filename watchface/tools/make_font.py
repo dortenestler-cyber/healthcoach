@@ -1,19 +1,23 @@
 # Erzeugt die Bitmap-Schrift (BMFont-Textformat + PNG) für das Zifferblatt aus Share Tech Mono.
-# Aufruf: python3 make_font.py ShareTechMono-Regular.ttf <Pixelgröße> <Ausgabeordner> <Name>
+# Aufruf: python3 make_font.py ShareTechMono-Regular.ttf <Pixelgröße> <Ausgabeordner> <Name> [Zeichen] [Abstand]
+# Zeichen: Standard alle für Felder; "time" = nur Ziffern und Doppelpunkt (große Uhrzeit). Abstand: Anteil der Schriftgröße, Standard 0,1.
 # Ziffern gleich breit, damit die Geisterziffern "8" genau hinter den Werten liegen.
 # Abstand zwischen Zeichen wie im Konzept (+10 % der Schriftgröße).
 import sys, os
 from PIL import Image, ImageDraw, ImageFont
 
 ttf, size, out, name = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4]
-CHARS = " 0123456789:%°.,+-–/?ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ"
+CHARS = " 0123456789:%°.,+-–/?·ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ"
+if len(sys.argv) > 5 and sys.argv[5] == "time":
+    CHARS = " 0123456789:"
+SPACING = float(sys.argv[6]) if len(sys.argv) > 6 else 0.1
 font = ImageFont.truetype(ttf, size)
 asc, desc = font.getmetrics()
 cap = font.getbbox("8")  # Ziffernhöhe als Bezug
 cap_top, cap_bottom = cap[1], cap[3]
 pad = max(1, round(size * 0.12))
 line = (cap_bottom - cap_top) + 2 * pad          # Zeilenhöhe = Ziffernhöhe + Rand, damit VCENTER die Ziffern mittig setzt
-spacing = round(size * 0.1)
+spacing = round(size * SPACING)
 adv = round(font.getlength("8")) + spacing
 
 glyphs = []
