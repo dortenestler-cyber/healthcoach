@@ -1,5 +1,5 @@
 # Übergabe · Oberfläche (OF)
-Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014pVPWcVjiHLjFPhDDpN5k8
+Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014pVPWfdKSxiXe7ibPTsTDa
 
 Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/design-*`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
@@ -7,11 +7,10 @@ Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/desig
 Sammelliste Runde 2 (Punkte 14–21) umgesetzt in PR #83, inklusive Teil A der Datenaktualisierung.
 
 ## In Arbeit
-- Zweig `claude/blissful-cori-3k6ad7`: Schmerzwerte früherer Tage einer Verletzung ändern, Wadenzucken auch Tag und Uhrzeit ändern.
 - Keine offene Arbeit. PR #83 (Zweig `claude/tender-archimedes-h1rwvr`): Sammelliste Runde 2.
   Neu: `components/charts/useChartWidth.ts` (Charts zeichnen in echter Breite, `grownHeight`), `monotoneCurve`/`smoothBand` in `scale.ts`, `usePick(..., w, shared)` für gemeinsamen Tag, `components/verlauf/VerlaufGroup.tsx` (Gruppen, `?m=` öffnet weiter die Detailansicht), `components/ui/DayPick.tsx`, `components/ui/EditSheet.tsx` (natives `<dialog>`), `lib/anzeichen.ts` und `SIGNS`/`ALL_SYMPTOMS` in `lib/catalog.ts`, `components/heute/SignHintCard.tsx`, `lib/refresh.ts` (`useRefresh`, `useToday`, `announceNewData`), `app/version/route.ts` und `NEXT_PUBLIC_BUILD_ID` in `next.config.ts`.
   `useGarminSync(data, enabled)` ruft kein `onSynced` mehr auf, sondern `announceNewData()`; Seiten laden über `useRefresh` neu.
-  Nächster Schritt: Rückmeldung der Nutzerin. Offen: Tagebuch lädt bewusst nicht automatisch neu (ungespeicherte Änderungen), Schmerzwerte früherer Tage einer Verletzung sind noch nicht änderbar, Wadenzucken nur löschbar.
+  Nächster Schritt: Rückmeldung der Nutzerin. Offen: Tagebuch lädt bewusst nicht automatisch neu (ungespeicherte Änderungen).
 - Keine offene Arbeit. PR #77 (Zweig `claude/kind-keller-hmdy0s`): Sammelliste `docs/sammelliste-oberflaeche.md` komplett, Web-App nach `docs/konzept-web-app.md`.
   Neu: `components/SideNav.tsx`, `components/CoachPanel.tsx`, `components/ui/TwoCol.tsx`, `lib/layout.ts` (Breiten, Coach-Spalte), `components/charts/pick.tsx` (Antippen in Charts), `components/heute/ActivityQuestion.tsx`, `lib/ovulation.ts`. Eisprung ist jetzt eigene `PhaseGroup`. `sportOf(a)` statt `sportOfGarmin(a.type_key)` (eigene Zuordnung zuerst). PIN nur iPhone (`pinRequired`).
   Nächster Schritt: Rückmeldung der Nutzerin; danach evtl. zwei Spalten für Training › Kalender und Gesundheit › Überblick/Medikamente.
@@ -46,6 +45,7 @@ Sammelliste Runde 2 (Punkte 14–21) umgesetzt in PR #83, inklusive Teil A der D
 - Keine festen Farbwerte in Komponenten, nur Variablen aus `app/globals.css`.
 
 ## Erledigt seit letzter Übergabe
+- PR #92: Schmerzwerte einer Verletzung im Bearbeiten-Bogen ändern, entfernen, nachtragen (`editPains`, gespeichert mit „Speichern“). Wadenzucken im Tagebuch: Tag (`DayPick`) und Uhrzeit änderbar; Uhrzeit vor 4 Uhr liegt am Kalendertag danach, zählt zum gewählten Abend.
 - PR #86 gemergt, Migration grün, von der Nutzerin in der App getestet (23. Nov.): Coach-Chats. Tabelle `coach_chats`, `coach_messages.chat_id` (on delete cascade). Funktion `coach` nimmt `chat_id`, legt neuen Chat erst nach der Antwort an, Verlauf nur aus dem Chat, gibt `chat_id` zurück; ohne Tabelle alter Verlauf. `CoachView`: Leiste Verlauf/Neuer Chat, Liste nach Heute/Gestern/Diese Woche/Älter, Löschen mit Rückfrage, nach 6 Stunden neuer Chat. Backup enthält `coach_chats` vor `coach_messages`.
 - PR #85 gemergt: Coach-Antworten nicht mehr abgeschnitten, Werte von heute, kleiner Senden-Knopf.
 - (PR #85) Coach-Fehler behoben (Zweig `claude/blissful-darwin-ww6tm7`): Antworten brachen ab, weil das Nachdenken des Modells zu `max_tokens` 900 zählte (jetzt 6000, effort low, abgeschnittene Antworten werden nicht gespeichert). Zusammenfassung enthält jetzt die Werte von heute und wird vor jeder Frage erneuert, wenn sie älter als 2 Minuten ist. Antworten mit fett und Listen, Senden als runder Pfeil-Knopf. Ändert auch `supabase/functions/coach` (DA-Bereich), daher Merge erst nach Freigabe.

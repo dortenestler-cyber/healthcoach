@@ -74,6 +74,10 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 - [ ] PR #77 ist nicht auf Vercel angekommen: In Vercel › healthcoach › „…“ › **Create Deployment** mit Branch `main` starten (bei „Resource is limited“ die genannte Zeit abwarten)
 - [ ] Nach dem nächsten Merge prüfen: Unter Deployments erscheint ein neuer „Production“-Eintrag. Arbeitszweige von Claude erscheinen als „Canceled“/„Ignored“, das ist so gewollt
 
+### Schmerzwerte und Wadenzucken ändern (PR #92)
+- [ ] Gesundheit › Krank & verletzt › „Eintrag oder Schmerzwerte ändern“ (auch bei früheren Verletzungen): Schmerzwerte je Tag mit − + ändern, mit ✕ entfernen oder für einen anderen Tag nachtragen, dann Speichern
+- [ ] Tagebuch › Wadenzucken und Krämpfe › Ändern: jetzt auch Tag und Uhrzeit. Ein verschobener Eintrag erscheint am neuen Tag
+
 ### Sammelliste Runde 2 (Punkte 14–21, PR #83)
 - [x] Punkte 14–21 freigegeben, Fragen beantwortet (23.11.)
 - [ ] Nach dem Merge ansehen: Verlauf (vier Gruppen, am Computer normale Schriftgröße), Gesundheit › Krank & verletzt (nachtragen, Einträge antippen zum Ändern), Tagebuch › Anzeichen, Heute (Hinweis bei Anzeichen)

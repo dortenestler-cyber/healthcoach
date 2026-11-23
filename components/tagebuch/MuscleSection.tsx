@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { isoDay } from "@/lib/dates";
+import { isoDay, shiftDay, shortDate } from "@/lib/dates";
+import DayPick from "@/components/ui/DayPick";
 import { MUSCLE_DURATIONS, MUSCLE_LEVELS, MUSCLE_SIDES, MUSCLE_SITUATIONS, MUSCLE_SPOTS } from "@/lib/catalog";
 
 export type MuscleEvent = {
@@ -93,6 +94,28 @@ export default function MuscleSection({ day, onChanged }: { day: string; onChang
     changed();
   };
 
+  // Tag und Uhrzeit ändern. Eine Uhrzeit nach Mitternacht (bis 4 Uhr) liegt am Kalendertag danach, zählt aber zum gewählten Abend.
+  const clock = (at: string) => {
+    const d = new Date(at);
+    return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  };
+  const moveTo = async (r: MuscleEvent, newDay: string, hhmm: string) => {
+    const [h, m] = hhmm.split(":").map(Number);
+    if (!Number.isFinite(h) || !Number.isFinite(m)) return;
+    const d = new Date((h < NIGHT_END ? shiftDay(newDay, 1) : newDay) + "T00:00:00");
+    d.setHours(h, m, 0, 0);
+    if (d.getTime() > Date.now()) {
+      setError("Dieser Zeitpunkt liegt in der Zukunft.");
+      return;
+    }
+    setError("");
+    if (newDay !== r.day) {
+      setOpen(null);
+      setNote(`Eintrag auf den ${shortDate(new Date(newDay + "T12:00:00"))} verschoben.`);
+    }
+    await update(r.id, { day: newDay, at: d.toISOString() });
+  };
+
   const remove = async (id: string) => {
     if (!window.confirm("Diesen Eintrag löschen?")) return;
     const { error: e } = await sb.from("muscle_events").delete().eq("id", id);
@@ -167,6 +190,11 @@ export default function MuscleSection({ day, onChanged }: { day: string; onChang
                   ))}
                 </div>
               </div>
+              <DayPick label="Tag" value={r.day} onChange={(d) => moveTo(r, d, clock(r.at))} />
+              <label className="field">
+                <span className="label">Uhrzeit</span>
+                <input type="time" className="input" defaultValue={clock(r.at)} key={r.at} onBlur={(e) => e.target.value && e.target.value !== clock(r.at) && moveTo(r, r.day, e.target.value)} />
+              </label>
               {choice(r, "side", MUSCLE_SIDES, "Seite")}
               {choice(r, "spot", MUSCLE_SPOTS, "Stelle")}
               {choice(r, "situation", MUSCLE_SITUATIONS, "Wann")}

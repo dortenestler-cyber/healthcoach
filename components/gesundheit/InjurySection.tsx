@@ -19,6 +19,8 @@ export default function InjurySection() {
   const [healing, setHealing] = useState<string | null>(null); // „Verheilt“: letzter Tag mit Schmerzen (Punkt 18)
   const [edit, setEdit] = useState<Injury | null>(null); // Bearbeiten-Bogen (Punkt 20)
   const [saving, setSaving] = useState(false);
+  const [editPains, setEditPains] = useState<Record<string, number | null>>({}); // Schmerzwerte im Bogen, null = löschen
+  const [addDay, setAddDay] = useState(isoDay());
 
   const load = useCallback(async () => {
     const sb = supabase();
@@ -74,11 +76,34 @@ export default function InjurySection() {
 
   const setPain = (v: number) => current && run(sb.from("injury_pain").upsert({ injury_id: current.id, day: isoDay(), pain: Math.max(0, Math.min(10, v)) }, { onConflict: "injury_id,day" }));
   const update = (patch: Partial<Injury>) => current && run(sb.from("injuries").update(patch).eq("id", current.id));
+  const openEdit = (r: Injury) => {
+    setEditPains(Object.fromEntries(pains.filter((p) => p.injury_id === r.id).map((p) => [p.day, p.pain])));
+    setAddDay(r.ended_on ?? isoDay());
+    setEdit(r);
+  };
+  const changePain = (day: string, v: number | null) => setEditPains((cur) => ({ ...cur, [day]: v === null ? null : Math.max(0, Math.min(10, v)) }));
   const saveEdit = async () => {
     if (!edit) return;
     const ended = edit.ended_on && edit.ended_on < edit.started_on ? edit.started_on : edit.ended_on;
-    if (await run(sb.from("injuries").update({ spot: edit.spot, kind: edit.kind, cause: edit.cause, started_on: edit.started_on, ended_on: ended }).eq("id", edit.id))) setEdit(null);
+    const old = new Map(pains.filter((p) => p.injury_id === edit.id).map((p) => [p.day, p.pain]));
+    const entries = Object.entries(editPains);
+    const upserts = entries.filter(([d, v]) => v !== null && old.get(d) !== v).map(([day, pain]) => ({ injury_id: edit.id, day, pain: pain as number }));
+    const removed = entries.filter(([d, v]) => v === null && old.has(d)).map(([d]) => d);
+    setSaving(true);
+    const results = await Promise.all([
+      sb.from("injuries").update({ spot: edit.spot, kind: edit.kind, cause: edit.cause, started_on: edit.started_on, ended_on: ended }).eq("id", edit.id),
+      upserts.length ? sb.from("injury_pain").upsert(upserts, { onConflict: "injury_id,day" }) : Promise.resolve({ error: null }),
+      removed.length ? sb.from("injury_pain").delete().eq("injury_id", edit.id).in("day", removed) : Promise.resolve({ error: null }),
+    ]);
+    setSaving(false);
+    const e = results.find((r) => r.error)?.error;
+    setError(e ? "Das hat nicht geklappt: " + e.message : "");
+    load();
+    if (!e) setEdit(null);
   };
+  const painDays = Object.entries(editPains)
+    .filter(([, v]) => v !== null)
+    .sort(([a], [b]) => (a < b ? 1 : -1)) as [string, number][];
   const remove = async () => {
     if (!edit) return;
     if (await run(sb.from("injuries").delete().eq("id", edit.id))) {
@@ -191,8 +216,8 @@ export default function InjurySection() {
             <p className="kyu">{spotInfo.kyu}</p>
           </section>
 
-          <button type="button" className="btn btn-quiet" onClick={() => setEdit(current)}>
-            Eintrag ändern oder löschen
+          <button type="button" className="btn btn-quiet" onClick={() => openEdit(current)}>
+            Eintrag oder Schmerzwerte ändern
           </button>
           {healing === null ? (
             <button type="button" className="btn btn-dark" onClick={() => setHealing(isoDay())}>
@@ -221,7 +246,7 @@ export default function InjurySection() {
             {list
               .filter((r) => r.ended_on)
               .map((r) => (
-                <button key={r.id} type="button" className="card-row list-line edit-row" onClick={() => setEdit(r)} aria-label={`${label(r)}, ${shortDate(toDate(r.started_on))}, ändern`}>
+                <button key={r.id} type="button" className="card-row list-line edit-row" onClick={() => openEdit(r)} aria-label={`${label(r)}, ${shortDate(toDate(r.started_on))}, ändern`}>
                   <span>{label(r)}</span>
                   <span className="edit-row-end">
                     <span className="meta">{shortDate(toDate(r.started_on))}{r.ended_on && r.ended_on !== r.started_on ? `–${shortDate(toDate(r.ended_on))}` : ""}</span>
@@ -273,6 +298,31 @@ export default function InjurySection() {
               </div>
             </div>
             {edit.ended_on !== null && <DayPick label="Letzter Tag mit Schmerzen" value={edit.ended_on} min={edit.started_on} onChange={(d) => setEdit({ ...edit, ended_on: d })} />}
+
+            <span className="label">Schmerzwerte</span>
+            {painDays.length === 0 && <span className="meta">Noch keine Schmerzwerte eingetragen.</span>}
+            {painDays.map(([day, v]) => (
+              <div key={day} className="card-row list-line">
+                <span className="row-label">{day === isoDay() ? "Heute" : shortDate(toDate(day))}</span>
+                <span className="edit-row-end">
+                <div className="stepper">
+                  <button type="button" aria-label={`Schmerz am ${shortDate(toDate(day))} weniger`} onClick={() => changePain(day, v - 1)}>−</button>
+                  <span>{v} / 10</span>
+                  <button type="button" aria-label={`Schmerz am ${shortDate(toDate(day))} mehr`} onClick={() => changePain(day, v + 1)}>+</button>
+                </div>
+                <button type="button" className="icon-btn" aria-label={`Schmerzwert vom ${shortDate(toDate(day))} entfernen`} onClick={() => changePain(day, null)}>✕</button>
+                </span>
+              </div>
+            ))}
+            <DayPick label="Wert für einen Tag nachtragen" value={addDay} min={edit.started_on} onChange={setAddDay} />
+            <button
+              type="button"
+              className="btn btn-soft"
+              disabled={typeof editPains[addDay] === "number"}
+              onClick={() => changePain(addDay, painDays.find(([d]) => d < addDay)?.[1] ?? 4)}
+            >
+              {typeof editPains[addDay] === "number" ? "Für diesen Tag schon eingetragen" : `Wert für ${addDay === isoDay() ? "heute" : shortDate(toDate(addDay))} hinzufügen`}
+            </button>
           </>
         )}
       </EditSheet>
