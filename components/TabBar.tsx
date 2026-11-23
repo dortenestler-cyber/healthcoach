@@ -8,7 +8,7 @@ const tabs = [
   { href: "/tagebuch", label: "Tagebuch", icon: "M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11" },
   { href: "/training", label: "Training", icon: "M9 6a3 3 0 0 1 6 0M7 9h10l1 10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z" },
   { href: "/zyklus", label: "Zyklus", icon: "M12 3a9 9 0 1 0 9 9M12 3a9 9 0 0 1 9 9M12 7v5l3 2" },
-  { href: "/gesundheit", label: "Gesundheit", icon: "M9 3h6v6h6v6h-6v6H9v-6H3V9h6z" },
+  { href: "/gesundheit", label: "Gesundheit", icon: "M5 19C5 10.5 10.5 5 19 5c0 8.5-5.5 14-14 14zM5 19l8.5-8.5" }, // Blatt: Wohlbefinden, Pflege
 ];
 
 export default function TabBar() {
