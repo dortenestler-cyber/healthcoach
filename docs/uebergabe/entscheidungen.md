@@ -21,3 +21,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-23 · OF · Nutzerin: Energie (Body Battery) in Sage hell `#8FD5B0`, Familie Erholung
 2026-11-23 · OF · Nutzerin: Rand der Erklärkarte läuft zur Beere aus, als Zeichen für den Coach · Farbkonzept „Nacht“ damit freigegeben
 2026-11-23 · OF · Nutzerin: Ringe dezenter und schmaler (Strich 5 statt 9 von 104, Halbbogen 8 statt 14, Spur dunkler)
+2026-11-23 · OF · Nutzerin: Gesundheit-Symbol in der Tab-Leiste ist ein Blatt statt des Kreuzes
