@@ -48,7 +48,7 @@ export default function WeekLoadView({ today, data, planned, done, labels, allta
         <DayBars
           tone="training"
           fmt={n0}
-          label={`${alltag ? "Last je Tag aus Training und Alltag" : "Trainingslast je Tag"}: ${w.days.map((d, i) => `${labels[i]} ${d.load === null ? "noch offen" : split ? `${d.load}, davon Alltag ${d.load - (d.training ?? 0)}` : d.load}`).join(", ")}`}
+          label={`${alltag ? "Belastung je Tag aus Training und Alltag" : "Belastung je Tag, nur Training"}: ${w.days.map((d, i) => `${labels[i]} ${d.load === null ? "noch offen" : split ? `${d.load}, davon Alltag ${d.load - (d.training ?? 0)}` : d.load}`).join(", ")}`}
           bars={w.days.map((d, i) => ({ label: labels[i], value: d.load, today: d.day === today, part: split ? d.training : null, date: d.day }))}
         />
         {split && (
@@ -91,7 +91,7 @@ export default function WeekLoadView({ today, data, planned, done, labels, allta
           <span className="metric-value">{w.days.filter((d) => (d.load ?? 0) > 0).length}</span>
         </div>
       </div>
-      <span className="meta">{alltag ? "Last aus Garmin-Trainings und Bewegung im Alltag (aus deinem Puls)." : "Nur Trainingslast aus Garmin."} Korridor 80–130 % deiner üblichen Woche, ein Richtwert.</span>
+      <span className="meta">{alltag ? "Belastung aus Garmin-Trainings und Bewegung im Alltag (aus deinem Puls)." : "Nur Belastung aus Garmin-Trainings."} Korridor 80–130 % deiner üblichen Woche, ein Richtwert.</span>
     </section>
   );
 }

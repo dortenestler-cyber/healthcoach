@@ -45,8 +45,8 @@ export default function RatioCard({ today, data, alltag = true }: { today: strin
               value={chronic ? r.acute / (chronic * SCALE_MAX) : 0}
               target={{ lo: RATIO_LO / SCALE_MAX, hi: RATIO_HI / SCALE_MAX }}
               center={String(Math.round(r.acute))}
-              caption="Last 7 Tage"
-              label={`Last der letzten 7 Tage ${Math.round(r.acute)}, Korridor ${Math.round(chronic * RATIO_LO)} bis ${Math.round(chronic * RATIO_HI)}`}
+              caption="Belastung 7 Tage"
+              label={`Belastung der letzten 7 Tage ${Math.round(r.acute)}, Korridor ${Math.round(chronic * RATIO_LO)} bis ${Math.round(chronic * RATIO_HI)}`}
             />
             <div className="stack status-means">
               <span className="eyebrow">Was das heißt</span>
@@ -66,7 +66,7 @@ export default function RatioCard({ today, data, alltag = true }: { today: strin
               label={`Belastungsverhältnis ${de2(r.ratio)}, Bereich ${de1(RATIO_LO)} bis ${de1(RATIO_HI)}`}
               zones={[{ to: RATIO_LO, label: "Abbau" }, { to: RATIO_HI, label: "Aufbau", target: true }, { to: SCALE_MAX, label: "schneller Anstieg" }]}
             />
-            <span className="meta">Last 7 Tage {Math.round(r.acute)} ÷ Wochenschnitt der letzten 4 Wochen {Math.round(chronic)}{alltag ? ", mit Alltag" : ", nur Training"}</span>
+            <span className="meta">Belastung 7 Tage {Math.round(r.acute)} ÷ Wochenschnitt der letzten 4 Wochen {Math.round(chronic)}{alltag ? ", mit Alltag" : ", nur Training"}</span>
           </div>
           <ExplainCard tone="training" question={`Mein Belastungsverhältnis ist ${de2(r.ratio)} (${statusWord(r.ratio)}). Wie plane ich die nächsten Tage?`}>
             Status <strong>{statusWord(r.ratio)}</strong>: {ratioText(r.ratio)}

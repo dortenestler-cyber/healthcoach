@@ -43,7 +43,7 @@ export default function LoadTrendCard({ today, data, alltag = true }: { today: s
   const inside = withBoth.filter((p) => (p.acute as number) >= (p.lo as number) && (p.acute as number) <= (p.hi as number)).length;
   const sentence = !withBoth.length
     ? "Der Korridor entsteht nach 5 Wochen mit Garmin-Aktivitäten."
-    : `Deine Last lag an ${inside} von ${withBoth.length} Tagen in deinem Korridor.`;
+    : `Deine Belastung lag an ${inside} von ${withBoth.length} Tagen in deinem Korridor.`;
 
   const vals = pts.flatMap((p) => [p.acute, p.hi]).filter((v): v is number => v !== null);
   const ticks = niceTicks(0, Math.max(10, ...vals));
@@ -56,7 +56,7 @@ export default function LoadTrendCard({ today, data, alltag = true }: { today: s
 
   return (
     <section className="card">
-      <span className="eyebrow">Last und Korridor</span>
+      <span className="eyebrow">Belastung und Korridor</span>
       <h2>{sentence}</h2>
       <div className="segmented" role="group" aria-label="Zeitraum">
         {SPANS.map((s) => (
@@ -65,7 +65,7 @@ export default function LoadTrendCard({ today, data, alltag = true }: { today: s
           </button>
         ))}
       </div>
-      <svg className="cb cb-training" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Last der letzten 7 Tage über ${SPANS.find((s) => s.key === span)!.name}, heute ${last.acute ?? "kein Wert"}${last.lo !== null ? `, Korridor ${Math.round(last.lo)} bis ${Math.round(last.hi!)}` : ""}`}>
+      <svg className="cb cb-training" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Belastung der letzten 7 Tage über ${SPANS.find((s) => s.key === span)!.name}, heute ${last.acute ?? "kein Wert"}${last.lo !== null ? `, Korridor ${Math.round(last.lo)} bis ${Math.round(last.hi!)}` : ""}`}>
         {ticks.map((t) => (
           <g key={t}>
             <line x1={0} x2={W - PAD_R} y1={y(t)} y2={y(t)} className="cb-grid" />
@@ -85,7 +85,7 @@ export default function LoadTrendCard({ today, data, alltag = true }: { today: s
         <text x={x(n - 1)} y={H - 4} textAnchor="end" className="cb-tick cb-tick-strong">heute</text>
       </svg>
       <div className="legend cb-training">
-        <span><i className="cb-key-line" />Last der letzten 7 Tage{alltag ? " mit Alltag" : ", nur Training"}</span>
+        <span><i className="cb-key-line" />Belastung der letzten 7 Tage{alltag ? " mit Alltag" : ", nur Training"}</span>
         <span><i className="cb-key-zone" />Korridor aus den 4 Wochen davor</span>
       </div>
     </section>

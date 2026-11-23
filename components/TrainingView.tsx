@@ -72,7 +72,7 @@ export default function TrainingView({ initial }: { initial: string }) {
       <PageHead title="Training" sub="Karate, Bouldern, Kettlebell und Ausdauer" tone="training" />
       {error && <p className="alert" role="alert">{error}</p>}
       {hasAlltag && (
-        <div className="segmented" role="group" aria-label="Welche Last zählt">
+        <div className="segmented" role="group" aria-label="Welche Belastung zählt">
           <button type="button" aria-pressed={alltag} onClick={() => setAlltag(true)}>
             Mit Alltag
           </button>
