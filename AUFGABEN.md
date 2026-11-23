@@ -148,6 +148,11 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 - [x] PR #84 gemergt und synchronisiert (23. Nov.), Migration und Upload grün. Ergebnis: Garmin gibt einzelne Nächte unter den bekannten Adressen nicht heraus (404)
 - [x] PR #87 gemergt und synchronisiert (23. Nov.). Ergebnis: Garmin liefert über diese Schnittstelle weder Hauttemperatur noch Schlafphasen mit Uhrzeit, nur Summen und die Anzahl der Wachphasen
 
+### 16. Glance und Zifferblatt der Uhr (PR #93, DA)
+Ändert die Funktion `watch`, deshalb mergst du ihn selbst.
+- [ ] Konzept ansehen: https://claude.ai/artifact/QT4fgePZ9sizxoYyygED86 und entscheiden, welche Vorschläge (15–20) dazukommen und ob der Farbmodus die 9 Farbregler ersetzt
+- [ ] PR #93 mergen, wenn der Lauf `watch-build` grün ist; danach die Uhr-App neu installieren und den Glance prüfen
+
 ## Erledigt
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)
 - [x] PR #34, #35, #36, #37 gemergt (Konzept, `CLAUDE.md`, Fundament, Merge-Regel)

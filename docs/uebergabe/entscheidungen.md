@@ -38,3 +38,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-23 · OF · Nutzerin: Sammelliste Runde 2 (Punkte 14–21) komplett freigegeben, auch Konzept Datenaktualisierung (Teil A und B)
 2026-11-23 · OF · Nutzerin: „Last“ heißt künftig „Belastung“ (nicht „Trainingsbelastung“), mit Zusatz „mit Alltag“ bzw. „nur Training“
 2026-11-23 · DA · Nutzerin: Garmin-Abruf tagsüber alle 2 Stunden (8–22 Uhr wie vorgeschlagen), B2 schneller nach dem Training ja
+2026-11-23 · DA · Nutzerin: Glance der Uhr an die Vorlage aus dem Klick-Dummy anpassen · Zifferblatt-Konzept für Fenix 9 Pro 47 mm ausarbeiten (genau nach Vorlage, Werte austauschbar, passendes Farbkonzept) und weitere Vorschläge digital und minimalistisch
