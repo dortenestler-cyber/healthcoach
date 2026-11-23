@@ -16,4 +16,8 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Vorschlag: Ab dem geschätzten Beginn rechnet der Kalender mit deiner üblichen Zykluslänge weiter. Erwartete Periodentage in Menstruationsfarbe, gestrichelt wie alle geschätzten Tage; Follikel, Eisprung und Luteal folgen danach. So weit nach vorn blättern, wie es sinnvoll ist (etwa drei Zyklen). Weil die Zyklen in der Perimenopause schwanken, steht über dem Kalender das Fenster als Satz, z. B. „Nächste Periode etwa 24.–29. Dez.“. Sobald du eine echte Blutung einträgst, verschiebt sich die Vorschau.
    Dateien: `components/zyklus/CycleCalendar.tsx`, evtl. `lib/cycle.ts`
 
+3. ☐ **Zyklus-Ring: Phasen mit Datum zeigen** (23.11.)
+   Mit der Maus über einen Bogen fahren oder auf einen Bogen tippen zeigt die Phase mit Zeitraum, z. B. „Eisprung · 18.–20. Nov. · Tag 13–15“. Die Anzeige erscheint in der Mitte des Rings anstelle von „Tag 18“. Noch einmal tippen oder daneben tippen führt zurück. Geschätzte Tage sind als „etwa“ gekennzeichnet. Jeder Bogen bekommt eine Tippfläche von mindestens 44 px und eine Beschriftung für den Screenreader.
+   Dateien: `components/zyklus/CycleRing.tsx`
+
 ## Erledigt
