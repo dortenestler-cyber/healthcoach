@@ -7,6 +7,7 @@ import Toybox.Math;
 import Toybox.System;
 import Toybox.Time;
 import Toybox.Time.Gregorian;
+import Toybox.UserProfile;
 import Toybox.Weather;
 import Toybox.WatchUi;
 
@@ -31,13 +32,8 @@ class FaceView extends WatchUi.WatchFace {
     const CORNER_ON = 0x9C9EA3;
     const BAR_OFF = 0x2A2B2F;
 
-    // Auswahl in Garmin Connect: 0 = Standard, danach Weiß, Grau, Beere, Sage, Terracotta, Slate-Blau, Amber, Violett
-    // (aufgehellte App-Farben, damit sie auf Schwarz lesbar sind)
-    const PALETTE = [-1, 0xE4E5DF, 0x7E8085, 0xE0517F, 0x6FBF8F, 0xE8784A, 0x7C9BE0, 0xF0A13A, 0xA98BE0];
-
     const SLOT_KEYS = ["s_a1", "s_a2", "s_b1", "s_b2", "s_b3", "s_b4", "s_c1", "s_c2", "s_c3", "s_c4", "s_d1", "s_d2", "s_e1", "s_e2"];
     const SLOT_DEFAULT = [1, 2, 3, 5, 6, 4, 7, 8, 9, 10, 11, 12, 13, 14];
-    const COLOR_KEYS = ["c_date", "c_top", "c_wx", "c_time", "c_mid", "c_low", "c_bot", "c_bars", "c_lines"];
 
     // 7-Segment: welche Balken je Ziffer leuchten
     const SEGS = {'0' => "abcdef", '1' => "bc", '2' => "abged", '3' => "abgcd", '4' => "fgbc", '5' => "afgcd", '6' => "afgedc", '7' => "abc", '8' => "abcdefg", '9' => "abcdfg"};
@@ -46,9 +42,17 @@ class FaceView extends WatchUi.WatchFace {
     var font = null;
     var k = 1.0;
     var slots = new [14];
-    var colors = new [9];
+    // Farbmodus: 0 Einfarbig (wie die Vorlage), 1 Bedeutung (Farbe aus der Familie des Werts), 2 Nacht (alles gedimmt)
+    var cmode = 0;
+    var nightAuto = false;
+    var night = false;
     var gaugeL = 1;
     var gaugeR = 2;
+    // Layout: 0 Datenraster, 1 Monolith, 2 Zyklus-Spur, 3 Stapel, 4 Eine Zeile (Vorschläge 15, 17, 19, 20)
+    var layout = 0;
+    var lslots = [10, 1, 2];
+    var big = null;
+    var kk = 1.0;
     var locMinute = -1;
     var loc = null;
 
@@ -59,7 +63,9 @@ class FaceView extends WatchUi.WatchFace {
 
     function onLayout(dc) {
         font = WatchUi.loadResource(Rez.Fonts.Mono);
+        big = WatchUi.loadResource(Rez.Fonts.Big);
         k = dc.getWidth() / 344.0;
+        kk = dc.getWidth() / 454.0;
     }
 
     function onEnterSleep() {
@@ -77,9 +83,16 @@ class FaceView extends WatchUi.WatchFace {
         for (var i = 0; i < SLOT_KEYS.size(); i++) {
             slots[i] = prop(SLOT_KEYS[i], SLOT_DEFAULT[i]);
         }
-        for (var i = 0; i < COLOR_KEYS.size(); i++) {
-            colors[i] = prop(COLOR_KEYS[i], 0);
+        cmode = prop("cmode", 0);
+        var na = null;
+        try {
+            na = Application.Properties.getValue("nauto");
+        } catch (e) {
+            na = null;
         }
+        nightAuto = (na == true);
+        layout = prop("layout", 0);
+        lslots = [prop("s_l1", 10), prop("s_l2", 1), prop("s_l3", 2)];
         gaugeL = prop("g_l", 1);
         gaugeR = prop("g_r", 2);
     }
@@ -94,10 +107,62 @@ class FaceView extends WatchUi.WatchFace {
         return (v instanceof Number) ? v : def;
     }
 
-    // Farbe eines Bereichs: gewählte Farbe oder Standard aus dem Konzept
-    function col(area, def) {
-        var c = colors[area];
-        return (c != null && c > 0 && c < PALETTE.size()) ? PALETTE[c] : def;
+    // ---------- Farben
+    // Nacht: Farbe auf 55 % dimmen
+    function C(c) {
+        if (!night) {
+            return c;
+        }
+        var r = (((c >> 16) & 0xFF) * 55) / 100;
+        var g = (((c >> 8) & 0xFF) * 55) / 100;
+        var b = ((c & 0xFF) * 55) / 100;
+        return (r << 16) | (g << 8) | b;
+    }
+
+    // Farbe eines Werts: im Modus "Bedeutung" die Farbe seiner Familie, sonst die Farbe des Platzes aus der Vorlage
+    function famCol(fam, def) {
+        if (cmode == 1 && fam != null && fam > 0 && fam < Fields.FAMCOL.size()) {
+            return C(Fields.FAMCOL[fam]);
+        }
+        return C(def);
+    }
+
+    function valueCol(t, def) {
+        return famCol((t != null && t >= 0 && t < Fields.FAM.size()) ? Fields.FAM[t] : 0, def);
+    }
+
+    function ghostCol() {
+        return night ? 0x17181B : GHOST;
+    }
+
+    function segOff() {
+        return night ? 0x121316 : SEG_OFF;
+    }
+
+    function barOff() {
+        return night ? 0x17181B : BAR_OFF;
+    }
+
+    function lineCol() {
+        return night ? 0x1E1F22 : LINE;
+    }
+
+    // Schlafenszeit aus dem Garmin-Profil (für "Nacht automatisch")
+    function inSleepTime(clock) {
+        if (!(Toybox has :UserProfile)) {
+            return false;
+        }
+        var p = UserProfile.getProfile();
+        if (p == null || p.sleepTime == null || p.wakeTime == null) {
+            return false;
+        }
+        var sl = p.sleepTime.value();
+        var wk = p.wakeTime.value();
+        var now = clock.hour * 3600 + clock.min * 60;
+        if (sl > wk) {
+            return now >= sl || now < wk;
+        }
+        return now >= sl && now < wk;
     }
 
     function S(v) {
@@ -111,12 +176,11 @@ class FaceView extends WatchUi.WatchFace {
         var settings = System.getDeviceSettings();
         dc.setColor(BG, BG);
         dc.clear();
+        night = (cmode == 2) || (nightAuto && inSleepTime(clock));
 
-        // Ruhemodus bei AMOLED: nur gedimmte Uhrzeit, die jede Minute etwas wandert (Schutz vor Einbrennen)
+        // Immer an (AMOLED): bei allen Layouts die Monolith-Uhrzeit, dünn und gedimmt (siehe drawMinimalAod)
         if (sleeping && (settings has :requiresBurnInProtection) && settings.requiresBurnInProtection) {
-            var dx = ((clock.min % 5) - 2) * 6;
-            var dy = (((clock.min / 5) % 5) - 2) * 6;
-            drawTime(dc, hhmm(clock.hour, clock.min, settings.is24Hour), cx + dx, S(146) + dy, Graphics.COLOR_DK_GRAY, BG);
+            drawMinimalAod(dc, clock, settings);
             return;
         }
 
@@ -143,10 +207,14 @@ class FaceView extends WatchUi.WatchFace {
         }
         ctx[:loc] = loc;
 
-        var lineCol = colors[8] == 1 ? BRIGHT : LINE;
-        var ringCol = colors[8] == 1 ? MUTED : RING;
-        var ring2Col = colors[8] == 1 ? GHOST : RING2;
-        var bezelCol = BEZEL;
+        if (layout > 0) {
+            drawMinimal(dc, hc, ctx, clock, settings, now);
+            return;
+        }
+
+        var ringCol = night ? 0x141517 : RING;
+        var ring2Col = night ? 0x111214 : RING2;
+        var bezelCol = C(BEZEL);
 
         // Rahmen: Markierungen am Rand, Kreise
         aa(dc, true);
@@ -164,66 +232,216 @@ class FaceView extends WatchUi.WatchFace {
         aa(dc, false);
 
         // Trennlinien
-        dc.setColor(lineCol, Graphics.COLOR_TRANSPARENT);
-        dc.fillRectangle(S(36), S(66), S(272), 1);
-        dc.fillRectangle(S(171), S(66), 1, S(34));
-        dc.fillRectangle(S(18), S(100), S(308), 1);
-        dc.fillRectangle(S(18), S(248), S(308), 1);
-        dc.fillRectangle(S(171), S(248), 1, S(34));
-        dc.fillRectangle(S(36), S(282), S(272), 1);
+        // Auf ganze Pixel und spiegelgleich: Breite = Display minus beide Ränder, senkrechte Striche genau in der Mitte
+        dc.setColor(lineCol(), Graphics.COLOR_TRANSPARENT);
+        dc.fillRectangle(S(36), S(66), w - 2 * S(36), 1);
+        dc.fillRectangle(cx, S(66), 1, S(100) - S(66));
+        dc.fillRectangle(S(18), S(100), w - 2 * S(18), 1);
+        dc.fillRectangle(S(18), S(248), w - 2 * S(18), 1);
+        dc.fillRectangle(cx, S(248), 1, S(282) - S(248));
+        dc.fillRectangle(S(36), S(282), w - 2 * S(36), 1);
 
         // Datum "22 11 2026", Kreuz bei Krankmeldung
         var d = Gregorian.info(now, Time.FORMAT_SHORT);
-        var dateCol = col(0, BRIGHT);
+        var dateCol = C(BRIGHT);
         var dateText = d.day.format("%02d") + " " + d.month.format("%02d") + " " + d.year.format("%04d");
         drawGhostText(dc, cx, S(50), "88 88 8888", dateText, dateCol, Graphics.TEXT_JUSTIFY_CENTER);
         if (hc != null && hc["sick"] == true) {
-            Icons.draw(dc, "cross", S(96), S(43), S(15), col(0, TIME_ON));
+            Icons.draw(dc, "cross", S(96), S(43), S(15), C(TIME_ON));
         }
 
         // Obere Zeile: zwei Felder links und rechts des Trennstrichs
-        var topCol = col(1, BRIGHT);
-        drawCentered(dc, cell(0, hc, ctx, topCol), S(118), S(83));
-        drawCentered(dc, cell(1, hc, ctx, topCol), S(226), S(83));
+        var topCol = BRIGHT;
+        drawCentered(dc, cell(0, hc, ctx, topCol), cx - S(54), S(83));
+        drawCentered(dc, cell(1, hc, ctx, topCol), cx + S(54), S(83));
 
         // Wetterzeile: links, Mitte (zwei Felder), rechts
-        var wxOuter = col(2, MUTED);
-        var wxInner = col(2, BRIGHT);
-        drawSpread(dc, [[cell(2, hc, ctx, wxOuter)], [cell(3, hc, ctx, wxInner), cell(4, hc, ctx, wxInner)], [cell(5, hc, ctx, wxOuter)]], S(28), S(316), S(117));
+        var wxOuter = MUTED;
+        var wxInner = BRIGHT;
+        drawSpread(dc, [[cell(2, hc, ctx, wxOuter)], [cell(3, hc, ctx, wxInner), cell(4, hc, ctx, wxInner)], [cell(5, hc, ctx, wxOuter)]], S(28), w - S(28), S(117));
 
         // Uhrzeit in 7-Segment-Ziffern, darunter kleine Sekunden
-        var timeCol = col(3, TIME_ON);
-        drawTime(dc, hhmm(clock.hour, clock.min, settings.is24Hour), cx, S(146), timeCol, SEG_OFF);
-        drawDigits(dc, clock.sec.format("%02d"), cx, S(206), S(13), S(12), S(3), S(4), col(3, SEC), SEG_OFF);
+        var timeCol = C(TIME_ON);
+        drawTime(dc, hhmm(clock.hour, clock.min, settings.is24Hour), cx, S(146), timeCol, segOff());
+        drawDigits(dc, clock.sec.format("%02d"), cx, S(206), S(13), S(12), S(3), S(4), C(SEC), segOff());
 
         // Zeile unter der Uhrzeit: vier Felder über die ganze Breite
-        var midCol = col(4, MUTED);
-        drawSpread(dc, [[cell(6, hc, ctx, midCol)], [cell(7, hc, ctx, midCol)], [cell(8, hc, ctx, midCol)], [cell(9, hc, ctx, midCol)]], S(28), S(316), S(236));
+        var midCol = MUTED;
+        drawSpread(dc, [[cell(6, hc, ctx, midCol)], [cell(7, hc, ctx, midCol)], [cell(8, hc, ctx, midCol)], [cell(9, hc, ctx, midCol)]], S(28), w - S(28), S(236));
 
         // Untere Zeile: zwei Felder links und rechts des Trennstrichs
-        var lowCol = col(5, BRIGHT);
-        drawCentered(dc, cell(10, hc, ctx, lowCol), S(118), S(265));
-        drawCentered(dc, cell(11, hc, ctx, lowCol), S(226), S(265));
+        var lowCol = BRIGHT;
+        drawCentered(dc, cell(10, hc, ctx, lowCol), cx - S(54), S(265));
+        drawCentered(dc, cell(11, hc, ctx, lowCol), cx + S(54), S(265));
 
         // Ganz unten: zwei Felder mittig
-        var botCol = col(6, BRIGHT);
+        var botCol = BRIGHT;
         var tok = Application.Properties.getValue("token");
         if (hc == null && (tok == null || !(tok instanceof String) || tok.length() < 10)) {
-            dc.setColor(botCol, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(C(botCol), Graphics.COLOR_TRANSPARENT);
             dc.drawText(cx, S(299), font, "KEIN SCHLÜSSEL", Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         } else {
             drawGroupCentered(dc, [cell(12, hc, ctx, botCol), cell(13, hc, ctx, botCol)], cx, S(299), S(16));
         }
 
         // Strich-Anzeigen: links und rechts je 10 Striche (von unten), in den Ecken je 5 kleine Striche
-        var barOn = col(7, BAR_ON);
-        var cornerOn = col(7, CORNER_ON);
-        drawGauge(dc, S(10), S(148), Fields.gauge(gaugeL, hc, ctx), barOn);
-        drawGauge(dc, w - S(10) - S(16), S(148), Fields.gauge(gaugeR, hc, ctx), barOn);
+        var cornerOn = C(CORNER_ON);
+        drawGauge(dc, S(10), S(148), Fields.gauge(gaugeL, hc, ctx), famCol(gfam(gaugeL), BAR_ON));
+        drawGauge(dc, w - S(10) - S(16), S(148), Fields.gauge(gaugeR, hc, ctx), famCol(gfam(gaugeR), BAR_ON));
         drawStack(dc, S(42), S(72), 3, cornerOn);
         drawStack(dc, w - S(42) - S(12), S(72), 5, cornerOn);
         drawStack(dc, S(38), S(254), 2, cornerOn);
         drawStack(dc, w - S(38) - S(12), S(254), 4, cornerOn);
+    }
+
+    // ---------- Schlichte Layouts (Konzept docs/entwurf-zifferblatt.html, Maße im 454-px-Raster)
+
+    function T(v) {
+        return (v * kk + 0.5).toNumber();
+    }
+
+    const DOW = ["SO", "MO", "DI", "MI", "DO", "FR", "SA"];
+
+    function dateShort(now) {
+        var d = Gregorian.info(now, Time.FORMAT_SHORT);
+        return DOW[(d.day_of_week - 1) % 7] + " " + d.day.format("%02d") + " " + d.month.format("%02d");
+    }
+
+    function lcell(i, hc, ctx, color) {
+        var t = lslots[i];
+        if (t == null || t <= 0 || t >= Fields.ICON.size()) {
+            return null;
+        }
+        return [Fields.ICON[t], Fields.GHOST[t], Fields.value(t, hc, ctx), valueCol(t, color)];
+    }
+
+    function phaseWord(p) {
+        if (p == null || !(p instanceof String)) {
+            return null;
+        }
+        if (p.equals("MENS")) { return "PERIODE"; }
+        if (p.equals("FOLL")) { return "FOLLIKEL"; }
+        if (p.equals("EISP")) { return "EISPRUNG"; }
+        return "LUTEAL";
+    }
+
+    function drawMinimal(dc, hc, ctx, clock, settings, now) {
+        var w = dc.getWidth();
+        var cx = w / 2;
+        var timeCol = C(TIME_ON);
+        var dateCol = C(MUTED);
+        var fieldCol = BRIGHT;
+        var lc = lineCol();
+        var t = hhmm(clock.hour, clock.min, settings.is24Hour);
+        var vc = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+
+        if (layout == 1) {
+            // 15 Monolith: Datum, große Segmentuhr, ein Feld
+            dc.setColor(dateCol, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, T(124), font, dateShort(now), vc);
+            drawDigits(dc, t, cx, T(170), T(80), T(106), T(13), T(14), timeCol, segOff());
+            drawCentered(dc, lcell(0, hc, ctx, fieldCol), cx, T(322));
+        } else if (layout == 2) {
+            // 17 Zyklus-Spur: Punkte für die Zyklustage, Uhrzeit, Zyklustag und Phase, zwei Felder
+            drawCycleDots(dc, hc, false);
+            dc.setColor(timeCol, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, T(192), big, t, vc);
+            var cd = (hc != null) ? hc["cycleDay"] : null;
+            var line = "ZYKLUS --";
+            if (cd != null) {
+                line = "ZT " + cd.toString();
+                var pw = phaseWord(hc["phase"]);
+                if (pw != null) {
+                    line += " · " + pw;
+                }
+            }
+            dc.setColor(famCol(4, BRIGHT), Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, T(282), font, line, vc);
+            var c1 = lcell(0, hc, ctx, MUTED);
+            var c2 = lcell(1, hc, ctx, MUTED);
+            if (c1 != null) {
+                drawCell(dc, c1, cx - T(18) - cellWidth(dc, c1), T(332));
+            }
+            if (c2 != null) {
+                drawCell(dc, c2, cx + T(18), T(332));
+            }
+            if (c1 != null && c2 != null) {
+                dc.setColor(lc, Graphics.COLOR_TRANSPARENT);
+                dc.fillRectangle(cx, T(318), 1, T(28));
+            }
+        } else if (layout == 3) {
+            // 19 Stapel: Stunden über Minuten links, drei Felder rechts
+            drawDigits(dc, t.substring(0, 2), T(136), T(92), T(66), T(120), T(12), T(16), timeCol, segOff());
+            drawDigits(dc, t.substring(3, 5), T(136), T(242), T(66), T(120), T(12), T(16), timeCol, segOff());
+            dc.setColor(lc, Graphics.COLOR_TRANSPARENT);
+            dc.fillRectangle(T(238), T(110), 1, T(234));
+            for (var i = 0; i < 3; i++) {
+                drawCell(dc, lcell(i, hc, ctx, fieldCol), T(262), T(149 + 74 * i));
+                if (i < 2) {
+                    dc.setColor(lc, Graphics.COLOR_TRANSPARENT);
+                    dc.fillRectangle(T(262), T(186 + 74 * i), T(138), 1);
+                }
+            }
+        } else {
+            // 20 Eine Zeile: Datum, Uhrzeit, drei Felder in einer Zeile
+            dc.setColor(dateCol, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, T(117), font, dateShort(now), vc);
+            dc.setColor(timeCol, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, T(210), big, t, vc);
+            drawGroupCentered(dc, [lcell(0, hc, ctx, fieldCol), lcell(1, hc, ctx, fieldCol), lcell(2, hc, ctx, fieldCol)], cx, T(311), T(26));
+        }
+    }
+
+    // Punkte am Rand: ein Punkt je Zyklustag, Periodentage (1–5) heller, heute groß
+    function drawCycleDots(dc, hc, aodOnly) {
+        var w = dc.getWidth();
+        var cx = w / 2;
+        var n = 28;
+        var today = null;
+        if (hc != null) {
+            if (hc["cycleLen"] instanceof Number) {
+                n = hc["cycleLen"];
+            }
+            today = hc["cycleDay"];
+        }
+        n = n < 20 ? 20 : (n > 45 ? 45 : n);
+        var r = T(205);
+        aa(dc, true);
+        for (var i = 0; i < n; i++) {
+            var isToday = today != null && (i + 1 == (today > n ? n : today));
+            if (aodOnly && !isToday) {
+                continue;
+            }
+            var a = (i.toFloat() / n) * 2 * Math.PI - Math.PI / 2;
+            var x = cx + r * Math.cos(a);
+            var y = cx + r * Math.sin(a);
+            if (isToday) {
+                dc.setColor(aodOnly ? Graphics.COLOR_DK_GRAY : famCol(4, TIME_ON), Graphics.COLOR_TRANSPARENT);
+                dc.fillCircle(x, y, T(9));
+            } else {
+                // Periodentage: im Modus "Bedeutung" Menstruation (Rosé), sonst gedämpftes Grau
+                dc.setColor(i < 5 ? (cmode == 1 ? C(0xF28B8B) : C(MUTED)) : (night ? 0x1E1F22 : 0x34373D), Graphics.COLOR_TRANSPARENT);
+                dc.fillCircle(x, y, T(5));
+            }
+        }
+        aa(dc, false);
+    }
+
+    // Immer an: Uhrzeit wie Monolith (gleiche Größe), aber mit dünnem Strich, damit höchstens etwa 7 % der Pixel leuchten
+    // (Garmin erlaubt auf AMOLED im Modus "Immer an" rund 10 %). Wandert jede Minute ein paar Pixel gegen Einbrennen.
+    // Zyklus-Spur zeigt zusätzlich den Punkt für heute.
+    function drawMinimalAod(dc, clock, settings) {
+        var w = dc.getWidth();
+        var cx = w / 2;
+        var dx = ((clock.min % 5) - 2) * 6;
+        var dy = (((clock.min / 5) % 5) - 2) * 6;
+        var t = hhmm(clock.hour, clock.min, settings.is24Hour);
+        if (layout == 2) {
+            var hc = Application.Storage.getValue("today");
+            drawCycleDots(dc, (hc instanceof Dictionary) ? hc : null, true);
+        }
+        var th = T(4) < 2 ? 2 : T(4);
+        drawDigits(dc, t, cx + dx, T(170) + dy, T(80), T(106), th, T(14), Graphics.COLOR_DK_GRAY, BG);
     }
 
     function aa(dc, on) {
@@ -253,7 +471,11 @@ class FaceView extends WatchUi.WatchFace {
         if (t == null || t <= 0 || t >= Fields.ICON.size() || t == 31) { // 31: frühere Hauttemperatur, gilt als leer
             return null;
         }
-        return [Fields.ICON[t], Fields.GHOST[t], Fields.value(t, hc, ctx), color];
+        return [Fields.ICON[t], Fields.GHOST[t], Fields.value(t, hc, ctx), valueCol(t, color)];
+    }
+
+    function gfam(g) {
+        return (g != null && g >= 0 && g < Fields.GFAM.size()) ? Fields.GFAM[g] : 0;
     }
 
     function iconSize() {
@@ -277,7 +499,7 @@ class FaceView extends WatchUi.WatchFace {
         var s = iconSize();
         Icons.draw(dc, c[0], left, cy - s / 2, s, c[3]);
         var right = left + cellWidth(dc, c);
-        dc.setColor(GHOST, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ghostCol(), Graphics.COLOR_TRANSPARENT);
         dc.drawText(right, cy, font, c[1], Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.setColor(c[3], Graphics.COLOR_TRANSPARENT);
         dc.drawText(right, cy, font, c[2], Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
@@ -344,7 +566,7 @@ class FaceView extends WatchUi.WatchFace {
 
     // Text mit Geisterziffern dahinter
     function drawGhostText(dc, x, cy, ghost, text, color, just) {
-        dc.setColor(GHOST, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(ghostCol(), Graphics.COLOR_TRANSPARENT);
         dc.drawText(x, cy, font, ghost, just | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
         dc.drawText(x, cy, font, text, just | Graphics.TEXT_JUSTIFY_VCENTER);
@@ -356,6 +578,12 @@ class FaceView extends WatchUi.WatchFace {
 
     // Ziffernfolge in 7-Segment-Optik, mittig um mx; Doppelpunkt aus zwei Quadraten
     function drawDigits(dc, text, mx, top, dw, dh, t, gap, on, off) {
+        // Gerade Strichstärke und Höhe, damit der Mittelbalken genau mittig sitzt (ganze Pixel)
+        t = (t / 2) * 2;
+        if (t < 2) {
+            t = 2;
+        }
+        dh = (dh / 2) * 2;
         var chars = text.toCharArray();
         var total = 0;
         for (var i = 0; i < chars.size(); i++) {
@@ -363,6 +591,7 @@ class FaceView extends WatchUi.WatchFace {
         }
         total += gap * (chars.size() - 1);
         var x = mx - total / 2;
+        x = x.toNumber();
         for (var i = 0; i < chars.size(); i++) {
             if (chars[i] == ':') {
                 dc.setColor(on, Graphics.COLOR_TRANSPARENT);
@@ -423,7 +652,7 @@ class FaceView extends WatchUi.WatchFace {
         var bh = S(2) < 2 ? 2 : S(2);
         var step = bh + S(3);
         for (var i = 0; i < n; i++) {
-            dc.setColor(i < lit ? on : BAR_OFF, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(i < lit ? on : barOff(), Graphics.COLOR_TRANSPARENT);
             dc.fillRectangle(x, top + (n - 1 - i) * step, S(16), bh);
         }
     }
@@ -433,7 +662,7 @@ class FaceView extends WatchUi.WatchFace {
         var bh = S(2) < 2 ? 2 : S(2);
         var step = bh + S(3);
         for (var i = 0; i < 5; i++) {
-            dc.setColor(i < lit ? on : BAR_OFF, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(i < lit ? on : barOff(), Graphics.COLOR_TRANSPARENT);
             dc.fillRectangle(x, top + i * step, S(12), bh);
         }
     }

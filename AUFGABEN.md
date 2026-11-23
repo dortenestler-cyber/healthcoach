@@ -158,8 +158,11 @@ Enthält eine Migration und ändert die Funktionen `garmin-sync` und `watch`, de
 ### 17. Glance und Zifferblatt der Uhr (PR #93, DA)
 Ändert die Funktion `watch`, deshalb mergst du ihn selbst.
 - [x] Konzept angesehen (https://claude.ai/artifact/QT4fgePZ9sizxoYyygED86), entschieden: Layouts 15, 17, 19, 20 kommen dazu (23. Nov.)
-- [ ] Entscheiden, ob der Farbmodus (Einfarbig, Bedeutung, Nacht) die 9 Farbregler ersetzt
-- [ ] PR #93 mergen, wenn der Lauf `watch-build` grün ist; danach die Uhr-App neu installieren und den Glance prüfen
+- [x] Entschieden: Farbmodus (Einfarbig, Bedeutung, Nacht) ersetzt die 9 Farbregler (23. Nov.)
+- [x] PR #93 gemergt (23. Nov.)
+- [ ] Uhr-App neu installieren und den Glance prüfen
+- [ ] PR #96 mergen, wenn die Läufe grün sind (ändert `watch`); danach Zifferblatt neu installieren. Garmin fragt dabei einmal nach dem Zugriff auf dein Profil (für „Nacht automatisch“)
+- [ ] In Garmin Connect beim Zifferblatt „Layout“ und „Farbmodus“ wählen. Vorher gewählte Farben gehen dabei verloren, das ist gewollt
 
 ### Temperatur entfernt, Wachphasen und Sauerstoff (PR #97, OF)
 - [ ] Nach dem Merge: Heute › Schlaf ansehen, dort steht die Karte „Wach und Sauerstoff in der Nacht“ (ab der ersten Nacht mit Werten)

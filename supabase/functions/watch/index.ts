@@ -274,6 +274,7 @@ async function today(sb: Any, uid: string, day: string) {
     flashes24h: flashes.count ?? 0,
     checkinDone: !!checkin.data,
     cycleDay,
+    cycleLen: cyc.length, // für die Punkte der Zyklus-Spur auf dem Zifferblatt
     phase: phaseShort(cycleDay, cyc.length),
     goal: target.score,
     load,

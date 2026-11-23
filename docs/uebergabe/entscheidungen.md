@@ -41,3 +41,5 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-23 · DA · Nutzerin: Wachphasen (Anzahl) und Sauerstoffsättigung im Schlaf speichern (Migration freigegeben). Hauttemperatur vollständig aus App, Uhr und Datenbank entfernen, weil Garmin sie über die Personal API nicht liefert. Schlafphasen mit Uhrzeit gibt es ebenfalls nicht (PR #84, #87, #90)
 2026-11-23 · DA · Nutzerin: Glance der Uhr an die Vorlage aus dem Klick-Dummy anpassen · Zifferblatt-Konzept für Fenix 9 Pro 47 mm ausarbeiten (genau nach Vorlage, Werte austauschbar, passendes Farbkonzept) und weitere Vorschläge digital und minimalistisch
 2026-11-23 · DA · Nutzerin: Zifferblatt-Layouts 15 Monolith, 17 Zyklus-Spur, 19 Stapel und 20 Eine Zeile einbauen (16 Ziel-Bogen und 18 Dein Tag nicht)
+2026-11-23 · DA · Nutzerin: Monolith ist die Anzeige „Immer an“ auch für das Datenraster (dünner Strich wegen der 10-%-Grenze bei AMOLED, gilt für alle Layouts)
+2026-11-23 · DA · Nutzerin: Farbmodus (Einfarbig, Bedeutung, Nacht) ersetzt die 9 Farbregler des Zifferblatts; Zifferblatt auf ganze Pixel anpassen

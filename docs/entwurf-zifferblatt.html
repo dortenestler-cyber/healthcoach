@@ -165,7 +165,7 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
 
   <section class="card" aria-labelledby="h-vor">
     <h2 id="h-vor">Neue Vorschläge, digital und minimalistisch</h2>
-    <p>Sechs Zifferblätter mit weniger Werten, alle in der Schrift und den Segmentziffern der Vorlage. Jedes hat einen eigenen Modus „Immer an“, und die Werte bleiben austauschbar.</p>
+    <p>Sechs Zifferblätter mit weniger Werten, alle in der Schrift und den Segmentziffern der Vorlage. Gewählt sind 15, 17, 19 und 20 (23. Nov.). Im Modus „Immer an“ zeigen alle Layouts, auch das Datenraster, die Monolith-Uhrzeit mit dünnem Strich, damit unter 10 % der Pixel leuchten.</p>
     <div class="props" id="props"></div>
   </section>
 
@@ -175,15 +175,15 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
       <li>Eigene Maße für 454 px (ganze Pixel) statt der freien Skalierung: Segmente 66 × 58 px mit 10 px Strich, Linien 1 px, Striche der Anzeigen 3 px.</li>
       <li>Eigener Ordner <code>resources-round-454x454</code> mit Share Tech Mono in 22 px und Icons im 20-px-Raster, damit sie nicht verschwimmen.</li>
       <li>Hintergrund reines Schwarz (#000) statt Dunkelgrau. Auf AMOLED verschmilzt das mit dem Rand und spart Akku.</li>
-      <li>Modus „Immer an“: nur Uhrzeit ohne Geisterziffern und Datum, gedimmt, verschiebt sich jede Minute um ein paar Pixel gegen Einbrennen.</li>
+      <li>Modus „Immer an“: Monolith-Uhrzeit mit dünnem Strich, gedimmt, verschiebt sich jede Minute um ein paar Pixel gegen Einbrennen.</li>
       <li>Garmin Connect: 14 Felder und 2 Strich-Anzeigen bleiben wählbar. Die 9 Farbregler werden durch „Farbmodus“ und „Nacht automatisch“ ersetzt.</li>
       <li>Neue Zifferblätter werden als Auswahl „Layout“ im selben Zifferblatt gebaut, nicht als eigene Apps. So bleiben Uhr-Schlüssel und Daten gleich.</li>
     </ul>
     <div class="decide">
-      <h3>Zu entscheiden</h3>
+      <h3>Entschieden (23. Nov.)</h3>
       <ul class="plain">
-        <li>Welche Vorschläge sollen als Layout dazukommen? (Nummer nennen)</li>
-        <li>Farbmodus „Bedeutung“ und „Nacht“ so übernehmen, statt der 9 Farbregler?</li>
+        <li>Layouts: entschieden, 15, 17, 19 und 20 (PR #96).</li>
+        <li>Farbmodus: entschieden, ersetzt die 9 Farbregler, dazu „Nacht automatisch“ zur Schlafenszeit (PR #96).</li>
       </ul>
     </div>
   </section>
@@ -247,7 +247,7 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
     { n: "Erholungszeit (h)", v: "14", g: "88", i: "recov", f: "training", grp: "Aktivität" },
     { n: "HRV", v: "38", g: "88", i: "hrv", f: "erholung", grp: "Health Coach und Körper" },
     { n: "Schlafwert", v: "74", g: "88", i: "sleep", f: "schlaf", grp: "Health Coach und Körper" },
-    { n: "Hauttemperatur", v: "+0,3", g: "+8,8", i: "temp", f: "zyklus", grp: "Health Coach und Körper" },
+    null, // 31 Hauttemperatur entfernt (Garmin liefert sie nicht)
     { n: "Readiness", v: "7,4", g: "8,8", i: "ready", f: "erholung", grp: "Health Coach und Körper" },
     { n: "Zyklusphase", v: "LUT", g: "888", i: "phase", f: "zyklus", grp: "Health Coach und Körper" },
     { n: "Offene Einnahmen", v: "1", g: "8", i: "pill", f: "neutral", grp: "Health Coach und Körper" }
@@ -389,11 +389,9 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
     var aod = state.mode === "aod";
     var on = dim(C.time);
     if (aod) {
-      // Nur Uhrzeit und Datum, gedimmt, ohne Geisterziffern
-      var col = "#8E9095";
-      var w = segWidth("10:56", S(50), S(8), S(10));
-      seg7(g, "10:56", 227 - w / 2, S(146), S(50), S(44), S(8), S(10), col, null);
-      txt(g, 227, S(40), S(17), 0.12, "20 11 2026", "#6E7075", "middle");
+      // Immer an: Monolith-Uhrzeit mit dünnem Strich, gedimmt (unter 10 % leuchtende Pixel)
+      var w = segWidth("10:56", 80, 4, 14);
+      seg7(g, "10:56", 227 - w / 2, 170, 80, 106, 4, 14, "#8E9095", null);
       return;
     }
     // Rahmen, Kreise und Markierungen
@@ -548,10 +546,10 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
 
   var PROPS = [
     {
-      nr: "15", name: "Monolith",
+      nr: "15", name: "Monolith", pick: true,
       idea: "Nur die Uhrzeit, so groß wie möglich, mit Geistersegmenten. Darunter Datum und ein einziger Wert.",
       swap: "1 Feld unten",
-      aodText: "Uhrzeit ohne Geistersegmente",
+      aodText: "Monolith-Uhrzeit, dünn und gedimmt",
       draw: function (g, aod) {
         var w = segWidth("10:56", 80, 13, 14);
         seg7(g, "10:56", 227 - w / 2, 170, 80, 106, 13, 14, aod ? "#8E9095" : dim(C.time), aod ? null : (state.color === "night" ? "#121316" : C.segOff));
@@ -566,7 +564,7 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
       nr: "16", name: "Ziel-Bogen",
       idea: "Ein schmaler Bogen am Rand zeigt das Tagesziel: der Zielbereich als dunkle Spur, die Belastung bisher hell darüber. Mitte nur Uhrzeit und ein Satz.",
       swap: "Bogen: Tagesziel, Body Battery, Schritte · 2 Felder",
-      aodText: "Uhrzeit und dünner Bogen",
+      aodText: "Monolith-Uhrzeit, dünn und gedimmt",
       draw: function (g, aod) {
         arc(g, 212, 0, 359.9, state.color === "night" ? "#121316" : "#1A1D22", 6);
         arc(g, 212, 0.45 * 360, 0.65 * 360, famCol("training", "#4A4C51") === "#7C9AE0" ? "#3B5998" : dim("#4A4C51"), 6);
@@ -580,10 +578,10 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
       }
     },
     {
-      nr: "17", name: "Zyklus-Spur",
+      nr: "17", name: "Zyklus-Spur", pick: true,
       idea: "28 Punkte am Rand sind die Zyklustage. Periodentage in Rosé, heute ein größerer Punkt in Terracotta. Innen Uhrzeit, Zyklustag und Phase.",
       swap: "2 Felder unten",
-      aodText: "Uhrzeit und Punkt für heute",
+      aodText: "Monolith-Uhrzeit und Punkt für heute",
       draw: function (g, aod) {
         var n = 28, today = 18;
         for (var i = 0; i < n; i++) {
@@ -607,7 +605,7 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
       nr: "18", name: "Dein Tag",
       idea: "Die fünf Ringe von „Heute“ aus der App in klein: Energie, Schlaf, Readiness, Belastung, Stress. Jeder Ring mit Zahl und Icon, darüber die Uhrzeit.",
       swap: "5 Ringe in fester Reihenfolge, Uhrzeit-Stil",
-      aodText: "nur Uhrzeit",
+      aodText: "Monolith-Uhrzeit, dünn und gedimmt",
       draw: function (g, aod) {
         txt(g, 227, 100, 96, 0.02, "10:56", aod ? "#8E9095" : dim(C.time), "middle");
         if (aod) return;
@@ -625,10 +623,10 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
       }
     },
     {
-      nr: "19", name: "Stapel",
+      nr: "19", name: "Stapel", pick: true,
       idea: "Stunden über Minuten, links in großen Segmentziffern. Rechts drei Werte untereinander, durch feine Linien getrennt.",
       swap: "3 Felder rechts",
-      aodText: "Stunden und Minuten ohne Werte",
+      aodText: "Monolith-Uhrzeit, dünn und gedimmt",
       draw: function (g, aod) {
         var on = aod ? "#8E9095" : dim(C.time), off = aod ? null : (state.color === "night" ? "#121316" : C.segOff);
         seg7(g, "10", 62, 92, 66, 120, 12, 16, on, off);
@@ -643,10 +641,10 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
       }
     },
     {
-      nr: "20", name: "Eine Zeile",
+      nr: "20", name: "Eine Zeile", pick: true,
       idea: "Kleinste Fassung: Uhrzeit in Share Tech Mono, darunter eine Zeile mit drei Werten. Kein Rahmen, keine Linien, viel Schwarz.",
       swap: "3 Felder in einer Zeile",
-      aodText: "Uhrzeit allein",
+      aodText: "Monolith-Uhrzeit, dünn und gedimmt",
       draw: function (g, aod) {
         txt(g, 227, 150, 120, 0, "10:56", aod ? "#8E9095" : dim(C.time), "middle");
         if (aod) return;
@@ -663,12 +661,19 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
     box.innerHTML = "";
     PROPS.forEach(function (p) {
       var d = document.createElement("article"); d.className = "prop";
-      var h = document.createElement("h3"); h.innerHTML = '<span class="nr">' + p.nr + '</span> ' + p.name; d.appendChild(h);
+      var h = document.createElement("h3"); h.innerHTML = '<span class="nr">' + p.nr + '</span> ' + p.name + (p.pick ? ' <span class="tag">Gewählt</span>' : ' <span class="tag">nicht gewählt</span>'); d.appendChild(h);
       var svg = document.createElementNS(NS, "svg");
       svg.setAttribute("viewBox", "-20 -20 494 494"); svg.setAttribute("role", "img");
       svg.setAttribute("aria-label", "Vorschlag " + p.nr + " " + p.name + " mit Beispieldaten");
       bezel(svg, 227);
-      p.draw(el("g", {}, svg), state.mode === "aod");
+      if (state.mode === "aod") {
+        var ga = el("g", {}, svg);
+        var w = segWidth("10:56", 80, 4, 14);
+        seg7(ga, "10:56", 227 - w / 2, 170, 80, 106, 4, 14, "#8E9095", null);
+        if (p.nr === "17") el("circle", { cx: 227 + 205 * Math.cos(17 / 28 * 2 * Math.PI - Math.PI / 2), cy: 227 + 205 * Math.sin(17 / 28 * 2 * Math.PI - Math.PI / 2), r: 9, fill: "#6E7075" }, ga);
+      } else {
+        p.draw(el("g", {}, svg), false);
+      }
       d.appendChild(svg);
       var t = document.createElement("p"); t.className = "note"; t.textContent = p.idea; d.appendChild(t);
       var dl = document.createElement("dl");

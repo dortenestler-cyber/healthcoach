@@ -10,14 +10,19 @@ module Icons {
     var _u = 1.0;
     var _fg = 0xFFFFFF;
 
+    // Rechteck auf ganze Pixel gerundet: Anfang und Ende getrennt runden, damit Kanten scharf bleiben
     function r(dc, a, b, w, h) {
-        dc.fillRectangle(_x + a * _u, _y + b * _u, w * _u + 0.5, h * _u + 0.5);
+        var x0 = (_x + a * _u + 0.5).toNumber();
+        var y0 = (_y + b * _u + 0.5).toNumber();
+        var x1 = (_x + (a + w) * _u + 0.5).toNumber();
+        var y1 = (_y + (b + h) * _u + 0.5).toNumber();
+        dc.fillRectangle(x0, y0, (x1 - x0) < 1 ? 1 : x1 - x0, (y1 - y0) < 1 ? 1 : y1 - y0);
     }
 
     function p(dc, pts) {
         var out = new [pts.size() / 2];
         for (var i = 0; i < out.size(); i++) {
-            out[i] = [_x + pts[i * 2] * _u, _y + pts[i * 2 + 1] * _u];
+            out[i] = [(_x + pts[i * 2] * _u + 0.5).toNumber(), (_y + pts[i * 2 + 1] * _u + 0.5).toNumber()];
         }
         dc.fillPolygon(out);
     }
@@ -42,8 +47,8 @@ module Icons {
     }
 
     function draw(dc, name, x, y, s, fg) {
-        _x = x;
-        _y = y;
+        _x = x.toNumber();
+        _y = y.toNumber();
         _u = s / 16.0;
         _fg = fg;
         dc.setColor(fg, Graphics.COLOR_TRANSPARENT);
