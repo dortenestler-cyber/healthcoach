@@ -1,18 +1,21 @@
 # Übergabe · Oberfläche (OF)
-Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014pVPWewGvc4fmfts8C73m8
+Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014pVPWcVjiHLjFPhDDpN5k8
 
 Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/design-*`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
 ## Stand in einem Satz
-Sammelliste (13 Punkte) und Web-App am Computer umgesetzt (PR #77).
+Sammelliste Runde 1 umgesetzt (PR #77). Runde 2 (Punkte 14–21) gesammelt, wartet auf Freigabe; Konzept Datenaktualisierung geschrieben.
 
 ## In Arbeit
+- Sammelliste Runde 2 (`docs/sammelliste-oberflaeche.md`, Punkte 14–21) und `docs/konzept-datenaktualisierung.md`, Zweig `claude/tender-archimedes-h1rwvr`. Nur Doku, nichts umgesetzt.
+  Nächster Schritt: nach Freigabe umsetzen. Ursache Punkt 15: Charts zeichnen in `viewBox` mit fester Breite `W` und skalieren auf volle Breite; Lösung echte Breite messen. Punkt 17: `bandPath` in `LineBand.tsx` zeichnet Treppe. Punkt 18–19 ohne Migration möglich (`started_on`/`ended_on` und Symptome flexibel).
 - Keine offene Arbeit. PR #77 (Zweig `claude/kind-keller-hmdy0s`): Sammelliste `docs/sammelliste-oberflaeche.md` komplett, Web-App nach `docs/konzept-web-app.md`.
   Neu: `components/SideNav.tsx`, `components/CoachPanel.tsx`, `components/ui/TwoCol.tsx`, `lib/layout.ts` (Breiten, Coach-Spalte), `components/charts/pick.tsx` (Antippen in Charts), `components/heute/ActivityQuestion.tsx`, `lib/ovulation.ts`. Eisprung ist jetzt eigene `PhaseGroup`. `sportOf(a)` statt `sportOfGarmin(a.type_key)` (eigene Zuordnung zuerst). PIN nur iPhone (`pinRequired`).
   Nächster Schritt: Rückmeldung der Nutzerin; danach evtl. zwei Spalten für Training › Kalender und Gesundheit › Überblick/Medikamente.
 - Detailseiten nach Whoop sind mit PR #78 gemergt (`FactorList`, `ReadinessCard`/`HrvCard`/`StressCard` entfernt). Stift zum Wählen von Ringen und Kacheln: noch nicht freigegeben, nur vorgeschlagen.
 
 ## Wartet auf
+- Nutzerin: Freigabe Sammelliste Runde 2 und Antworten zum Konzept Datenaktualisierung (`AUFGABEN.md`)
 - Daten: Spalten `garmin_activities.sport_override/sport_label` und `diary_entries.ovulation_signs` (siehe unten). Bis dahin blendet die Oberfläche beides aus.
 - Nutzerin: Rückmeldung zu PR #77 (`AUFGABEN.md` Abschnitt „Sammelliste Anpassungen“)
 - Nutzerin: Rückmeldung zur neuen Seite Heute (`AUFGABEN.md` Abschnitt „Heute als Einstiegsseite“)
@@ -20,6 +23,7 @@ Sammelliste (13 Punkte) und Web-App am Computer umgesetzt (PR #77).
 - Nutzerin: Rückmeldung zur Seite Zyklus (`AUFGABEN.md` Abschnitt 6)
 
 ## Für die andere Rolle
+- Daten: Konzept `docs/konzept-datenaktualisierung.md` Teil B (Abrufe tagsüber, gemeinsames Protokoll, Sperre bei Garmin). Noch nicht freigegeben, bitte nur lesen.
 - Daten: **Freigegeben am 23.11.** Zwei Migrationen für die Sammelliste (`docs/sammelliste-oberflaeche.md`). Die Oberfläche liest und schreibt diese Namen, bitte so anlegen:
   - `garmin_activities.sport_override text null` (Werte `karate|kettlebell|klettern|ausdauer|sonstiges|ignorieren`) und `garmin_activities.sport_label text null` (eigener Name bei „Anderes“). `garmin-sync` darf beide beim Upsert nicht überschreiben. Update-Recht für die eigene Zeile per RLS.
   - `diary_entries.ovulation_signs text[] not null default '{}'` (Werte `test|mittelschmerz|schleim|temperatur`).
