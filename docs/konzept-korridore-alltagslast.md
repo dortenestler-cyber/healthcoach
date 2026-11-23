@@ -12,7 +12,7 @@ Zwei Wünsche der Nutzerin:
 
 ### Wie es heute ist
 - `lib/baseline.ts`: Bereich = mittlere Hälfte der letzten 30 Tage ohne heute, ab 14 Tagen Daten.
-- Nur für HRV, Ruhepuls und Temperatur gibt es in der Lutealphase einen eigenen Bereich.
+- Nur für HRV und Ruhepuls gibt es in der Lutealphase einen eigenen Bereich.
 - In den Diagrammen (`VerlaufView`, `HrvCard`, `LineBand`) ist der Bereich **ein festes Band** über den ganzen Zeitraum. Er zeigt nur, wo der Bereich heute liegt.
 - Die Karte sagt nur „im Bereich“, „über“ oder „unter“.
 - Trainingslast hat einen eigenen Korridor (80–130 % der 4 Wochen davor), der in `LoadTrendCard` schon mitwandert.

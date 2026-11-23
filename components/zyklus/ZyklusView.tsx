@@ -18,7 +18,7 @@ import { byCycleDay, CYCLE_METRICS, effectsByPhase, MIN_DAYS, phaseProfile } fro
 
 const MONTHS = ["Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sep.", "Okt.", "Nov.", "Dez."];
 const date = (iso: string) => `${Number(iso.slice(8, 10))}. ${MONTHS[Number(iso.slice(5, 7)) - 1]}`;
-const tone = (k: MetricKey) => (k === "schlaf" ? "sleep" : k === "temperatur" ? "cycle" : k === "bb" ? "training" : "recovery");
+const tone = (k: MetricKey) => (k === "schlaf" ? "sleep" : k === "bb" ? "training" : "recovery");
 const ms = (v: number) => `${Math.round(v)} ms`;
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");
@@ -101,7 +101,7 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
           if (c !== null && u !== null) diffs.push(c - u);
         }
         const avg = diffs.reduce((a, b) => a + b, 0) / Math.max(1, diffs.length);
-        const smallStep = metric === "temperatur" ? 0.1 : metric === "schlaf" ? 0.25 : 2;
+        const smallStep = metric === "schlaf" ? 0.25 : 2;
         return Math.abs(avg) < smallStep ? `${m.label} verläuft in diesem Zyklus wie in deinen früheren Zyklen.` : `${m.label} liegt in diesem Zyklus zuletzt ${avg > 0 ? "über" : "unter"} dem Schnitt deiner früheren Zyklen.`;
       })();
 
@@ -192,7 +192,7 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
           ))}
         </div>
         {ct.cycleDay !== null ? (
-          <CycleDayChart d={bcd} fmt={m.fmt} tone={tone(metric)} zeroLine={metric === "temperatur"} label={`${m.label} nach Zyklustag: dieser Zyklus gegen den Schnitt von ${bcd.cycles} früheren Zyklen`} />
+          <CycleDayChart d={bcd} fmt={m.fmt} tone={tone(metric)} label={`${m.label} nach Zyklustag: dieser Zyklus gegen den Schnitt von ${bcd.cycles} früheren Zyklen`} />
         ) : (
           <p>Die Ansicht nach Zyklustag erscheint, sobald eine Periode im Tagebuch steht.</p>
         )}

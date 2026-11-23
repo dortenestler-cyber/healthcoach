@@ -35,7 +35,7 @@ Hauptbutton und aktive Auswahl bleiben hell auf dunkel. Beere `#A3234F` bleibt M
 
 1. **Satz, Zahl, Bereich, Grafik** in dieser Reihenfolge. Der Satz nennt das Ergebnis, die Zahl steht groß, darunter der persönliche Bereich in Zahlen.
 2. **Fester persönlicher Bereich:** letzte 30 Tage ohne heute, mittlere Hälfte der Werte. Er hängt nicht am gewählten Zeitraum. Unter 14 Tagen Daten steht „Bereich ab 14 Tagen“.
-3. **Zyklus-angepasst:** In der Lutealphase gilt für HRV, Ruhepuls und Temperatur ein eigener Bereich aus früheren Lutealphasen. Beide Bereiche sind sichtbar.
+3. **Zyklus-angepasst:** In der Lutealphase gilt für HRV und Ruhepuls ein eigener Bereich aus früheren Lutealphasen. Beide Bereiche sind sichtbar.
 4. **Readiness mit Beitragsfaktoren:** HRV, Ruhepuls, Schlaf und Last, je mit Bereich und Punkt.
 5. **Echte Achsen:** festes Seitenverhältnis, 2–3 beschriftete Hilfslinien, letzter Wert als Zahl am Punkt. Keine Streckung auf 100 × 100.
 6. **Zeitraum T · W · M · 6M · J.** Der Satz oben passt sich an. Ab 6M werden Tage zu Wochenmitteln.
@@ -62,7 +62,6 @@ Der Entwurf lag als Design-Canvas in Claude vor (privater Link, daher nicht daue
 | Ruhepuls | Garmin | 30-Tage-Bereich, zyklus-angepasst | Bereichszeile, Linie mit Band | Heute, Detail |
 | Schlaf | Garmin, Phasen | Bereich + eigenes Ziel, Nachtschweiß aus dem Tagebuch | Phasenbalken, 7-Nächte-Säulen | Heute, Schlaf |
 | Body Battery | Garmin | 30-Tage-Bereich | Bereichszeile, Tagesverlauf | Heute, Muster |
-| Hauttemperatur | Garmin, Abweichung | ±0,0 °C als Mitte, Anstieg nach Eisprung erwartet | Linie um Nulllinie mit Phasen | Detail |
 | Trainingslast | Garmin-Aktivitäten | Wochenkorridor aus 4 Wochen | Bereichsbalken, Tagessäulen | Training |
 | Belastungsverhältnis | Last 7 Tage ÷ Schnitt 28 Tage | 0,8–1,3 | Zonen-Skala mit Punkt | Training |
 | Intensitätsminuten | Garmin | 150 pro Woche (WHO) | Fortschrittsbalken | Training |
@@ -110,8 +109,8 @@ Jeder PR mit Bildschirmfotos auf iPhone-Größe.
 Auf Wunsch der Nutzerin heißt der vierte Reiter jetzt **Zyklus** (`/zyklus`, `/muster` leitet weiter). Der Fokus liegt auf dem eigenen Zyklus, die Muster sind innerhalb des Zyklus eingeordnet:
 
 1. Zyklus-Ring mit Phasenbögen, Zyklustag, Phase (geschätzt), Periodenfenster und Vorschlag zur Phase.
-2. Heute in deinem Zyklus: HRV, Ruhepuls, Temperatur und Schlaf in der heutigen Phase gegen den Schnitt, häufige Symptome um diesen Zyklustag.
-3. Werte nach Zyklustag: laufender Zyklus gegen den Schnitt der früheren Zyklen (HRV, Ruhepuls, Temperatur, Schlaf, Body Battery).
+2. Heute in deinem Zyklus: HRV, Ruhepuls und Schlaf in der heutigen Phase gegen den Schnitt, häufige Symptome um diesen Zyklustag.
+3. Werte nach Zyklustag: laufender Zyklus gegen den Schnitt der früheren Zyklen (HRV, Ruhepuls, Schlaf, Body Battery).
 4. Zykluslängen, Hitzewallungen pro Woche, Symptome nach Zyklustag (vorher Reiter unter Gesundheit).
 5. Was dir guttut je Phase: HRV der Folgenacht, Follikel- und Lutealphase getrennt, ab je 5 Nächten.
 6. Weitere Muster ohne Zyklusbezug unten. „Energie über den Tag“ steht auf Heute.
@@ -176,10 +175,8 @@ Biologisches Alter und Alterungstempo (05), empfohlene Schlafens- und Aufstehzei
   - Nicht als Knopf auf Heute.
 - **Detailseite je Gewohnheit** (`/gesundheit/gewohnheit?k=sauna`):
   - Wie oft, mit Raster der letzten 13 Wochen
-  - Die Nacht danach mit und ohne: HRV, Ruhepuls, Tiefschlaf, Hauttemperatur, Nachtschweiß
+  - Die Nacht danach mit und ohne: HRV, Ruhepuls, Tiefschlaf, Nachtschweiß
   - Je Zyklusphase, dazu Hitzewallungen am Tag danach
-  - Hauttemperatur mit markierten Nächten nach der Gewohnheit
-  - Nächte nach der Sauna sind auch im Verlauf der Hauttemperatur markiert.
 - **Sperrbildschirm**: nur der Zen-Ring ohne Kachel (`public/icons/enso.svg`), Gruß nach Tageszeit, Ziffernfeld wie beim iPhone mit Buchstaben, Face ID im Ziffernfeld. Nie ein Gesundheitswert.
 - **Icons** statt Kürzeln für Sportarten. Coach-Symbol: Sprechblase mit Pulslinie.
 - **App-Symbol Zen-Ring** (Ensō, mit dem Pinsel gezeichnet, trockene Pinselspuren, ausfaserndes Ende): dunkle Variante freigegeben, seit 23.11. Sage hell auf dunklem Grüngrau (passt zu getönten Symbolen in iOS), für hell und dunkel gleich.

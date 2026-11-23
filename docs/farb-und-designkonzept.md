@@ -87,7 +87,6 @@ Schlaf bleibt neutral, damit er sich nie mit einer Bedeutungsfarbe vermischt. Ti
 | Text | `#F2B193` | Schrift auf Fläche |
 | Menstruation | `#F28B8B` auf `#3B1E22` | Periodentage |
 | Follikelphase | `#1D232B` | Kalenderfläche |
-| Hauttemperatur | Terracotta-Linie | weil sie den Zyklus anzeigt |
 
 ### Hinweis · Amber
 | Stufe | Wert | Verwendung |
@@ -114,7 +113,6 @@ Amber heißt „schau hin“, nie „krank“. Warnzeichen mit Verweis auf ärzt
 | HRV | Erholung | Linie Sage, Band Sage-Grund | Kachel (Symbol neutral) |
 | Ruhepuls | Erholung | Linie Sage hell | Kachel |
 | Atemfrequenz | Erholung | Linie Text 2 | Kachel |
-| Hauttemperatur | Zyklus | Linie Terracotta | Kachel |
 | Schlaf, Schlafbedarf | Schlaf | Mondgrau `#E5E7EB` | Ring, Kachel |
 | Belastung heute | Training | Slate `#7C9AE0` + Alltag `#C3D1F2`, Zielbogen `#3B5998` | Ring |
 | Last 7 Tage, Belastungsverhältnis | Training | Slate | – |
@@ -176,7 +174,6 @@ Inter, Ziffern in gleicher Breite (`tabular-nums`). Eine feste Skala, nichts daz
 | Readiness-Stufen alle gleich | vier Sage-Stufen, mehr ist heller |
 | Pulszonen ohne feste Farbe | fünf Slate-Stufen, mehr ist heller |
 | Schlafphasen ohne feste Abstufung | Tief → REM → Leicht → Wach von hell nach dunkel |
-| Hauttemperatur neutral | Terracotta (Zyklus) |
 | Erklärkarte Rand in Bereichsfarbe | Verlauf zur Beere als Zeichen für den Coach |
 | Karte ohne Ebene darin | neue Ebene „Karte hoch“ `#1C2026` |
 | Achsen gedämpft | eigene Achsenfarbe `#7A838F` |

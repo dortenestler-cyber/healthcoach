@@ -22,7 +22,7 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Heute: 13 Knöpfe nebeneinander, immer nur ein Wert sichtbar.
    Vorschlag: vier Gruppen statt 13 Knöpfen. Jede Gruppe zeigt ihre Werte als kleine Charts untereinander (iPhone) bzw. zwei nebeneinander (Computer), alle mit derselben Zeitachse und einer gemeinsamen Phasenleiste. Fährt man über einen Tag, zeigen alle Charts der Gruppe denselben Tag.
    - **Schlaf:** Schlaf, Tiefschlaf, REM-Schlaf, Einschlafen
-   - **Herz und Körper:** HRV, Ruhepuls, Atemfrequenz, Temperatur
+   - **Herz und Körper:** HRV, Ruhepuls, Atemfrequenz
    - **Energie und Stress:** Body Battery, Body Battery aufgeladen, Stress, Stress hoch
    - **Bewegung:** Schritte, Alltagsschritte, Trainingsbelastung
    Tippen auf einen kleinen Chart öffnet ihn groß wie heute. Zeitraum T · W · M · 6M · J bleibt oben und gilt für alle.
@@ -47,7 +47,7 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Rauer Hals · Halsschmerzen · Verstopfte Nase · Schnupfen · Niesen · Husten · Frösteln · Gliederschmerzen · Abgeschlagen · Druck im Kopf/Nebenhöhlen · Lippenbläschen.
    Wie die Symptome gespeichert, deshalb keine Änderung an der Datenbank nötig. Punkt 5e gilt: oben die eingetragenen und häufig genutzten, der Rest unter „Weitere anzeigen“.
    Einbindung in die Mustererkennung:
-   - **Frühwarnung:** Treffen Anzeichen auf HRV unter deinem Bereich, Ruhepuls oder Hauttemperatur darüber, steht auf Heute ein ruhiger Hinweis: „Rauer Hals und HRV unter deinem Bereich. Heute lieber locker trainieren.“ Keine Diagnose.
+   - **Frühwarnung:** Treffen Anzeichen auf HRV unter deinem Bereich, Ruhepuls darüber, steht auf Heute ein ruhiger Hinweis: „Rauer Hals und HRV unter deinem Bereich. Heute lieber locker trainieren.“ Keine Diagnose.
    - **Übergang zur Krankheit:** Werden die Anzeichen an zwei Tagen in Folge stärker, fragt die App „Bist du krank?“ mit einem Tipp auf „Erkältung eintragen“, Beginn am ersten Tag mit Anzeichen (nutzt Punkt 18).
    - **Muster:** Unter Gesundheit › Überblick in „Weitere Muster“ z. B. „Anzeichen kamen 4 von 5 Mal nach einer Woche über deinem Korridor“ oder „… häufiger nach kurzen Nächten“. Nach Zyklusphase in Zyklus › Werte und Symptome. Erst ab genug Tagen, vorher „noch zu wenige Tage“.
    - Der Coach bekommt die Anzeichen der letzten 7 Tage mit, nur Name und Stärke.

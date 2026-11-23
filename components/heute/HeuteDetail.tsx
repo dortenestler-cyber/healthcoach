@@ -106,7 +106,6 @@ function ReadinessDetail({ day, data, rule, showGarmin }: { day: string; data: D
   const tone = rule.level === "phase" ? (rule.cycle.phase ? "suggest-cycle" : "") : rule.level === "reha" ? "suggest-training" : "suggest-warn";
   const phase = rule.cycle.phase ? PHASES[rule.cycle.phase].label : null;
   const night = showGarmin ? vitalRows(day, data).filter((r) => r.key !== "hrv" && r.key !== "ruhepuls") : [];
-  const hasTemp = data.daily.some((d) => typeof d.skin_temp_delta === "number");
 
   return (
     <>
@@ -140,7 +139,6 @@ function ReadinessDetail({ day, data, rule, showGarmin }: { day: string; data: D
         <section className="card detail-card">
           <span className="eyebrow">Weitere Werte der Nacht</span>
           <FactorList rows={night} tone="neutral" legend="Heute gegen deine letzten 30 Tage" />
-          {!hasTemp && <span className="meta">Hauttemperatur kommt noch nicht von Garmin an.</span>}
         </section>
       )}
 
