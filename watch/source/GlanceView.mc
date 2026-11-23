@@ -20,6 +20,15 @@ class HcGlanceView extends WatchUi.GlanceView {
     }
 
     function onUpdate(dc) {
+        try {
+            draw(dc);
+        } catch (e) {
+            dc.setColor(MUTED, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(0, dc.getHeight() / 2, Graphics.FONT_GLANCE, "APP ÖFFNEN", Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
+        }
+    }
+
+    function draw(dc) {
         var h = dc.getHeight();
         var font = Graphics.FONT_GLANCE;
         var fh = dc.getFontHeight(font);

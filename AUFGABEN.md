@@ -172,6 +172,9 @@ Enthält eine Migration und ändert die Funktionen `garmin-sync` und `watch`, de
 - [ ] Nach dem Merge: Heute › Schlaf ansehen, dort steht die Karte „Wach und Sauerstoff in der Nacht“ (ab der ersten Nacht mit Werten)
 - [ ] Prüfen, dass nirgends mehr Hauttemperatur auftaucht (Verlauf, Zyklus, Gewohnheiten, Readiness)
 
+### 18. Uhr-App stürzt nach neuem Uhr-Schlüssel ab (DA)
+- [ ] Nach dem Merge im Lauf „Uhr-App bauen“ das Paket `upload-uhr-app` laden, `HealthCoach.iq` im Garmin-Entwicklerportal hochladen und nach der Freigabe auf der Uhr aktualisieren. Statt abzustürzen zeigt die App jetzt den Grund an („FEHLER AUF DER UHR …“). Bitte den Text melden, falls er erscheint
+
 ## Erledigt
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)
 - [x] PR #34, #35, #36, #37 gemergt (Konzept, `CLAUDE.md`, Fundament, Merge-Regel)

@@ -7,8 +7,21 @@ import Toybox.WatchUi;
 module Api {
 
     function call(action, payload, callback) {
-        var token = Application.Properties.getValue("token");
-        var base = Application.Properties.getValue("baseUrl");
+        var token = null;
+        var base = null;
+        try {
+            token = Application.Properties.getValue("token");
+            base = Application.Properties.getValue("baseUrl");
+        } catch (e) {
+            token = null;
+        }
+        // Leerzeichen und Zeilenumbrüche aus dem eingetragenen Schlüssel entfernen
+        if (token instanceof String) {
+            token = trim(token);
+        }
+        if (base instanceof String) {
+            base = trim(base);
+        }
         if (token == null || !(token instanceof String) || token.length() < 10) {
             callback.invoke(-401, null);
             return;
@@ -28,7 +41,24 @@ module Api {
             },
             :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
         };
-        Communications.makeWebRequest(base + "/functions/v1/watch", payload, options, callback);
+        try {
+            Communications.makeWebRequest(base + "/functions/v1/watch", payload, options, callback);
+        } catch (e) {
+            callback.invoke(-1, {"error" => e.getErrorMessage()});
+        }
+    }
+
+    // Entfernt Leerzeichen, Zeilenumbrüche und Tabs ohne Hilfsfunktionen aus der Standardbibliothek
+    function trim(s) {
+        var out = "";
+        var chars = s.toCharArray();
+        for (var i = 0; i < chars.size(); i++) {
+            var c = chars[i];
+            if (c != ' ' && c != '\n' && c != '\r' && c != '\t') {
+                out += c;
+            }
+        }
+        return out;
     }
 
     function errorText(code) {
@@ -57,6 +87,23 @@ class Net {
     }
 
     function onReceive(code, data) {
+        try {
+            handle(code, data);
+        } catch (e) {
+            // Nie abstürzen: den Grund auf der Uhr zeigen, damit er sich beheben lässt
+            var msg = e.getErrorMessage();
+            var text = msg == null ? "UNBEKANNT" : msg.toString().toUpper();
+            if (text.length() > 24) {
+                text = text.substring(0, 24);
+            }
+            try {
+                WatchUi.pushView(new InfoView(["FEHLER AUF DER UHR", text]), new InfoDelegate(), WatchUi.SLIDE_UP);
+            } catch (e2) {
+            }
+        }
+    }
+
+    function handle(code, data) {
         if (code == 200 && data instanceof Dictionary) {
             Store.save(data);
             WatchUi.switchToView(MainMenu.build(data), new MainMenuDelegate(), WatchUi.SLIDE_IMMEDIATE);
