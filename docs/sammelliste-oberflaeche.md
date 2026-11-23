@@ -41,4 +41,12 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Braucht Daten `[DA]`: eine Spalte für die eigene Zuordnung in `garmin_activities` (Migration, wartet auf Freigabe). `garmin-sync` darf sie beim nächsten Abruf nicht überschreiben.
    Dateien OF: `lib/training.ts` (Zuordnung lesen), neue Karte unter `components/heute/`
 
+7. ☐ **Heute: Garmin-Stand als Punkt am Zahnrad** (23.11.)
+   Die Zeile „Garmin · Stand 08:02 · nach unten ziehen zum Aktualisieren“ unter dem Datum fällt weg. Am Zahnrad oben rechts sitzt stattdessen ein kleiner Punkt:
+   - Daten jünger als 30 Minuten: kein Punkt
+   - 30 Minuten bis 1 Stunde: grauer Punkt (gedämpft)
+   - älter als 1 Stunde oder Abruf fehlgeschlagen: Amber-Punkt
+   Damit der Punkt nicht ohne Text steht: Die Beschriftung des Zahnrads lautet z. B. „Einstellungen · Garmin-Daten von 08:02, älter als 1 Stunde“. Unter Einstellungen › Garmin steht der Stand als Satz. Fehlermeldungen beim Abruf bleiben wie bisher auf Heute sichtbar. Ziehen zum Aktualisieren bleibt, der Hinweis darauf steht nur noch beim Ziehen selbst.
+   Dateien: `components/heute/DayHead.tsx`, `app/globals.css`
+
 ## Erledigt
