@@ -132,7 +132,7 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 ### 15. Schlafphasen mit Uhrzeit und Hauttemperatur, Daten (PR #84, DA)
 Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst du ihn selbst. In der App ist noch nichts Neues zu sehen, die Zeitachse baut danach die Rolle Oberfläche.
 - [x] PR #84 gemergt und synchronisiert (23. Nov.), Migration und Upload grün. Ergebnis: Garmin gibt einzelne Nächte unter den bekannten Adressen nicht heraus (404)
-- [ ] PR #85 ansehen und mergen (nur `garmin-sync`, keine Migration). Er zeigt, welche Felder die Schlafübersicht wirklich enthält, und versucht zwei weitere Adressen
+- [ ] PR #87 ansehen und mergen (nur `garmin-sync`, keine Migration). Er zeigt, welche Felder die Schlafübersicht wirklich enthält, und versucht zwei weitere Adressen
 - [ ] Nach dem Upload (etwa 1 Minute nach dem Merge) in der App unter **Einstellungen › Garmin** synchronisieren und Claude Bescheid geben
 
 ## Erledigt
