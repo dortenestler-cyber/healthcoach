@@ -34,3 +34,6 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-23 · OF · Nutzerin: Web-App-Konzept: Coach am Computer als feste Spalte, „vorerfasst“ = nur Anmeldedaten, iPad wie Computer (keine PIN)
 2026-11-23 · OF · Nutzerin: Sammelliste Oberfläche (Punkte 1–13, PR #77) freigegeben, inklusive Datenbank-Änderungen für Punkt 6 (eigene Sportart Garmin) und Punkt 10 (Eisprung-Zeichen im Tagebuch)
 2026-11-23 · OF · Nutzerin: Vercel baut nur noch `main`, keine Vorschau-Builds für Arbeitszweige (vercel.json, ignoreCommand), weil der Merge von PR #77 nicht gebaut wurde (vermutlich Tageslimit)
+2026-11-23 · OF · Nutzerin: Sammelliste Runde 2 (Punkte 14–21) komplett freigegeben, auch Konzept Datenaktualisierung (Teil A und B)
+2026-11-23 · OF · Nutzerin: „Last“ heißt künftig „Belastung“ (nicht „Trainingsbelastung“), mit Zusatz „mit Alltag“ bzw. „nur Training“
+2026-11-23 · DA · Nutzerin: Garmin-Abruf tagsüber alle 2 Stunden (8–22 Uhr wie vorgeschlagen), B2 schneller nach dem Training ja
