@@ -211,23 +211,8 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
     neutral: { name: "Neutral", col: null }
   };
 
-  // Icons der Vorlage (16er-Raster)
-  var ICON = {
-    bb: { d: "M1 4h12v8H1zM2.5 5.5v5h9v-5zM13 6h2v4h-2zM8 5.5L5.5 8.5h2L6.5 10.5L9.5 7.5h-2z", eo: true },
-    cy: { d: "M5 1H11L15 5V11L11 15H5L1 11V5zM5.6 2.5L2.5 5.6V10.4L5.6 13.5H10.4L13.5 10.4V5.6L10.4 2.5zM4.5 9h3v3h-3z", eo: true },
-    su: { d: "M2 12h12v1.5H2zM4.5 12V10L6 8.5h4L11.5 10V12zM8 1.5L10.5 4.5H9V7H7V4.5H5.5z" },
-    cl: { d: "M1.5 12.5V9.5L3.5 7.5H5.5L7.5 5H11L13 7V8.5L14.5 10V12.5z" },
-    dr: { d: "M8 1L13 8L11 14H5L3 8z" },
-    sd: { d: "M2 12h12v1.5H2zM4.5 12V10L6 8.5h4L11.5 10V12zM8 7L5.5 4H7V1.5h2V4h1.5z" },
-    he: { d: "M2 4L4 2H6L8 4L10 2H12L14 4V7.5L8 13.5L2 7.5z" },
-    fl: { d: "M8 1L11 5L10 7.5L12 6.5L13 10L10.5 14.5H5.5L3 10L4 6.5L6 8.5z" },
-    st: { d: "M2.5 2h4v6.5h-4zM3 10h3v2.5H3zM9.5 4.5h4V11h-4zM10 12.5h3V15h-3z" },
-    ta: { d: "M1 1h14v14H1zM2.5 2.5v11h11v-11zM4.5 4.5h7v7h-7zM6 6v4h4V6zM7.25 7.25h1.5v1.5h-1.5z", eo: true },
-    be: { d: "M4 11V6L6 3H10L12 6V11L13.5 12.5H2.5zM6.5 13.5h3V15h-3z" },
-    hg: { d: "M3 1h10v2.5L9.5 8L13 12.5V15H3V12.5L6.5 8L3 3.5z" },
-    kb: { d: "M5 1h6v1.5H5zM3.5 2.5H5V6H3.5zM11 2.5h1.5V6H11zM5 6h6l2.5 2.5v4L11 15H5l-2.5-2.5v-4z" },
-    "in": { d: "M5.5 1h3.5v4.5H5.5zM3.5 6h7.5v8.5H3.5zM11 10h3.5v4.5H11z" }
-  };
+  // Icons wie im Zifferblatt-Code (watchface/source/Icons.mc, 16er-Raster): Flächen f, Aussparungen h in Schwarz
+  var ICON = {"bb": [["f", "M1 4h12v8h-12z"], ["h", "M2.5 5.5h9v5h-9z"], ["f", "M13 6h2v4h-2z"], ["f", "M8 5.5L5.5 8.5L7.5 8.5L6.5 10.5L9.5 7.5L7.5 7.5z"]], "batt": [["f", "M1 4h12v8h-12z"], ["h", "M2.5 5.5h9v5h-9z"], ["f", "M13 6h2v4h-2z"], ["f", "M3.5 6.5h5v3h-5z"]], "cy": [["f", "M5 1L11 1L15 5L15 11L11 15L5 15L1 11L1 5z"], ["h", "M5.6 2.5L10.4 2.5L13.5 5.6L13.5 10.4L10.4 13.5L5.6 13.5L2.5 10.4L2.5 5.6z"], ["f", "M4.5 9h3v3h-3z"]], "phase": [["f", "M5 1L11 1L15 5L15 11L11 15L5 15L1 11L1 5z"], ["h", "M5.6 2.5L10.4 2.5L13.5 5.6L13.5 10.4L10.4 13.5L5.6 13.5L2.5 10.4L2.5 5.6z"], ["f", "M8 4h4v8h-4z"]], "su": [["f", "M2 12h12v1.5h-12z"], ["f", "M4.5 12L4.5 10L6 8.5L10 8.5L11.5 10L11.5 12z"], ["f", "M8 1.5L10.5 4.5L9 4.5L9 7L7 7L7 4.5L5.5 4.5z"]], "sd": [["f", "M2 12h12v1.5h-12z"], ["f", "M4.5 12L4.5 10L6 8.5L10 8.5L11.5 10L11.5 12z"], ["f", "M8 7L5.5 4L7 4L7 1.5L9 1.5L9 4L10.5 4z"]], "cl": [["f", "M1.5 12.5L1.5 9.5L3.5 7.5L5.5 7.5L7.5 5L11 5L13 7L13 8.5L14.5 10L14.5 12.5z"]], "dr": [["f", "M8 1L13 8L11 14L5 14L3 8z"]], "spo2": [["f", "M8 1L13 8L11 14L5 14L3 8z"], ["h", "M8 5L10.5 8.5L9.5 11.5L6.5 11.5L5.5 8.5z"]], "he": [["f", "M2 4L4 2L6 2L8 4L10 2L12 2L14 4L14 7.5L8 13.5L2 7.5z"]], "rhr": [["f", "M2 4L4 2L6 2L8 4L10 2L12 2L14 4L14 7.5L8 13.5L2 7.5z"], ["h", "M4 6.5h8v1.5h-8z"]], "hrv": [["f", "M2 4L4 2L6 2L8 4L10 2L12 2L14 4L14 7.5L8 13.5L2 7.5z"], ["h", "M3 6.5L5.5 6.5L7 4L9 9L10.5 6.5L13 6.5L13 7.8L11.2 7.8L9 11.5L7 6.7L6.2 7.8L3 7.8z"]], "fl": [["f", "M8 1L11 5L10 7.5L12 6.5L13 10L10.5 14.5L5.5 14.5L3 10L4 6.5L6 8.5z"]], "kcal": [["f", "M8 1L11 5L10 7.5L12 6.5L13 10L10.5 14.5L5.5 14.5L3 10L4 6.5L6 8.5z"], ["h", "M8 8L10 11L9 13L7 13L6 11z"]], "st": [["f", "M2.5 2h4v6.5h-4z"], ["f", "M3 10h3v2.5h-3z"], ["f", "M9.5 4.5h4v6.5h-4z"], ["f", "M10 12.5h3v2.5h-3z"]], "ta": [["f", "M1 1h14v14h-14z"], ["h", "M2.5 2.5h11v11h-11z"], ["f", "M4.5 4.5h7v7h-7z"], ["h", "M6 6h4v4h-4z"], ["f", "M7.25 7.25h1.5v1.5h-1.5z"]], "ready": [["f", "M1 1h14v14h-14z"], ["h", "M2.5 2.5h11v11h-11z"], ["f", "M4 8L5.5 6.5L7.5 8.5L11 4L12.5 5.5L7.5 11.5z"]], "be": [["f", "M4 11L4 6L6 3L10 3L12 6L12 11L13.5 12.5L2.5 12.5z"], ["f", "M6.5 13.5h3v1.5h-3z"]], "alarm": [["f", "M4 11L4 6L6 3L10 3L12 6L12 11L13.5 12.5L2.5 12.5z"], ["f", "M6.5 13.5h3v1.5h-3z"], ["f", "M0.5 4h1.5v4h-1.5z"], ["f", "M14 4h1.5v4h-1.5z"]], "hg": [["f", "M3 1L13 1L13 3.5L9.5 8L13 12.5L13 15L3 15L3 12.5L6.5 8L3 3.5z"]], "recov": [["f", "M5 1L11 1L15 5L15 11L11 15L5 15L1 11L1 5z"], ["h", "M5.6 2.5L10.4 2.5L13.5 5.6L13.5 10.4L10.4 13.5L5.6 13.5L2.5 10.4L2.5 5.6z"], ["f", "M7.25 4.5h1.5v4h-1.5z"], ["f", "M7.25 7.25h4v1.5h-4z"]], "kb": [["f", "M5 1h6v1.5h-6z"], ["f", "M3.5 2.5h1.5v3.5h-1.5z"], ["f", "M11 2.5h1.5v3.5h-1.5z"], ["f", "M5 6L11 6L13.5 8.5L13.5 12.5L11 15L5 15L2.5 12.5L2.5 8.5z"]], "in": [["f", "M5.5 1h3.5v4.5h-3.5z"], ["f", "M3.5 6h7.5v8.5h-7.5z"], ["f", "M11 10h3.5v4.5h-3.5z"]], "pill": [["f", "M5 1L11 1L13 3L13 13L11 15L5 15L3 13L3 3z"], ["h", "M4.5 8.5L11.5 8.5L11.5 12.5L10.5 13.5L5.5 13.5L4.5 12.5z"]], "stress": [["f", "M10 1L4 9L7.5 9L6 15L12.5 6.5L9 6.5z"]], "floors": [["f", "M1 15L1 11L5 11L5 7L9 7L9 3L15 3L15 15z"]], "intens": [["f", "M2 8L8 2L14 8L14 10.5L8 4.5L2 10.5z"], ["f", "M2 13L8 7L14 13L14 15.5L8 9.5L2 15.5z"]], "dist": [["f", "M8 1L13 4L13 8L8 15L3 8L3 4z"], ["h", "M6.5 4.5h3v3h-3z"]], "resp": [["f", "M7.25 1h1.5v6h-1.5z"], ["f", "M2 6L4 4L6.5 4L6.5 14L2 14z"], ["f", "M9.5 4L12 4L14 6L14 14L9.5 14z"]], "alt": [["f", "M1 14L6 5L9 10L11 7L15 14z"]], "press": [["f", "M1 12L2 7L5 3.5L8 2.5L11 3.5L14 7L15 12z"], ["h", "M3.5 12L4.3 8L6.2 5.6L8 5L9.8 5.6L11.7 8L12.5 12z"], ["f", "M7.3 12L10.5 6L8.7 12z"]], "move": [["f", "M1 11h2v4h-2z"], ["f", "M4 9h2v6h-2z"], ["f", "M7 7h2v8h-2z"], ["f", "M10 5h2v10h-2z"], ["f", "M13 3h2v12h-2z"]], "sleep": [["f", "M9 1L5 2.5L2.5 6L2.5 10L5 13.5L9 15L13 13.5L15 10.5L11 11L8 9L7 5.5z"]], "temp": [["f", "M6.5 1h3v9h-3z"], ["f", "M4.5 10.5L6 9L10 9L11.5 10.5L11.5 13.5L10 15L6 15L4.5 13.5z"]], "cross": [["f", "M6 2L10 2L10 6L14 6L14 10L10 10L10 14L6 14L6 10L2 10L2 6L6 6z"]]};
 
   // Wählbare Werte, Nummern wie in settings.xml (Beispieldaten)
   var VALUES = [
@@ -246,26 +231,26 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
     { n: "Fitness-Alter", v: "36", g: "88", i: "hg", f: "training", grp: "Health Coach und Körper" },
     { n: "Nächste Einheit", v: "18:00", g: "88:88", i: "kb", f: "training", grp: "Health Coach und Körper" },
     { n: "Bufori-Hübe heute", v: "1", g: "8", i: "in", f: "symptom", grp: "Health Coach und Körper" },
-    { n: "Stress", v: "24", g: "88", a: "SR", f: "stress", grp: "Health Coach und Körper" },
-    { n: "Ruhepuls", v: "58", g: "88", a: "RP", f: "erholung", grp: "Health Coach und Körper" },
-    { n: "Etagen", v: "6", g: "88", a: "ET", f: "alltag", grp: "Aktivität" },
-    { n: "Intensitätsminuten (Woche)", v: "110", g: "888", a: "IM", f: "training", grp: "Aktivität" },
-    { n: "Kalorien", v: "1840", g: "8888", a: "KC", f: "neutral", grp: "Aktivität" },
-    { n: "Distanz (km)", v: "4,8", g: "88,8", a: "KM", f: "alltag", grp: "Aktivität" },
-    { n: "Sauerstoffsättigung", v: "96", g: "88", a: "O2", f: "neutral", grp: "Health Coach und Körper" },
-    { n: "Atemfrequenz", v: "14", g: "88", a: "AF", f: "neutral", grp: "Health Coach und Körper" },
-    { n: "Höhe (m)", v: "312", g: "8888", a: "HM", f: "neutral", grp: "Umgebung" },
-    { n: "Luftdruck (hPa)", v: "1013", g: "8888", a: "LD", f: "neutral", grp: "Umgebung" },
-    { n: "Akku", v: "72", g: "88", a: "AK", f: "neutral", grp: "Uhr" },
-    { n: "Wecker", v: "1", g: "8", a: "WK", f: "neutral", grp: "Uhr" },
-    { n: "Bewegungsbalken", v: "2", g: "8", a: "BW", f: "alltag", grp: "Aktivität" },
-    { n: "Erholungszeit (h)", v: "14", g: "88", a: "EZ", f: "training", grp: "Aktivität" },
-    { n: "HRV", v: "38", g: "88", a: "HV", f: "erholung", grp: "Health Coach und Körper" },
-    { n: "Schlafwert", v: "74", g: "88", a: "SL", f: "schlaf", grp: "Health Coach und Körper" },
-    { n: "Hauttemperatur", v: "+0,3", g: "+8,8", a: "HT", f: "zyklus", grp: "Health Coach und Körper" },
-    { n: "Readiness", v: "7,4", g: "8,8", a: "RD", f: "erholung", grp: "Health Coach und Körper" },
-    { n: "Zyklusphase", v: "LUT", g: "888", a: "ZP", f: "zyklus", grp: "Health Coach und Körper" },
-    { n: "Offene Einnahmen", v: "1", g: "8", a: "OE", f: "neutral", grp: "Health Coach und Körper" }
+    { n: "Stress", v: "24", g: "88", i: "stress", f: "stress", grp: "Health Coach und Körper" },
+    { n: "Ruhepuls", v: "58", g: "88", i: "rhr", f: "erholung", grp: "Health Coach und Körper" },
+    { n: "Etagen", v: "6", g: "88", i: "floors", f: "alltag", grp: "Aktivität" },
+    { n: "Intensitätsminuten (Woche)", v: "110", g: "888", i: "intens", f: "training", grp: "Aktivität" },
+    { n: "Kalorien", v: "1840", g: "8888", i: "kcal", f: "neutral", grp: "Aktivität" },
+    { n: "Distanz (km)", v: "4,8", g: "88,8", i: "dist", f: "alltag", grp: "Aktivität" },
+    { n: "Sauerstoffsättigung", v: "96", g: "88", i: "spo2", f: "neutral", grp: "Health Coach und Körper" },
+    { n: "Atemfrequenz", v: "14", g: "88", i: "resp", f: "neutral", grp: "Health Coach und Körper" },
+    { n: "Höhe (m)", v: "312", g: "8888", i: "alt", f: "neutral", grp: "Umgebung" },
+    { n: "Luftdruck (hPa)", v: "1013", g: "8888", i: "press", f: "neutral", grp: "Umgebung" },
+    { n: "Akku", v: "72", g: "88", i: "batt", f: "neutral", grp: "Uhr" },
+    { n: "Wecker", v: "1", g: "8", i: "alarm", f: "neutral", grp: "Uhr" },
+    { n: "Bewegungsbalken", v: "2", g: "8", i: "move", f: "alltag", grp: "Aktivität" },
+    { n: "Erholungszeit (h)", v: "14", g: "88", i: "recov", f: "training", grp: "Aktivität" },
+    { n: "HRV", v: "38", g: "88", i: "hrv", f: "erholung", grp: "Health Coach und Körper" },
+    { n: "Schlafwert", v: "74", g: "88", i: "sleep", f: "schlaf", grp: "Health Coach und Körper" },
+    { n: "Hauttemperatur", v: "+0,3", g: "+8,8", i: "temp", f: "zyklus", grp: "Health Coach und Körper" },
+    { n: "Readiness", v: "7,4", g: "8,8", i: "ready", f: "erholung", grp: "Health Coach und Körper" },
+    { n: "Zyklusphase", v: "LUT", g: "888", i: "phase", f: "zyklus", grp: "Health Coach und Körper" },
+    { n: "Offene Einnahmen", v: "1", g: "8", i: "pill", f: "neutral", grp: "Health Coach und Körper" }
   ];
   var GAUGES = [
     { n: "Leer", v: null, f: "neutral" },
@@ -316,16 +301,11 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
     if (ghostCol) txt(g, x, top, size, ls, ghost, ghostCol);
     return txt(g, x, top, size, ls, val, col);
   }
-  function icon(g, key, abbr, x, top, size, col) {
-    if (key && ICON[key]) {
-      var p = el("path", { d: ICON[key].d, fill: col, transform: "translate(" + x + " " + top + ") scale(" + size / 16 + ")" }, g);
-      if (ICON[key].eo) p.setAttribute("fill-rule", "evenodd");
-    } else {
-      // Platzhalter für Icons, die nur im Code gezeichnet sind
-      el("rect", { x: x + 0.5, y: top + 0.5, width: size - 1, height: size - 1, fill: "none", stroke: col, "stroke-width": 1.2 }, g);
-      var t = el("text", { x: x + size / 2, y: top + size * 0.72, fill: col, "font-family": "Share Tech Mono, monospace", "font-size": size * 0.52, "text-anchor": "middle" }, g);
-      t.textContent = abbr || "";
-    }
+  function icon(g, key, x, top, size, col) {
+    var layers = ICON[key];
+    if (!layers) return;
+    var gg = el("g", { transform: "translate(" + x + " " + top + ") scale(" + size / 16 + ")" }, g);
+    layers.forEach(function (l) { el("path", { d: l[1], fill: l[0] === "h" ? "#000" : col }, gg); });
   }
   // Feld = Icon + Wert; gibt Breite zurück, zeichnet nur wenn draw
   function fieldW(id, size, ls) {
@@ -339,7 +319,7 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
     if (!v) return;
     var col = colorFor(v.f, defCol);
     var isz = size * 0.88;
-    icon(g, v.i, v.a, x, top + (size - isz) / 2 + 0.5, isz, col);
+    icon(g, v.i, x, top + (size - isz) / 2 + 0.5, isz, col);
     var tx = x + isz + size * 0.3;
     ghostTxt(g, tx, top, size, ls, v.v, v.g, col, state.mode === "aod" ? null : ghostCol());
   }
@@ -506,9 +486,6 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
     box.appendChild(selectFor("sel-gl", "Links", GAUGES, state.gL, function (v) { state.gL = v; drawRaster(face); }, true));
     box.appendChild(selectFor("sel-gr", "Rechts", GAUGES, state.gR, function (v) { state.gR = v; drawRaster(face); }, true));
     grp.appendChild(box); ctl.appendChild(grp);
-    var n = document.createElement("p"); n.className = "note";
-    n.textContent = "Werte mit Kästchen statt Icon haben auf der Uhr ein eigenes Icon, das hier nicht nachgezeichnet ist.";
-    ctl.appendChild(n);
   }
   function selectFor(id, label, list, cur, onChange, isGauge) {
     var wrap = document.createElement("div"); wrap.className = "slot";
@@ -628,13 +605,13 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
     },
     {
       nr: "18", name: "Dein Tag",
-      idea: "Die fünf Ringe von „Heute“ aus der App in klein: Energie, Schlaf, Readiness, Belastung, Stress. Jeder Ring mit Zahl und Kürzel, darüber die Uhrzeit.",
+      idea: "Die fünf Ringe von „Heute“ aus der App in klein: Energie, Schlaf, Readiness, Belastung, Stress. Jeder Ring mit Zahl und Icon, darüber die Uhrzeit.",
       swap: "5 Ringe in fester Reihenfolge, Uhrzeit-Stil",
       aodText: "nur Uhrzeit",
       draw: function (g, aod) {
         txt(g, 227, 100, 96, 0.02, "10:56", aod ? "#8E9095" : dim(C.time), "middle");
         if (aod) return;
-        var rings = [["EN", 54, 0.54, "energie"], ["SL", 74, 0.74, "schlaf"], ["RD", "7,4", 0.74, "erholung"], ["BL", 18, 0.18, "training"], ["SR", 24, 0.24, "stress"]];
+        var rings = [["bb", 54, 0.54, "energie"], ["sleep", 74, 0.74, "schlaf"], ["ready", "7,4", 0.74, "erholung"], ["ta", 18, 0.18, "training"], ["stress", 24, 0.24, "stress"]];
         rings.forEach(function (r, i) {
           var cx = 227 + (i - 2) * 72, cy = 290, rr = i === 2 ? 30 : 26;
           el("circle", { cx: cx, cy: cy, r: rr, fill: "none", stroke: state.color === "night" ? "#121316" : "#20252C", "stroke-width": 4 }, g);
@@ -642,7 +619,7 @@ ul.plain { margin: 0; padding-left: 18px; color: var(--text-2); display: flex; f
           var a = r[2] * 2 * Math.PI, sx = cx, sy = cy - rr, ex = cx + rr * Math.sin(a), ey = cy - rr * Math.cos(a);
           el("path", { d: "M" + sx + " " + sy + " A" + rr + " " + rr + " 0 " + (r[2] > 0.5 ? 1 : 0) + " 1 " + ex + " " + ey, fill: "none", stroke: col, "stroke-width": 4, "stroke-linecap": "round" }, g);
           txt(g, cx, cy - 10, 19, 0, String(r[1]), dim(C.time), "middle");
-          txt(g, cx, cy + rr + 10, 15, 0.1, r[0], dim(C.muted), "middle");
+          icon(g, r[0], cx - 9, cy + rr + 10, 18, colorFor(r[3], C.muted));
         });
         txt(g, 227, 64, 18, 0.14, "MO 23 11", dim(C.muted), "middle");
       }
