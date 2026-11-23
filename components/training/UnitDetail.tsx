@@ -10,7 +10,7 @@ import { activityLabel, durationText, distanceText } from "@/lib/garmin";
 import type { Data } from "@/lib/insights";
 import { loadInsightData } from "@/lib/insightData";
 import { announceNewData, useRefresh } from "@/lib/refresh";
-import { SPORTS, sportOf } from "@/lib/training";
+import { SPORTS, sportOf, sportOfGarmin, type Sport } from "@/lib/training";
 import {
   afterUnit,
   clockOf,
@@ -84,6 +84,7 @@ export default function UnitDetail({ id }: { id: string }) {
           </span>
           <h2 className="unit-title">{sport === "sonstiges" ? activityLabel(unit) : SPORTS[sport].label}</h2>
           <span className="meta">{[durationText(unit.duration_s), distanceText(unit.distance_m), "Garmin"].filter(Boolean).join(" · ")}</span>
+          <SportPicker unit={unit} onSaved={(o, l) => { setUnit({ ...unit, sport_override: o, sport_label: l }); load(); }} />
         </div>
       )}
 
@@ -93,6 +94,67 @@ export default function UnitDetail({ id }: { id: string }) {
       {unit && <TimelineCard t={timeline(unit, data)} />}
       {unit && data && <AfterCard unit={unit} data={data} today={today} />}
     </>
+  );
+}
+
+const CHOICES: Sport[] = ["karate", "kettlebell", "klettern", "ausdauer"];
+
+// Sportart der Einheit ändern (wie die Frage auf Heute, Sammelliste Punkt 6): eigene Zuordnung vor der Garmin-Sportart.
+// Bei „Sonstiges“ ohne eigene Zuordnung ist die Auswahl gleich offen.
+function SportPicker({ unit, onSaved }: { unit: Unit; onSaved: (override: string | null, label: string | null) => void }) {
+  const unassigned = !unit.sport_override && sportOfGarmin(unit.type_key) === "sonstiges";
+  const [open, setOpen] = useState(unassigned);
+  const [own, setOwn] = useState(false);
+  const [name, setName] = useState(unit.sport_label ?? "");
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+  const current = unit.sport_override ?? null;
+  const save = async (override: string | null, label: string | null) => {
+    const sb = supabase();
+    if (!sb || busy) return;
+    setBusy(true);
+    const { error } = await sb.from("garmin_activities").update({ sport_override: override, sport_label: label }).eq("activity_id", unit.activity_id);
+    setBusy(false);
+    if (error) {
+      setMsg("Das hat nicht geklappt: " + error.message);
+      return;
+    }
+    setMsg("");
+    setOwn(false);
+    setOpen(false);
+    onSaved(override, label);
+    announceNewData();
+  };
+  if (!open) {
+    return (
+      <button type="button" className="btn btn-link unit-sport-change" onClick={() => setOpen(true)}>
+        Sportart ändern
+      </button>
+    );
+  }
+  return (
+    <div className="unit-sport-picker">
+      <span className="meta">{unassigned ? "Garmin kennt die Sportart nicht. Was war das?" : "Welche Sportart war das?"}</span>
+      {own ? (
+        <form className="act-q-own" onSubmit={(e) => { e.preventDefault(); if (name.trim()) save("sonstiges", name.trim().slice(0, 40)); }}>
+          <input id="unit-own-sport" className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="z. B. Yoga, Tanzen" aria-label="Eigener Name" autoFocus maxLength={40} />
+          <button type="submit" className="btn btn-primary btn-44" disabled={busy || !name.trim()}>Speichern</button>
+        </form>
+      ) : (
+        <div className="pills wrap unit-sport-pills" role="group" aria-label="Sportart wählen">
+          {CHOICES.map((sp) => (
+            <button key={sp} type="button" className="pill" aria-pressed={current === sp} disabled={busy} onClick={() => save(sp, null)}>
+              {SPORTS[sp].label}
+            </button>
+          ))}
+          <button type="button" className="pill" aria-pressed={current === "sonstiges"} disabled={busy} onClick={() => setOwn(true)}>Anderes …</button>
+          <button type="button" className="pill pill-quiet" aria-pressed={current === "ignorieren"} disabled={busy} onClick={() => save("ignorieren", null)}>Nicht zuordnen</button>
+          {current && <button type="button" className="pill pill-quiet" disabled={busy} onClick={() => save(null, null)}>Wie bei Garmin</button>}
+          {!unassigned && <button type="button" className="btn btn-link" onClick={() => setOpen(false)}>Abbrechen</button>}
+        </div>
+      )}
+      {msg && <p className="meta-warn" role="alert">{msg}</p>}
+    </div>
   );
 }
 
