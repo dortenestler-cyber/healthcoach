@@ -124,7 +124,7 @@ export default function MedsSection() {
                 ) : (
                   <div className="footer-links left">
                     <button type="button" className="btn btn-link" onClick={() => setEditing(m.id)}>
-                      Uhrzeiten und Menge ändern
+                      Ändern
                     </button>
                     <button type="button" className="btn btn-link" onClick={() => run(sb.from("medications").update({ active: false }).eq("id", m.id))}>
                       Nicht mehr nehmen
@@ -190,14 +190,35 @@ export default function MedsSection() {
         <section className="card">
           <details className="derive">
           <summary>Frühere Mittel ({inactive.length})</summary>
-          {inactive.map((m) => (
-            <div key={m.id} className="card-row list-line">
-              <span>{m.name}</span>
-              <button type="button" className="btn btn-link" onClick={() => run(sb.from("medications").update({ active: true }).eq("id", m.id))}>
-                Wieder aufnehmen
-              </button>
-            </div>
-          ))}
+          {inactive.map((m) =>
+            editing === m.id ? (
+              <EditMed
+                key={m.id}
+                med={m}
+                onCancel={() => setEditing(null)}
+                onSave={(patch) => {
+                  setEditing(null);
+                  run(sb.from("medications").update(patch).eq("id", m.id));
+                }}
+                onDelete={() => {
+                  setEditing(null);
+                  run(sb.from("medications").delete().eq("id", m.id));
+                }}
+              />
+            ) : (
+              <div key={m.id} className="card-row list-line">
+                <span>{m.name}</span>
+                <span className="footer-links">
+                  <button type="button" className="btn btn-link" onClick={() => setEditing(m.id)}>
+                    Ändern
+                  </button>
+                  <button type="button" className="btn btn-link" onClick={() => run(sb.from("medications").update({ active: true }).eq("id", m.id))}>
+                    Wieder aufnehmen
+                  </button>
+                </span>
+              </div>
+            ),
+          )}
           </details>
         </section>
       )}
@@ -213,26 +234,52 @@ function parseTimes(text: string): string[] | null {
   return list.every(Boolean) ? (list as string[]).sort() : null;
 }
 
-function EditMed({ med, onSave, onCancel }: { med: Medication; onSave: (p: Partial<Medication>) => void; onCancel: () => void }) {
+// Mittel ändern (Sammelliste Punkt 20): Name, Art, regelmäßig/bei Bedarf, Uhrzeiten, Menge. Löschen nur bei früheren Mitteln.
+function EditMed({ med, onSave, onCancel, onDelete }: { med: Medication; onSave: (p: Partial<Medication>) => void; onCancel: () => void; onDelete?: () => void }) {
+  const [name, setName] = useState(med.name);
+  const [kind, setKind] = useState(med.kind);
+  const [regular, setRegular] = useState(med.regular);
+  const [asNeeded, setAsNeeded] = useState(med.as_needed);
   const [times, setTimes] = useState(med.times.join(", "));
   const [amount, setAmount] = useState(med.amount ?? "");
   const [msg, setMsg] = useState("");
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    const t = parseTimes(times);
+    if (!name.trim()) return setMsg("Bitte einen Namen eintragen.");
+    if (!regular && !asNeeded) return setMsg("Bitte regelmäßig, bei Bedarf oder beides wählen.");
+    const t = regular ? parseTimes(times) : [];
     if (t === null) return setMsg("Uhrzeiten bitte so: 07:30, 21:30");
-    onSave({ times: t, amount: amount.trim() || null });
+    onSave({ name: name.trim(), kind, regular, as_needed: asNeeded, times: t, amount: amount.trim() || null, notes_key: guessNotesKey(name) ?? med.notes_key });
   };
   return (
     <form className="form" onSubmit={submit}>
-      <label className="label" htmlFor={"t" + med.id}>Uhrzeiten</label>
-      <input id={"t" + med.id} className="input" value={times} onChange={(e) => setTimes(e.target.value)} placeholder="07:30, 21:30" />
+      <label className="label" htmlFor={"n" + med.id}>Name</label>
+      <input id={"n" + med.id} className="input" value={name} onChange={(e) => setName(e.target.value)} />
+      <div className="pills wrap" role="group" aria-label="Art">
+        <button type="button" className="pill pill-sm" aria-pressed={kind === "medikament"} onClick={() => setKind("medikament")}>Medikament</button>
+        <button type="button" className="pill pill-sm" aria-pressed={kind === "supplement"} onClick={() => setKind("supplement")}>Supplement</button>
+      </div>
+      <div className="pills wrap" role="group" aria-label="Wann">
+        <button type="button" className="pill pill-sm" aria-pressed={regular} onClick={() => setRegular(!regular)}>Regelmäßig</button>
+        <button type="button" className="pill pill-sm" aria-pressed={asNeeded} onClick={() => setAsNeeded(!asNeeded)}>Bei Bedarf</button>
+      </div>
+      {regular && (
+        <>
+          <label className="label" htmlFor={"t" + med.id}>Uhrzeiten</label>
+          <input id={"t" + med.id} className="input" value={times} onChange={(e) => setTimes(e.target.value)} placeholder="07:30, 21:30" />
+        </>
+      )}
       <label className="label" htmlFor={"a" + med.id}>Menge (wie verordnet)</label>
       <input id={"a" + med.id} className="input" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="z. B. 1 Hub" />
       {msg && <p className="login-msg">{msg}</p>}
       <div className="footer-links left">
         <button type="submit" className="btn btn-dark">Speichern</button>
         <button type="button" className="btn btn-link" onClick={onCancel}>Abbrechen</button>
+        {onDelete && (
+          <button type="button" className="btn btn-link edit-sheet-delete" onClick={() => window.confirm(`„${med.name}“ löschen? Alle Einnahmen dazu werden mit gelöscht.`) && onDelete()}>
+            Löschen
+          </button>
+        )}
       </div>
     </form>
   );
