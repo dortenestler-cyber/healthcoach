@@ -53,6 +53,7 @@ export default function CycleHistory({ today, diary, flashes, showFlashes, muscl
               tone="cycle"
               label={`Zykluslängen: ${cl.recent.map((c) => `${short(c.start)} ${c.length} Tage`).join(", ")}`}
               band={y}
+              tipNote={(i) => `Beginn ${short(cl.recent[i].start)}`}
               xLabels={[{ index: 0, text: short(cl.recent[0].start) }, { index: cl.recent.length - 1, text: short(last.start) }]}
               height={150}
             />
@@ -72,7 +73,7 @@ export default function CycleHistory({ today, diary, flashes, showFlashes, muscl
               label={`Hitzewallungen der letzten 12 Wochen: ${weeks.map((w) => `ab ${short(w.monday)} ${w.count}`).join(", ")}`}
               target={avg}
               targetLabel={avg !== null ? `Schnitt ${de1(avg)}` : undefined}
-              bars={weeks.map((w, i) => ({ label: i % 3 === 0 || i === weeks.length - 1 ? short(w.monday) : "", value: w.count, today: i === weeks.length - 1 }))}
+              bars={weeks.map((w, i) => ({ label: i % 3 === 0 || i === weeks.length - 1 ? short(w.monday) : "", value: w.count, tip: `Woche ab ${short(w.monday)}`, today: i === weeks.length - 1 }))}
             />
           </ValueHeader>
         </section>

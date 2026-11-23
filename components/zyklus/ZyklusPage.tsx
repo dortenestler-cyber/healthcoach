@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { loadOvulation, withOvulation } from "@/lib/ovulation";
 import PageHead from "@/components/PageHead";
 import ZyklusView from "@/components/zyklus/ZyklusView";
 import PeriodBackfill from "@/components/zyklus/PeriodBackfill";
@@ -31,12 +32,13 @@ export default function ZyklusPage() {
       sb.from("hot_flashes").select("at").gte("at", daysAgo(90).toISOString()),
       loadGarminCycles(sb, isoDay(daysAgo(760))),
       loadMusterExtra(),
+      loadOvulation(sb, isoDay(daysAgo(760))),
     ])
-      .then(([d, diary, f, gc, x]) => {
+      .then(([d, diary, f, gc, x, ov]) => {
         setExtra(x);
         if (diary.error) throw new Error(diary.error.message);
         setData(d);
-        setLongDiary(mergeGarminCycles(((diary.data ?? []) as Diary[]).map((e) => ({ ...e, symptoms: e.symptoms ?? {}, influences: e.influences ?? [] })), gc));
+        setLongDiary(withOvulation(mergeGarminCycles(((diary.data ?? []) as Diary[]).map((e) => ({ ...e, symptoms: e.symptoms ?? {}, influences: e.influences ?? [] })), gc), ov));
         setFlashes(((f.data ?? []) as { at: string }[]).map((r) => r.at));
       })
       .catch((e) => setError("Daten konnten nicht geladen werden: " + (e instanceof Error ? e.message : String(e))));

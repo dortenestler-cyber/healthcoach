@@ -27,8 +27,9 @@ const SUGGESTIONS = [
   "Wie bereite ich mich diese Woche auf den 5. Kyu vor?",
 ];
 
-// Coach-Chat: die Frage und eine kompakte Zusammenfassung gehen an die Funktion "coach"
-export default function CoachView() {
+// Coach-Chat: die Frage und eine kompakte Zusammenfassung gehen an die Funktion "coach".
+// panel: als Spalte rechts am Computer (Konzept Web-App), mit eigenem Kopf und Einklappen-Knopf.
+export default function CoachView({ panel, onClose }: { panel?: boolean; onClose?: () => void } = {}) {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -36,6 +37,7 @@ export default function CoachView() {
   const [prefilled, setPrefilled] = useState(false);
   const context = useRef<Promise<string> | null>(null);
   const end = useRef<HTMLDivElement>(null);
+  const field = useRef<HTMLTextAreaElement>(null);
   const prefs = useCoachPrefs();
 
   useEffect(() => {
@@ -52,7 +54,7 @@ export default function CoachView() {
     // Zusammenfassung schon vorbereiten, damit die erste Antwort schneller kommt
     context.current = buildCoachContext().catch(() => "");
     // Coach-Einstieg aus einer Karte: Frage vorbelegen, gesendet wird erst nach deinem Tippen
-    const frage = new URLSearchParams(window.location.search).get("frage");
+    const frage = panel ? null : new URLSearchParams(window.location.search).get("frage");
     if (frage) {
       setText(frage.slice(0, 2000));
       setPrefilled(true);
@@ -60,9 +62,31 @@ export default function CoachView() {
     }
   }, []);
 
+  // Eingabefeld wächst mit dem Text (bis zur Obergrenze in globals.css)
+  useEffect(() => {
+    const el = field.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + 2 + "px";
+  }, [text]);
+
   useEffect(() => {
     end.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [msgs, busy]);
+
+  // Am Computer: „/“ springt ins Eingabefeld
+  useEffect(() => {
+    if (!panel) return;
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (e.key === "/" && t && !["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName) && !t.isContentEditable) {
+        e.preventDefault();
+        field.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [panel]);
 
   const send = async (q: string) => {
     const sb = supabase();
@@ -98,6 +122,7 @@ export default function CoachView() {
     send(text);
   };
 
+  if (!prefs.on && panel) return null;
   if (!prefs.on) {
     return (
       <>
@@ -112,10 +137,26 @@ export default function CoachView() {
     );
   }
 
-  return (
+  const head = panel ? (
+    <div className="coach-panel-head">
+      <span className="coach-panel-title"><CoachMark /> Coach</span>
+      <Link href="/coach/hinweise" className="link-small">Hinweise</Link>
+      {onClose && (
+        <button type="button" className="btn btn-soft btn-44" onClick={onClose} aria-label="Coach einklappen">
+          Einklappen ›
+        </button>
+      )}
+    </div>
+  ) : (
     <>
       <PageHead title="Coach" sub="Kennt Training, Erholung, Zyklus, Symptome und Medikamente" />
       <Link href="/coach/hinweise" className="settings-link">Alle Hinweise des Coachs ansehen ›</Link>
+    </>
+  );
+
+  return (
+    <>
+      {head}
       <div className="chat">
         {!msgs.length && (
           <div className="bubble bubble-assistant">
@@ -147,7 +188,7 @@ export default function CoachView() {
       </div>
       {prefilled && text && <span className="meta">Frage vorbereitet. Sie geht erst an den Coach, wenn du auf Senden tippst.</span>}
       <form className="chat-input" onSubmit={submit}>
-        <textarea className="input" rows={prefilled ? 3 : 1} value={text} onChange={(e) => setText(e.target.value)} placeholder="Frag deinen Coach" aria-label="Frage an den Coach" maxLength={2000} />
+        <textarea ref={field} className="input" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="Frag deinen Coach" aria-label="Frage an den Coach" maxLength={2000} />
         <button type="submit" className="btn btn-primary chat-send" disabled={busy || !text.trim()}>
           Senden
         </button>

@@ -16,7 +16,7 @@ import { useFeatures } from "@/lib/prefs";
 
 const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 const MON_SHORT = ["Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sep.", "Okt.", "Nov.", "Dez."];
-const PHASE_LABEL = { menstruation: "Menstruation", follikel: "Follikelphase", luteal: "Lutealphase" } as const;
+const PHASE_LABEL = { menstruation: "Menstruation", follikel: "Follikelphase", eisprung: "Eisprung", luteal: "Lutealphase" } as const;
 const WEEKS = 13;
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");
@@ -235,6 +235,7 @@ export default function HabitDetail({ habitKey }: { habitKey: string }) {
                 zeroLine
                 markers={marks}
                 phases={tDays.map((d) => groupOf(cycleToday(d, data.diary).phase))}
+                dates={tDays}
                 label={`Hauttemperatur der letzten 28 Nächte, ${marks.filter(Boolean).length} Nächte nach ${label} markiert`}
                 xLabels={[{ index: 0, text: "vor 4 Wochen" }, { index: 27, text: "heute" }]}
               />

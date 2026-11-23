@@ -5,6 +5,8 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import TabBar from "@/components/TabBar";
 import CoachButton from "@/components/CoachButton";
+import CoachPanel from "@/components/CoachPanel";
+import SideNav from "@/components/SideNav";
 import PinLock from "@/components/PinLock";
 import UsageTracker from "@/components/UsageTracker";
 import { clearOfflineData } from "@/components/ServiceWorker";
@@ -48,7 +50,11 @@ export default function AuthGate({ children }: { children: ReactNode }) {
   if (state === "login") return <Login />;
   return (
     <PinLock>
-      {children}
+      <div className="app-frame">
+        <SideNav />
+        <div className="app-content">{children}</div>
+        <CoachPanel />
+      </div>
       <CoachButton />
       <TabBar />
       <UsageTracker />
@@ -56,8 +62,16 @@ export default function AuthGate({ children }: { children: ReactNode }) {
   );
 }
 
+const EMAIL_KEY = "hc_last_email"; // nur die E-Mail-Adresse, nie das Passwort
+
 function Login() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => {
+    try {
+      return localStorage.getItem(EMAIL_KEY) ?? "";
+    } catch {
+      return "";
+    }
+  });
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"login" | "neu">("login");
   const [busy, setBusy] = useState(false);
@@ -71,6 +85,13 @@ function Login() {
     setMsg("");
     if (mode === "login") {
       const { error } = await sb.auth.signInWithPassword({ email: email.trim(), password });
+      if (!error) {
+        try {
+          localStorage.setItem(EMAIL_KEY, email.trim());
+        } catch {
+          // nicht wichtig
+        }
+      }
       if (error) {
         setMsg(
           error.message.toLowerCase().includes("confirm")
@@ -98,12 +119,13 @@ function Login() {
       <img src="/icons/icon.svg" alt="" width={72} height={72} className="login-icon" />
       <h1 className="page-title">Health Coach</h1>
       <span className="page-sub">Training, Erholung und Perimenopause</span>
-      <form className="card login-card" onSubmit={submit}>
+      <form className="card login-card" method="post" action="#" onSubmit={submit}>
         <label htmlFor="email" className="label">E-Mail-Adresse</label>
-        <input id="email" className="input" type="email" autoComplete="email" inputMode="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input id="email" name="email" className="input" type="email" autoComplete="username" inputMode="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         <label htmlFor="password" className="label">Passwort</label>
         <input
           id="password"
+          name="password"
           className="input"
           type="password"
           autoComplete={mode === "login" ? "current-password" : "new-password"}

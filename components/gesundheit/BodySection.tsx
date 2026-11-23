@@ -93,10 +93,12 @@ export default function BodySection() {
       )}
       {mode !== "aus" && (
         <section className="card">
-          <h2>So geht die App mit deinen Werten um</h2>
+          <details className="derive">
+          <summary>So geht die App mit deinen Werten um</summary>
           <p>
             Freiwillig und höchstens einmal pro Woche. Die App zeigt den Trend über 4 Wochen, nicht den Tageswert. Wasser vor der Periode kann den Wert ein paar Tage anheben, diese Tage sind markiert. Es gibt kein Zielgewicht und keine Abnehm-Funktion.
           </p>
+          </details>
         </section>
       )}
     </>

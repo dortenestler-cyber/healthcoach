@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { tipDate } from "@/components/charts/pick";
 import { LineBand, RangeRow, SleepStagesBar, ValueHeader } from "@/components/charts";
 import PhaseCompare from "@/components/verlauf/PhaseCompare";
 import { CYCLE_SENSITIVE, metricBaseline, metricRangeSeries, phaseRange, RANGE_PHASE_NAMES, seriesOf, type Range } from "@/lib/baseline";
@@ -138,6 +139,8 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
               phaseBand={weekly ? null : base.phase}
               bands={moving ? pointBands : undefined}
               phases={hasPhase ? phases : undefined}
+              dates={weekly ? undefined : points.map((p) => p.day)}
+              tipNote={weekly ? (i) => `Wochenmittel, Woche ab ${tipDate(points[i].day)}` : undefined}
               zeroLine={metric === "temperatur"}
               markers={metric === "schlaf" && !weekly ? points.map((p) => sweat.has(p.day)) : metric === "temperatur" && !weekly && saunaNights > 0 ? points.map((p) => saunaNight(p.day)) : undefined}
               xLabels={axisLabels(points, span)}
@@ -155,9 +158,6 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
           )}
           {hasPhase && (
             <>
-              <span><i className="ph-menses-bg" />Menstruation</span>
-              <span><i className="ph-follikel-bg" />Follikel</span>
-              <span><i className="ph-luteal-bg" />Luteal</span>
               <span>Phasen geschätzt</span>
             </>
           )}

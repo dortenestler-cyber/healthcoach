@@ -626,7 +626,9 @@ button {
 }
 
 /* Phase 2: Garmin */
-.shell > * + * {
+.shell > * + *,
+.app-content > * + *,
+.coach-panel > * + * {
   margin-top: 14px;
 }
 
@@ -695,9 +697,12 @@ button {
 
 .pills.scroll {
   overflow-x: auto;
+  scrollbar-width: none;
   gap: 6px;
   padding-bottom: 2px;
 }
+
+.pills.scroll::-webkit-scrollbar { display: none; }
 
 .pills.scroll .pill {
   flex: none;
@@ -1406,8 +1411,9 @@ button {
 
 .chat-input {
   display: flex;
+  align-items: flex-end;
   gap: 8px;
-  padding-right: 72px;
+  margin-top: 12px;
 }
 
 .chat-send {
@@ -1560,6 +1566,7 @@ button {
 .cal-cell[data-phase="menses"] { background-color: var(--menses-bg); }
 .cal-cell[data-phase="follikel"] { background-color: var(--phase-follikel); }
 .cal-cell[data-phase="luteal"] { background-color: var(--cycle-bg); }
+.cal-cell[data-phase="eisprung"] { background-color: color-mix(in srgb, var(--cycle) 30%, var(--card)); }
 
 /* Kommende Tage sind nur geschätzt: heller */
 .cal-cell[data-future="true"][data-phase] {
@@ -2424,7 +2431,16 @@ body { overflow-x: clip; }
   background: linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(135deg, var(--brand), var(--training)) border-box;
 }
 
-.chat-input textarea.input { resize: none; line-height: 1.4; font-family: inherit; }
+.chat-input textarea.input {
+  flex: 1;
+  min-width: 0;
+  min-height: 92px;
+  max-height: 40vh;
+  resize: none;
+  line-height: 1.4;
+  font-family: inherit;
+  font-size: 16px;
+}
 
 /* Sperrbildschirm (Konzept dunkel 2) */
 .pin { position: relative; gap: 0; padding-top: 7vh; }
@@ -2433,7 +2449,7 @@ body { overflow-x: clip; }
   z-index: -1;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--brand) 22%, var(--bg)) 0%, var(--bg) 70%);
+  background: radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--energy) 12%, var(--bg)) 0%, var(--bg) 70%);
 }
 .pin-icon { display: block; }
 .pin-brand { margin-top: 20px; }
@@ -2655,6 +2671,202 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
 .page-glow[data-tone="stress"] { --glow: var(--stress-bg); }
 .derive-list { margin: 4px 0 0; padding-left: 18px; color: var(--text-2); font-size: 13px; }
 
+/* Sammelliste: zusammengeklappte Zeilen (Erledigtes als eine Zeile mit ✓) */
+.fold-row {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 0;
+  background: none;
+  border: 0;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.fold-ok { color: var(--recovery); font-weight: 700; margin-right: 4px; }
+.fold-row:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 8px; }
+.agenda-foot { display: inline-flex; align-items: center; min-height: 44px; color: var(--muted); }
+.more-link { margin-top: 6px; min-height: 44px; padding: 0; color: var(--muted); font-size: 14px; }
+
+/* Garmin-Stand als Punkt am Zahnrad (Sammelliste Punkt 7) */
+.gear-btn { position: relative; }
+.sync-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--card);
+  background: var(--muted);
+}
+.sync-dot[data-level="veraltet"] { background: var(--warn); }
+
+/* Zyklus-Kalender: Vorschau und Eisprung-Zeichen (Sammelliste Punkt 2 und 10) */
+.cal-forecast { margin: 0 0 10px; font-size: 14px; color: var(--cycle-fg); }
+.cal-ov { position: absolute; top: 2px; right: 4px; font-size: 10px; color: var(--cycle-fg); line-height: 1; }
+.cal-ov-key { color: var(--cycle-fg); margin-right: 4px; font-size: 11px; }
+.ov-label { display: block; margin: 14px 0 6px; }
+
+/* Zyklus-Ring antippen (Sammelliste Punkt 3) */
+.cyc4-hit { stroke: transparent; fill: none; cursor: pointer; pointer-events: stroke; outline: none; }
+.cyc4-hit:focus-visible { stroke: rgba(242, 244, 247, 0.12); }
+.cb circle[data-dim="true"] { opacity: 0.3; transition: opacity 0.15s; }
+.cycle-ring-pick { background: none; border: 0; color: var(--text); font: inherit; cursor: pointer; border-radius: 50%; margin: 48px; inset: 0; }
+.cycle-ring-phase { font-size: 22px; font-weight: 700; }
+.cycle-ring-range { font-size: 15px; font-weight: 600; }
+.cycle-ring-center:not(.cycle-ring-pick) { pointer-events: none; }
+
+/* Charts: Phasenleiste, Periodenbeginn, Antippen (Sammelliste Punkt 8 und 9) */
+.cb-strip-menstruation { fill: var(--menses-bg); }
+.cb-strip-follikel { fill: var(--fill); }
+.cb-strip-eisprung { fill: color-mix(in srgb, var(--cycle) 45%, var(--card)); }
+.cb-strip-luteal { fill: var(--cycle-bg); }
+.cb-strip[data-est="true"] { fill-opacity: 0.45; stroke: var(--cycle); stroke-opacity: 0.6; stroke-width: 1; stroke-dasharray: 3 3; }
+.cb-strip-text { font-size: 9.5px; font-weight: 600; }
+.cb-strip-text-menstruation { fill: var(--menses-fg); }
+.cb-strip-text-follikel { fill: var(--text-2); }
+.cb-strip-text-eisprung { fill: var(--cycle-fg); }
+.cb-strip-text-luteal { fill: var(--cycle-fg); }
+.cb-period-start line { stroke: var(--menses-fg); stroke-opacity: 0.5; stroke-width: 1; }
+.cb-period-start path { fill: var(--menses-fg); }
+.cb-pickable { cursor: crosshair; touch-action: pan-y; outline: none; }
+.cb-pickable:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 8px; }
+.cb-pick-line { stroke: var(--muted); stroke-width: 1; }
+.cb-pick-dot { fill: var(--card); stroke: var(--text); stroke-width: 2; }
+.cb-tip-box { fill: var(--fill); }
+.cb-tip-main { fill: var(--text); font-size: 11.5px; font-weight: 700; }
+.cb-tip-sub { fill: var(--muted); font-size: 10px; }
+.ph-eisprung { fill: color-mix(in srgb, var(--cycle) 30%, var(--card)); }
+.legend .ph-eisprung-bg { background: color-mix(in srgb, var(--cycle) 30%, var(--card)); }
+.cb-pick-col { fill: var(--text); fill-opacity: 0.06; }
+
+/* Frage zu einer unklaren Garmin-Aktivität (Sammelliste Punkt 6) */
+.act-q-head { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; }
+.act-q-text { margin: 0; line-height: 1.45; }
+.act-q-own { display: flex; gap: 8px; align-items: center; }
+.act-q-own .input { flex: 1; min-width: 0; }
+.pill-quiet { color: var(--muted); }
+
+/* ---------- Web-App: Seitenleiste, Inhaltsbreite, Coach-Spalte (docs/konzept-web-app.md) ---------- */
+.sidenav, .coach-panel { display: none; }
+.app-content { position: relative; }
+
+@media (min-width: 768px) {
+  .shell { max-width: none; margin: 0; padding: 0; }
+  .tabbar { display: none; }
+  .app-frame { display: flex; align-items: flex-start; min-height: 100dvh; }
+  .app-content {
+    flex: 1;
+    min-width: 0;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 32px 32px 96px;
+    overflow-x: clip;
+  }
+  .page-glow { left: -32px; right: -32px; width: auto; transform: none; top: -32px; height: 380px; }
+
+  .sidenav {
+    position: sticky;
+    top: 0;
+    flex: none;
+    width: 72px;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 18px 12px;
+    background: var(--bg);
+    border-right: 1px solid var(--line);
+  }
+  .sidenav-brand { display: flex; align-items: center; gap: 10px; margin: 0 2px 18px; color: var(--text); font-weight: 700; font-size: 16px; text-decoration: none; }
+  .sidenav-brand img { border-radius: 9px; flex: none; }
+  .sidenav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: 12px;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .sidenav-item svg { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .sidenav-item:hover { color: var(--text); background: var(--card); }
+  .sidenav-item[aria-current="page"] { color: var(--text); background: var(--fill); }
+  .sidenav-item:focus-visible, .sidenav-brand:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+  .sidenav-grow { flex: 1; }
+  .sidenav-sync { display: flex; align-items: center; gap: 10px; min-height: 32px; padding: 0 16px; font-size: 12.5px; color: var(--muted); }
+  .sidenav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--recovery); flex: none; }
+  .sidenav-dot[data-level="alt"] { background: var(--muted); }
+  .sidenav-dot[data-level="veraltet"] { background: var(--warn); }
+  .sidenav-label { display: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Coach als schwebender Knopf unten rechts, ohne Leiste darunter */
+  .coach-fab { right: 24px; bottom: 24px; }
+
+  /* Fenster von rechts (768–1023 px) */
+  .coach-backdrop { position: fixed; inset: 0; z-index: 20; background: rgba(0, 0, 0, 0.5); }
+  .coach-panel {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    z-index: 21;
+    top: 0;
+    right: 0;
+    width: min(380px, 92vw);
+    height: 100dvh;
+    padding: 18px 18px 20px;
+    background: var(--bg);
+    border-left: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .coach-panel .chat { flex: 1; min-height: 0; overflow-y: auto; padding-right: 4px; }
+  .coach-panel .chat-input { margin-top: 4px; }
+  .coach-panel .hint { margin-top: 4px; }
+  .coach-panel-head { display: flex; align-items: center; gap: 10px; }
+  .coach-panel-title { flex: 1; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; }
+
+  /* Hover für Karten und Zeilen, die weiterführen */
+  a.card:hover, a.tile:hover, a.glance-tile:hover, .settings-row:hover, a.list-line:hover { filter: brightness(1.12); }
+}
+
+@media (min-width: 1024px) {
+  .coach-panel:not(.coach-overlay) { position: sticky; z-index: 1; flex: none; width: 360px; }
+}
+
+@media (min-width: 1200px) {
+  .sidenav { width: 232px; padding: 22px 14px; }
+  .sidenav-label { display: inline; }
+}
+
+/* Zwei Spalten im Inhalt (Komponente TwoCol) */
+.two-col { display: flex; flex-direction: column; gap: 14px; }
+.two-col > div { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.two-col > div > * { margin-top: 0; }
+@media (min-width: 768px) {
+  .two-col.is-wide { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+}
+/* Formulare und Einstellungen nicht breiter als nötig */
+@media (min-width: 768px) {
+  .narrow-page { max-width: 640px; margin: 0 auto; }
+}
+.refresh-btn { width: auto; margin: 0 8px 0 0; min-height: 44px; padding: 0 14px; flex: none; }
+@media (min-width: 768px) { .day-head .gear-btn { display: none; } }
+@media (min-width: 768px) {
+  .ring-strip { margin: 0; padding: 8px 0 6px; justify-content: space-around; overflow: visible; scroll-snap-type: none; }
+  .ring-strip-cell:hover { background: var(--card); }
+  .ring-strip-cell { padding: 6px 8px 8px; }
+}
+@media (min-width: 768px) {
+  .segmented-tabs { max-width: 640px; }
+}
+.narrow-page > * + * { margin-top: 14px; }
 /* Detailseiten nach Whoop: Kennzahlen-Liste mit Pfeil oder drei Stufen (FactorList) */
 .detail-hero { margin: 4px 0 2px; }
 .detail-center { text-align: center; }

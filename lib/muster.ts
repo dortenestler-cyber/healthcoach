@@ -7,7 +7,7 @@ import { cycleToday, groupOf, type PhaseGroup } from "@/lib/cycle";
 import type { Illness } from "@/lib/health";
 import { cycleInfo, loadPercent, type Data } from "@/lib/insights";
 import { load7 } from "@/lib/today";
-import { sportOfGarmin } from "@/lib/training";
+import { sportOf } from "@/lib/training";
 
 export const MIN_EVENT_DAYS = 8; // so viele Tage mit Ereignis braucht die Auswertung
 export const MIN_GROUP_DAYS = 4; // so viele Tage braucht jede Seite eines Vergleichs
@@ -56,13 +56,14 @@ export function conditions(data: Data, extra: MusterExtra): Condition[] {
   out.push({ key: "vor_periode", group: "zyklus", label: "die 5 Tage vor der Periode", has: (d) => cycleInfo(d, data.diary).beforePeriod });
   out.push({ key: "menstruation", group: "zyklus", label: "Tage der Menstruation", has: (d) => group(d) === "menstruation" });
   out.push({ key: "follikel", group: "zyklus", label: "Tage der Follikelphase", has: (d) => group(d) === "follikel" });
+  out.push({ key: "eisprung", group: "zyklus", label: "Tage um den Eisprung", has: (d) => group(d) === "eisprung" });
   out.push({ key: "luteal", group: "zyklus", label: "Tage der Lutealphase", has: (d) => group(d) === "luteal" });
 
   // Training am selben Tag (der Krampf kommt meist am Abend danach)
   out.push({ key: "hart", group: "training", label: "Tage mit hoher Belastung", has: (d) => loadPercent(d, data.daily, data.acts) >= 70 });
   const sportDays = new Map<string, Set<string>>();
   for (const a of data.acts) {
-    const k = a.type_key && /run/.test(a.type_key) ? "ausdauer" : sportOfGarmin(a.type_key);
+    const k = a.type_key && /run/.test(a.type_key) ? "ausdauer" : sportOf(a);
     if (!sportDays.has(k)) sportDays.set(k, new Set());
     sportDays.get(k)!.add((a.start_local ?? "").slice(0, 10));
   }
@@ -213,7 +214,7 @@ export function muscleByPhase(data: Data, extra: MusterExtra, today: string): { 
   const ev = muscleEventDays(extra.muscle);
   const first = [...ev].sort()[0];
   if (!first) return [];
-  const rows: Record<PhaseGroup, { days: number; events: number }> = { menstruation: { days: 0, events: 0 }, follikel: { days: 0, events: 0 }, luteal: { days: 0, events: 0 } };
+  const rows: Record<PhaseGroup, { days: number; events: number }> = { menstruation: { days: 0, events: 0 }, follikel: { days: 0, events: 0 }, eisprung: { days: 0, events: 0 }, luteal: { days: 0, events: 0 } };
   const start = first > addDays(today, -179) ? first : addDays(today, -179);
   for (let d = start; d <= today; d = addDays(d, 1)) {
     const g = groupOf(cycleToday(d, data.diary).phase);
@@ -221,7 +222,7 @@ export function muscleByPhase(data: Data, extra: MusterExtra, today: string): { 
     rows[g].days++;
     if (ev.has(d)) rows[g].events++;
   }
-  const labels: Record<PhaseGroup, string> = { menstruation: "Menstruation", follikel: "Follikel", luteal: "Luteal" };
+  const labels: Record<PhaseGroup, string> = { menstruation: "Menstruation", follikel: "Follikel", eisprung: "Eisprung", luteal: "Luteal" };
   return (Object.keys(rows) as PhaseGroup[]).map((g) => ({ group: g, label: labels[g], ...rows[g] }));
 }
 

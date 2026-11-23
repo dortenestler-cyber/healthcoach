@@ -4,11 +4,11 @@
 import type { Activity, Daily } from "@/lib/garmin";
 import { INFLUENCES } from "@/lib/catalog";
 import { illnessRule, type Illness } from "@/lib/health";
-import { sportOfGarmin, type Sport } from "@/lib/training";
+import { sportOf, type Sport } from "@/lib/training";
 import { alltagMinutes, readLoadDay } from "@/lib/alltagslast";
 import { baselineFor, RANGE_PHASE_NAMES, type Baseline, type Range } from "@/lib/baseline";
 
-export type Diary = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[]; fromGarmin?: boolean; garminOnly?: boolean };
+export type Diary = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[]; fromGarmin?: boolean; garminOnly?: boolean; ovulation?: string[] };
 // fromGarmin: Blutung an diesem Tag stammt aus Garmin · garminOnly: kein eigener Tagebucheintrag an diesem Tag
 export type Checkin = { day: string; energy: number | null; sleep: number | null; mood: number | null };
 export type Hub = { day: string };
@@ -305,7 +305,7 @@ export function patterns(data: Data): Pattern[] {
   for (const h of data.hubs) hubCount.set(h.day, (hubCount.get(h.day) ?? 0) + 1);
   const sportDays = new Map<Sport, Set<string>>();
   for (const a of data.acts) {
-    const sp = sportOfGarmin(a.type_key);
+    const sp = sportOf(a);
     const k: Sport = a.type_key && /run/.test(a.type_key) ? "ausdauer" : sp;
     if (!sportDays.has(k)) sportDays.set(k, new Set());
     sportDays.get(k)!.add((a.start_local ?? "").slice(0, 10));

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import TwoCol from "@/components/ui/TwoCol";
 import Link from "next/link";
 import { DivergingBars } from "@/components/charts";
 import CycleRing, { arcs4, PHASE4, PHASE4_LABEL, PhaseIcon, phase4Of } from "@/components/zyklus/CycleRing";
@@ -32,6 +33,11 @@ type Props = { today: string; data: Data; longDiary: Diary[]; flashes: string[];
 export default function ZyklusView({ today, data, longDiary, flashes, showFlashes, extra }: Props) {
   const [metric, setMetric] = useState<MetricKey>("hrv");
   const ct = cycleToday(today, longDiary);
+  const cycleStart = (t: string, cd: number) => {
+    const d = new Date(t + "T12:00:00");
+    d.setDate(d.getDate() - (cd - 1));
+    return d.toISOString().slice(0, 10);
+  };
   const phase = ct.phase ? PHASES[ct.phase] : null;
   const p4 = phase4Of(ct.phase);
   // Zeitraum der heutigen Phase (geschätzt)
@@ -113,9 +119,12 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         {(!phase || !ct.window) && <Link href="/tagebuch#perioden" className="settings-link">Perioden nachtragen ›</Link>}
       </div>
 
+      <TwoCol
+        left={
+          <>
       <section className="card">
         <div className="ring-hero">
-          <CycleRing cycleDay={ct.cycleDay} length={ct.length} phase={p4} />
+          <CycleRing cycleDay={ct.cycleDay} length={ct.length} phase={p4} today={today} ovDay={ct.ovDay} start={ct.cycleDay !== null ? cycleStart(today, ct.cycleDay) : null} />
         </div>
         <div className="phase-icons">
           {PHASE4.map((k) => (
@@ -140,6 +149,11 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
       </section>
 
       <CycleCalendar today={today} diary={longDiary} />
+          </>
+        }
+        right={
+          <>
+
 
       {phase && (
         <section className="card">
@@ -185,9 +199,6 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         <div className={`legend cb-${tone(metric)}`}>
           <span><i className="cb-key-line" />Dieser Zyklus</span>
           <span><i className="cb-key-usual" />Schnitt aus {bcd.cycles} früheren Zyklen</span>
-          <span><i className="ph-menses-bg" />Menstruation</span>
-          <span><i className="ph-follikel-bg" />Follikel</span>
-          <span><i className="ph-luteal-bg" />Luteal</span>
         </div>
         <Link href={`/verlauf?m=${metric}`} className="settings-link">{m.label} im Verlauf ›</Link>
       </section>
@@ -230,6 +241,9 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         </span>
         <span aria-hidden="true">›</span>
       </Link>
+          </>
+        }
+      />
     </>
   );
 }

@@ -65,6 +65,18 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 - [x] Ansehen und drei Fragen beantworten (immer dunkel überall, Energie Sage hell, Beere im Rand der Erklärkarte)
 - [ ] Nach dem Merge die App auf dem iPhone öffnen: Sie sollte dunkel sein, auch wenn das iPhone auf Hell steht. Ringe schmaler, Readiness-Stufen in vier Grüntönen. Falls die Statusleiste oben falsch aussieht: App vom Home-Bildschirm entfernen und neu hinzufügen (iOS merkt sich die alte Einstellung)
 
+### Sammelliste Anpassungen (PR #77)
+- [ ] Nach dem Merge: Health Coach vom Home-Bildschirm entfernen und in Safari neu „Zum Home-Bildschirm“ hinzufügen, damit das neue grüne App-Symbol erscheint
+- [x] Freigabe der Datenbank-Änderungen für Punkt 6 (eigene Sportart für Garmin-Aktivitäten) und Punkt 10 (Eisprung-Zeichen im Tagebuch), am 23.11. erteilt. Die Daten-Instanz legt die Spalten an; bis dahin sind die Frage zu Garmin-Aktivitäten und die Eisprung-Zeichen ausgeblendet
+- [ ] Coach: Das Eingabefeld ist größer und wächst beim Schreiben mit
+- [ ] Heute: Sind alle Medikamente abgehakt, steht nur noch eine Zeile da; Tippen klappt auf. Erledigtes Training ebenso
+- [ ] Heute: Der Punkt am Zahnrad zeigt, wie alt die Garmin-Daten sind (kein Punkt bis 30 Minuten, grau bis 1 Stunde, Amber danach)
+- [ ] Tagebuch: Check-in nach dem Speichern als eine Zeile; neue Zyklus-Symptome unter „Weitere anzeigen“
+- [ ] Zyklus: Ring antippen zeigt die Phase mit Datum; der Kalender zeigt die nächsten Perioden (bis 3 Monate vor)
+- [ ] Charts: Phasenleiste unter der Zeitachse; Antippen zeigt Datum und Wert
+- [ ] Am Computer im Browser öffnen: Seitenleiste links, Coach rechts, keine PIN; nach dem Abmelden steht die E-Mail schon im Feld
+- [ ] Auf dem iPad: keine PIN, Seitenleiste mit Symbolen
+
 ### Heute als Einstiegsseite (PR #76)
 - [x] Entwurf ansehen und die fünf Fragen beantworten
 - [ ] Nach dem Merge Heute auf dem iPhone ansehen: Gruß, fünf Ringe (seitlich wischen), Satz zum Tag, vier Kacheln, Heute steht an, Letzte Aktivitäten

@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import TwoCol from "@/components/ui/TwoCol";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, longDate, shortDate } from "@/lib/dates";
-import { BLEEDING, GRID_ROWS, LEVELS, SYMPTOMS } from "@/lib/catalog";
+import { BLEEDING, GRID_ROWS, LEVELS, splitFrequent, SYMPTOMS } from "@/lib/catalog";
+import { OVULATION_SIGNS } from "@/lib/ovulation";
 import { DEFAULT_HABITS, loadHabits, SAUNA_GAENGE, SAUNA_WANN, WANN_LABEL, type Habit, type HabitDetails, type SaunaDetails } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
 import CheckinCard from "@/components/tagebuch/CheckinCard";
@@ -43,6 +45,10 @@ export default function TagebuchView({ initial }: { initial?: string }) {
   const [saved, setSaved] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState("");
+  const [moreSym, setMoreSym] = useState(false);
+  const [ovSigns, setOvSigns] = useState<string[]>([]);
+  const [ovReady, setOvReady] = useState(false); // Spalte ovulation_signs vorhanden
+  const [moreHab, setMoreHab] = useState(false);
 
   const load = useCallback(async () => {
     const sb = supabase();
@@ -64,6 +70,10 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     loadHabits(sb).then(setHabits).catch(() => undefined);
     const det = await sb.from("diary_entries").select("habit_details").eq("day", day).maybeSingle();
     setDetails(det.error ? {} : (((det.data as { habit_details?: HabitDetails } | null)?.habit_details ?? {}) as HabitDetails));
+    // Eisprung-Zeichen erst nach der Migration (Daten), sonst ausgeblendet
+    const ov = await sb.from("diary_entries").select("ovulation_signs").eq("day", day).maybeSingle();
+    setOvReady(!ov.error);
+    setOvSigns(ov.error ? [] : ((ov.data as { ovulation_signs?: string[] } | null)?.ovulation_signs ?? []));
     setSaved(!!t);
     setDirty(false);
   }, [day]);
@@ -115,8 +125,12 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     // Details nur für eingetragene Gewohnheiten speichern. Fehlt die Spalte noch, bleibt der Eintrag trotzdem gespeichert.
     const keep: HabitDetails = Object.fromEntries(Object.entries(details).filter(([k]) => influences.includes(k)));
     const d2 = await sb.from("diary_entries").update({ habit_details: keep }).eq("day", day);
-    setDetailsNote(d2.error ? "Die Sauna-Details werden gespeichert, sobald die Datenbank aktualisiert ist (PR mit Migration)." : "");
     setError("");
+    if (ovReady) {
+      const o2 = await sb.from("diary_entries").update({ ovulation_signs: ovSigns }).eq("day", day);
+      if (o2.error) setError("Eisprung-Zeichen konnten nicht gespeichert werden: " + o2.error.message);
+    }
+    setDetailsNote(d2.error ? "Die Sauna-Details werden gespeichert, sobald die Datenbank aktualisiert ist (PR mit Migration)." : "");
     setSaved(true);
     setDirty(false);
     load();
@@ -132,6 +146,12 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     return heat[e.symptoms?.[rowKey] ?? 0];
   };
 
+  // Oben die genutzten, Rest unter „Weitere anzeigen“ (Sammelliste 5e)
+  const usedSym = new Set<string>([...Object.keys(symptoms).filter((k) => symptoms[k] > 0), ...history.flatMap((e) => Object.keys(e.symptoms ?? {}).filter((k) => (e.symptoms[k] ?? 0) > 0))]);
+  const symSplit = splitFrequent(SYMPTOMS, usedSym);
+  const usedHab = new Set<string>([...influences, ...history.flatMap((e) => e.influences ?? [])]);
+  const habSplit = splitFrequent(habits.filter((h) => h.on || influences.includes(h.key)), usedHab);
+
   return (
     <>
       <PageHead title="Tagebuch" sub={(day === today ? "Eintrag für " : "Nachtrag für ") + longDate(new Date(day + "T12:00:00"))} />
@@ -146,6 +166,9 @@ export default function TagebuchView({ initial }: { initial?: string }) {
         <button type="button" className="btn btn-link btn-44" onClick={() => go(today)}>Zurück zu heute</button>
       )}
 
+      <TwoCol
+        left={
+          <>
       <CheckinCard key={"c" + day} day={day} isToday={day === today} />
 
       <section className="card">
@@ -160,6 +183,21 @@ export default function TagebuchView({ initial }: { initial?: string }) {
             </button>
           ))}
         </div>
+        {feat.zyklus && ovReady && (
+          <>
+            <span className="meta ov-label">Eisprung-Zeichen (wenn du eines bemerkst)</span>
+            <div className="pills wrap">
+              {OVULATION_SIGNS.map((o) => {
+                const on = ovSigns.includes(o.key);
+                return (
+                  <button key={o.key} type="button" className="pill" aria-pressed={on} onClick={() => { setOvSigns(on ? ovSigns.filter((x) => x !== o.key) : [...ovSigns, o.key]); changed(); }}>
+                    {o.label}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
       </section>
 
       <section className="card">
@@ -168,7 +206,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
           <span className="meta">Tippen: leicht, mittel, stark</span>
         </div>
         <div className="pills wrap">
-          {SYMPTOMS.map((s) => {
+          {[...symSplit.top, ...(moreSym ? symSplit.rest : [])].map((s) => {
             const v = symptoms[s.key] ?? 0;
             return (
               <button
@@ -182,6 +220,11 @@ export default function TagebuchView({ initial }: { initial?: string }) {
             );
           })}
         </div>
+        {symSplit.rest.length > 0 && (
+          <button type="button" className="btn btn-link more-link" onClick={() => setMoreSym(!moreSym)} aria-expanded={moreSym}>
+            {moreSym ? "Weniger anzeigen" : `Weitere anzeigen (${symSplit.rest.length})`}
+          </button>
+        )}
       </section>
 
       {feat.perimenopause && <FlashCounter key={"f" + day} day={day} />}
@@ -192,9 +235,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
           <Link href="/einstellungen/gewohnheiten" className="settings-link">Verwalten ›</Link>
         </div>
         <div className="pills wrap">
-          {habits
-            .filter((h) => h.on || influences.includes(h.key))
-            .map((f) => {
+          {[...habSplit.top, ...(moreHab ? habSplit.rest : [])].map((f) => {
               const on = influences.includes(f.key);
               return (
                 <button
@@ -209,6 +250,11 @@ export default function TagebuchView({ initial }: { initial?: string }) {
               );
             })}
         </div>
+        {habSplit.rest.length > 0 && (
+          <button type="button" className="btn btn-link more-link" onClick={() => setMoreHab(!moreHab)} aria-expanded={moreHab}>
+            {moreHab ? "Weniger anzeigen" : `Weitere anzeigen (${habSplit.rest.length})`}
+          </button>
+        )}
         {influences.includes("sauna") && (
           <div className="habit-detail">
             <span className="row-strong">Sauna · Details (freiwillig)</span>
@@ -241,6 +287,10 @@ export default function TagebuchView({ initial }: { initial?: string }) {
         {saved ? "Gespeichert" : day === today ? "Eintrag speichern" : "Nachtrag speichern"}
       </button>
 
+          </>
+        }
+        right={
+          <>
       <DayIntakes key={"i" + day} day={day} />
 
       {feat.muskeln && <MuscleSection key={"m" + day} day={day} onChanged={loadMuscle} />}
@@ -268,6 +318,9 @@ export default function TagebuchView({ initial }: { initial?: string }) {
           {history.length === 0 && <p>Sobald du Einträge machst, füllt sich das Raster.</p>}
         </details>
       </section>
+          </>
+        }
+      />
     </>
   );
 }

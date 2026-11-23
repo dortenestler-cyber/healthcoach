@@ -12,6 +12,7 @@ const empty: Checkin = { energy: null, sleep: null, mood: null };
 export default function CheckinCard({ day, isToday }: { day: string; isToday: boolean }) {
   const [checkin, setCheckin] = useState<Checkin>(empty);
   const [saved, setSaved] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
@@ -24,6 +25,7 @@ export default function CheckinCard({ day, isToday }: { day: string; isToday: bo
     }
     setCheckin(data ? { energy: data.energy, sleep: data.sleep, mood: data.mood } : empty);
     setSaved(!!data);
+    setEditing(false);
   }, [day]);
 
   useEffect(() => {
@@ -38,10 +40,27 @@ export default function CheckinCard({ day, isToday }: { day: string; isToday: bo
     else {
       setError("");
       setSaved(true);
+      setEditing(false);
     }
   };
 
   const complete = CHECKIN_QUESTIONS.every((q) => checkin[q.key] !== null);
+
+  // Gespeichert: eine Zeile mit den Werten, Tipp zum Ändern
+  if (saved && complete && !editing) {
+    const summary = CHECKIN_QUESTIONS.map((q) => `${q.label} ${CHECKIN_LEVELS[(checkin[q.key] ?? 1) - 1]}`).join(" · ");
+    return (
+      <section className="card">
+        <button type="button" className="card-row fold-row" onClick={() => setEditing(true)} aria-expanded={false}>
+          <span className="stack">
+            <span className="row-label"><span className="fold-ok" aria-hidden="true">✓</span> {isToday ? "Morgen-Check-in" : "Check-in"}</span>
+            <span className="meta">{summary}</span>
+          </span>
+          <span className="link-small">Ändern</span>
+        </button>
+      </section>
+    );
+  }
 
   return (
     <section className="card">

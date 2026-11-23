@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { isoDay } from "@/lib/dates";
 import type { Data } from "@/lib/insights";
-import { sportOfGarmin, WEEKDAY_LABELS, type Session } from "@/lib/training";
+import { sportOf, WEEKDAY_LABELS, type Session } from "@/lib/training";
 import WeekLoadView from "@/components/training/WeekLoadView";
 
 // Diese Woche: Last mit Zielkorridor aus 4 Wochen, Tagessäulen, Soll und Ist der geplanten Einheiten
@@ -29,6 +29,6 @@ export default function WeekLoadCard({ data, alltag = true }: { data: Data | nul
   if (!data) return null;
   const actsOn = (day: string) => data.acts.filter((a) => (a.start_local ?? "").slice(0, 10) === day);
   const planned = sessions.filter((s) => s.status !== "ausgelassen");
-  const done = planned.filter((s) => s.status === "erledigt" || actsOn(s.day).some((a) => sportOfGarmin(a.type_key) === s.sport)).length;
+  const done = planned.filter((s) => s.status === "erledigt" || actsOn(s.day).some((a) => sportOf(a) === s.sport)).length;
   return <WeekLoadView today={today} data={data} planned={planned.length} done={done} labels={WEEKDAY_LABELS} alltag={alltag} />;
 }

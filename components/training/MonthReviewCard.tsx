@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Data } from "@/lib/insights";
-import { SPORTS, sportOfGarmin, type Sport } from "@/lib/training";
+import { SPORTS, sportOf, type Sport } from "@/lib/training";
 import SportIcon from "@/components/ui/SportIcon";
 
 const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
@@ -18,7 +18,7 @@ export default function MonthReviewCard({ today, data }: { today: string; data: 
   const ym = today.slice(0, 7);
   const prev = new Date(y, m - 1, 15, 12);
   const pym = `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, "0")}`;
-  const acts = data.acts.filter((a) => a.start_local).map((a) => ({ day: (a.start_local as string).slice(0, 10), sport: sportOfGarmin(a.type_key) }));
+  const acts = data.acts.filter((a) => a.start_local).map((a) => ({ day: (a.start_local as string).slice(0, 10), sport: sportOf(a) }));
   const mine = acts.filter((a) => a.day.startsWith(ym));
   const prevCount = acts.filter((a) => a.day.startsWith(pym)).length;
   const shown = filter ? mine.filter((a) => a.sport === filter) : mine;

@@ -102,7 +102,7 @@ Amber heißt „schau hin“, nie „krank“. Warnzeichen mit Verweis auf ärzt
 | Familie | Werte | Verwendung |
 | --- | --- | --- |
 | Mobility · Violett | `#A98BE0`, Grund `#2A2140`, Text `#CDB9F0` | Mobility-Einheiten, Dehnen |
-| Marke · Beere | Knopf `#A3234F`, hell `#E0527F` | App-Symbol, Coach-Knopf, Rand der Erklärkarte am Ende des Verlaufs („das kommt vom Coach“) |
+| Marke · Beere | Knopf `#A3234F`, hell `#E0527F` | Coach-Knopf, Rand der Erklärkarte am Ende des Verlaufs („das kommt vom Coach“) |
 | Körper · neutral | Text-Farben | Gewicht (nur Trend), Medikamente, Krankheit und Verletzung (Wort + Symbol) |
 
 ## 5. Welcher Wert bekommt welche Farbe

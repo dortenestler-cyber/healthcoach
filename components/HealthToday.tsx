@@ -124,12 +124,8 @@ export default function HealthToday({ children }: { children?: ReactNode }) {
         </div>
       )}
 
-      <div className="agenda-part card-row">
-        <span className="row-label">Krank oder verletzt?</span>
-        <div className="pills">
-          <Link href="/gesundheit?t=krankverl" className="pill pill-sm pill-link">Krankheit</Link>
-          <Link href="/gesundheit?t=krankverl" className="pill pill-sm pill-link">Verletzung</Link>
-        </div>
+      <div className="agenda-part">
+        <Link href="/gesundheit?t=krankverl" className="link-small agenda-foot">Krank oder verletzt? ›</Link>
       </div>
     </>
   );

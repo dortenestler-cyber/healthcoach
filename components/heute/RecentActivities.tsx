@@ -2,7 +2,7 @@ import Link from "next/link";
 import SportIcon from "@/components/ui/SportIcon";
 import type { Data } from "@/lib/insights";
 import { hm } from "@/lib/today";
-import { sportOfGarmin, SPORTS } from "@/lib/training";
+import { sportOf, SPORTS } from "@/lib/training";
 
 const WEEKDAY = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 
@@ -32,7 +32,7 @@ export default function RecentActivities({ day, data }: { day: string; data: Dat
       </div>
       <div className="card today-acts">
         {acts.map((a) => {
-          const sport = sportOfGarmin(a.type_key);
+          const sport = sportOf(a);
           const parts = [when((a.start_local as string).slice(0, 10), day)];
           if (a.duration_s) parts.push(hm(a.duration_s / 3600));
           if (a.training_load) parts.push(`Last ${Math.round(a.training_load)}`);

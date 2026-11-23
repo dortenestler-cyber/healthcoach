@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay } from "@/lib/dates";
-import { GOAL_GRADE, GRADES, sportOfGarmin, type Climb } from "@/lib/training";
+import { GOAL_GRADE, GRADES, sportOf, type Climb } from "@/lib/training";
 
 const RESULTS: [Climb["result"], string][] = [
   ["flash", "Flash"],
@@ -29,7 +29,7 @@ export default function ClimbSection() {
     ]);
     if (c.error) setError("Boulder konnten nicht geladen werden: " + c.error.message);
     setClimbs((c.data ?? []) as Climb[]);
-    setSessions(((a.data ?? []) as { type_key: string | null }[]).filter((r) => sportOfGarmin(r.type_key) === "klettern").length);
+    setSessions(((a.data ?? []) as { type_key: string | null }[]).filter((r) => sportOf(r) === "klettern").length);
   }, []);
 
   useEffect(() => {

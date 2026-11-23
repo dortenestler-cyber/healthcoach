@@ -16,7 +16,7 @@ import {
   fromIso,
   healthEffect,
   loadSettings,
-  sportOfGarmin,
+  sportOf,
   SPORTS,
   WEEKDAY_LABELS,
   type Session,
@@ -35,7 +35,7 @@ const FILTERS: [Filter, string][] = [
 type Filter = "alles" | "training" | "zyklus";
 
 // Drei Flächen im Kalender: Menstruation, Follikel (mit Eisprung-Fenster), Luteal
-const band = (p: Phase | null) => (p === "menstruation" ? "menses" : p === "follikel" || p === "eisprung" ? "follikel" : p ? "luteal" : undefined);
+const band = (p: Phase | null) => (p === "menstruation" ? "menses" : p === "follikel" ? "follikel" : p === "eisprung" ? "eisprung" : p ? "luteal" : undefined);
 
 export default function CalendarSection({ data }: { data: Data | null }) {
   const [filter, setFilter] = useState<Filter>("alles");
@@ -95,7 +95,7 @@ export default function CalendarSection({ data }: { data: Data | null }) {
 
   const actsOn = (day: string) => acts.filter((a) => (a.start_local ?? "").slice(0, 10) === day);
   const sessOn = (day: string) => sessions.filter((s) => s.day === day);
-  const doneByGarmin = (s: Session) => actsOn(s.day).some((a) => sportOfGarmin(a.type_key) === s.sport);
+  const doneByGarmin = (s: Session) => actsOn(s.day).some((a) => sportOf(a) === s.sport);
 
   // Raster mit Montag als erstem Tag
   const lead = (month.getDay() + 6) % 7;
@@ -111,7 +111,7 @@ export default function CalendarSection({ data }: { data: Data | null }) {
       dots.push({ key: s.id, color: SPORTS[s.sport].color, filled: done });
     }
     for (const a of actsOn(day)) {
-      const sp = sportOfGarmin(a.type_key);
+      const sp = sportOf(a);
       if (!sessOn(day).some((s) => s.sport === sp)) dots.push({ key: String(a.activity_id), color: SPORTS[sp].color, filled: true });
     }
     return dots.slice(0, 4);
@@ -229,6 +229,7 @@ export default function CalendarSection({ data }: { data: Data | null }) {
             <>
               <span><i className="ph-menses-bg" />Menstruation</span>
               <span><i className="ph-follikel-bg" />Follikel</span>
+              <span><i className="ph-eisprung-bg" />Eisprung</span>
               <span><i className="ph-luteal-bg" />Luteal</span>
               <span><i className="legend-period" />Periode (Tagebuch oder Garmin)</span>
               <span><i className="cal-dot-symptom legend-dot" />Symptome</span>
@@ -293,7 +294,7 @@ export default function CalendarSection({ data }: { data: Data | null }) {
         {selActs.map((a) => (
           <div key={a.activity_id} className="card-row list-line">
             <span className="row-strong">
-              <i className="dot" style={{ background: SPORTS[sportOfGarmin(a.type_key)].color }} />
+              <i className="dot" style={{ background: SPORTS[sportOf(a)].color }} />
               {activityLabel(a)}
             </span>
             <span className="meta">{[durationText(a.duration_s), a.avg_hr ? "Puls Ø " + a.avg_hr : ""].filter(Boolean).join(" · ")} · Garmin</span>
