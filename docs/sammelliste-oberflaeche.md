@@ -5,20 +5,20 @@ Zweig: `claude/tender-archimedes-h1rwvr`
 
 Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Freigabe) · ☑ umgesetzt und gemergt
 
-## Runde 2 · gesammelt am 23.11., wartet auf Freigabe
+## Runde 2 · freigegeben am 23.11., umgesetzt in PR #83
 
-14. ☐ **„Last“ heißt künftig „Trainingsbelastung“** (23.11.)
+14. ☑ **„Last“ heißt künftig „Belastung“** (23.11., Nutzerin: „Belastung“ statt „Trainingsbelastung“, mit „mit Alltag“ bzw. „nur Training“)
    Betrifft alle sichtbaren Texte: Ring und Erklärkarte auf Training („Trainingsbelastung 7 Tage“), Chart „Trainingsbelastung und Korridor“, Kachel auf Heute, „Letzte Aktivitäten“ („Trainingsbelastung 85“), Begriffe-Seite und die Frage an den Coach.
    Offene Frage: Wenn der Alltag mitzählt, ist es streng genommen keine reine Trainingsbelastung. Vorschlag: überall „Trainingsbelastung“, mit dem Zusatz „mit Alltag“ bzw. „nur Training“ wie heute. Die Belastung in % auf Heute (Ring „Belastung“) bleibt, wie sie ist.
    Dateien: `components/training/RatioCard.tsx`, `LoadTrendCard.tsx`, `components/heute/RecentActivities.tsx`, `lib/today.ts`, `components/BegriffeView.tsx`
 
-15. ☐ **Charts am Computer viel zu groß** (23.11.)
+15. ☑ **Charts am Computer viel zu groß** (23.11.)
    Ursache: Jeder Chart ist für die iPhone-Breite gezeichnet (340 Punkte) und wird am Computer einfach hochgezogen. Bei 900 px Breite wird alles fast dreimal so groß, auch Schrift, Linien und das Schild beim Antippen.
    Vorschlag: Die Charts messen ihre echte Breite und zeichnen in echten Pixeln. Schrift bleibt immer 11–12 px, Linien bleiben schmal, die Höhe wächst nur leicht (iPhone 170 px, Computer höchstens etwa 220 px). Am Computer entsteht so mehr Platz für Tage statt größerer Zahlen.
    Gilt für alle Charts: Linien, Balken, Schlafphasen, Heatmap, Energie über den Tag, Phasenleiste.
    Dateien: `components/charts/*`, neuer kleiner Helfer zum Messen der Breite, `app/globals.css`
 
-16. ☐ **Verlauf: Werte bündeln** (23.11., Alternative oder Ergänzung zu Punkt 15)
+16. ☑ **Verlauf: Werte bündeln** (23.11., Alternative oder Ergänzung zu Punkt 15)
    Heute: 13 Knöpfe nebeneinander, immer nur ein Wert sichtbar.
    Vorschlag: vier Gruppen statt 13 Knöpfen. Jede Gruppe zeigt ihre Werte als kleine Charts untereinander (iPhone) bzw. zwei nebeneinander (Computer), alle mit derselben Zeitachse und einer gemeinsamen Phasenleiste. Fährt man über einen Tag, zeigen alle Charts der Gruppe denselben Tag.
    - **Schlaf:** Schlaf, Tiefschlaf, REM-Schlaf, Einschlafen
@@ -29,12 +29,12 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Empfehlung: Punkt 15 in jedem Fall, Punkt 16 dazu.
    Dateien: `components/VerlaufView.tsx`, `components/verlauf/*`, `components/charts/pick.tsx` (gemeinsamer Tag)
 
-17. ☐ **Korridor glatt statt Treppe** (23.11.)
+17. ☑ **Korridor glatt statt Treppe** (23.11.)
    Der persönliche Bereich wird heute Tag für Tag als Stufe gezeichnet. Vorschlag: Ober- und Unterkante als weiche Kurve durch die Tagesmitten. Die Kurve bleibt dabei immer zwischen den echten Tageswerten, sie erfindet keine Spitzen. Lücken ohne Bereich bleiben frei. Das Schild beim Antippen nennt weiter den genauen Bereich des Tages.
    Gilt für alle Charts mit wanderndem Bereich (Verlauf, Detailseiten unter Heute, Trainingsbelastung und Korridor).
    Dateien: `components/charts/LineBand.tsx`, `components/charts/scale.ts`, `components/training/LoadTrendCard.tsx`
 
-18. ☐ **Krankheiten und Verletzungen nachtragen** (23.11.)
+18. ☑ **Krankheiten und Verletzungen nachtragen** (23.11.)
    Heute beginnt jede Krankheit und Verletzung „heute“ und endet mit „Wieder gesund“ am selben Tag. Vorschlag:
    - Nach dem Tipp auf eine Krankheit (oder „+ Verletzung eintragen“) fragt eine Zeile **„Seit wann?“** · Heute · Gestern · Vorgestern · Datum wählen.
    - Darunter **„Schon vorbei?“** · Nein, noch krank · Ja, bis … (Datum). So lässt sich auch eine Erkältung von vor drei Wochen in einem Schritt eintragen.
@@ -42,7 +42,7 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Keine Änderung an der Datenbank nötig, Beginn und Ende gibt es schon. Nachgetragene Tage zählen sofort überall mit: Readiness (Krankheitstage zählen nicht in den Bereich), „Weitere Muster“, Wiedereinstieg in Stufen (nur wenn das Ende höchstens 5 Tage her ist).
    Dateien: `components/gesundheit/IllnessSection.tsx`, `InjurySection.tsx`
 
-19. ☐ **Leichte Anzeichen erfassen, ohne gleich krank zu sein** (23.11.)
+19. ☑ **Leichte Anzeichen erfassen, ohne gleich krank zu sein** (23.11.)
    Vorschlag: Im Tagebuch eine eigene Gruppe **„Anzeichen“** neben den Symptomen, per Tipp, jeweils leicht · mittel · stark:
    Rauer Hals · Halsschmerzen · Verstopfte Nase · Schnupfen · Niesen · Husten · Frösteln · Gliederschmerzen · Abgeschlagen · Druck im Kopf/Nebenhöhlen · Lippenbläschen.
    Wie die Symptome gespeichert, deshalb keine Änderung an der Datenbank nötig. Punkt 5e gilt: oben die eingetragenen und häufig genutzten, der Rest unter „Weitere anzeigen“.
@@ -54,7 +54,7 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Bei Warnzeichen (Fieber über mehrere Tage, Atemnot, Brustschmerz) bleibt der Hinweis auf ärztliche Abklärung stehen.
    Dateien: `lib/catalog.ts`, Tagebuch-Komponenten, `lib/muster.ts`, `components/heute/*`, `components/gesundheit/OverviewSection.tsx`
 
-20. ☐ **Einträge überall nachträglich ändern** (23.11.)
+20. ☑ **Einträge überall nachträglich ändern** (23.11.)
    Heute lassen sich frühere Krankheiten, Verletzungen und manche Einträge nur ansehen. Vorschlag, einheitlich für alle Listen:
    - Tippen auf einen Eintrag (z. B. „Grippaler Infekt · 23. Nov. · 1 Tag“) öffnet ihn zum Bearbeiten: Name, Beginn, Ende, Stärke, Fieber, Notiz; bei Verletzungen Stelle, Art, Ursache, Schmerzwerte.
    - Unten immer **„Löschen“**, mit Rückfrage.
@@ -63,8 +63,8 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Ich gehe beim Umsetzen alle Bereiche durch und liste vorher auf, wo heute etwas fehlt.
    Dateien: `components/gesundheit/*`, `components/tagebuch/*`, `components/zyklus/*`, neuer gemeinsamer Bearbeiten-Bogen in `components/ui/`
 
-21. ☐ **Daten regelmäßig aktualisieren** (23.11.)
-   Eigenes Konzept zur Sichtung: `docs/konzept-datenaktualisierung.md`. Teil A Oberfläche, Teil B Daten `[DA]` (Zeitplan, braucht Migration).
+21. ☑ **Daten regelmäßig aktualisieren** (23.11., Teil A umgesetzt; Teil B liegt bei Daten `[DA]`)
+   Konzept: `docs/konzept-datenaktualisierung.md`. Umgesetzt: `lib/refresh.ts` (neu laden beim Zurückkehren, alle 15 Minuten, beim Tageswechsel), Garmin-Abruf ab 60 Minuten altem Stand, ab 20 Minuten wenn heute Training geplant ist und die Aktivität fehlt (höchstens alle 30 Minuten je Gerät), Hinweis „Neue Version“ (`/version`), „Aktualisieren“ in der Seitenleiste. A6 (zentraler Datenspeicher) ersetzt durch den gemeinsamen Hook.
 
 ## Runde 1 · umgesetzt in PR #77
 

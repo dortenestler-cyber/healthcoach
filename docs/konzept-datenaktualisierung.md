@@ -1,6 +1,6 @@
 # Konzept · Daten regelmäßig aktualisieren
 
-Stand: 23.11. · Sammelliste Punkt 21 · wartet auf Freigabe
+Stand: 23.11. · Sammelliste Punkt 21 · freigegeben am 23.11. (alle 2 Stunden, 8–22 Uhr, B2 ja) · Teil A umgesetzt in PR #83, Teil B offen bei Daten
 Ziel: Wer die App öffnet, auf dem iPhone oder im Browser, sieht ohne Zutun aktuelle Werte. Ziehen nach unten bleibt, ist aber nur noch selten nötig.
 
 ## So ist es heute
@@ -74,8 +74,8 @@ B5. **Uhr.** Die Uhr liest aus der Datenbank und bekommt durch B1 tagsüber fris
 4. DA: B2
 5. OF: A7
 
-## Fragen an dich
+## Entscheidungen (23.11.)
 
-- Reichen alle 2 Stunden tagsüber, oder lieber stündlich (dann etwa 18 Abrufe am Tag, etwas mehr Sperrgefahr)?
-- Ab wann und bis wann soll abgerufen werden? Vorschlag 8–22 Uhr.
-- Soll B2 (schneller nach dem Training) gebaut werden?
+- Tagsüber alle 2 Stunden, 8–22 Uhr.
+- B2 ja. Die App setzt es schon um (Abruf ab 20 Minuten, wenn heute Training geplant ist und die Aktivität fehlt).
+- A6 umgesetzt als gemeinsamer Hook `useRefresh` statt zentralem Datenspeicher: jede Seite meldet ihre Ladefunktion an.
