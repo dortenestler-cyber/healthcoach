@@ -87,4 +87,7 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Damit das Tagebuch nicht länger wird, gilt Punkt 5e: Oben stehen die eingetragenen und häufig genutzten, der Rest liegt unter „Weitere anzeigen“. Auswertungen nach Zyklusphase (mit Eisprung, Punkt 10) zeigen die neuen Symptome automatisch mit.
    Dateien: `lib/catalog.ts`, Tagebuch-Komponenten
 
+13. ☐ **Health Coach im Browser am Computer, keine PIN im Browser, Anmeldung bleibt bestehen** (23.11.)
+   Eigenes Konzept zur Sichtung: `docs/konzept-web-app.md`, Entwurf `docs/bilder/entwuerfe/web-heute.png`. Wird nach Freigabe in Schritten umgesetzt.
+
 ## Erledigt
