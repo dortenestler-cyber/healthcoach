@@ -195,10 +195,6 @@ module Icons {
         } else if (name.equals("sleep")) {
             // Mond (Schlafwert)
             p(dc, [9, 1, 5, 2.5, 2.5, 6, 2.5, 10, 5, 13.5, 9, 15, 13, 13.5, 15, 10.5, 11, 11, 8, 9, 7, 5.5]);
-        } else if (name.equals("temp")) {
-            // Thermometer (Hauttemperatur)
-            r(dc, 6.5, 1, 3, 9);
-            p(dc, [4.5, 10.5, 6, 9, 10, 9, 11.5, 10.5, 11.5, 13.5, 10, 15, 6, 15, 4.5, 13.5]);
         } else if (name.equals("cross")) {
             // Kreuz (krank gemeldet)
             p(dc, [6, 2, 10, 2, 10, 6, 14, 6, 14, 10, 10, 10, 10, 14, 6, 14, 6, 10, 2, 10, 2, 6, 6, 6]);

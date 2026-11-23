@@ -148,9 +148,17 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 - [x] PR #84 gemergt und synchronisiert (23. Nov.), Migration und Upload grün. Ergebnis: Garmin gibt einzelne Nächte unter den bekannten Adressen nicht heraus (404)
 - [x] PR #87 gemergt und synchronisiert (23. Nov.). Ergebnis: Garmin liefert über diese Schnittstelle weder Hauttemperatur noch Schlafphasen mit Uhrzeit, nur Summen und die Anzahl der Wachphasen
 
-### 16. Glance und Zifferblatt der Uhr (PR #93, DA)
+### 16. Wachphasen und Sauerstoff im Schlaf, Temperatur entfernt, Daten (PR #90, DA)
+Enthält eine Migration und ändert die Funktionen `garmin-sync` und `watch`, deshalb mergst du ihn selbst.
+- [x] PR #90 gemergt (23. Nov.), Migration und Upload grün (geprüft von Claude)
+- [x] Synchronisiert. Geprüft von Claude: Wachphasen und Sauerstoff kommen an (3 Nächte aus dem Abrufzeitraum, jede neue Nacht kommt automatisch dazu)
+- [ ] Falls auf dem Zifferblatt ein Feld „Hauttemperatur“ gewählt war: Es bleibt jetzt leer. In Garmin Connect unter den Einstellungen des Zifferblatts einen anderen Wert wählen
+- [ ] Die Anzeige der Temperatur in der App entfernt die Rolle Oberfläche in einer eigenen Sitzung, die Bitte steht in ihrer Übergabe
+
+### 17. Glance und Zifferblatt der Uhr (PR #93, DA)
 Ändert die Funktion `watch`, deshalb mergst du ihn selbst.
-- [ ] Konzept ansehen: https://claude.ai/artifact/QT4fgePZ9sizxoYyygED86 und entscheiden, welche Vorschläge (15–20) dazukommen und ob der Farbmodus die 9 Farbregler ersetzt
+- [x] Konzept angesehen (https://claude.ai/artifact/QT4fgePZ9sizxoYyygED86), entschieden: Layouts 15, 17, 19, 20 kommen dazu (23. Nov.)
+- [ ] Entscheiden, ob der Farbmodus (Einfarbig, Bedeutung, Nacht) die 9 Farbregler ersetzt
 - [ ] PR #93 mergen, wenn der Lauf `watch-build` grün ist; danach die Uhr-App neu installieren und den Glance prüfen
 
 ## Erledigt

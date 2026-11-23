@@ -85,6 +85,11 @@ export async function tableCsv(name: string): Promise<{ csv: string; count: numb
   return { csv: toCsv(rows), count: rows.length };
 }
 
+// Spalten, die es nicht mehr gibt: ältere Sicherungen enthalten sie noch, beim Einspielen weglassen
+const REMOVED: Record<string, string[]> = {
+  garmin_daily: ["skin_temp_delta", "sleep_levels", "sleep_detail_diag"],
+};
+
 // Spielt eine Sicherung ein. Vorhandene Einträge mit gleichem Schlüssel werden überschrieben,
 // nichts wird gelöscht. Die Reihenfolge von TABLES beachtet Verweise (z. B. Plan vor Übung).
 export async function restoreBackup(b: Backup, onStep?: (label: string) => void): Promise<number> {
@@ -96,7 +101,8 @@ export async function restoreBackup(b: Backup, onStep?: (label: string) => void)
   if (!uid) throw new Error("Nicht angemeldet");
   let total = 0;
   for (const t of TABLES) {
-    const rows = (b.tables[t.name] ?? []).map((r) => ({ ...r, user_id: uid }));
+    const drop = REMOVED[t.name] ?? [];
+    const rows = (b.tables[t.name] ?? []).map((r) => ({ ...Object.fromEntries(Object.entries(r).filter(([k]) => !drop.includes(k))), user_id: uid }));
     if (!rows.length) continue;
     onStep?.(t.label);
     for (let i = 0; i < rows.length; i += 500) {

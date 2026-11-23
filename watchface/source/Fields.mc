@@ -16,10 +16,10 @@ module Fields {
     // Icon und Geisterziffern je Wert (Index = Nummer aus den Einstellungen)
     const ICON = [null, "bb", "cy", "su", "sd", "cl", "dr", "he", "fl", "st", "ta", "be", "hg", "kb", "in",
         "stress", "rhr", "floors", "intens", "kcal", "dist", "spo2", "resp", "alt", "press", "batt", "alarm", "move", "recov",
-        "hrv", "sleep", "temp", "ready", "phase", "pill"];
+        "hrv", "sleep", null, "ready", "phase", "pill"];
     const GHOST = ["", "88", "88", "8888", "8888", "8°", "88", "88", "8", "8888", "88", "8", "88", "88:88", "8",
         "88", "88", "88", "888", "8888", "88,8", "88", "88", "8888", "8888", "88", "8", "8", "88",
-        "88", "88", "+8,8", "8,8", "8888", "8"];
+        "88", "88", "", "8,8", "8888", "8"];
 
     const NONE = "--";
 
@@ -85,11 +85,8 @@ module Fields {
         }
         if (t == 29) { return hcNum(hc, "hrv"); }
         if (t == 30) { return hcNum(hc, "sleep"); }
-        if (t == 31) {
-            if (hc == null || hc["skin"] == null) { return NONE; }
-            var v = hc["skin"].toFloat();
-            return (v >= 0 ? "+" : "-") + comma(v.abs());
-        }
+        // 31 war die Hauttemperatur (entfernt, Garmin liefert sie nicht). Nummer bleibt frei.
+        if (t == 31) { return NONE; }
         if (t == 32) {
             if (hc == null || hc["goal"] == null) { return NONE; }
             return comma(hc["goal"].toFloat() / 10.0);
