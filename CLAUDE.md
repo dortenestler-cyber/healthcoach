@@ -10,6 +10,7 @@ Health Coach bringt Training, Erholung, Zyklus, Perimenopause-Symptome, Krankhei
 - Antworten und Texte in der App auf Deutsch, klar und knapp, ohne Fachjargon.
 - Beispieldaten immer als solche kennzeichnen.
 - Was die Nutzerin selbst tun muss (Migrationen, Secrets, Einstellungen in Supabase oder GitHub), in `AUFGABEN.md` eintragen und Erledigtes abhaken.
+- Uhr-App und Zifferblätter installiert die Nutzerin nur über das Garmin-Entwicklerportal (apps.garmin.com/developer/upload), nicht per USB. Jede Änderung an `watch/` oder `watchface/` liefert ein fertiges Upload-Paket: `.iq`, Store-Icon 500 × 500 und aussagekräftige Screenshots (JPG unter 150 KB) sowie den Beschreibungstext, gebaut vom Lauf „Uhr-App bauen“.
 
 ## Zwei Instanzen
 Zwei Claude-Instanzen arbeiten parallel, Regeln in `docs/konzept-zwei-instanzen.md`.

@@ -2,9 +2,10 @@ name: Uhr-App bauen
 
 # Baut die Uhr-App und das Zifferblatt "Datenraster" für die Fenix 9 Pro mit dem Connect IQ SDK.
 # Ergebnis zum Herunterladen unter Actions → dieser Lauf → Artifacts:
-#   HealthCoach.iq      für das Hochladen im Garmin-Entwickler-Dashboard (Beta-App)
-#   HealthCoachFace.iq  Zifferblatt für das Entwickler-Dashboard (eigene Beta-App)
-#   HealthCoach-*.prg   zum Kopieren per USB auf die Uhr (Ordner GARMIN/APPS)
+#   upload-zifferblatt  alles für das Garmin-Entwicklerportal: HealthCoachFace.iq, Store-Icon, Screenshots, Beschreibung
+#   upload-uhr-app      dasselbe für die Uhr-App: HealthCoach.iq, Store-Icon, Screenshots, Beschreibung
+#   health-coach-uhr    nur die Dateien (.iq und .prg; .prg wird nicht genutzt, die Nutzerin lädt nur übers Portal hoch)
+# Screenshots und Icons liegen in watchface/store und watch/store, neu erzeugen mit: node watchface/tools/store_bilder.js
 #
 # Secrets (Settings → Secrets and variables → Actions):
 #   GARMIN_BUILD_EMAIL, GARMIN_BUILD_PASSWORD   zweites Garmin-Konto nur zum Herunterladen des SDK
@@ -104,6 +105,24 @@ jobs:
           name: entwicklerschluessel
           path: keyout/CIQ_DEVELOPER_KEY_B64.txt
           retention-days: 1
+
+      - name: Upload-Pakete fürs Garmin-Entwicklerportal
+        run: |
+          mkdir -p upload/zifferblatt upload/uhr-app
+          cp build/HealthCoachFace.iq watchface/store/* upload/zifferblatt/
+          cp build/HealthCoach.iq watch/store/* upload/uhr-app/
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: upload-zifferblatt
+          path: upload/zifferblatt
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: upload-uhr-app
+          path: upload/uhr-app
+          retention-days: 30
 
       - uses: actions/upload-artifact@v5
         with:

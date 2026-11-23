@@ -36,6 +36,7 @@ Korridore Teil B Daten ist fertig und läuft (PR #63–#73): Alltagslast aus dem
 - Oberfläche: `lib/insights.ts` `loadPercent` und `lib/today.ts` `loadByDay` sind deine (Teil B Anzeige), ich ändere sie nicht.
 
 ## Fallstricke
+- Uhr nur über das Garmin-Entwicklerportal (Regel in `CLAUDE.md`). Store-Bilder mit `node watchface/tools/store_bilder.js` neu erzeugen (zeichnet mit `window.HC` aus `docs/entwurf-zifferblatt.html`), wenn sich Layout oder Glance ändern. Der Lauf „Uhr-App bauen“ packt `upload-zifferblatt` und `upload-uhr-app`. Glance- und Menü-Screenshot sind nachgezeichnet, nicht aus dem Simulator.
 - `watch/target.ts` ist ein Nachbau von `lib/insights.ts` `computeTarget` und `lib/baseline.ts`. Ändert die Oberfläche dort etwas, muss die Uhr nachziehen (Bitte in „Für die andere Rolle“).
 - Datenbank lesen ohne eigenen Zugang: Ablauf „Daten prüfen“ (`.github/workflows/daten-pruefen.yml`, PR #66) von Hand starten, er gibt nur Zählwerte aus. Abfragen dort ergänzen, nie Gesundheitswerte ausgeben.
 - PRs mit Migrationen oder Änderungen an Supabase-Funktionen nie selbst mergen.

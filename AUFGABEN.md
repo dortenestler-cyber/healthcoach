@@ -161,7 +161,10 @@ Enthält eine Migration und ändert die Funktionen `garmin-sync` und `watch`, de
 - [x] Entschieden: Farbmodus (Einfarbig, Bedeutung, Nacht) ersetzt die 9 Farbregler (23. Nov.)
 - [x] PR #93 gemergt (23. Nov.)
 - [ ] Uhr-App neu installieren und den Glance prüfen
-- [ ] PR #96 mergen, wenn die Läufe grün sind (ändert `watch`); danach Zifferblatt neu installieren. Garmin fragt dabei einmal nach dem Zugriff auf dein Profil (für „Nacht automatisch“)
+- [ ] PR #96 mergen, wenn die Läufe grün sind (ändert `watch`)
+- [ ] Upload-Pakete holen: GitHub › Actions › „Uhr-App bauen“ › letzter Lauf auf `main` › Artifacts „upload-zifferblatt“ und „upload-uhr-app“ herunterladen und entpacken
+- [ ] Im Garmin-Entwicklerportal (apps.garmin.com/developer/upload) je App die `.iq`-Datei hochladen, dann Store-Icon, Screenshots und Texte aus `beschreibung.md` übernehmen
+- [ ] Nach der Freigabe durch Garmin auf der Uhr aktualisieren. Garmin fragt beim Zifferblatt einmal nach dem Zugriff auf dein Profil (für „Nacht automatisch“)
 - [ ] In Garmin Connect beim Zifferblatt „Layout“ und „Farbmodus“ wählen. Vorher gewählte Farben gehen dabei verloren, das ist gewollt
 
 ## Erledigt
