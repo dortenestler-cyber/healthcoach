@@ -75,12 +75,11 @@ Zeichen: ☐ gesammelt · ◐ vorbereitet (fertig auf dem Zweig, wartet auf Frei
    Braucht Daten `[DA]`: ein neues Feld im Tagebuch (Migration, wartet auf Freigabe).
    Dateien: `lib/cycle.ts`, `lib/muster.ts`, `lib/zyklusSeite.ts`, `lib/habitStats.ts`, betroffene Komponenten
 
-11. ☐ **App-Symbol passend zum getönten Home-Bildschirm** (23.11.)
-   Mit getönten Symbolen rechnet iOS unser Symbol selbst in Graustufen um. Für eine Web-App kann man keine eigene getönte Fassung mitgeben. Der Ring in Beere ist mittelhell, darum wird er zu einem flauen Grau. Bei den anderen Apps ist das Zeichen hell auf fast schwarzem Grund.
-   Vorschlag: Der Ring wird hell, Rosé-Beere mit Verlauf von `#FAC6D6` nach `#F08CAB`. Der Strich wird etwas kräftiger, der Ring kleiner mit mehr Rand (wie bei Podcasts, Musik). Der Grund wird fast schwarz `#1E2127` → `#0B0D10`, ohne eigene runde Ecken, die setzt iOS. Getönt ergibt das ein helles Zeichen auf dunklem Grund wie bei den anderen Apps. Ungetönt bleibt es erkennbar Beere, nur heller.
-   Entwurf: `docs/bilder/entwuerfe/app-symbol-getoent.png`, Vorlage `docs/bilder/entwuerfe/app-symbol-vorschlag.svg`.
-   Danach: alle PNG-Größen neu erzeugen und `CLAUDE.md` (App-Symbol-Farbe) anpassen. Auf dem iPhone muss die App einmal vom Home-Bildschirm gelöscht und neu hinzugefügt werden, sonst bleibt das alte Symbol (→ `AUFGABEN.md`).
-   Dateien: `public/icons/*`, `CLAUDE.md`
+11. ◐ **App-Symbol passend zum getönten Home-Bildschirm** (23.11., freigegeben, grüne Fassung)
+   Mit getönten Symbolen rechnet iOS das Symbol einer Web-App selbst um. Eine eigene getönte Fassung kann man nicht mitgeben, darum wurde der Ring in Beere zu flauem Grau.
+   Umgesetzt auf dem Zweig: Ensō in Sage hell (`#D2F1E0` → `#8FD5B0`, Familie Erholung/Energie) auf dunklem Grüngrau, Strich etwas kräftiger, Ring kleiner mit mehr Rand, keine eigenen runden Ecken. Alle PNG-Größen neu. Sperrbildschirm: Ring und Schimmer ebenfalls grün. Der Coach-Knopf bleibt Beere. `CLAUDE.md` und Designkonzepte angepasst. Neu hinzufügen auf dem iPhone: `AUFGABEN.md`.
+   Entwurf: `docs/bilder/entwuerfe/app-symbol-getoent.png`.
+   Dateien: `public/icons/*`, `app/globals.css` (`.pin-glow`), `CLAUDE.md`, `docs/farb-und-designkonzept.md`, `docs/design-konzept-dunkel.md`
 
 12. ☐ **Weitere übliche Zyklus-Symptome im Tagebuch** (23.11.)
    Die Symptome werden schon flexibel gespeichert, deshalb ist keine Änderung an der Datenbank nötig. Vorschlag zum Auswählen, jeweils leicht · mittel · stark:

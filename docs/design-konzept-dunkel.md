@@ -29,7 +29,7 @@ Als Variablen in `app/globals.css` unter dem dunklen Thema, keine festen Werte i
 | Mobility (Violett) | `#A98BE0` |
 | Schlaf (neutral, keine eigene Bedeutungsfarbe) | `#E5E7EB` |
 
-Hauptbutton und aktive Auswahl bleiben hell auf dunkel. Beere `#A3234F` bleibt Markenfarbe (App-Symbol, Coach-Knopf).
+Hauptbutton und aktive Auswahl bleiben hell auf dunkel. Beere `#A3234F` bleibt Markenfarbe (Coach-Knopf). Das App-Symbol ist seit 23.11. Sage hell.
 
 ## Sechs Regeln für jeden Wert
 
@@ -182,4 +182,4 @@ Biologisches Alter und Alterungstempo (05), empfohlene Schlafens- und Aufstehzei
   - Nächte nach der Sauna sind auch im Verlauf der Hauttemperatur markiert.
 - **Sperrbildschirm**: nur der Zen-Ring ohne Kachel (`public/icons/enso.svg`), Gruß nach Tageszeit, Ziffernfeld wie beim iPhone mit Buchstaben, Face ID im Ziffernfeld. Nie ein Gesundheitswert.
 - **Icons** statt Kürzeln für Sportarten. Coach-Symbol: Sprechblase mit Pulslinie.
-- **App-Symbol Zen-Ring** (Ensō, mit dem Pinsel gezeichnet, trockene Pinselspuren, ausfaserndes Ende): dunkle Variante freigegeben, Beere auf Anthrazit, für hell und dunkel gleich.
+- **App-Symbol Zen-Ring** (Ensō, mit dem Pinsel gezeichnet, trockene Pinselspuren, ausfaserndes Ende): dunkle Variante freigegeben, seit 23.11. Sage hell auf dunklem Grüngrau (passt zu getönten Symbolen in iOS), für hell und dunkel gleich.

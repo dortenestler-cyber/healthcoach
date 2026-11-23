@@ -34,7 +34,7 @@ Zwei Claude-Instanzen arbeiten parallel, Regeln in `docs/konzept-zwei-instanzen.
 - Sportfarben bleiben in der Familie Slate-Blau, Ausdauer sehr hell. Türkis gehört nur zu Stress.
 - Konzept „dunkel 2“ mit Vorlagen: `docs/design-konzept-dunkel.md`, `docs/bilder/vorlagen/`. Vor jedem Umbau eines Bildschirms den Prompt in `docs/prompt-designkonzept.md` befolgen.
 - Hauptbutton, aktive Auswahl und Links: hell auf dunkel (`#F2F4F7`).
-- Beere `#A3234F` ist Markenfarbe: App-Symbol, Coach-Knopf und das Ende des Rand-Verlaufs der Erklärkarte (`#E0527F`).
+- Beere `#A3234F` ist Markenfarbe: Coach-Knopf und das Ende des Rand-Verlaufs der Erklärkarte (`#E0527F`).
 - Jedes Diagramm bekommt eine Überschrift mit einem Satz, der das Ergebnis nennt.
 - Farben und Abstände kommen aus den Variablen in `app/globals.css`, keine festen Farbwerte in Komponenten.
 - Tap-Ziele mindestens 44 px, Kontrast mindestens AA.
@@ -43,7 +43,7 @@ Zwei Claude-Instanzen arbeiten parallel, Regeln in `docs/konzept-zwei-instanzen.
 - Die Seite Zyklus stellt den Zyklus in den Mittelpunkt: Ring mit Phasen, was in der heutigen Phase üblich ist, Werte und Symptome nach Zyklustag, Gewohnheiten je Phase.
 - Gesundheit hat die Reiter Überblick · Medikamente · Krank & verletzt · Körper. Der Überblick zeigt heute auf einen Blick, was dir guttut, Gewohnheiten im Monat und die Muster ohne Zyklusbezug („Weitere Muster“).
 - Gewohnheiten (früher „Einflüsse“) werden im Tagebuch per Tipp erfasst, Details nur wo nötig (Sauna: Gänge, Wann, Kältebecken). Liste und eigene Gewohnheiten unter Einstellungen › Gewohnheiten. Jede Gewohnheit hat eine Detailseite unter Gesundheit.
-- App-Symbol: Zen-Ring (Ensō), mit dem Pinsel gezeichnet, Beere `#E0527F` auf Anthrazit (`public/icons/icon.svg`, `public/icons/icon-dark.svg`, PNG-Größen daneben).
+- App-Symbol: Zen-Ring (Ensō), mit dem Pinsel gezeichnet, Sage hell (`#D2F1E0` → `#8FD5B0`) auf dunklem Grüngrau, hell genug für getönte Symbole in iOS (`public/icons/icon.svg`, `public/icons/icon-dark.svg`, PNG-Größen daneben).
 
 ## Gesundheit und Sicherheit
 - Keine Diagnosen, keine Dosierungsvorschläge. Mengen von Medikamenten trägt die Nutzerin selbst ein.

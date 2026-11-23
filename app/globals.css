@@ -2446,7 +2446,7 @@ body { overflow-x: clip; }
   z-index: -1;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--brand) 22%, var(--bg)) 0%, var(--bg) 70%);
+  background: radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--energy) 12%, var(--bg)) 0%, var(--bg) 70%);
 }
 .pin-icon { display: block; }
 .pin-brand { margin-top: 20px; }
