@@ -8,8 +8,8 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 ## Jetzt
 
 ### Eigene Sportart und Eisprung-Zeichen (PR #106)
-- [ ] PR #106 ansehen und mergen. Er enthält die Migration `supabase/migrations/20261127100000_sportart_eisprung.sql`: die schon am 23.11. freigegebenen Spalten für die eigene Sportart (`garmin_activities.sport_override`, `sport_label`) und die Eisprung-Zeichen (`diary_entries.ovulation_signs`). Sie fehlten bisher, deshalb kam auf der Einheit-Seite eine Fehlermeldung und die Frage auf Heute sowie die Eisprung-Zeile im Tagebuch blieben ausgeblendet
-- [ ] Claude Bescheid geben, dann prüft Claude den Lauf
+- [x] PR #106 gemergt (23. Nov.), Migration grün (geprüft von Claude). Er enthält die Migration `supabase/migrations/20261127100000_sportart_eisprung.sql`: die schon am 23.11. freigegebenen Spalten für die eigene Sportart (`garmin_activities.sport_override`, `sport_label`) und die Eisprung-Zeichen (`diary_entries.ovulation_signs`). Sie fehlten bisher, deshalb kam auf der Einheit-Seite eine Fehlermeldung und die Frage auf Heute sowie die Eisprung-Zeile im Tagebuch blieben ausgeblendet
+- [x] Claude Bescheid gegeben, Lauf grün
 - [ ] Die Einheit vom 16. November öffnen und Karate wählen
 
 ### Training-Insights (PR #101)
