@@ -85,7 +85,10 @@ export default function LineBand({ values, fmt, label, tone = "recovery", band, 
   const d0 = ticks[0] ?? 0;
   const d1 = ticks[ticks.length - 1] ?? 1;
   const x0 = PAD_L;
-  const x1 = w - PAD_R;
+  // Platz rechts nach der Länge der letzten Zahl, damit z. B. „−0,2 °C“ nicht abgeschnitten wird
+  const lastIdx = [...values.keys()].reverse().find((i) => values[i] !== null && (futureFrom === undefined || i < futureFrom));
+  const padR = Math.max(PAD_R, lastIdx === undefined ? 0 : fmt(values[lastIdx] as number).length * 7.6 + 14);
+  const x1 = w - padR;
   const step = (x1 - x0) / n;
   const x = (i: number) => x0 + (i + 0.5) * step;
   const y = linear(d0, d1, height - PAD_B, PAD_T);

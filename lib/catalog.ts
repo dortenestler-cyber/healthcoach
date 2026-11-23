@@ -26,18 +26,19 @@ export const SYMPTOMS: { key: string; label: string }[] = [
 ];
 
 // Leichte Anzeichen, ohne gleich krank zu sein (Sammelliste Punkt 19). Gespeichert wie Symptome, eigene Schlüssel.
-export const SIGNS: { key: string; label: string }[] = [
-  { key: "hals_rau", label: "Rauer Hals" },
-  { key: "halsweh", label: "Halsschmerzen" },
-  { key: "nase_zu", label: "Verstopfte Nase" },
-  { key: "schnupfen", label: "Schnupfen" },
-  { key: "niesen", label: "Niesen" },
-  { key: "husten", label: "Husten" },
-  { key: "froesteln", label: "Frösteln" },
-  { key: "glieder", label: "Gliederschmerzen" },
-  { key: "abgeschlagen", label: "Abgeschlagen" },
-  { key: "nebenhoehlen", label: "Druck im Kopf, Nebenhöhlen" },
-  { key: "lippen", label: "Lippenbläschen" },
+// phrase: Form mitten im Satz, z. B. „Rauer Hals und verstopfte Nase“
+export const SIGNS: { key: string; label: string; phrase: string }[] = [
+  { key: "hals_rau", label: "Rauer Hals", phrase: "rauer Hals" },
+  { key: "halsweh", label: "Halsschmerzen", phrase: "Halsschmerzen" },
+  { key: "nase_zu", label: "Verstopfte Nase", phrase: "verstopfte Nase" },
+  { key: "schnupfen", label: "Schnupfen", phrase: "Schnupfen" },
+  { key: "niesen", label: "Niesen", phrase: "Niesen" },
+  { key: "husten", label: "Husten", phrase: "Husten" },
+  { key: "froesteln", label: "Frösteln", phrase: "Frösteln" },
+  { key: "glieder", label: "Gliederschmerzen", phrase: "Gliederschmerzen" },
+  { key: "abgeschlagen", label: "Abgeschlagen", phrase: "Abgeschlagenheit" },
+  { key: "nebenhoehlen", label: "Druck im Kopf, Nebenhöhlen", phrase: "Druck in den Nebenhöhlen" },
+  { key: "lippen", label: "Lippenbläschen", phrase: "Lippenbläschen" },
 ];
 export const SIGN_KEYS = new Set(SIGNS.map((s) => s.key));
 

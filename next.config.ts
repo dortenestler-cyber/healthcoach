@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 // Kennung des Builds: die App vergleicht sie mit /version und meldet eine neue Version (Konzept Datenaktualisierung A7)
-const build = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 12) || String(Date.now());
+const build = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 12) || "lokal"; // lokal: keine Meldung
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,

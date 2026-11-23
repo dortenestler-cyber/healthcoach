@@ -16,7 +16,7 @@ const addDays = (iso: string, n: number) => {
 // Anzeichen eines Tages mit Stärke (1–3)
 export function signsOf(e: Diary | undefined): { key: string; label: string; level: number }[] {
   if (!e?.symptoms) return [];
-  return SIGNS.filter((s) => (e.symptoms[s.key] ?? 0) > 0).map((s) => ({ key: s.key, label: s.label, level: e.symptoms[s.key] }));
+  return SIGNS.filter((s) => (e.symptoms[s.key] ?? 0) > 0).map((s) => ({ key: s.key, label: s.phrase, level: e.symptoms[s.key] }));
 }
 const sum = (e: Diary | undefined) => signsOf(e).reduce((a, s) => a + s.level, 0);
 

@@ -15,7 +15,7 @@ export default function ServiceWorker() {
     const mine = process.env.NEXT_PUBLIC_BUILD_ID;
     let last = 0;
     const check = () => {
-      if (document.visibilityState !== "visible" || Date.now() - last < 5 * 60 * 1000 || !mine) return;
+      if (document.visibilityState !== "visible" || Date.now() - last < 5 * 60 * 1000 || !mine || mine === "lokal") return;
       last = Date.now();
       fetch("/version", { cache: "no-store" })
         .then((r) => (r.ok ? r.json() : null))
