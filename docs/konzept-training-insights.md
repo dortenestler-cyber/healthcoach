@@ -19,6 +19,7 @@ Neue Detailseite `/training/einheit/…`, Kopf in Training-Blau.
 - **Kacheln**: Dauer, Puls Ø, Puls max, Belastung.
 - **Vergleich mit dir**: jede Kachel gegen den Schnitt der letzten 5 Einheiten derselben Sportart („+8 Schläge“, „länger als üblich“). Kein Vergleich mit anderen Menschen.
 - **Zeit in Pulszonen** (Stufe 2): ein Balken, mehr Zone = heller.
+- **Zeitstrahl der Einheit** (Stufe 2): Puls je 5 Minuten als Balken in Zonenfarbe, dazu eine Linie, wie sich die Belastung über die Einheit aufbaut, mit Satz zum härtesten Abschnitt. Tipp auf eine Stelle zeigt Uhrzeit, Puls und bisherige Belastung. Die Belastung je Abschnitt ist eine Schätzung aus den Pulszonen, die Garmin-Zahl am Ende bleibt maßgeblich.
 - **Danach**: HRV und Ruhepuls am nächsten Morgen, Schlafdauer der Nacht, Readiness, jeweils gegen deinen Bereich. Sage-Familie.
 - **Kontext**: Zyklustag und Phase (geschätzt), Symptome des Tages aus dem Tagebuch.
 
@@ -41,7 +42,7 @@ Texte beschreiben nur, was zusammen vorkommt, nie Ursache. Keine Diagnosen, kein
 | Schritt | Rolle | Inhalt | Datenbank |
 |---|---|---|---|
 | 1 | OF | `lib/trainingInsights.ts`, Einheit-Seite, Vergleich, „Danach“, Sportart-Seiten | keine |
-| 2 | DA | Zeit in Pulszonen je Einheit aus Garmin holen und speichern (`hr_zones`) | **Migration, Freigabe nötig** |
+| 2 | DA | Pulsverlauf je Einheit (ein Wert je 5 Minuten) und Zeit in Pulszonen aus Garmin holen und speichern (`hr_series`, `hr_zones`) | **Migration, Freigabe nötig** |
 | 3 | OF | Muster-Karten, Einstieg von Training und Gesundheit | keine |
 | 4 | OF | Einheit-Kennzahlen in den Coach-Kontext (nur Zahlen, keine Rohdaten) | keine |
 | optional | DA/OF | „Wie fühlte es sich an?“ 1–10 nach der Einheit, Tipp im Tagebuch | **Migration** |
