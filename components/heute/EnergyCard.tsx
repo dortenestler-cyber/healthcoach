@@ -4,7 +4,7 @@ import type { Data } from "@/lib/insights";
 import { energyDay, usualRhythm } from "@/lib/energie";
 
 // Energie über den Tag: Satz, aktuelle Body Battery, Diagramm. Ohne Netzwerk.
-export default function EnergyCard({ day, data, nowMinute }: { day: string; data: Data; nowMinute: number }) {
+export default function EnergyCard({ day, data, nowMinute, hideValue = false }: { day: string; data: Data; nowMinute: number; hideValue?: boolean }) {
   const e = energyDay(day, data.daily, data.acts, nowMinute);
   const hasCurves = data.daily.some((d) => Array.isArray(d.bb_curve));
   const lastIdx = [...e.today.keys()].reverse().find((i) => e.today[i] !== null);
@@ -27,7 +27,7 @@ export default function EnergyCard({ day, data, nowMinute }: { day: string; data
     <Link href="/verlauf?m=bb" className="card chart-card">
       <span className="eyebrow">Energie über den Tag · Body Battery ›</span>
       <h2>{sentence}</h2>
-      <p className="value-big">{now ?? "–"}</p>
+      {!hideValue && <p className="value-big">{now ?? "–"}</p>}
       <p className="value-range">{usualNow !== null ? `Üblich um diese Zeit: ${Math.round(usualNow)} · aus ${e.usualDays} Tagen` : "Dein üblicher Tag: Median der letzten 30 Tage"}</p>
       {hasCurves && <EnergyChart e={e} label={`Body Battery heute${now !== null ? `, jetzt ${now}` : ""}${usualNow !== null ? `, üblich ${Math.round(usualNow)}` : ""}${at22 !== null ? `, um 22 Uhr etwa ${Math.round(at22)}` : ""}`} />}
       {rhythm && (
