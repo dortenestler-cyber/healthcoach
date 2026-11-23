@@ -695,9 +695,12 @@ button {
 
 .pills.scroll {
   overflow-x: auto;
+  scrollbar-width: none;
   gap: 6px;
   padding-bottom: 2px;
 }
+
+.pills.scroll::-webkit-scrollbar { display: none; }
 
 .pills.scroll .pill {
   flex: none;
@@ -1406,8 +1409,9 @@ button {
 
 .chat-input {
   display: flex;
+  align-items: flex-end;
   gap: 8px;
-  padding-right: 72px;
+  margin-top: 12px;
 }
 
 .chat-send {
@@ -2424,7 +2428,16 @@ body { overflow-x: clip; }
   background: linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(135deg, var(--brand), var(--training)) border-box;
 }
 
-.chat-input textarea.input { resize: none; line-height: 1.4; font-family: inherit; }
+.chat-input textarea.input {
+  flex: 1;
+  min-width: 0;
+  min-height: 92px;
+  max-height: 40vh;
+  resize: none;
+  line-height: 1.4;
+  font-family: inherit;
+  font-size: 16px;
+}
 
 /* Sperrbildschirm (Konzept dunkel 2) */
 .pin { position: relative; gap: 0; padding-top: 7vh; }

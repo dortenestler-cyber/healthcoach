@@ -36,6 +36,7 @@ export default function CoachView() {
   const [prefilled, setPrefilled] = useState(false);
   const context = useRef<Promise<string> | null>(null);
   const end = useRef<HTMLDivElement>(null);
+  const field = useRef<HTMLTextAreaElement>(null);
   const prefs = useCoachPrefs();
 
   useEffect(() => {
@@ -59,6 +60,14 @@ export default function CoachView() {
       window.history.replaceState(null, "", "/coach");
     }
   }, []);
+
+  // Eingabefeld wächst mit dem Text (bis zur Obergrenze in globals.css)
+  useEffect(() => {
+    const el = field.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + 2 + "px";
+  }, [text]);
 
   useEffect(() => {
     end.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -147,7 +156,7 @@ export default function CoachView() {
       </div>
       {prefilled && text && <span className="meta">Frage vorbereitet. Sie geht erst an den Coach, wenn du auf Senden tippst.</span>}
       <form className="chat-input" onSubmit={submit}>
-        <textarea className="input" rows={prefilled ? 3 : 1} value={text} onChange={(e) => setText(e.target.value)} placeholder="Frag deinen Coach" aria-label="Frage an den Coach" maxLength={2000} />
+        <textarea ref={field} className="input" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="Frag deinen Coach" aria-label="Frage an den Coach" maxLength={2000} />
         <button type="submit" className="btn btn-primary chat-send" disabled={busy || !text.trim()}>
           Senden
         </button>
