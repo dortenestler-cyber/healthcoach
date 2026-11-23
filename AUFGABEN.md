@@ -7,6 +7,11 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Coach mit Verlauf vergangener Chats (PR #86)
+- [ ] PR #86 ansehen und mergen. Er enthält die Migration `supabase/migrations/20261126090000_coach_chats.sql` (neue Tabelle `coach_chats`). Deine bisherigen Coach-Nachrichten landen dabei im Chat „Frühere Fragen“
+- [ ] Im Coach auf **Verlauf** tippen: Die Liste zeigt deine Chats nach Tagen. Mit **Neuer Chat** beginnt ein leerer Chat, nach 6 Stunden ohne Nachricht passiert das von selbst
+- [ ] Claude Bescheid geben, dann prüft Claude, ob Migration und Upload der Funktion grün sind
+
 ### Wadenzucken und Wadenkrämpfe erfassen (PR #49)
 - [x] PR #49 gemergt (22. Nov.), Migration grün (geprüft von Claude). Er enthält die Migration `supabase/migrations/20261123110000_muskeln.sql` (neue Tabelle `muscle_events`). Dein Merge ist die Freigabe, danach legt GitHub die Tabelle automatisch an (das Secret `SUPABASE_DB_URL` ist eingerichtet)
 - [ ] Magnesium unter **Gesundheit › Medikamente** als Supplement eintragen (falls noch nicht geschehen) und täglich abhaken, damit die spätere Auswertung Tage mit und ohne Einnahme vergleichen kann
