@@ -2704,3 +2704,12 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
 .cal-ov { position: absolute; top: 2px; right: 4px; font-size: 10px; color: var(--cycle-fg); line-height: 1; }
 .cal-ov-key { color: var(--cycle-fg); margin-right: 4px; font-size: 11px; }
 .ov-label { display: block; margin: 14px 0 6px; }
+
+/* Zyklus-Ring antippen (Sammelliste Punkt 3) */
+.cyc4-hit { stroke: transparent; fill: none; cursor: pointer; pointer-events: stroke; outline: none; }
+.cyc4-hit:focus-visible { stroke: rgba(242, 244, 247, 0.12); }
+.cb circle[data-dim="true"] { opacity: 0.3; transition: opacity 0.15s; }
+.cycle-ring-pick { background: none; border: 0; color: var(--text); font: inherit; cursor: pointer; border-radius: 50%; margin: 48px; inset: 0; }
+.cycle-ring-phase { font-size: 22px; font-weight: 700; }
+.cycle-ring-range { font-size: 15px; font-weight: 600; }
+.cycle-ring-center:not(.cycle-ring-pick) { pointer-events: none; }

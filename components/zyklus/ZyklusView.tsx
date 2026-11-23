@@ -32,6 +32,11 @@ type Props = { today: string; data: Data; longDiary: Diary[]; flashes: string[];
 export default function ZyklusView({ today, data, longDiary, flashes, showFlashes, extra }: Props) {
   const [metric, setMetric] = useState<MetricKey>("hrv");
   const ct = cycleToday(today, longDiary);
+  const cycleStart = (t: string, cd: number) => {
+    const d = new Date(t + "T12:00:00");
+    d.setDate(d.getDate() - (cd - 1));
+    return d.toISOString().slice(0, 10);
+  };
   const phase = ct.phase ? PHASES[ct.phase] : null;
   const p4 = phase4Of(ct.phase);
   // Zeitraum der heutigen Phase (geschätzt)
@@ -115,7 +120,7 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
 
       <section className="card">
         <div className="ring-hero">
-          <CycleRing cycleDay={ct.cycleDay} length={ct.length} phase={p4} />
+          <CycleRing cycleDay={ct.cycleDay} length={ct.length} phase={p4} today={today} ovDay={ct.ovDay} start={ct.cycleDay !== null ? cycleStart(today, ct.cycleDay) : null} />
         </div>
         <div className="phase-icons">
           {PHASE4.map((k) => (
