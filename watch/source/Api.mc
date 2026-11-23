@@ -71,8 +71,14 @@ module Api {
         if (code == -104 || code == -2) {
             return "KEIN HANDY";
         }
-        if (code == -300 || code == -400) {
+        if (code == -300) {
             return "ZEITÜBERSCHREITUNG";
+        }
+        if (code == -400) {
+            return "ANTWORT UNLESBAR";
+        }
+        if (code == -402 || code == -403) {
+            return "ANTWORT ZU GROSS";
         }
         return "CODE " + code.toString();
     }
@@ -111,7 +117,7 @@ class Net {
                 WatchUi.pushView(new InfoView(mAfter), new InfoDelegate(), WatchUi.SLIDE_UP);
             }
         } else {
-            var lines = ["FEHLER", Api.errorText(code)];
+            var lines = ["FEHLER " + code.toString(), Api.errorText(code)];
             // Grund vom Server anzeigen, falls vorhanden
             if (data instanceof Dictionary && data["error"] != null) {
                 var msg = data["error"].toString().toUpper();
