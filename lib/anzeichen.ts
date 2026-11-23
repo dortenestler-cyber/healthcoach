@@ -22,13 +22,12 @@ const sum = (e: Diary | undefined) => signsOf(e).reduce((a, s) => a + s.level, 0
 
 export const signDays = (diary: Diary[]) => new Set(diary.filter((e) => Object.entries(e.symptoms ?? {}).some(([k, v]) => SIGN_KEYS.has(k) && v > 0)).map((e) => e.day));
 
-// Frühwarnung: Anzeichen heute oder gestern, dazu HRV unter dem Bereich, Ruhepuls oder Temperatur darüber
+// Frühwarnung: Anzeichen heute oder gestern, dazu HRV unter dem Bereich, Ruhepuls darüber
 export type SignHint = { day: string; signs: string[]; values: string[]; text: string };
 
 const WATCH: { key: MetricKey; bad: "unter" | "über"; word: string }[] = [
   { key: "hrv", bad: "unter", word: "HRV unter deinem Bereich" },
   { key: "ruhepuls", bad: "über", word: "Ruhepuls über deinem Bereich" },
-  { key: "temperatur", bad: "über", word: "Hauttemperatur über deinem Bereich" },
 ];
 
 export function signHint(data: Data, today: string): SignHint | null {

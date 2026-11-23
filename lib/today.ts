@@ -125,12 +125,11 @@ export function readinessFactors(day: string, data: Data): Row[] {
   ];
 }
 
-// Vitalwerte der letzten Nacht. Atemfrequenz und Hauttemperatur nur, wenn es Werte gibt.
+// Vitalwerte der letzten Nacht. Atemfrequenz nur, wenn es Werte gibt.
 export function vitalRows(day: string, data: Data): Row[] {
   const keys: MetricKey[] = ["hrv", "ruhepuls", "bb", "stress"];
-  if (data.daily.some((d) => typeof d.skin_temp_delta === "number")) keys.splice(2, 0, "temperatur");
   if (data.daily.some((d) => typeof d.respiration_avg === "number")) keys.splice(2, 0, "atem");
-  return keys.map((k) => metricRow(k, day, data, k === "temperatur" ? "Hauttemperatur" : undefined));
+  return keys.map((k) => metricRow(k, day, data));
 }
 
 // ---------- Belastungsziel
@@ -150,7 +149,7 @@ export type OffStreak = { key: MetricKey; label: string; days: number; side: "ü
 const STREAK_MIN = 3;
 
 // Je Wert: seit wie vielen Tagen mit Wert er auf der ungünstigen Seite liegt (gemessen am Bereich, der an dem Tag galt)
-export function offStreaks(day: string, data: Data, keys: MetricKey[] = ["hrv", "ruhepuls", "schlaf", "temperatur", "atem", "stress"]): OffStreak[] {
+export function offStreaks(day: string, data: Data, keys: MetricKey[] = ["hrv", "ruhepuls", "schlaf", "atem", "stress"]): OffStreak[] {
   const ctx = { diary: data.diary, sick: data.sick };
   const days = Array.from({ length: 14 }, (_, i) => addDays(day, i - 13));
   const out: OffStreak[] = [];
@@ -159,7 +158,7 @@ export function offStreaks(day: string, data: Data, keys: MetricKey[] = ["hrv", 
     if (!data.daily.some((d) => d.day === day && m.value(d) !== null)) continue; // nur mit Wert von heute
     const bands = metricRangeSeries(key, data.daily, ctx, days);
     const n = badStreak(seriesOf(key, data.daily), new Map(days.map((d, i) => [d, bands[i]])), day, m.higherIsBetter);
-    if (n >= STREAK_MIN) out.push({ key, label: key === "temperatur" ? "Hauttemperatur" : m.label, days: n, side: m.higherIsBetter ? "unter" : "über" });
+    if (n >= STREAK_MIN) out.push({ key, label: m.label, days: n, side: m.higherIsBetter ? "unter" : "über" });
   }
   return out.sort((a, b) => b.days - a.days);
 }

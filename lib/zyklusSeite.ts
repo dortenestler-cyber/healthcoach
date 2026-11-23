@@ -16,7 +16,7 @@ const between = (a: string, b: string) => Math.round((new Date(b + "T12:00:00").
 const mean = (v: number[]) => (v.length ? v.reduce((a, b) => a + b, 0) / v.length : null);
 
 export const MIN_DAYS = 5; // so viele Tage braucht ein Vergleich je Gruppe
-export const CYCLE_METRICS: MetricKey[] = ["hrv", "ruhepuls", "temperatur", "schlaf", "bb"];
+export const CYCLE_METRICS: MetricKey[] = ["hrv", "ruhepuls", "schlaf", "bb"];
 
 // ---------- Ring
 
@@ -42,7 +42,7 @@ export type PhaseRow = { key: MetricKey; label: string; phase: number | null; al
 export function phaseProfile(day: string, data: Data, phase: Phase): PhaseRow[] {
   const recent = data.daily.filter((r) => r.day < day && r.day >= addDays(day, -180));
   const inPhase = recent.filter((r) => cycleToday(r.day, data.diary).phase === phase);
-  return (["hrv", "ruhepuls", "temperatur", "schlaf"] as MetricKey[]).map((k) => {
+  return (["hrv", "ruhepuls", "schlaf"] as MetricKey[]).map((k) => {
     const m = METRICS[k];
     const p = inPhase.map(m.value).filter((v): v is number => v !== null);
     const a = recent.map(m.value).filter((v): v is number => v !== null);

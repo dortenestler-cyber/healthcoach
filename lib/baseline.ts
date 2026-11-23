@@ -1,6 +1,6 @@
 // Persönlicher Bereich (Korridor) für jeden Wert: die letzten 30 Tage ohne heute, mittlere Hälfte der Werte.
 // Ab 7 Tagen gibt es einen vorläufigen Bereich, ab 14 Tagen gilt er als stabil. Nur stabile Bereiche zählen für die Readiness.
-// Für zyklusabhängige Werte (HRV, Ruhepuls, Temperatur, Atemfrequenz, Schlaf) gilt je Zyklusphase ein eigener Bereich
+// Für zyklusabhängige Werte (HRV, Ruhepuls, Atemfrequenz, Schlaf) gilt je Zyklusphase ein eigener Bereich
 // aus denselben Phasen der letzten etwa fünf Zyklen. Fehlt die Phase oder gibt es zu wenige Tage, gilt der 30-Tage-Bereich.
 // Krankheitstage und die 3 Tage danach zählen nicht mit, damit eine Erkältung den Bereich nicht verschiebt.
 // Der Bereich kann für jeden Tag so berechnet werden, wie er an diesem Tag galt (wandernder Korridor).
@@ -20,7 +20,7 @@ export const SICK_AFTER = 3; // Tage nach einer Krankheit, die noch nicht mitzä
 export const NO_RANGE_TEXT = `Bereich ab ${MIN_PROVISIONAL} Tagen`;
 
 // Für diese Werte verschiebt die Zyklusphase das Übliche
-export const CYCLE_SENSITIVE: MetricKey[] = ["hrv", "ruhepuls", "temperatur", "atem", "schlaf", "tiefschlaf", "rem"];
+export const CYCLE_SENSITIVE: MetricKey[] = ["hrv", "ruhepuls", "atem", "schlaf", "tiefschlaf", "rem"];
 
 export type Point = { day: string; value: number | null };
 
