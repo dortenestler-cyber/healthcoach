@@ -7,6 +7,7 @@ Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/desig
 Sammelliste Runde 2 (Punkte 14–21) umgesetzt in PR #83, inklusive Teil A der Datenaktualisierung.
 
 ## In Arbeit
+- Entwurfs-PR `[OF]` Temperatur entfernen + Wachphasen/Sauerstoff anzeigen (Zweig `claude/bold-thompson-n6ty19`). Schritte: 1 Temperatur aus lib/, 2 aus Komponenten, 3 vierte Kachel Heute (Vorschlag an Nutzerin), 4 Schlaf-Seite Wachphasen und SpO2, 5 Stresskurve-Hinweis, 6 Konzepte anpassen.
 - Keine offene Arbeit. PR #83 (Zweig `claude/tender-archimedes-h1rwvr`): Sammelliste Runde 2.
   Neu: `components/charts/useChartWidth.ts` (Charts zeichnen in echter Breite, `grownHeight`), `monotoneCurve`/`smoothBand` in `scale.ts`, `usePick(..., w, shared)` für gemeinsamen Tag, `components/verlauf/VerlaufGroup.tsx` (Gruppen, `?m=` öffnet weiter die Detailansicht), `components/ui/DayPick.tsx`, `components/ui/EditSheet.tsx` (natives `<dialog>`), `lib/anzeichen.ts` und `SIGNS`/`ALL_SYMPTOMS` in `lib/catalog.ts`, `components/heute/SignHintCard.tsx`, `lib/refresh.ts` (`useRefresh`, `useToday`, `announceNewData`), `app/version/route.ts` und `NEXT_PUBLIC_BUILD_ID` in `next.config.ts`.
   `useGarminSync(data, enabled)` ruft kein `onSynced` mehr auf, sondern `announceNewData()`; Seiten laden über `useRefresh` neu.
