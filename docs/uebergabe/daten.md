@@ -4,24 +4,22 @@ Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014p
 Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`, `.github/`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
 ## Stand in einem Satz
-PR #70 gemergt: Alltagslast Version 2 läuft (21 von 57 Tagen neu, Rest folgt), Readiness der Uhr wie in der App. Stressverlauf liefert Garmin nicht (beide Pfade 404).
+Korridore Teil B Daten ist fertig und läuft (PR #63–#73): Alltagslast aus dem Tagespuls, Readiness der Uhr wie in der App, Morgen-Abruf 6:15 Uhr bestätigt. Keine offenen PRs.
 
 ## In Arbeit
-- PR #63 (gemergt): Migration `20261124090000_alltagslast.sql`, `garmin-sync` mit Tagespuls, Zonen, Training/Alltag, Umrechnungsfaktor, Nachberechnung 90 Tage (bis zu 21 Tage je Abruf). Rechenteil in `supabase/functions/garmin-sync/alltag.ts`, Aufbau für die App in `lib/alltagslast.ts`.
-  Ergebnis erster Abruf („Daten prüfen“, 22.11. 19:55): 21 von 70 Tagen berechnet, alle aus Puls, Faktor 0,62 aus 6 Trainings, Maximalpuls aus Aktivitäten. Aber `bewegung` überall „keine“ (Schrittverlauf und Stress liefern nichts), `active_s`/`active_kcal` leer, `garmin_activities.steps` leer.
-- PR #68 (gemergt): Fehlersuche in `load_daily_min.diag` (nur Feldnamen und Fehlermeldungen). Ergebnis 22.11. 20:00: `dailySummaryChart?date=` und `dailyStress/{Tag}` → 404. Tageszusammenfassung hat `calories.burnedActive`, aber keine aktive Zeit (`active_s`, `highly_active_s` bleiben leer). Aktivitäten im Abrufzeitraum hatten keine Liste, Feldname für Schritte je Aktivität noch offen (vielleicht nur Klettern/Kraft ohne Schritte).
-- PR #69 (gemergt): aktive kcal aus `calories.burnedActive` (kommt an). `/userprofile-service/socialProfile` → 404, also kein Profilname, kein Schrittverlauf. Bewegung im Alltag nur über den Puls erkennbar.
-- PR #70: Rechenweise Version 2 (`LOAD_VERSION` in `alltag.ts`): ohne Stressverlauf zählt Zone 1 ab 10 Minuten am Stück (`bewegung: "dauer"`), mit Stressverlauf nur Minuten mit Stresswert −2 (`"stress"`). Ältere Tage (v1) rechnet jeder Abruf nach (bis 21). Stress über `STRESS_PATHS` (zuerst `?date=`), gemeinsamer Zwischenspeicher für Stresskurve und Alltag. Schrittverlauf, Profil und Feldnamen-Suche entfernt; `diag` enthält nur noch `puls_pfad`, `stress_pfad`, `stress`.
-  Uhr: `watch/target.ts` rechnet Bereiche wie `lib/baseline.ts` (30 Tage ab 7/stabil 14, je Phase 150 Tage ab 10, kranke Tage + 3 raus, Schlaf zyklusabhängig). Krankheiten werden dafür 180 Tage geladen.
-  Ergebnis 22.11. 20:15: `version_2` 21, `dailyStress?date=` und `dailyStress/{Tag}` beide 404, `stress_pfad` null. Bewegung im Alltag also immer nach der 10-Minuten-Regel.
-  23.11. 6:39: Morgen-Abruf 6:15 ok, `version_2` 40 von 58. Heute galt am Morgen als `quelle: "schritte"` (374 Minuten Puls < 8 h): PR #73 misst heute an 60 % der Zeit seit Mitternacht und entfernt `diag`. Stressabruf bleibt drin (zwei Abrufe je Lauf, danach gesperrt), falls Garmin ihn freischaltet.
-  Offen, kein Eilfall: `bb_curve` nur an 3 Tagen, also kommt „Energie über den Tag“ nur teilweise. Prüfen, ob der Body-Battery-Pfad nur für kurze Zeiträume antwortet.
-- Stresskurve (`AUFGABEN.md` Abschnitt 11): Garmin Personal API liefert keinen Stressverlauf (`dailyStress/{Tag}` und `dailyStress?date=` 404). Nur die Tageswerte (Durchschnitt, Aufteilung) kommen.
+- Nichts. Nächste mögliche Aufgaben, kein Eilfall:
+  - „Energie über den Tag“: `bb_curve` nur an wenigen Tagen. Prüfen, ob der Body-Battery-Pfad nur für kurze Zeiträume antwortet (mit „Daten prüfen“ zählen, Spalte `energiekurve`).
+  - Uhr: Belastungsring mit Alltag (Konzept Teil B, „später“), sinnvoll nach Teil B Anzeige der Oberfläche.
+
+## Was Garmin liefert (Personal API, geprüft 22./23.11.)
+- Tagespuls: `/wellness-service/wellness/dailyHeartRate?date=` ✓
+- Schrittverlauf (`dailySummaryChart`), Stressverlauf (`dailyStress/{Tag}`, `dailyStress?date=`), Profil (`socialProfile`): alle 404. `garmin-sync` versucht Stress je Lauf noch einmal (zwei Abrufe), falls Garmin ihn freischaltet.
+- Tageszusammenfassung: `calories.burnedActive` ✓, keine aktive Zeit (`active_s`, `highly_active_s` bleiben leer).
+- Schritte je Aktivität: bisher keine (`garmin_activities.steps` leer), Feldname ungeklärt.
+- Alltagslast Version 2: ohne Bewegungsdaten zählt Zone 1 ab 10 Minuten am Stück, Zone 2 und höher immer (`bewegung: "dauer"`). Ältere Tage (v1) rechnet jeder Abruf nach.
 
 ## Wartet auf
-- Nutzerin: Rückmeldung, ob die Readiness auf der Uhr zur App passt (`AUFGABEN.md` Abschnitt 14)
 - Nutzerin: Secrets für Push und Eintrag `push_cron_secret` im Tresor (`AUFGABEN.md` Abschnitt 3 und 4)
-- Nutzerin: Merge von PR #73 (Korrektur heutiger Tag, `diag` raus)
 - Nutzerin: Rückmeldung, ob Atemfrequenz und Stress im Tagesverlauf ankommen (`AUFGABEN.md` Abschnitt 11)
 
 ## Für die andere Rolle
@@ -42,6 +40,8 @@ PR #70 gemergt: Alltagslast Version 2 läuft (21 von 57 Tagen neu, Rest folgt), 
 - Die Pfade für Tagespuls und Schrittverlauf der Garmin Personal API sind nicht dokumentiert, es werden Pfade aus Garmin Connect versucht. Ohne Schrittverlauf erkennt `garmin-sync` Bewegung am Stresswert −2, ohne beides zählt der Alltag erst ab Zone 2.
 
 ## Erledigt seit letzter Übergabe
+- PR #73 gemergt: heutiger Tag am Morgen richtig, `diag` raus, Upload grün
+- Readiness der Uhr passt zur App (Nutzerin, 23.11.)
 - Morgen-Abruf 6:15 Uhr läuft (23.11. bestätigt)
 - PR #70 gemergt: Alltag Version 2, Readiness der Uhr wie in der App
 - PR #66 gemergt: Ablauf „Daten prüfen“ (nur lesend)
