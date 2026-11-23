@@ -4,12 +4,13 @@
 // Zyklusphasen als schmale Leiste unter der Zeitachse (Sammelliste Punkt 8), Periodenbeginn als feine Linie mit Tropfen.
 // Antippen oder Überfahren zeigt Datum und Wert (Punkt 9).
 // Das Band ist entweder fest (Bereich heute) oder wandert mit (bands: Bereich, wie er an jedem Tag galt).
-// Festes Seitenverhältnis, 2–3 beschriftete Hilfslinien (Zahl links über der Linie), letzter Wert als Zahl am Punkt.
+// Zeichnet in echter Breite (Punkt 15), 2–3 beschriftete Hilfslinien (Zahl links über der Linie), letzter Wert als Zahl am Punkt.
 
 import type { Range } from "@/lib/baseline";
 import { PHASE_GROUP_LABEL, type PhaseGroup } from "@/lib/cycle";
-import { W, extent, linear, niceTicks, segments, type Tone } from "@/components/charts/scale";
-import { ChartTip, tipDate, usePick } from "@/components/charts/pick";
+import { extent, grownHeight, linear, niceTicks, segments, smoothBand, type Tone } from "@/components/charts/scale";
+import { useChartWidth } from "@/components/charts/useChartWidth";
+import { ChartTip, tipDate, usePick, type SharedPick } from "@/components/charts/pick";
 
 type Props = {
   values: (number | null)[]; // ein Wert pro Tag, ältester zuerst
@@ -28,6 +29,7 @@ type Props = {
   xLabels?: { index: number; text: string }[];
   markers?: boolean[]; // Markierung oben am Tag, z. B. Nachtschweiß (Legende steht in der Karte)
   height?: number;
+  shared?: SharedPick; // gemeinsamer Tag mehrerer Charts
 };
 
 const PAD_L = 4;
@@ -64,14 +66,15 @@ function bandRuns(bands: (Range | null)[]): { i: number; r: Range }[][] {
   return runs;
 }
 
-// Fläche als Treppe: jeder Tag bekommt seine volle Breite
+// Fläche als weiche Kurve durch die Tagesmitten (Sammelliste Punkt 17), an den Enden volle Tagesbreite
 function bandPath(run: { i: number; r: Range }[], x0: number, step: number, y: (v: number) => number): string {
-  const top = run.flatMap(({ i, r }) => [`${x0 + i * step},${y(r.hi)}`, `${x0 + (i + 1) * step},${y(r.hi)}`]);
-  const bottom = [...run].reverse().flatMap(({ i, r }) => [`${x0 + (i + 1) * step},${y(r.lo)}`, `${x0 + i * step},${y(r.lo)}`]);
-  return `M${[...top, ...bottom].join("L")}Z`;
+  const xs = run.map(({ i }) => x0 + (i + 0.5) * step);
+  return smoothBand(xs, run.map(({ r }) => y(r.hi)), run.map(({ r }) => y(r.lo)), step / 2);
 }
 
-export default function LineBand({ values, fmt, label, tone = "recovery", band, phaseBand, bands, phases, dates, tipNote, futureFrom, todayIndex, zeroLine, xLabels = [], markers, height = 170 }: Props) {
+export default function LineBand({ values, fmt, label, tone = "recovery", band, phaseBand, bands, phases, dates, tipNote, futureFrom, todayIndex, zeroLine, xLabels = [], markers, height: baseHeight = 170, shared }: Props) {
+  const { ref, w } = useChartWidth();
+  const height = grownHeight(baseHeight, w);
   const n = Math.max(values.length, 1);
   const moving = bands?.some(Boolean) ? bands : undefined;
   const fixed = moving ? null : band;
@@ -82,7 +85,10 @@ export default function LineBand({ values, fmt, label, tone = "recovery", band, 
   const d0 = ticks[0] ?? 0;
   const d1 = ticks[ticks.length - 1] ?? 1;
   const x0 = PAD_L;
-  const x1 = W - PAD_R;
+  // Platz rechts nach der Länge der letzten Zahl, damit z. B. „−0,2 °C“ nicht abgeschnitten wird
+  const lastIdx = [...values.keys()].reverse().find((i) => values[i] !== null && (futureFrom === undefined || i < futureFrom));
+  const padR = Math.max(PAD_R, lastIdx === undefined ? 0 : fmt(values[lastIdx] as number).length * 7.6 + 14);
+  const x1 = w - padR;
   const step = (x1 - x0) / n;
   const x = (i: number) => x0 + (i + 0.5) * step;
   const y = linear(d0, d1, height - PAD_B, PAD_T);
@@ -92,7 +98,7 @@ export default function LineBand({ values, fmt, label, tone = "recovery", band, 
   const lastV = last !== undefined ? (values[last] as number) : null;
   const hasStrip = !!phases?.some(Boolean);
   const total = height + (hasStrip ? STRIP : 0);
-  const pick = usePick(n, x0, step);
+  const pick = usePick(n, x0, step, w, shared);
   const sel = pick.sel;
 
   // Zweite Zeile im Schild: Lage zum Bereich und Phase
@@ -109,7 +115,7 @@ export default function LineBand({ values, fmt, label, tone = "recovery", band, 
   };
 
   return (
-    <svg className={`cb cb-${tone} cb-pickable`} viewBox={`0 0 ${W} ${total}`} role="img" aria-label={label} {...pick.handlers}>
+    <svg ref={ref} className={`cb cb-${tone} cb-pickable`} viewBox={`0 0 ${w} ${total}`} role="img" aria-label={label} {...pick.handlers}>
       {fixed && <rect x={x0} width={x1 - x0} y={y(fixed.hi)} height={Math.max(1, y(fixed.lo) - y(fixed.hi))} className="cb-band" />}
       {fixedPhase && <rect x={x0} width={x1 - x0} y={y(fixedPhase.hi)} height={Math.max(1, y(fixedPhase.lo) - y(fixedPhase.hi))} className="cb-band-luteal" />}
       {moving && bandRuns(moving).map((run, i) => (
@@ -172,6 +178,7 @@ export default function LineBand({ values, fmt, label, tone = "recovery", band, 
           <line x1={x(sel)} x2={x(sel)} y1={PAD_T - 6} y2={height - PAD_B} className="cb-pick-line" />
           {values[sel] !== null && <circle cx={x(sel)} cy={y(values[sel] as number)} r={5} className="cb-pick-dot" />}
           <ChartTip
+            w={w}
             x={x(sel)}
             lines={[`${dates?.[sel] ? tipDate(dates[sel]) + " · " : ""}${values[sel] === null ? "kein Wert" : fmt(values[sel] as number)}`, note(sel)].filter(Boolean) as string[]}
           />

@@ -1,7 +1,10 @@
+"use client";
+
 // Wärmeraster: Zeilen (z. B. Symptome) × Spalten (z. B. Zyklustage), Zelle = Häufigkeit 0–1.
 // Fünf Stufen in Amber, Legende „selten“ bis „häufig“ steht immer dabei. Leere Zellen: keine Daten.
 
-import { W, type Tone } from "@/components/charts/scale";
+import { type Tone } from "@/components/charts/scale";
+import { useChartWidth } from "@/components/charts/useChartWidth";
 
 export type HeatRow = { label: string; values: (number | null)[] };
 
@@ -22,12 +25,13 @@ export const heatLevel = (v: number | null) => (v === null ? -1 : v <= 0 ? 0 : v
 
 export default function Heatmap({ rows, columns, label, every = 7, tone = "warn" }: Props) {
   const cols = Math.max(columns.length, 1);
+  const { ref, w: W } = useChartWidth();
   const cw = (W - LABEL_W) / cols;
   const h = rows.length * ROW_H + AXIS_H;
 
   return (
     <figure className={`cb-figure cb-${tone}`}>
-      <svg className="cb" viewBox={`0 0 ${W} ${h}`} role="img" aria-label={label}>
+      <svg ref={ref} className="cb" viewBox={`0 0 ${W} ${h}`} role="img" aria-label={label}>
         {rows.map((r, ri) => (
           <g key={r.label}>
             <text x={0} y={ri * ROW_H + ROW_H / 2 + 4} className="cb-tick cb-tick-strong">

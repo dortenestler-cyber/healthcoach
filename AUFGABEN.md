@@ -74,6 +74,11 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 - [ ] PR #77 ist nicht auf Vercel angekommen: In Vercel › healthcoach › „…“ › **Create Deployment** mit Branch `main` starten (bei „Resource is limited“ die genannte Zeit abwarten)
 - [ ] Nach dem nächsten Merge prüfen: Unter Deployments erscheint ein neuer „Production“-Eintrag. Arbeitszweige von Claude erscheinen als „Canceled“/„Ignored“, das ist so gewollt
 
+### Sammelliste Runde 2 (Punkte 14–21, PR #83)
+- [x] Punkte 14–21 freigegeben, Fragen beantwortet (23.11.)
+- [ ] Nach dem Merge ansehen: Verlauf (vier Gruppen, am Computer normale Schriftgröße), Gesundheit › Krank & verletzt (nachtragen, Einträge antippen zum Ändern), Tagebuch › Anzeichen, Heute (Hinweis bei Anzeichen)
+- [ ] Teil B der Datenaktualisierung (Abruf alle 2 Stunden vom Server) baut die Daten-Instanz. Der PR enthält eine Migration, die mergst du selbst
+
 ### Sammelliste Anpassungen (PR #77)
 - [ ] Nach dem Merge: Health Coach vom Home-Bildschirm entfernen und in Safari neu „Zum Home-Bildschirm“ hinzufügen, damit das neue grüne App-Symbol erscheint
 - [x] Freigabe der Datenbank-Änderungen für Punkt 6 (eigene Sportart für Garmin-Aktivitäten) und Punkt 10 (Eisprung-Zeichen im Tagebuch), am 23.11. erteilt. Die Daten-Instanz legt die Spalten an; bis dahin sind die Frage zu Garmin-Aktivitäten und die Eisprung-Zeichen ausgeblendet

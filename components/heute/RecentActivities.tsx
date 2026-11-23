@@ -35,7 +35,7 @@ export default function RecentActivities({ day, data }: { day: string; data: Dat
           const sport = sportOf(a);
           const parts = [when((a.start_local as string).slice(0, 10), day)];
           if (a.duration_s) parts.push(hm(a.duration_s / 3600));
-          if (a.training_load) parts.push(`Last ${Math.round(a.training_load)}`);
+          if (a.training_load) parts.push(`Belastung ${Math.round(a.training_load)}`);
           return (
             <Link key={a.activity_id} href="/training" className="today-act">
               <span className="today-act-icon is-training" aria-hidden="true">

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRefresh } from "@/lib/refresh";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { HalfGauge, ValueRing } from "@/components/charts";
@@ -39,6 +40,7 @@ export default function HeuteDetail({ k, day: dayParam }: { k: DetailKey; day?: 
       setError("Daten konnten nicht geladen werden: " + (e instanceof Error ? e.message : String(e)));
     }
   }, []);
+  useRefresh(load);
   useEffect(() => {
     load();
   }, [load]);

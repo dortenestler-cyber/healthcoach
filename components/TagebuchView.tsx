@@ -5,7 +5,7 @@ import TwoCol from "@/components/ui/TwoCol";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, longDate, shortDate } from "@/lib/dates";
-import { BLEEDING, GRID_ROWS, LEVELS, splitFrequent, SYMPTOMS } from "@/lib/catalog";
+import { BLEEDING, GRID_ROWS, LEVELS, SIGNS, splitFrequent, SYMPTOMS } from "@/lib/catalog";
 import { OVULATION_SIGNS } from "@/lib/ovulation";
 import { DEFAULT_HABITS, loadHabits, SAUNA_GAENGE, SAUNA_WANN, WANN_LABEL, type Habit, type HabitDetails, type SaunaDetails } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
@@ -46,6 +46,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState("");
   const [moreSym, setMoreSym] = useState(false);
+  const [moreSign, setMoreSign] = useState(false);
   const [ovSigns, setOvSigns] = useState<string[]>([]);
   const [ovReady, setOvReady] = useState(false); // Spalte ovulation_signs vorhanden
   const [moreHab, setMoreHab] = useState(false);
@@ -149,6 +150,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
   // Oben die genutzten, Rest unter „Weitere anzeigen“ (Sammelliste 5e)
   const usedSym = new Set<string>([...Object.keys(symptoms).filter((k) => symptoms[k] > 0), ...history.flatMap((e) => Object.keys(e.symptoms ?? {}).filter((k) => (e.symptoms[k] ?? 0) > 0))]);
   const symSplit = splitFrequent(SYMPTOMS, usedSym);
+  const signSplit = splitFrequent(SIGNS, usedSym);
   const usedHab = new Set<string>([...influences, ...history.flatMap((e) => e.influences ?? [])]);
   const habSplit = splitFrequent(habits.filter((h) => h.on || influences.includes(h.key)), usedHab);
 
@@ -223,6 +225,34 @@ export default function TagebuchView({ initial }: { initial?: string }) {
         {symSplit.rest.length > 0 && (
           <button type="button" className="btn btn-link more-link" onClick={() => setMoreSym(!moreSym)} aria-expanded={moreSym}>
             {moreSym ? "Weniger anzeigen" : `Weitere anzeigen (${symSplit.rest.length})`}
+          </button>
+        )}
+      </section>
+
+      {/* Leichte Anzeichen, ohne gleich krank zu sein (Sammelliste Punkt 19) */}
+      <section className="card">
+        <div className="card-row">
+          <h2>Anzeichen</h2>
+          <span className="meta">Noch nicht krank, aber etwas ist da</span>
+        </div>
+        <div className="pills wrap">
+          {[...signSplit.top, ...(moreSign ? signSplit.rest : [])].map((s) => {
+            const v = symptoms[s.key] ?? 0;
+            return (
+              <button
+                key={s.key}
+                type="button"
+                className={"pill level-" + v}
+                onClick={() => { setSymptoms({ ...symptoms, [s.key]: (v + 1) % 4 }); changed(); }}
+              >
+                {s.label}{v ? " · " + LEVELS[v] : ""}
+              </button>
+            );
+          })}
+        </div>
+        {signSplit.rest.length > 0 && (
+          <button type="button" className="btn btn-link more-link" onClick={() => setMoreSign(!moreSign)} aria-expanded={moreSign}>
+            {moreSign ? "Weniger anzeigen" : `Weitere anzeigen (${signSplit.rest.length})`}
           </button>
         )}
       </section>

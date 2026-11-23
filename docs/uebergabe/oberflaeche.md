@@ -1,18 +1,24 @@
 # Übergabe · Oberfläche (OF)
-Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014pVPWewGvc4fmfts8C73m8
+Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014pVPWcVjiHLjFPhDDpN5k8
 
 Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/design-*`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
 ## Stand in einem Satz
-Sammelliste (13 Punkte) und Web-App am Computer umgesetzt (PR #77).
+Sammelliste Runde 2 (Punkte 14–21) umgesetzt in PR #83, inklusive Teil A der Datenaktualisierung.
 
 ## In Arbeit
+- Keine offene Arbeit. PR #83 (Zweig `claude/tender-archimedes-h1rwvr`): Sammelliste Runde 2.
+  Neu: `components/charts/useChartWidth.ts` (Charts zeichnen in echter Breite, `grownHeight`), `monotoneCurve`/`smoothBand` in `scale.ts`, `usePick(..., w, shared)` für gemeinsamen Tag, `components/verlauf/VerlaufGroup.tsx` (Gruppen, `?m=` öffnet weiter die Detailansicht), `components/ui/DayPick.tsx`, `components/ui/EditSheet.tsx` (natives `<dialog>`), `lib/anzeichen.ts` und `SIGNS`/`ALL_SYMPTOMS` in `lib/catalog.ts`, `components/heute/SignHintCard.tsx`, `lib/refresh.ts` (`useRefresh`, `useToday`, `announceNewData`), `app/version/route.ts` und `NEXT_PUBLIC_BUILD_ID` in `next.config.ts`.
+  `useGarminSync(data, enabled)` ruft kein `onSynced` mehr auf, sondern `announceNewData()`; Seiten laden über `useRefresh` neu.
+  Nächster Schritt: Rückmeldung der Nutzerin. Offen: Tagebuch lädt bewusst nicht automatisch neu (ungespeicherte Änderungen), Schmerzwerte früherer Tage einer Verletzung sind noch nicht änderbar, Wadenzucken nur löschbar.
 - Keine offene Arbeit. PR #77 (Zweig `claude/kind-keller-hmdy0s`): Sammelliste `docs/sammelliste-oberflaeche.md` komplett, Web-App nach `docs/konzept-web-app.md`.
   Neu: `components/SideNav.tsx`, `components/CoachPanel.tsx`, `components/ui/TwoCol.tsx`, `lib/layout.ts` (Breiten, Coach-Spalte), `components/charts/pick.tsx` (Antippen in Charts), `components/heute/ActivityQuestion.tsx`, `lib/ovulation.ts`. Eisprung ist jetzt eigene `PhaseGroup`. `sportOf(a)` statt `sportOfGarmin(a.type_key)` (eigene Zuordnung zuerst). PIN nur iPhone (`pinRequired`).
   Nächster Schritt: Rückmeldung der Nutzerin; danach evtl. zwei Spalten für Training › Kalender und Gesundheit › Überblick/Medikamente.
 - Detailseiten nach Whoop sind mit PR #78 gemergt (`FactorList`, `ReadinessCard`/`HrvCard`/`StressCard` entfernt). Stift zum Wählen von Ringen und Kacheln: noch nicht freigegeben, nur vorgeschlagen.
 
 ## Wartet auf
+- Nutzerin: Rückmeldung zu PR #83 (`AUFGABEN.md` Abschnitt „Sammelliste Runde 2“)
+- Daten: Teil B der Datenaktualisierung (siehe unten)
 - Daten: Spalten `garmin_activities.sport_override/sport_label` und `diary_entries.ovulation_signs` (siehe unten). Bis dahin blendet die Oberfläche beides aus.
 - Nutzerin: Rückmeldung zu PR #77 (`AUFGABEN.md` Abschnitt „Sammelliste Anpassungen“)
 - Nutzerin: Rückmeldung zur neuen Seite Heute (`AUFGABEN.md` Abschnitt „Heute als Einstiegsseite“)
@@ -20,6 +26,8 @@ Sammelliste (13 Punkte) und Web-App am Computer umgesetzt (PR #77).
 - Nutzerin: Rückmeldung zur Seite Zyklus (`AUFGABEN.md` Abschnitt 6)
 
 ## Für die andere Rolle
+- Daten: **Freigegeben am 23.11.** Konzept `docs/konzept-datenaktualisierung.md` Teil B: Abruf alle 2 Stunden von 8 bis 22 Uhr (Europe/Berlin, 1 Tag), alle Abrufe in `garmin_sync_runs` protokollieren (auch die aus der App), läuft schon einer, keinen zweiten starten, bei „zu vielen Anfragen“ 2 Stunden Pause. Die App prüft derzeit nur das Alter von `garmin_daily.synced_at` und merkt sich ihren letzten Versuch je Gerät; sobald B3 steht, kann sie die Sperre und laufende Abrufe aus `garmin_sync_runs` lesen.
+- Daten: Der Coach-Text in `supabase/functions/coach` nennt die 7-Tage-Summe evtl. noch „Last“; die App sagt jetzt „Belastung“. Die App schickt jetzt auch Anzeichen (z. B. `hals_rau`, `nase_zu`) als Symptome mit.
 - Daten: **Freigegeben am 23.11.** Zwei Migrationen für die Sammelliste (`docs/sammelliste-oberflaeche.md`). Die Oberfläche liest und schreibt diese Namen, bitte so anlegen:
   - `garmin_activities.sport_override text null` (Werte `karate|kettlebell|klettern|ausdauer|sonstiges|ignorieren`) und `garmin_activities.sport_label text null` (eigener Name bei „Anderes“). `garmin-sync` darf beide beim Upsert nicht überschreiben. Update-Recht für die eigene Zeile per RLS.
   - `diary_entries.ovulation_signs text[] not null default '{}'` (Werte `test|mittelschmerz|schleim|temperatur`).

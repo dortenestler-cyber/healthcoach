@@ -7,6 +7,8 @@ import { supabase } from "@/lib/supabase";
 import { clearPin } from "@/lib/pin";
 import { tabs } from "@/components/TabBar";
 import { syncState } from "@/components/heute/DayHead";
+import { syncGarmin } from "@/lib/garmin";
+import { announceNewData, REFRESH_EVENT } from "@/lib/refresh";
 
 // Seitenleiste ab 768 px (Konzept Web-App): App-Symbol, Navigation, unten Einstellungen, Garmin-Stand und Abmelden.
 // 768–1199 px nur Symbole, ab 1200 px mit Namen.
@@ -14,6 +16,8 @@ export default function SideNav() {
   const pathname = usePathname();
   const [lastSync, setLastSync] = useState(0);
   const [now, setNow] = useState(() => Date.now());
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     const sb = supabase();
@@ -30,10 +34,26 @@ export default function SideNav() {
       setNow(Date.now());
       load();
     }, 5 * 60000);
-    return () => clearInterval(t);
+    const onNew = () => {
+      setNow(Date.now());
+      load();
+    };
+    window.addEventListener(REFRESH_EVENT, onNew);
+    return () => {
+      clearInterval(t);
+      window.removeEventListener(REFRESH_EVENT, onNew);
+    };
   }, [pathname]);
 
-  const sync = syncState(lastSync, false, now);
+  const sync = syncState(lastSync, failed, now);
+  // Aktualisieren (Konzept Datenaktualisierung A8): kurzer Garmin-Abruf, danach laden alle Seiten neu
+  const refresh = async () => {
+    setBusy(true);
+    const res = await syncGarmin(1);
+    setBusy(false);
+    setFailed(!res.ok);
+    announceNewData();
+  };
   const signOut = async () => {
     clearPin();
     await supabase()?.auth.signOut();
@@ -65,11 +85,14 @@ export default function SideNav() {
         </svg>
         <span className="sidenav-label">Einstellungen</span>
       </Link>
-      <span className="sidenav-sync" title={sync.text}>
+      <button type="button" className="sidenav-sync sidenav-refresh" title={`${sync.text} · Tippen zum Aktualisieren`} onClick={refresh} disabled={busy} aria-busy={busy}>
         <span className="sidenav-dot" data-level={sync.level} aria-hidden="true" />
-        <span className="sidenav-label" aria-hidden="true">{lastSync ? `Garmin · ${new Date(lastSync).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}` : "Garmin · keine Daten"}</span>
-        <span className="sr-only">{sync.text}</span>
-      </span>
+        <span className="sidenav-label" aria-hidden="true">
+          {busy ? "Garmin · lädt …" : lastSync ? `Garmin · Stand ${new Date(lastSync).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })}` : "Garmin · keine Daten"}
+          {!busy && <span className="sidenav-refresh-word"> · Aktualisieren</span>}
+        </span>
+        <span className="sr-only">{sync.text}. Aktualisieren</span>
+      </button>
       <button type="button" className="sidenav-item sidenav-out" onClick={signOut} title="Abmelden">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10" />

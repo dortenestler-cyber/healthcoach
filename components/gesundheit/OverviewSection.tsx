@@ -1,5 +1,6 @@
 "use client";
 
+import { useRefresh } from "@/lib/refresh";
 import Link from "next/link";
 import { Row } from "@/components/SettingsView";
 import { useEffect, useState } from "react";
@@ -14,6 +15,8 @@ import { loadInsightData } from "@/lib/insightData";
 import { patterns, type Data } from "@/lib/insights";
 import { groupsFor } from "@/lib/intakes";
 import { ILLNESSES } from "@/lib/health";
+import { signAnalysis } from "@/lib/anzeichen";
+import { MIN_EVENT_DAYS } from "@/lib/muster";
 
 const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 const ms = (v: number) => `${Math.round(v)} ms`;
@@ -26,9 +29,12 @@ export default function OverviewSection() {
   const [intake, setIntake] = useState<{ done: number; total: number } | null>(null);
   const [illness, setIllness] = useState<Illness | null>(null);
   const [injuries, setInjuries] = useState<Injury[]>([]);
+  const [allIll, setAllIll] = useState<Illness[]>([]);
   const [error, setError] = useState("");
   const today = isoDay();
 
+  const [tick, setTick] = useState(0); // Neu laden (Konzept Datenaktualisierung)
+  useRefresh(() => setTick((t) => t + 1));
   useEffect(() => {
     const sb = supabase();
     if (!sb) return;
@@ -39,14 +45,16 @@ export default function OverviewSection() {
       sb.from("medication_intakes").select("id, medication_id, at, as_needed, slot, day").eq("day", today),
       sb.from("illnesses").select("*").is("ended_on", null).limit(1),
       sb.from("injuries").select("*").is("ended_on", null),
-    ]).then(([m, t, il, inj]) => {
+      sb.from("illnesses").select("*").gte("started_on", isoDay(daysAgo(200))),
+    ]).then(([m, t, il, inj, all]) => {
+      setAllIll((all.data ?? []) as Illness[]);
       const groups = groupsFor((m.data ?? []) as Medication[], (t.data ?? []) as Intake[]);
       const items = groups.flatMap((g) => g.items);
       setIntake({ done: items.filter((i) => i.done).length, total: items.length });
       setIllness(((il.data ?? []) as Illness[])[0] ?? null);
       setInjuries((inj.data ?? []) as Injury[]);
     });
-  }, [today]);
+  }, [today, tick]);
 
   const from = isoDay(daysAgo(90));
   const effects = data
@@ -57,6 +65,9 @@ export default function OverviewSection() {
   const ready = effects.filter((x) => x.c.diff !== null).sort((a, b) => (b.c.diff as number) - (a.c.diff as number));
   const waiting = effects.filter((x) => x.c.diff === null);
   const best = ready[0];
+  // Anzeichen-Muster (Sammelliste Punkt 19): nur zeigen, wenn es schon Anzeichen gibt
+  const signs = data ? signAnalysis(data, { muscle: [], intakes: [], illnesses: allIll }, today) : null;
+  const signsShown = signs && signs.eventDays > 0 ? signs : null;
   const freq = data ? habits.map((h) => ({ h, f: frequency(data.diary, h.key, today) })).filter((x) => x.f.month > 0 || x.f.prevMonth > 0) : [];
   const more = data ? patterns(data).filter((p) => p.key !== "zyklus") : [];
   const injury = injuries[0];
@@ -144,9 +155,26 @@ export default function OverviewSection() {
         </div>
       </section>
 
-      {more.length > 0 && (
+      {(more.length > 0 || signsShown) && (
         <section className="card">
           <span className="eyebrow">Weitere Muster</span>
+          {signsShown && (
+            <div className="pattern-block">
+              <span className="eyebrow pattern-title">Anzeichen wie rauer Hals oder verstopfte Nase</span>
+              {!signsShown.ready ? (
+                <span className="meta">Muster erscheinen ab {MIN_EVENT_DAYS} Tagen mit Anzeichen, bisher {signsShown.eventDays}. Anzeichen trägst du im Tagebuch ein.</span>
+              ) : signsShown.findings.length ? (
+                <>
+                  {signsShown.findings.slice(0, 3).map((f) => (
+                    <span key={f.key} className="pattern-text">{f.text}</span>
+                  ))}
+                  <span className="meta">Grundlage: {signsShown.eventDays} Tage mit Anzeichen in {signsShown.windowDays} Tagen, ohne Krankheitstage. Ein Zusammenhang, kein Beweis.</span>
+                </>
+              ) : (
+                <span className="meta">Bei {signsShown.eventDays} Tagen mit Anzeichen zeigt sich bisher kein deutliches Muster.</span>
+              )}
+            </div>
+          )}
           {more.map((p) => (
             <div key={p.key} className="pattern-block">
               <span className="eyebrow pattern-title">{p.title}</span>

@@ -44,6 +44,7 @@ export default function PeriodBackfill({ onChanged }: { onChanged: () => void })
   const [confirm, setConfirm] = useState<string | null>(null);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
+  const [editing, setEditing] = useState<Run | null>(null); // Periode ändern (Sammelliste Punkt 20)
 
   const load = useCallback(async () => {
     const sb = supabase();
@@ -79,10 +80,14 @@ export default function PeriodBackfill({ onChanged }: { onChanged: () => void })
     }
     const list = Array.from({ length: days }, (_, i) => addDays(start, i)).filter((d) => d <= today);
     setBusy(true);
-    const e = await write(list, () => strength);
+    // Beim Ändern: alte Tage, die nicht mehr dazugehören, auf „keine Blutung“ setzen
+    const old = editing ? Array.from({ length: editing.days }, (_, i) => addDays(editing.start, i)).filter((d) => !list.includes(d)) : [];
+    const e0 = old.length ? await write(old, () => 0) : null;
+    const e = e0 ?? (await write(list, () => strength));
     setBusy(false);
-    setMsg(e ? "Das hat nicht geklappt: " + e : `Periode ab ${fmt(start)} mit ${list.length} Tagen eingetragen.`);
+    setMsg(e ? "Das hat nicht geklappt: " + e : `Periode ab ${fmt(start)} mit ${list.length} Tagen ${editing ? "geändert" : "eingetragen"}.`);
     if (!e) {
+      setEditing(null);
       setStart("");
       await load();
       onChanged();
@@ -106,7 +111,7 @@ export default function PeriodBackfill({ onChanged }: { onChanged: () => void })
 
   return (
     <section className="card" id="perioden">
-      <h2>Vergangene Perioden nachtragen</h2>
+      <h2>{editing ? `Periode ab ${fmt(editing.start)} ändern` : "Vergangene Perioden nachtragen"}</h2>
       <p>Für den Zyklus zählt der erste Tag mit mindestens leichter Blutung. Je mehr Perioden eingetragen sind, desto genauer werden Phasen, Zykluslänge und Vergleiche.</p>
       <label className="field">
         <span className="meta">Erster Tag</span>
@@ -131,8 +136,13 @@ export default function PeriodBackfill({ onChanged }: { onChanged: () => void })
         </div>
       </div>
       <button type="button" className="btn btn-dark btn-44" disabled={busy || !start} onClick={add}>
-        Periode eintragen
+        {editing ? "Änderung speichern" : "Periode eintragen"}
       </button>
+      {editing && (
+        <button type="button" className="btn btn-soft btn-44" onClick={() => { setEditing(null); setStart(""); setDays(5); }}>
+          Abbrechen
+        </button>
+      )}
       {msg && <span className="meta" role="status">{msg}</span>}
 
       {runs.length > 0 && (
@@ -147,9 +157,26 @@ export default function PeriodBackfill({ onChanged }: { onChanged: () => void })
                   <span className="row-label">ab {fmt(r.start)}</span>
                   <span className="meta">{r.days} {r.days === 1 ? "Tag" : "Tage"}{gap !== null ? ` · Zyklus ${gap} Tage` : " · laufender Zyklus"}</span>
                 </div>
-                <button type="button" className={confirm === r.start ? "btn btn-soft btn-44 meta-warn" : "btn btn-link btn-44"} disabled={busy} onClick={() => remove(r)}>
-                  {confirm === r.start ? "Wirklich entfernen?" : "Entfernen"}
-                </button>
+                <span className="footer-links">
+                  <button
+                    type="button"
+                    className="btn btn-link btn-44"
+                    disabled={busy}
+                    onClick={() => {
+                      setEditing(r);
+                      setStart(r.start);
+                      setDays(r.days);
+                      const b = byDay.get(r.start)?.bleeding ?? 3;
+                      setStrength(STRENGTH.some(([v]) => v === b) ? b : 3);
+                      document.getElementById("perioden")?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                  >
+                    Ändern
+                  </button>
+                  <button type="button" className={confirm === r.start ? "btn btn-soft btn-44 meta-warn" : "btn btn-link btn-44"} disabled={busy} onClick={() => remove(r)}>
+                    {confirm === r.start ? "Wirklich entfernen?" : "Entfernen"}
+                  </button>
+                </span>
               </div>
             );
           })}

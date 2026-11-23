@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { isoDay, shortDate } from "@/lib/dates";
 import { INJURY_CAUSES, INJURY_KINDS, SPOTS, type Injury } from "@/lib/health";
+import DayPick from "@/components/ui/DayPick";
+import EditSheet, { EditIcon } from "@/components/ui/EditSheet";
 
 type Pain = { injury_id: string; day: string; pain: number };
 const toDate = (iso: string) => new Date(iso + "T12:00:00");
@@ -14,6 +16,9 @@ export default function InjurySection() {
   const [pains, setPains] = useState<Pain[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [healing, setHealing] = useState<string | null>(null); // „Verheilt“: letzter Tag mit Schmerzen (Punkt 18)
+  const [edit, setEdit] = useState<Injury | null>(null); // Bearbeiten-Bogen (Punkt 20)
+  const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
     const sb = supabase();
@@ -37,9 +42,12 @@ export default function InjurySection() {
   if (!sb) return null;
 
   const run = async (p: PromiseLike<{ error: { message: string } | null }>) => {
+    setSaving(true);
     const { error: e } = await p;
+    setSaving(false);
     setError(e ? "Das hat nicht geklappt: " + e.message : "");
     load();
+    return !e;
   };
 
   const activeList = (list ?? []).filter((r) => !r.ended_on);
@@ -66,6 +74,19 @@ export default function InjurySection() {
 
   const setPain = (v: number) => current && run(sb.from("injury_pain").upsert({ injury_id: current.id, day: isoDay(), pain: Math.max(0, Math.min(10, v)) }, { onConflict: "injury_id,day" }));
   const update = (patch: Partial<Injury>) => current && run(sb.from("injuries").update(patch).eq("id", current.id));
+  const saveEdit = async () => {
+    if (!edit) return;
+    const ended = edit.ended_on && edit.ended_on < edit.started_on ? edit.started_on : edit.ended_on;
+    if (await run(sb.from("injuries").update({ spot: edit.spot, kind: edit.kind, cause: edit.cause, started_on: edit.started_on, ended_on: ended }).eq("id", edit.id))) setEdit(null);
+  };
+  const remove = async () => {
+    if (!edit) return;
+    if (await run(sb.from("injuries").delete().eq("id", edit.id))) {
+      if (selected === edit.id) setSelected(null);
+      setEdit(null);
+    }
+  };
+  const label = (r: Injury) => `${SPOTS[r.spot]?.label ?? r.spot}${r.kind ? " · " + r.kind : ""}`;
 
   return (
     <>
@@ -119,6 +140,7 @@ export default function InjurySection() {
       {current && spotInfo && (
         <>
           <section className="card">
+            <DayPick label="Seit wann?" value={current.started_on} onChange={(d) => update({ started_on: d })} />
             <span className="label">Art</span>
             <div className="pills wrap">
               {INJURY_KINDS.map((v) => (
@@ -169,9 +191,26 @@ export default function InjurySection() {
             <p className="kyu">{spotInfo.kyu}</p>
           </section>
 
-          <button type="button" className="btn btn-dark" onClick={() => { update({ ended_on: isoDay() }); setSelected(null); }}>
-            Verheilt
+          <button type="button" className="btn btn-quiet" onClick={() => setEdit(current)}>
+            Eintrag ändern oder löschen
           </button>
+          {healing === null ? (
+            <button type="button" className="btn btn-dark" onClick={() => setHealing(isoDay())}>
+              Verheilt
+            </button>
+          ) : (
+            <section className="card">
+              <DayPick label="Letzter Tag mit Schmerzen" value={healing} min={current.started_on} onChange={setHealing} />
+              <div className="edit-sheet-actions">
+                <button type="button" className="btn btn-dark" disabled={saving} onClick={async () => { if (await update({ ended_on: healing })) { setHealing(null); setSelected(null); } }}>
+                  Verheilt
+                </button>
+                <button type="button" className="btn btn-soft" onClick={() => setHealing(null)}>
+                  Abbrechen
+                </button>
+              </div>
+            </section>
+          )}
         </>
       )}
 
@@ -182,14 +221,61 @@ export default function InjurySection() {
             {list
               .filter((r) => r.ended_on)
               .map((r) => (
-                <div key={r.id} className="card-row list-line">
-                  <span>{SPOTS[r.spot]?.label ?? r.spot}{r.kind ? " · " + r.kind : ""}</span>
-                  <span className="meta">{shortDate(toDate(r.started_on))}</span>
-                </div>
+                <button key={r.id} type="button" className="card-row list-line edit-row" onClick={() => setEdit(r)} aria-label={`${label(r)}, ${shortDate(toDate(r.started_on))}, ändern`}>
+                  <span>{label(r)}</span>
+                  <span className="edit-row-end">
+                    <span className="meta">{shortDate(toDate(r.started_on))}{r.ended_on && r.ended_on !== r.started_on ? `–${shortDate(toDate(r.ended_on))}` : ""}</span>
+                    <EditIcon />
+                  </span>
+                </button>
               ))}
           </details>
         </section>
       )}
+
+      <EditSheet title="Verletzung ändern" open={!!edit} onClose={() => setEdit(null)} onSave={saveEdit} onDelete={remove} deleteQuestion="Diese Verletzung löschen? Die Schmerzwerte dazu werden mit gelöscht." saving={saving}>
+        {edit && (
+          <>
+            <span className="label">Stelle</span>
+            <div className="pills wrap">
+              {Object.entries(SPOTS).map(([k, sp]) => (
+                <button key={k} type="button" className="pill pill-sm" aria-pressed={edit.spot === k} onClick={() => setEdit({ ...edit, spot: k })}>
+                  {sp.label}
+                </button>
+              ))}
+            </div>
+            <span className="label">Art</span>
+            <div className="pills wrap">
+              {INJURY_KINDS.map((v) => (
+                <button key={v} type="button" className="pill pill-sm" aria-pressed={edit.kind === v} onClick={() => setEdit({ ...edit, kind: edit.kind === v ? null : v })}>
+                  {v}
+                </button>
+              ))}
+            </div>
+            <span className="label">Wobei passiert?</span>
+            <div className="pills wrap">
+              {INJURY_CAUSES.map((v) => (
+                <button key={v} type="button" className="pill pill-sm" aria-pressed={edit.cause === v} onClick={() => setEdit({ ...edit, cause: edit.cause === v ? null : v })}>
+                  {v}
+                </button>
+              ))}
+            </div>
+            <DayPick label="Beginn" value={edit.started_on} onChange={(d) => setEdit({ ...edit, started_on: d })} />
+            <div className="day-pick">
+              <span className="label">Ende</span>
+              <div className="pills wrap">
+                <button type="button" className="pill pill-sm" aria-pressed={edit.ended_on === null} onClick={() => setEdit({ ...edit, ended_on: null })}>
+                  Tut noch weh
+                </button>
+                <button type="button" className="pill pill-sm" aria-pressed={edit.ended_on !== null} onClick={() => setEdit({ ...edit, ended_on: edit.ended_on ?? isoDay() })}>
+                  Verheilt
+                </button>
+              </div>
+            </div>
+            {edit.ended_on !== null && <DayPick label="Letzter Tag mit Schmerzen" value={edit.ended_on} min={edit.started_on} onChange={(d) => setEdit({ ...edit, ended_on: d })} />}
+          </>
+        )}
+      </EditSheet>
 
       <span className="hint">Bitte ärztlich abklären: starke Schwellung, Taubheit, Fehlstellung, ein plötzlicher Schmerz wie ein Schlag an der Ferse oder Schmerz, der nach einer Woche nicht nachlässt.</span>
     </>

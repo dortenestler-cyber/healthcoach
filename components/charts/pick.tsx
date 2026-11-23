@@ -9,14 +9,19 @@ import { W } from "@/components/charts/scale";
 
 const HIDE_AFTER_MS = 4000;
 
-export function usePick(n: number, x0: number, step: number) {
-  const [sel, setSel] = useState<number | null>(null);
+// w: Breite der Zeichnung (viewBox), damit Zeiger und Tage zusammenpassen
+// shared: von außen gesteuerter Tag, damit mehrere Charts denselben Tag zeigen (Verlauf in Gruppen, Punkt 16)
+export type SharedPick = { sel: number | null; setSel: (i: number | null | ((s: number | null) => number | null)) => void };
+export function usePick(n: number, x0: number, step: number, w: number = W, shared?: SharedPick) {
+  const [ownSel, setOwnSel] = useState<number | null>(null);
+  const sel = shared ? shared.sel : ownSel;
+  const setSel = shared ? shared.setSel : setOwnSel;
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
 
   const indexAt = (e: PointerEvent<SVGSVGElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
-    const vx = ((e.clientX - r.left) / r.width) * W;
+    const vx = ((e.clientX - r.left) / r.width) * w;
     return Math.max(0, Math.min(n - 1, Math.floor((vx - x0) / step)));
   };
   const hideLater = () => {
@@ -55,11 +60,11 @@ export function tipDate(iso: string): string {
 }
 
 // Schild oben im Chart, mittig über x, am Rand eingerückt. Zeile 1 kräftig, Zeile 2 gedämpft.
-export function ChartTip({ x, lines, top = 2 }: { x: number; lines: string[]; top?: number }) {
+export function ChartTip({ x, lines, top = 2, w: width = W }: { x: number; lines: string[]; top?: number; w?: number }) {
   const [a, b] = lines;
   const w = Math.max(a.length * 6.6, (b ?? "").length * 5.6) + 18;
   const h = b ? 34 : 22;
-  const left = Math.max(1, Math.min(W - w - 1, x - w / 2));
+  const left = Math.max(1, Math.min(width - w - 1, x - w / 2));
   return (
     <g className="cb-tip" aria-hidden="true" pointerEvents="none">
       <rect x={left} y={top} width={w} height={h} rx={8} className="cb-tip-box" />
