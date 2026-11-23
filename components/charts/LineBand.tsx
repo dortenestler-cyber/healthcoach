@@ -25,7 +25,7 @@ type Props = {
   tipNote?: (i: number) => string | null; // eigene zweite Zeile im Schild
   futureFrom?: number; // ab diesem Index geschätzt (heller)
   todayIndex?: number;
-  zeroLine?: boolean; // Nulllinie, z. B. für die Temperatur-Abweichung
+  zeroLine?: boolean; // Nulllinie, z. B. für Abweichungen vom Normalwert
   xLabels?: { index: number; text: string }[];
   markers?: boolean[]; // Markierung oben am Tag, z. B. Nachtschweiß (Legende steht in der Karte)
   height?: number;

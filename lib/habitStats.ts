@@ -42,7 +42,7 @@ const hm = (h: number) => {
   return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")} h`;
 };
 
-// Die Nacht danach: HRV, Ruhepuls, Tiefschlaf, Hauttemperatur, Nachtschweiß
+// Die Nacht danach: HRV, Ruhepuls, Tiefschlaf, Nachtschweiß
 export function nightAfter(data: Data, key: string, from?: string): NightRow[] {
   const { withD, withoutD } = splitDays(data.diary, key, from);
   const byDay = new Map<string, Daily>(data.daily.map((d) => [d.day, d]));
@@ -56,7 +56,6 @@ export function nightAfter(data: Data, key: string, from?: string): NightRow[] {
     { key: "hrv", label: "HRV", c: compare(withD, withoutD, get((d) => d.hrv_last_night)), fmt: (v) => `${de(v)} ms`, unit: "ms", higherIsBetter: true },
     { key: "ruhepuls", label: "Ruhepuls", c: compare(withD, withoutD, get((d) => d.resting_hr)), fmt: (v) => de(v), unit: "", higherIsBetter: false },
     { key: "tief", label: "Tiefschlaf", c: compare(withD, withoutD, get((d) => (d.sleep_deep_s ? d.sleep_deep_s / 3600 : null))), fmt: hm, unit: "h", higherIsBetter: true },
-    { key: "temp", label: "Hauttemperatur", c: compare(withD, withoutD, get((d) => (typeof d.skin_temp_delta === "number" ? Number(d.skin_temp_delta) : null))), fmt: (v) => `${v > 0.04 ? "+" : ""}${de(v, 1)} °C`, unit: "°C", higherIsBetter: null },
     {
       key: "nacht",
       label: "Nachtschweiß",

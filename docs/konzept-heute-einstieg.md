@@ -55,7 +55,7 @@ Landschaftsfoto als Hintergrund, Schritte und Kalorien als Tagesziel, „Top x %
 
 1. Energie über den Tag nur als Ring auf Heute, die Kurve auf der Energie-Seite.
 2. Readiness immer in der Mitte der Ringreihe.
-3. Vier Kacheln: HRV, Ruhepuls, Zyklus, Schlafbedarf. Atemfrequenz und Hauttemperatur auf der Readiness-Seite („Weitere Werte der Nacht“). Hauttemperatur kommt derzeit nicht von Garmin an.
+3. Vier Kacheln: HRV, Ruhepuls, Zyklus, Schlafbedarf. Atemfrequenz auf der Readiness-Seite („Weitere Werte der Nacht“). Hauttemperatur gibt es nicht mehr (Entscheidung 23.11., Garmin liefert sie nicht).
 4. Gruß als großer Titel, der Reiter heißt weiter „Heute“.
 5. Synchronisieren per Ziehen nach unten, kein Knopf.
 

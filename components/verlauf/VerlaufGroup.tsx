@@ -19,7 +19,7 @@ export type GroupKey = "schlaf" | "herz" | "energie" | "bewegung";
 
 export const GROUPS: { key: GroupKey; label: string; name: string; metrics: MetricKey[] }[] = [
   { key: "schlaf", label: "Schlaf", name: "Schlaf", metrics: ["schlaf", "tiefschlaf", "rem", "einschlafen"] },
-  { key: "herz", label: "Herz", name: "Herz und Körper", metrics: ["hrv", "ruhepuls", "atem", "temperatur"] },
+  { key: "herz", label: "Herz", name: "Herz und Körper", metrics: ["hrv", "ruhepuls", "atem"] },
   { key: "energie", label: "Energie", name: "Energie und Stress", metrics: ["bb", "bb_aufgeladen", "stress", "stress_hoch"] },
   { key: "bewegung", label: "Bewegung", name: "Bewegung", metrics: ["schritte", "alltagsschritte", "belastung"] },
 ];
@@ -111,7 +111,6 @@ export default function VerlaufGroup({ group, span, rows, diary, sick, onOpen, m
                 phases={hasPhase ? phases : undefined}
                 dates={weekly ? undefined : c.points.map((p) => p.day)}
                 tipNote={weekly ? (i) => `Wochenmittel, Woche ab ${tipDate(c.points[i].day)}` : undefined}
-                zeroLine={c.key === "temperatur"}
                 xLabels={axisLabels(c.points, span)}
                 shared={{ sel, setSel }}
               />

@@ -38,7 +38,7 @@ function note(r: NightRow): { text: string; tone: string } {
   return { text: `${sign}${amount}`, tone: good === null ? "note-cycle" : good ? "note-good" : "note-warn" };
 }
 
-// Detailseite einer Gewohnheit (Konzept dunkel 2): wie oft, die Nacht danach, im Zyklus, Hauttemperatur.
+// Detailseite einer Gewohnheit (Konzept dunkel 2): wie oft, die Nacht danach, im Zyklus.
 export default function HabitDetail({ habitKey }: { habitKey: string }) {
   const [data, setData] = useState<Data | null>(null);
   const [habits, setHabits] = useState<Habit[]>(DEFAULT_HABITS);
@@ -108,16 +108,6 @@ export default function HabitDetail({ habitKey }: { habitKey: string }) {
       : phReady.length === 1
       ? `In der ${PHASE_LABEL[phReady[0].group]} hängt „${label}“ so mit deiner HRV zusammen.`
       : `In der ${PHASE_LABEL[phTop.group]} hängt „${label}“ am stärksten mit deiner HRV zusammen.`;
-
-  // Hauttemperatur der letzten 28 Nächte, Nächte nach der Gewohnheit markiert
-  const tDays = Array.from({ length: 28 }, (_, i) => addDays(today, i - 27));
-  const byDay = new Map((data?.daily ?? []).map((d) => [d.day, d]));
-  const tVals = tDays.map((d) => {
-    const v = byDay.get(d)?.skin_temp_delta;
-    return typeof v === "number" ? Number(v) : null;
-  });
-  const marks = tDays.map((d) => !!f?.days.has(addDays(d, -1)));
-  const hasTemp = tVals.some((v) => v !== null);
 
   return (
     <>
@@ -217,35 +207,6 @@ export default function HabitDetail({ habitKey }: { habitKey: string }) {
                   <span className="meta">Schnitt pro Tag aus deinen Einträgen auf Heute.</span>
                 </div>
               )}
-            </section>
-          )}
-
-          {hasTemp && (
-            <section className="card">
-              <span className="eyebrow">Hauttemperatur und Zyklus</span>
-              <h2>
-                {temp && temp.c.diff !== null && Math.abs(temp.c.diff) >= 0.1
-                  ? `Nach „${label}“ liegt deine Hauttemperatur nachts im Schnitt ${de(Math.abs(temp.c.diff), 1)} °C ${temp.c.diff > 0 ? "höher" : "niedriger"}.`
-                  : `Nach „${label}“ ist deine Hauttemperatur nachts wie sonst.`}
-              </h2>
-              <LineBand
-                values={tVals}
-                fmt={(v) => `${v > 0.04 ? "+" : ""}${de(v, 1)} °C`}
-                tone="cycle"
-                zeroLine
-                markers={marks}
-                phases={tDays.map((d) => groupOf(cycleToday(d, data.diary).phase))}
-                dates={tDays}
-                label={`Hauttemperatur der letzten 28 Nächte, ${marks.filter(Boolean).length} Nächte nach ${label} markiert`}
-                xLabels={[{ index: 0, text: "vor 4 Wochen" }, { index: 27, text: "heute" }]}
-              />
-              <div className="legend cb-cycle">
-                <span><i className="cb-key-line" />Hauttemperatur</span>
-                <span><i className="legend-sweat" />Nacht nach {label}</span>
-              </div>
-              <ExplainCard tone="cycle" question={`Wie wirkt sich „${label}“ auf meine Hauttemperatur und meinen Zyklus aus?`}>
-                Diese Nächte sind im Temperaturverlauf markiert, damit du einen Anstieg nach „{label}“ nicht mit dem Anstieg nach dem Eisprung verwechselst.
-              </ExplainCard>
             </section>
           )}
 

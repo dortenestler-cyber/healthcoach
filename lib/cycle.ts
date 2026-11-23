@@ -51,7 +51,7 @@ export const PHASES: Record<Phase, { label: string; inPhase: string; pattern: st
   "luteal-frueh": {
     label: "Frühe Lutealphase",
     inPhase: "deiner frühen Lutealphase",
-    pattern: "Temperatur und Ruhepuls leicht höher, die HRV sinkt etwas.",
+    pattern: "Ruhepuls leicht höher, die HRV sinkt etwas.",
     suggestion: "Kraft, ruhige Ausdauer",
     rpe: "8–8,5",
     hint: "Etwas niedrigere HRV ist in dieser Phase normal.",
@@ -188,14 +188,13 @@ function redFlagFor(day: string, diary: Diary[]): string | null {
 function infectionFor(day: string, data: Data): boolean {
   const today = data.daily.find((r) => r.day === day);
   if (!today || today.hrv_last_night === null) return false;
-  if (today.resting_hr === null && typeof today.skin_temp_delta !== "number") return false;
+  if (today.resting_hr === null) return false;
   const hist = data.daily.filter((r) => r.day < day && r.day >= addDays(day, -30));
   const rhr = mean(hist.map((r) => r.resting_hr).filter((v): v is number => v !== null));
   const hrv = mean(hist.map((r) => r.hrv_last_night).filter((v): v is number => v !== null));
   if (rhr === null || hrv === null || hist.length < 7) return false;
-  const temp = typeof today.skin_temp_delta === "number" ? Number(today.skin_temp_delta) : null;
-  // Ruhepuls deutlich höher oder Hauttemperatur mindestens 0,5 °C über dem Normalwert, jeweils zusammen mit niedriger HRV
-  return ((today.resting_hr !== null && today.resting_hr >= rhr + 6) || (temp !== null && temp >= 0.5)) && today.hrv_last_night < hrv;
+  // Ruhepuls deutlich höher, zusammen mit niedriger HRV
+  return today.resting_hr >= rhr + 6 && today.hrv_last_night < hrv;
 }
 
 // 4. Symptome plus niedrige HRV (beides muss zusammenkommen)
@@ -239,7 +238,7 @@ export function dayRule(day: string, data: Data, injuredSports: string[] = []): 
       ...base,
       level: "infekt",
       title: "Schongang empfohlen",
-      text: "Ruhepuls oder Hauttemperatur sind deutlich höher und deine HRV niedriger als sonst. Das kann auf einen Infekt hindeuten. Vorschlag: heute Pause oder nur ruhig gehen. Du entscheidest.",
+      text: "Ruhepuls ist deutlich höher und deine HRV niedriger als sonst. Das kann auf einen Infekt hindeuten. Vorschlag: heute Pause oder nur ruhig gehen. Du entscheidest.",
     };
   if (rehaSports.length)
     return {

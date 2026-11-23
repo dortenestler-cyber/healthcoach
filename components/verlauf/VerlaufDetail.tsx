@@ -16,10 +16,10 @@ const SLEEP: MetricKey[] = ["schlaf", "tiefschlaf", "rem", "einschlafen"];
 const TRAINING: MetricKey[] = ["schritte", "bb", "bb_aufgeladen", "belastung", "alltagsschritte"];
 // Farbfamilien nach docs/farb-und-designkonzept.md: Energie und Ruhepuls Sage hell, Atemfrequenz neutral
 export const metricTone = (k: MetricKey) =>
-  SLEEP.includes(k) ? "sleep" : k === "temperatur" ? "cycle" : k === "stress" || k === "stress_hoch" ? "stress" : TRAINING.includes(k) ? "training" : k === "bb" || k === "bb_aufgeladen" || k === "ruhepuls" ? "energy" : k === "atem" ? "neutral" : "recovery";
+  SLEEP.includes(k) ? "sleep" : k === "stress" || k === "stress_hoch" ? "stress" : TRAINING.includes(k) ? "training" : k === "bb" || k === "bb_aufgeladen" || k === "ruhepuls" ? "energy" : k === "atem" ? "neutral" : "recovery";
 
 const KORRIDOR_DAYS = 181; // Abschnitt „Dein Bereich“: letztes Halbjahr
-const NIGHT: MetricKey[] = ["schlaf", "hrv", "ruhepuls", "atem", "temperatur", "bb", "tiefschlaf", "rem", "einschlafen", "bb_aufgeladen"]; // Werte der Nacht, dem Aufwachtag zugeordnet
+const NIGHT: MetricKey[] = ["schlaf", "hrv", "ruhepuls", "atem", "bb", "tiefschlaf", "rem", "einschlafen", "bb_aufgeladen"]; // Werte der Nacht, dem Aufwachtag zugeordnet
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");
   d.setDate(d.getDate() + n);
@@ -79,15 +79,6 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
   );
   const sweat = new Set(diary.filter((e) => (e.symptoms?.nacht ?? 0) > 0).map((e) => e.day));
   const sweatNights = days.filter((d) => sweat.has(d)).length;
-  // Hauttemperatur: Nächte nach der Sauna markieren (Garmin ordnet die Nacht dem Aufwachtag zu)
-  const saunaDays = new Set(diary.filter((e) => e.influences?.includes("sauna")).map((e) => e.day));
-  const dayBefore = (d: string) => {
-    const x = new Date(d + "T12:00:00");
-    x.setDate(x.getDate() - 1);
-    return x.toISOString().slice(0, 10);
-  };
-  const saunaNight = (d: string) => saunaDays.has(dayBefore(d));
-  const saunaNights = days.filter(saunaNight).length;
   // Jeder Tag zählt gegen den Bereich, der an diesem Tag galt
   const rangeFor = (d: string) => bandMap.get(d) ?? null;
   const sum = summarize(span, points, base.active, rangeFor, m.fmt, m.label, metric === "schlaf" ? sweatNights : 0);
@@ -141,8 +132,7 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
               phases={hasPhase ? phases : undefined}
               dates={weekly ? undefined : points.map((p) => p.day)}
               tipNote={weekly ? (i) => `Wochenmittel, Woche ab ${tipDate(points[i].day)}` : undefined}
-              zeroLine={metric === "temperatur"}
-              markers={metric === "schlaf" && !weekly ? points.map((p) => sweat.has(p.day)) : metric === "temperatur" && !weekly && saunaNights > 0 ? points.map((p) => saunaNight(p.day)) : undefined}
+              markers={metric === "schlaf" && !weekly ? points.map((p) => sweat.has(p.day)) : undefined}
               xLabels={axisLabels(points, span)}
             />
           )}
@@ -162,7 +152,6 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
             </>
           )}
           {metric === "schlaf" && !weekly && sweatNights > 0 && <span><i className="legend-sweat" />Nachtschweiß</span>}
-          {metric === "temperatur" && !weekly && saunaNights > 0 && <span><i className="legend-sweat" />Nacht nach der Sauna</span>}
         </div>
         {span !== "T" && pointBands.some(Boolean) && (
           <div className="segmented" role="group" aria-label="Bereich im Diagramm">
@@ -173,9 +162,6 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
               Bereich heute
             </button>
           </div>
-        )}
-        {metric === "temperatur" && !rows.some((r) => typeof r.skin_temp_delta === "number") && (
-          <p>Noch keine Hauttemperatur. Sie kommt mit dem nächsten Garmin-Abruf, wenn deine Uhr sie nachts misst.</p>
         )}
       </section>
 

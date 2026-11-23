@@ -25,7 +25,7 @@ export async function buildCoachContext(): Promise<string> {
   // Garmin: Werte von heute (letzte Nacht), damit der Coach keine Zahlen raten muss
   const todayRow = data.daily.find((d) => d.day === day);
   if (todayRow) {
-    const vals = (["schlaf", "hrv", "ruhepuls", "bb", "stress", "temperatur"] as const)
+    const vals = (["schlaf", "hrv", "ruhepuls", "bb", "stress"] as const)
       .map((k) => { const v = METRICS[k].value(todayRow); return v === null ? null : `${METRICS[k].label} ${METRICS[k].fmt(v)}`; })
       .filter(Boolean);
     if (todayRow.sleep_score !== null) vals.unshift(`Schlafwert ${todayRow.sleep_score} von 100`);
@@ -35,11 +35,11 @@ export async function buildCoachContext(): Promise<string> {
   // Garmin: letzte 7 Tage gegen 30 Tage
   const last7 = data.daily.filter((d) => d.day >= isoDay(daysAgo(6)));
   const last30 = data.daily.filter((d) => d.day >= isoDay(daysAgo(29)));
-  for (const k of ["schlaf", "hrv", "ruhepuls", "temperatur", "bb"] as const) {
+  for (const k of ["schlaf", "hrv", "ruhepuls", "bb"] as const) {
     const m = METRICS[k];
     const a = stats(last7.map(m.value).filter((v): v is number => v !== null));
     const b = stats(last30.map(m.value).filter((v): v is number => v !== null));
-    if (a && b) lines.push(`${k === "temperatur" ? "Hauttemperatur (Abweichung vom Normalwert)" : m.label}: Schnitt 7 Tage ${m.fmt(a.mean)}, 30 Tage ${m.fmt(b.mean)}.`);
+    if (a && b) lines.push(`${m.label}: Schnitt 7 Tage ${m.fmt(a.mean)}, 30 Tage ${m.fmt(b.mean)}.`);
   }
 
   const cyc = cycleInfo(day, data.diary);

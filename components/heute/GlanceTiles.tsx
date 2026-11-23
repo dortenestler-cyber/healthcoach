@@ -38,7 +38,7 @@ export default function GlanceTiles({ day, data, rule, showGarmin, showCycle }: 
   tiles.push({ key: "schlafbedarf", label: "Schlafbedarf", value: hm(need.hours), word: "heute Nacht", href: `/heute/schlaf?tag=${day}`, icon: ICON.mond });
 
   const count = countInRange(rows.map((r) => ({ value: r.value, range: r.base.active })));
-  const longHigh = streaks.some((s) => (s.key === "ruhepuls" || s.key === "temperatur") && s.days >= 5);
+  const longHigh = streaks.some((s) => s.key === "ruhepuls" && s.days >= 5);
 
   return (
     <section aria-label="Auf einen Blick">
