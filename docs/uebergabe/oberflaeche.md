@@ -7,7 +7,7 @@ Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/desig
 - Einheit-Seite `app/training/einheit/[id]` → `components/training/UnitDetail.tsx`, Reiter „Insights“ in `TrainingView` → `components/training/InsightsSection.tsx`, Rechnung in `lib/trainingInsights.ts`. Aktivitäten in `CalendarSection`, `TodayPlan` und `RecentActivities` verlinken auf die Einheit. Training-Muster mit Ergebnis zusätzlich in `OverviewSection` („Weitere Muster“), letzte Einheit im Coach-Kontext.
 - Beide Seiten laden `garmin_activities` mit `select("*")`, damit sie ohne die neuen Spalten weiterlaufen. `loadInsightData` bleibt unverändert.
 - PR #103: Zeitstrahl mit zwei Achsen (Puls links, Belastung rechts) und Legende. PR #104: `SportPicker` auf der Einheit-Seite schreibt `sport_override`/`sport_label`; „Sonstiges“ ohne Namen wird nicht verglichen.
-- Offen: Muster „Ruhetage zwischen harten Einheiten“ (Konzept).
+- Muster „Ruhetage zwischen harten Tagen“ (`restDaysPattern`, PR #110) umgesetzt, Konzept damit vollständig.
 
 ## Sport und Stress aus Garmin im Tagebuch (PR #108)
 - `TagebuchView`: Kachel zeigt „· aus Garmin“ (`auto_set`), Abwählen schreibt beim Speichern `auto_off`, Speichern setzt `manual = true`.

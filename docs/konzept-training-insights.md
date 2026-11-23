@@ -54,7 +54,7 @@ Schritt 1 und 3 brauchen keine Migration und könnten sofort nach Freigabe start
 - Insights: Reiter „Insights“ auf Training (`components/training/InsightsSection.tsx`). Muster mit Ergebnis erscheinen zusätzlich unter Gesundheit › Überblick › Weitere Muster.
 - Rechnung: `lib/trainingInsights.ts`. Pulszonen und Pulsverlauf berechnet `garmin-sync` aus dem Tagespuls (ein Wert etwa alle 2 Minuten), ohne zusätzliche Abrufe bei Garmin. Gleiche Zonen wie die Belastung aus dem Alltag.
 - Anstrengung 1–10 direkt auf der Einheit-Seite statt im Tagebuch: Dort gehört sie zur richtigen Einheit, auch bei zwei Einheiten am Tag.
-- Noch nicht umgesetzt: das Muster „Ruhetage zwischen harten Einheiten“. Es braucht eine Festlegung, was eine harte Einheit ist, und folgt bei Bedarf.
+- Muster „Ruhetage zwischen harten Tagen“ (PR #110): harter Tag ab Belastung 105 aus Training (70 % eines vollen Tages, wie „Harter Trainingstag“), Ruhetag ohne Garmin-Aktivität ab 20 Minuten (wie „Sport“ im Tagebuch). Verglichen wird die Readiness am Morgen des harten Tages nach 0, 1 oder 2 und mehr Ruhetagen, je Gruppe ab 5 Tagen. Abstände über 10 Tage zählen nicht.
 
 ## Entscheidungen (23.11., alle freigegeben)
 1. Einstieg: Tipp auf die Aktivität in der Tagesliste (Training) und zusätzlich Karte „Insights“ auf Training. Passt das?
