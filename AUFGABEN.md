@@ -65,6 +65,10 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 - [x] Ansehen und drei Fragen beantworten (immer dunkel überall, Energie Sage hell, Beere im Rand der Erklärkarte)
 - [ ] Nach dem Merge die App auf dem iPhone öffnen: Sie sollte dunkel sein, auch wenn das iPhone auf Hell steht. Ringe schmaler, Readiness-Stufen in vier Grüntönen. Falls die Statusleiste oben falsch aussieht: App vom Home-Bildschirm entfernen und neu hinzufügen (iOS merkt sich die alte Einstellung)
 
+### Vercel baut nur `main`
+- [ ] PR #77 ist nicht auf Vercel angekommen: In Vercel › healthcoach › „…“ › **Create Deployment** mit Branch `main` starten (bei „Resource is limited“ die genannte Zeit abwarten)
+- [ ] Nach dem nächsten Merge prüfen: Unter Deployments erscheint ein neuer „Production“-Eintrag. Arbeitszweige von Claude erscheinen als „Canceled“/„Ignored“, das ist so gewollt
+
 ### Sammelliste Anpassungen (PR #77)
 - [ ] Nach dem Merge: Health Coach vom Home-Bildschirm entfernen und in Safari neu „Zum Home-Bildschirm“ hinzufügen, damit das neue grüne App-Symbol erscheint
 - [x] Freigabe der Datenbank-Änderungen für Punkt 6 (eigene Sportart für Garmin-Aktivitäten) und Punkt 10 (Eisprung-Zeichen im Tagebuch), am 23.11. erteilt. Die Daten-Instanz legt die Spalten an; bis dahin sind die Frage zu Garmin-Aktivitäten und die Eisprung-Zeichen ausgeblendet
