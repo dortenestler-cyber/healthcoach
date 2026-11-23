@@ -175,6 +175,9 @@ Enthält eine Migration und ändert die Funktionen `garmin-sync` und `watch`, de
 ### 18. Uhr-App stürzt nach neuem Uhr-Schlüssel ab (DA)
 - [ ] Nach dem Merge im Lauf „Uhr-App bauen“ das Paket `upload-uhr-app` laden, `HealthCoach.iq` im Garmin-Entwicklerportal hochladen und nach der Freigabe auf der Uhr aktualisieren. Statt abzustürzen zeigt die App jetzt den Grund an („FEHLER AUF DER UHR …“). Bitte den Text melden, falls er erscheint
 
+### 19. Uhr-App zeigt Fehler beim Laden (DA)
+- [ ] Nach dem Merge `upload-uhr-app` neu hochladen. Die Uhr zeigt dann den echten Fehlercode („FEHLER −300“ usw.), vorher war „Zeitüberschreitung“ auch für „Antwort unlesbar“ beschriftet. Bitte Foto schicken, falls der Fehler bleibt
+
 ## Erledigt
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)
 - [x] PR #34, #35, #36, #37 gemergt (Konzept, `CLAUDE.md`, Fundament, Merge-Regel)
