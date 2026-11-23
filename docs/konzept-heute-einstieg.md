@@ -1,6 +1,6 @@
 # Konzept: Heute als ruhige Einstiegsseite
 
-Stand 23.11.2026 · Entwurf zur Sichtung, noch nicht freigegeben. Alle Zahlen im Entwurf sind Beispieldaten.
+Stand 23.11.2026 · freigegeben und umgesetzt (PR #76). Alle Zahlen im Entwurf und in den Bildschirmfotos (`docs/bilder/heute-einstieg/`) sind Beispieldaten.
 
 - Entwurf zum Anklicken: `docs/entwurf-heute-einstieg.html` (auch als Seite in Claude veröffentlicht)
 - Prompt, nach dem gearbeitet wurde: `docs/prompt-heute-einstieg.md`
@@ -13,14 +13,14 @@ In 5 Sekunden weiß die Nutzerin, wie es ihr geht und was heute ansteht. Alles W
 ## Aufbau von Heute (nach Sonar)
 
 1. **Kopf:** Gruß nach Tageszeit, darunter Datum mit ‹ › zum Blättern und „Garmin · Stand 9:12“. Zahnrad für Einstellungen. Sage-Verlauf wie bisher.
-2. **Dein Tag:** fünf Ringe in einer wischbaren Reihe. Wort über dem Ring, Zahl im Ring, Zustand darunter. Readiness groß in der Mitte, die äußeren Ringe schauen angeschnitten hervor. Stift: Reihenfolge und Mitte festlegen.
+2. **Dein Tag:** fünf Ringe in einer wischbaren Reihe. Wort über dem Ring, Zahl im Ring, Zustand darunter. Readiness groß in der Mitte, die äußeren Ringe schauen angeschnitten hervor. Später: Stift zum Festlegen der Reihenfolge.
    - Energie: Body Battery jetzt, 0–100, Sage
    - Schlaf: letzte Nacht in % vom Bedarf, neutral
    - Readiness: 0–10, Stufenwort, Sage
    - Belastung: heute in %, Zielbogen außen, Alltag heller, Slate-Blau
    - Stress: Garmin-Tagesschnitt 0–100, Türkis, höher = heller
 3. **Ein Satz zum Tag:** eine Erklärkarte mit Stufe, Grund, Vorschlag und Belastungsziel. „Mehr dazu im Coach“ legt die Frage vor, gesendet wird erst nach dem Tippen. Bei Warnzeichen steht hier der Hinweis auf ärztliche Abklärung.
-4. **Auf einen Blick:** 2 × 3 Kacheln mit Symbol, Name, Zahl, Wort zur Einordnung. Standard: HRV, Ruhepuls, Atemfrequenz, Hauttemperatur, Zyklus (Tag und Phase), Schlafbedarf heute Nacht. Satz „4 von 4 im Bereich“. Stift: Kacheln wählen (auch Schritte, Tiefschlaf, Gewicht-Trend). Wert seit 3 Tagen außerhalb: Wort in Amber. Ab 5 Tagen Ruhepuls oder Temperatur zusätzlich Hinweis auf ärztliche Abklärung.
+4. **Auf einen Blick:** 2 × 2 Kacheln mit Symbol, Name, Zahl, Wort zur Einordnung: HRV, Ruhepuls, Zyklus (Tag und Phase), Schlafbedarf heute Nacht. Satz „x von y im Bereich“. Wert seit 3 Tagen außerhalb: Wort in Amber. Ab 5 Tagen Ruhepuls oder Temperatur zusätzlich Hinweis auf ärztliche Abklärung. Später: Stift zum Wählen der Kacheln.
 5. **Heute steht an:** je eine Zeile für geplantes Training, Medikamente (Anzahl), offenen Check-in, Krankheit oder Verletzung. Erledigtes verschwindet.
 6. **Letzte Aktivitäten:** zwei Einheiten mit Sport-Symbol, Dauer, Last. „Alle ›“ öffnet Training.
 
@@ -51,13 +51,13 @@ In 5 Sekunden weiß die Nutzerin, wie es ihr geht und was heute ansteht. Alles W
 
 Landschaftsfoto als Hintergrund, Schritte und Kalorien als Tagesziel, „Top x %“, biologisches Alter, Blutzucker, Bettzeit, Ampelfarben in den Schlaf-Balken, Markennamen.
 
-## Offene Fragen
+## Entschieden (23.11.2026)
 
-1. Energie über den Tag nur als Ring auf Heute, Kurve auf der Energie-Seite? (Ändert eine Zeile in `CLAUDE.md`.)
-2. Mitte der Ringreihe: immer Readiness oder der zuletzt angetippte Ring?
-3. Sechs oder vier Kacheln bei „Auf einen Blick“?
-4. Gruß statt „Heute“ als großer Titel?
-5. Synchronisieren-Knopf von Heute weg?
+1. Energie über den Tag nur als Ring auf Heute, die Kurve auf der Energie-Seite.
+2. Readiness immer in der Mitte der Ringreihe.
+3. Vier Kacheln: HRV, Ruhepuls, Zyklus, Schlafbedarf. Atemfrequenz und Hauttemperatur auf der Readiness-Seite („Weitere Werte der Nacht“). Hauttemperatur kommt derzeit nicht von Garmin an.
+4. Gruß als großer Titel, der Reiter heißt weiter „Heute“.
+5. Synchronisieren per Ziehen nach unten, kein Knopf.
 
 ## Umsetzung nach Freigabe
 

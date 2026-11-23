@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 import { checkFaceId, faceIdOn } from "@/lib/faceid";
 import { checkPin, clearPin, fails, hasPin, isUnlocked, lock, markUnlocked, MAX_FAILS, setPin, LOCK_AFTER_MS } from "@/lib/pin";
+import { greeting } from "@/lib/dates";
 
 type Mode = "laden" | "festlegen" | "bestaetigen" | "eingeben" | "offen";
 
@@ -120,8 +121,7 @@ export default function PinLock({ children }: { children: ReactNode }) {
         ? "Zur Sicherheit noch einmal."
         : "Health Coach ist gesperrt.";
 
-  const hour = new Date().getHours();
-  const greeting = hour < 11 ? "Guten Morgen" : hour < 18 ? "Guten Tag" : "Guten Abend";
+  const hello = greeting();
   const letters = ["", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ"];
   const minutes = Math.round(LOCK_AFTER_MS / 60000);
 
@@ -132,7 +132,7 @@ export default function PinLock({ children }: { children: ReactNode }) {
       <div className="pin-glow" aria-hidden="true" />
       <img src="/icons/enso.svg" alt="" width={104} height={104} className="pin-icon" />
       <span className="eyebrow pin-brand">Health Coach</span>
-      <h1 className="pin-title">{mode === "eingeben" ? greeting : title}</h1>
+      <h1 className="pin-title">{mode === "eingeben" ? hello : title}</h1>
       <span className="pin-sub">{mode === "eingeben" ? "PIN eingeben" : sub}</span>
       <div className="pin-dots" role="img" aria-label={`${digits.length} von 4 Ziffern eingegeben`}>
         {[0, 1, 2, 3].map((i) => (

@@ -39,7 +39,8 @@ Zwei Claude-Instanzen arbeiten parallel, Regeln in `docs/konzept-zwei-instanzen.
 - Farben und Abstände kommen aus den Variablen in `app/globals.css`, keine festen Farbwerte in Komponenten.
 - Tap-Ziele mindestens 44 px, Kontrast mindestens AA.
 - Navigation: Heute, Tagebuch, Training, Zyklus, Gesundheit. Der Coach ist ein schwebender Knopf auf jeder Seite.
-- Die Seite Zyklus stellt den Zyklus in den Mittelpunkt: Ring mit Phasen, was in der heutigen Phase üblich ist, Werte und Symptome nach Zyklustag, Gewohnheiten je Phase. „Energie über den Tag“ steht auf Heute.
+- Heute ist eine ruhige Einstiegsseite (`docs/konzept-heute-einstieg.md`): Gruß und Datum mit ‹ ›, fünf Ringe „Dein Tag“ (Energie, Schlaf, Readiness in der Mitte, Belastung, Stress), ein Satz zum Tag, vier Kacheln „Auf einen Blick“, Heute steht an, Letzte Aktivitäten. Jeder Ring öffnet eine Detailseite (`/heute/…`), dort stehen Kurven und Faktoren, auch „Energie über den Tag“. Aktualisieren durch Ziehen nach unten.
+- Die Seite Zyklus stellt den Zyklus in den Mittelpunkt: Ring mit Phasen, was in der heutigen Phase üblich ist, Werte und Symptome nach Zyklustag, Gewohnheiten je Phase.
 - Gesundheit hat die Reiter Überblick · Medikamente · Krank & verletzt · Körper. Der Überblick zeigt heute auf einen Blick, was dir guttut, Gewohnheiten im Monat und die Muster ohne Zyklusbezug („Weitere Muster“).
 - Gewohnheiten (früher „Einflüsse“) werden im Tagebuch per Tipp erfasst, Details nur wo nötig (Sauna: Gänge, Wann, Kältebecken). Liste und eigene Gewohnheiten unter Einstellungen › Gewohnheiten. Jede Gewohnheit hat eine Detailseite unter Gesundheit.
 - App-Symbol: Zen-Ring (Ensō), mit dem Pinsel gezeichnet, Beere `#E0527F` auf Anthrazit (`public/icons/icon.svg`, `public/icons/icon-dark.svg`, PNG-Größen daneben).

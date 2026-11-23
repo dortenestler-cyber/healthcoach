@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { isoDay, longDate } from "@/lib/dates";
-import PageHead from "@/components/PageHead";
-import ReadinessCard from "@/components/heute/ReadinessCard";
-import TodayRings from "@/components/heute/TodayRings";
+import { isoDay } from "@/lib/dates";
+import DayHead from "@/components/heute/DayHead";
+import RingRow from "@/components/heute/RingRow";
+import DaySentence from "@/components/heute/DaySentence";
+import GlanceTiles from "@/components/heute/GlanceTiles";
 import TodayAgenda from "@/components/heute/TodayAgenda";
-import ValuesCard from "@/components/heute/ValuesCard";
-import EnergyCard from "@/components/heute/EnergyCard";
+import RecentActivities from "@/components/heute/RecentActivities";
+import PullToRefresh from "@/components/ui/PullToRefresh";
 import { readinessFactors } from "@/lib/today";
 import { loadInsightData } from "@/lib/insightData";
 import { dayRule } from "@/lib/cycle";
@@ -16,14 +17,18 @@ import { SPOTS } from "@/lib/health";
 import { SPORTS, type Sport } from "@/lib/training";
 import type { Data } from "@/lib/insights";
 import { useFeatures } from "@/lib/prefs";
+import { useGarminSync } from "@/lib/useGarminSync";
+import { clock } from "@/lib/dates";
 
-// Heute beantwortet: Wie geht es mir, was steht heute an? Eingetragen wird im Tagebuch.
-// 1 Ringe · 2 Readiness · 3 Heute steht an · 4 Deine Werte · 5 Energie über den Tag
+// Heute als ruhige Einstiegsseite (docs/konzept-heute-einstieg.md, nach Sonar):
+// 1 Gruß und Datum · 2 Dein Tag (fünf Ringe) · 3 ein Satz zum Tag · 4 Auf einen Blick · 5 Heute steht an · 6 Letzte Aktivitäten.
+// Alles Weitere liegt einen Tipp tiefer auf den Detailseiten /heute/… . Ziehen nach unten synchronisiert Garmin.
 export default function HeuteView() {
   const [error, setError] = useState("");
   const [data, setData] = useState<Data | null>(null);
   const [rehaSports, setRehaSports] = useState<string[]>([]);
   const today = isoDay();
+  const [day, setDay] = useState(today);
   const feat = useFeatures();
 
   const loadData = useCallback(async () => {
@@ -42,22 +47,40 @@ export default function HeuteView() {
     loadData();
   }, [loadData]);
 
-  const rule = data ? dayRule(today, data, rehaSports) : null;
+  const gsync = useGarminSync(data, loadData, feat.garmin);
+  const refresh = useCallback(() => {
+    if (feat.garmin) gsync.sync(3);
+    else loadData();
+  }, [feat.garmin, gsync, loadData]);
+
+  const isToday = day === today;
+  const rule = data ? dayRule(day, data, isToday ? rehaSports : []) : null;
+  const now = new Date();
+  const nowMinute = isToday ? now.getHours() * 60 + now.getMinutes() : 24 * 60 - 1;
 
   return (
-    <>
-      <PageHead title="Heute" sub={longDate()} tone="heute" />
+    <PullToRefresh onRefresh={refresh} busy={gsync.busy}>
+      <DayHead day={day} today={today} lastSync={gsync.lastSync} onDay={setDay} />
       {error && <p className="alert" role="alert">{error}</p>}
+      {gsync.error && <p className="alert" role="alert">{gsync.error}</p>}
+      {isToday && gsync.morningFailed && gsync.morning && (
+        <p className="alert">
+          Der Abruf heute Morgen um {clock(new Date(gsync.morning.at))} hat nicht geklappt. Zieh die Seite nach unten, um es jetzt zu versuchen. ({gsync.morning.message ?? "unbekannter Fehler"})
+        </p>
+      )}
+      {gsync.note && <span className="meta">{gsync.note}</span>}
 
-      {data && rule && <TodayRings day={today} data={data} rule={rule} showLoad={feat.tagesziel} />}
+      {data && rule && <RingRow day={day} data={data} rule={rule} nowMinute={nowMinute} showLoad={feat.tagesziel} showGarmin={feat.garmin} />}
 
-      {data && rule && <ReadinessCard rule={rule} factors={readinessFactors(today, data)} />}
+      {data && rule && <DaySentence rule={rule} factors={readinessFactors(day, data)} showLoad={feat.tagesziel} />}
 
-      <TodayAgenda day={today} data={data} rule={rule} showPlan={feat.tagesplan} showLoad={feat.tagesziel} />
+      {data && rule && <GlanceTiles day={day} data={data} rule={rule} showGarmin={feat.garmin} showCycle={feat.zyklus} />}
 
-      {feat.garmin && <ValuesCard day={today} data={data} showPhases={feat.zyklus} onSynced={loadData} />}
+      {isToday && <TodayAgenda day={day} data={data} rule={rule} showPlan={feat.tagesplan} />}
 
-      {feat.garmin && data && <EnergyCard day={today} data={data} nowMinute={new Date().getHours() * 60 + new Date().getMinutes()} />}
-    </>
+      {data && feat.garmin && <RecentActivities day={day} data={data} />}
+
+      {!data && !error && <p className="meta">Lädt …</p>}
+    </PullToRefresh>
   );
 }
