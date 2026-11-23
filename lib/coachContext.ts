@@ -1,5 +1,6 @@
 "use client";
 
+import { activityLabel } from "@/lib/garmin";
 import { coachUnitLine } from "@/lib/trainingInsights";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay } from "@/lib/dates";
@@ -60,7 +61,7 @@ export async function buildCoachContext(): Promise<string> {
   const acts = data.acts.filter((a) => (a.start_local ?? "") >= isoDay(daysAgo(13)));
   const unitLine = coachUnitLine(data.acts, data);
   if (unitLine) lines.push(unitLine);
-  if (acts.length) lines.push("Aktivitäten letzte 14 Tage (Garmin): " + acts.map((a) => `${(a.start_local ?? "").slice(5, 10)} ${a.type_key} ${Math.round((a.duration_s ?? 0) / 60)} min`).join("; ") + ".");
+  if (acts.length) lines.push("Aktivitäten letzte 14 Tage (Garmin): " + acts.map((a) => `${(a.start_local ?? "").slice(5, 10)} ${activityLabel(a)} ${Math.round((a.duration_s ?? 0) / 60)} min`).join("; ") + ".");
 
   const [meds, inj, plan, kb, climbs, settings] = await Promise.all([
     sb.from("medications").select("name, kind, regular, as_needed, times").eq("active", true),

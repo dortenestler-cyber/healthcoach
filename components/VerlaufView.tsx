@@ -42,7 +42,7 @@ export default function VerlaufView({ initial }: { initial: string | null }) {
       sb.from("garmin_daily").select("*").gte("day", from).order("day"),
       sb.from("diary_entries").select("*").gte("day", diaryFrom).order("day"),
       loadGarminCycles(sb, diaryFrom),
-      sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load").gte("start_local", from),
+      sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load, sport_override, sport_label").gte("start_local", from),
       sb.from("illnesses").select("started_on, ended_on").or(`ended_on.is.null,ended_on.gte.${from}`),
       loadHabits(sb),
     ]);

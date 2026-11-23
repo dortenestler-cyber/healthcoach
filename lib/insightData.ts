@@ -18,7 +18,7 @@ export async function loadInsightData(days = 180): Promise<Data | null> {
   const from = isoDay(daysAgo(days - 1));
   const [g, a, d, c, h, il, gc, ill, ov, so] = await Promise.all([
     sb.from("garmin_daily").select("*").gte("day", from).order("day"),
-    sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load").gte("start_local", from),
+    sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load, sport_override, sport_label").gte("start_local", from),
     sb.from("diary_entries").select("*").gte("day", from).order("day"),
     sb.from("checkins").select("day, energy, sleep, mood").gte("day", from),
     sb.from("medication_intakes").select("day").eq("as_needed", true).gte("day", from),

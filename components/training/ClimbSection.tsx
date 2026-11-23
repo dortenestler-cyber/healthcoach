@@ -25,11 +25,11 @@ export default function ClimbSection() {
     const from = isoDay(daysAgo(7 * 8));
     const [c, a] = await Promise.all([
       sb.from("climbs").select("id, day, grade, result").gte("day", from).order("created_at"),
-      sb.from("garmin_activities").select("type_key, start_local").gte("start_local", from),
+      sb.from("garmin_activities").select("type_key, start_local, sport_override").gte("start_local", from),
     ]);
     if (c.error) setError("Boulder konnten nicht geladen werden: " + c.error.message);
     setClimbs((c.data ?? []) as Climb[]);
-    setSessions(((a.data ?? []) as { type_key: string | null }[]).filter((r) => sportOf(r) === "klettern").length);
+    setSessions(((a.data ?? []) as { type_key: string | null; sport_override?: string | null }[]).filter((r) => sportOf(r) === "klettern").length);
   }, []);
 
   useEffect(() => {
