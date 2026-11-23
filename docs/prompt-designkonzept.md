@@ -23,7 +23,7 @@ Regeln:
 6. Ein Bildschirm pro Pull Request.
 
 Abnahme für jeden Bildschirm:
-- Bildschirmfoto bei 390 × 844, dunkel und hell, NEBEN der Vorlage in den Pull Request
+- Bildschirmfoto bei 390 × 844 (immer dunkel) NEBEN der Vorlage in den Pull Request
   (Beispieldaten, als solche gekennzeichnet).
 - Tabelle „Muster aus Vorlage → umgesetzt ja/nein/abgewandelt, warum“.
 - Liste jeder Abweichung von der Vorlage mit Grund. Ohne Grund wird zurückgebaut.

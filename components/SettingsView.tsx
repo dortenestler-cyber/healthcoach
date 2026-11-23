@@ -10,19 +10,15 @@ import {
   currentProfile,
   PROFILES,
   setCoachPrefs,
-  setTheme,
-  THEME_LABEL,
   useCoachPrefs,
   useFeatures,
-  useTheme,
-  type Theme,
 } from "@/lib/prefs";
 import { startOfToday } from "@/lib/dates";
 import PageHead from "@/components/PageHead";
 import PushRows from "@/components/settings/PushRows";
 import { disablePush } from "@/lib/push";
 
-// Einstellungen: nur, was du einmal einrichtest. Gruppen: Konto & Sicherheit, Darstellung, Funktionen & Gewohnheiten,
+// Einstellungen: nur, was du einmal einrichtest. Gruppen: Konto & Sicherheit, Funktionen & Gewohnheiten,
 // Geräte, Coach & Mitteilungen, Daten, Hilfe. Auswertungen (Verlauf, Muster) stehen in ihren Bereichen.
 export default function SettingsView() {
   const [email, setEmail] = useState("");
@@ -55,10 +51,6 @@ export default function SettingsView() {
         <Row label="PIN ändern" note="Du legst danach eine neue PIN fest." onClick={changePin} />
         <Row label="Automatische Sperre" value={`nach ${Math.round(LOCK_AFTER_MS / 60000)} Min. im Hintergrund`} />
         <Row label="Abmelden" note="PIN und Face ID auf diesem Gerät werden dabei gelöscht." onClick={signOut} />
-      </Group>
-
-      <Group title="Darstellung">
-        <ThemeRow />
       </Group>
 
       <Group title="Funktionen & Gewohnheiten">
@@ -123,22 +115,6 @@ function FaceIdRow() {
       <Toggle label="Face ID" note="Entsperren mit Face ID, die PIN bleibt als Rückfall." on={on} disabled={avail === null} onChange={toggle} />
       {msg && <p className="settings-note" role="status">{msg}</p>}
     </>
-  );
-}
-
-function ThemeRow() {
-  const theme = useTheme();
-  return (
-    <div className="settings-row">
-      <span className="row-label">Darstellung</span>
-      <div className="pills" role="radiogroup" aria-label="Darstellung">
-        {(Object.keys(THEME_LABEL) as Theme[]).map((t) => (
-          <button key={t} type="button" role="radio" className="pill pill-sm" aria-checked={theme === t} aria-pressed={theme === t} onClick={() => setTheme(t)}>
-            {THEME_LABEL[t]}
-          </button>
-        ))}
-      </div>
-    </div>
   );
 }
 

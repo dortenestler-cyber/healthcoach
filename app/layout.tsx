@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import AuthGate from "@/components/AuthGate";
 import ServiceWorker from "@/components/ServiceWorker";
-import { THEME_BOOT } from "@/lib/themeBoot";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -11,7 +10,7 @@ export const metadata: Metadata = {
   title: "Health Coach",
   description: "Training, Erholung und Perimenopause in einer App",
   applicationName: "Health Coach",
-  appleWebApp: { capable: true, title: "Health Coach", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "Health Coach", statusBarStyle: "black-translucent" },
   icons: {
     icon: [
       { url: "/icons/icon.svg", type: "image/svg+xml", media: "(prefers-color-scheme: light)" },
@@ -26,18 +25,13 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f2f2f7" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b0d10" },
-  ],
+  themeColor: "#0b0d10", // immer dunkel
+  colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de" className={inter.variable} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
-      </head>
       <body>
         <main className="shell">
           <ServiceWorker />

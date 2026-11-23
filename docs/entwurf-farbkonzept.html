@@ -1,0 +1,312 @@
+<title>Farbsystem Nacht</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: eine Spalte bis 1080 px, Familien als Raster aus Karten; bewusst nur dunkel, weil die App nur noch dunkel ist. */
+:root {
+  --bg: #0b0d10; --card: #15181d; --card-2: #1c2026; --fill: #262b33; --line-soft: #22272e; --line: #3a414b;
+  --text: #f2f4f7; --text-2: #c9cfd6; --muted: #9aa3ae; --axis: #7a838f;
+  --sage-g: #173326; --sage: #52b788; --sage-h: #8fd5b0; --sage-t: #c7ebd7; --sage-1: #34775a; --sage-2: #3f9068;
+  --moon: #e5e7eb; --rem: #aeb6c2; --leicht: #7d8794; --wach: #626b78;
+  --tr-g: #1b2438; --tr-ziel: #3b5998; --tr: #7c9ae0; --tr-alltag: #c3d1f2; --tr-t: #afc2ee;
+  --z1: #5a73a8; --z2: #6b86c4; --z3: #7c9ae0; --z4: #a9bdf0; --z5: #d3ddf7; --klettern: #5b78c4;
+  --st-g: #12302f; --st-ruhe: #5c6571; --st-1: #2f6e6c; --st-2: #3c9e9a; --st: #45c4c0; --st-3: #6fd8d4; --st-t: #9fe3e0;
+  --cy-g: #3a2318; --cy: #e8845a; --cy-t: #f2b193; --mens: #f28b8b; --mens-g: #3b1e22; --foll: #1d232b;
+  --wa-g: #3a2a12; --wa: #f0a24a; --wa-t: #f6c98e;
+  --mo-g: #2a2140; --mo: #a98be0; --mo-t: #cdb9f0;
+  --beere: #a3234f; --beere-h: #e0527f;
+  --ring-track: #20252c; --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 80px; }
+.top { background: linear-gradient(180deg, var(--sage-g), var(--bg) 320px); margin-top: calc(-1 * env(safe-area-inset-top, 0px)); padding-top: calc(env(safe-area-inset-top, 0px) + 48px); }
+.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+h1 { font-size: clamp(34px, 6vw, 56px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.02; margin: 8px 0 12px; }
+h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; text-wrap: balance; }
+h3 { font-size: 17px; font-weight: 700; margin: 0; }
+p { margin: 0 0 10px; max-width: 66ch; color: var(--text-2); }
+.lead { font-size: 18px; }
+section { margin-top: 64px; }
+.tag { display: inline-block; font-size: 12px; font-weight: 600; color: var(--wa); background: var(--wa-g); border-radius: 999px; padding: 3px 10px; }
+.principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 24px; }
+.pr { background: var(--card); border-radius: 18px; padding: 16px; box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+.pr b { display: block; font-size: 15px; margin-bottom: 4px; color: var(--text); }
+.pr span { font-size: 14px; color: var(--text-2); }
+
+/* Ebenen */
+.layers { margin-top: 20px; background: var(--bg); border: 1px solid var(--line-soft); border-radius: 28px; padding: 18px; }
+.l-card { background: var(--card); border-radius: 24px; padding: 18px; box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+.l-card2 { background: var(--card-2); border-radius: 18px; padding: 16px; margin-top: 12px; }
+.l-fill { background: var(--fill); border-radius: 12px; padding: 12px 14px; margin-top: 12px; }
+.lname { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--text-2); flex-wrap: wrap; }
+.lname code { color: var(--muted); }
+.textrow { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 14px; }
+.txs { font-size: 13px; }
+.txs .s { font-size: 20px; font-weight: 700; }
+
+/* Familien */
+.fams { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px; margin-top: 22px; }
+.fam { background: var(--card); border-radius: 24px; padding: 18px; box-shadow: inset 0 1px 0 rgba(255,255,255,.04); min-width: 0; display: grid; gap: 14px; align-content: start; }
+.fam .head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.fam .head small { color: var(--muted); font-size: 12.5px; }
+.sw { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.chip { display: grid; gap: 6px; font-size: 11.5px; color: var(--text-2); min-width: 0; }
+.chip i { display: block; height: 44px; border-radius: 12px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
+.chip code { font-size: 11px; color: var(--muted); }
+.scale { display: grid; gap: 6px; }
+.scale .bar { display: flex; gap: 3px; height: 14px; }
+.scale .bar i { flex: 1; border-radius: 4px; }
+.scale .lab { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); }
+.uses { font-size: 13px; color: var(--text-2); margin: 0; padding-left: 18px; }
+.uses li { margin-bottom: 2px; }
+.demo { background: var(--card-2); border-radius: 18px; padding: 14px; display: flex; gap: 14px; align-items: center; }
+.demo .t { font-size: 13.5px; color: var(--text-2); min-width: 0; }
+.demo .t b { color: var(--text); }
+
+/* Tabelle */
+.tbl-wrap { overflow-x: auto; margin-top: 18px; background: var(--card); border-radius: 24px; }
+table { border-collapse: collapse; width: 100%; min-width: 660px; font-size: 14px; }
+th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+th { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+.dot { display: inline-block; width: 12px; height: 12px; border-radius: 999px; vertical-align: -1px; margin-right: 8px; }
+td.num { white-space: nowrap; }
+
+/* Bausteine */
+.kit { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 22px; }
+.kit > div { background: var(--card); border-radius: 24px; padding: 18px; box-shadow: inset 0 1px 0 rgba(255,255,255,.04); min-width: 0; }
+.kit .cap { font-size: 13px; color: var(--muted); margin-top: 10px; }
+.ringrow { display: flex; gap: 12px; align-items: flex-end; justify-content: center; flex-wrap: wrap; }
+.rc { display: grid; justify-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.rc .w { color: var(--text-2); font-weight: 600; }
+.explain { border-radius: 18px; padding: 14px 16px 6px; background: linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(120deg, var(--sage), var(--line) 50%, var(--beere-h)) border-box; border: 1.5px solid transparent; font-size: 14.5px; }
+.explain .more { display: inline-flex; gap: 6px; align-items: center; font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; min-height: 40px; }
+.tile { background: var(--card-2); border-radius: 18px; padding: 12px; display: flex; gap: 10px; align-items: center; }
+.tile .ic { width: 40px; height: 40px; border-radius: 12px; background: var(--fill); display: grid; place-items: center; flex: 0 0 auto; }
+.tile .tl { font-size: 12.5px; color: var(--text-2); font-weight: 600; }
+.tile .tv { font-size: 18px; font-weight: 700; }
+.tile .tv small { font-size: 12px; color: var(--muted); font-weight: 500; }
+.tile .ts { font-size: 11.5px; color: var(--muted); }
+.stages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.stages div { display: grid; gap: 5px; justify-items: center; font-size: 11.5px; color: var(--muted); }
+.stages i { width: 100%; height: 6px; border-radius: 3px; }
+.stages .on { color: var(--text); font-weight: 700; }
+.seg3 { display: flex; gap: 3px; width: 72px; }
+.seg3 i { flex: 1; height: 4px; border-radius: 2px; background: var(--fill); }
+.mrow { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line-soft); font-size: 13px; }
+.mrow:last-child { border-bottom: 0; }
+.mrow .ml { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-2); }
+.mrow .mw { font-size: 12px; color: var(--muted); }
+.mrow b { font-size: 16px; }
+.hbar { display: flex; height: 16px; border-radius: 8px; overflow: hidden; gap: 2px; }
+.leg { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--text-2); margin-top: 8px; }
+.leg span { display: inline-flex; align-items: center; gap: 6px; }
+.leg i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.sb { display: grid; grid-template-columns: 60px 1fr 64px; gap: 10px; align-items: center; font-size: 12.5px; margin-top: 8px; }
+.sb .b { height: 10px; border-radius: 5px; background: var(--fill); overflow: hidden; }
+.sb .b i { display: block; height: 100%; border-radius: 5px; }
+.sb .v { text-align: right; color: var(--text-2); }
+.hint { background: var(--wa-g); color: var(--wa-t); border-radius: 16px; padding: 12px 14px; font-size: 13.5px; }
+.hint b { color: var(--text); display: block; }
+.suggest { background: var(--sage-g); color: var(--sage-t); border-radius: 16px; padding: 12px 14px; font-size: 13.5px; margin-top: 10px; }
+.suggest b { color: var(--text); display: block; }
+
+/* Schrift */
+.type { margin-top: 18px; background: var(--card); border-radius: 24px; padding: 6px 18px; }
+.ty { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 14px; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--line-soft); }
+.ty:last-child { border-bottom: 0; }
+.ty .m { font-size: 12px; color: var(--muted); }
+.ty .m b { display: block; color: var(--text-2); font-size: 13px; }
+@media (max-width: 520px) { .ty { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+ol.q { padding-left: 22px; display: grid; gap: 10px; max-width: 70ch; color: var(--text-2); }
+ol.q b { color: var(--text); }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
+</style>
+
+<div class="top"><div class="wrap">
+  <span class="eyebrow">Health Coach · Farb- und Designkonzept · Entwurf 23.11.2026</span>
+  <h1>Nacht</h1>
+  <p class="lead">Die App ist immer dunkel. Sechs Farbfamilien mit fester Bedeutung, und innerhalb jeder Familie gilt: mehr ist heller. Dazu Schrift, Abstände und die Bausteine, aus denen jede Seite gebaut wird.</p>
+  <p><span class="tag">Zahlen in den Beispielen sind Beispieldaten</span></p>
+  <div class="principles">
+    <div class="pr"><b>Immer dunkel</b><span>Auf dem iPhone und im Browser, egal was im System eingestellt ist. Die Wahl Hell/Dunkel entfällt.</span></div>
+    <div class="pr"><b>Sechs Familien</b><span>Erholung, Schlaf, Training, Stress, Zyklus, Hinweis. Eine Farbe bedeutet überall dasselbe.</span></div>
+    <div class="pr"><b>Mehr ist heller</b><span>Stress, Pulszonen, Readiness-Stufen: die hellere Stufe zeigt mehr. Kein Rot für schlecht, kein Grün für gut.</span></div>
+    <div class="pr"><b>Nie nur Farbe</b><span>Jede Farbe steht mit Zahl oder Wort. Text mindestens 4,5 : 1, Grafik mindestens 3 : 1.</span></div>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <section>
+    <h2>Neutrale Farben und Ebenen</h2>
+    <p>Tiefe entsteht nur über Helligkeit, ohne Schatten. Karten haben oben einen kaum sichtbaren Lichtrand.</p>
+    <div class="layers">
+      <div class="lname"><span>Grund · Seitenhintergrund</span><code>--bg #0B0D10</code></div>
+      <div class="l-card" style="margin-top:12px">
+        <div class="lname"><span>Karte</span><code>--card #15181D</code></div>
+        <div class="l-card2"><div class="lname"><span>Karte hoch · Kachel in einer Karte (neu)</span><code>--card-2 #1C2026</code></div>
+          <div class="l-fill"><div class="lname"><span>Fläche · Ringspur, Symbolfeld, leiser Knopf</span><code>--fill #262B33</code></div></div></div>
+        <div class="textrow">
+          <div class="txs"><div class="s" style="color:var(--text)">Text</div><code style="color:var(--muted)">#F2F4F7 · 16,2 : 1</code></div>
+          <div class="txs"><div class="s" style="color:var(--text-2)">Text 2</div><code style="color:var(--muted)">#C9CFD6 · 11,3 : 1</code></div>
+          <div class="txs"><div class="s" style="color:var(--muted)">Gedämpft</div><code style="color:var(--muted)">#9AA3AE · 7,0 : 1</code></div>
+          <div class="txs"><div class="s" style="color:var(--axis)">Achse (neu)</div><code style="color:var(--muted)">#7A838F · 4,6 : 1</code></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Die Familien</h2>
+    <p>Jede Familie hat dieselben Stufen: Grund (dunkle Fläche, Kopf-Verlauf), Haupt (Ring, Linie), Hell (Nebenwert, höhere Stufe) und Text (Schrift auf der Fläche). Kontrast jeweils auf der Karte.</p>
+    <div class="fams" id="fams"></div>
+  </section>
+
+  <section>
+    <h2>Welcher Wert welche Farbe bekommt</h2>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Wert</th><th>Familie</th><th>Farbe</th><th>Auf Heute</th></tr></thead>
+      <tbody id="map"></tbody>
+    </table></div>
+    <p style="margin-top:12px;font-size:14px">Auf Heute bleiben die Kacheln ruhig: Symbolfeld neutral, Zahl weiß, Wort gedämpft. Farbe zeigen nur die Ringe, das Zyklus-Symbol und Hinweise in Amber.</p>
+  </section>
+
+  <section>
+    <h2>Bausteine</h2>
+    <p>Aus diesen Teilen wird jede Seite gebaut. Maße und Regeln stehen jeweils darunter.</p>
+    <div class="kit" id="kit"></div>
+  </section>
+
+  <section>
+    <h2>Schrift</h2>
+    <p>Inter mit Ziffern in gleicher Breite. Eine feste Skala, nichts dazwischen.</p>
+    <div class="type">
+      <div class="ty"><span class="m"><b>Zahl groß</b>56 · 800</span><span style="font-size:56px;font-weight:800;letter-spacing:-0.02em;line-height:1">7,8</span></div>
+      <div class="ty"><span class="m"><b>Titel</b>30 · 800</span><span style="font-size:30px;font-weight:800;letter-spacing:-0.02em">Guten Morgen</span></div>
+      <div class="ty"><span class="m"><b>Zahl</b>28 · 800</span><span style="font-size:28px;font-weight:800">63 %</span></div>
+      <div class="ty"><span class="m"><b>Wert</b>18 · 700</span><span style="font-size:18px;font-weight:700">44 <small style="font-size:12px;color:var(--muted);font-weight:500">ms</small></span></div>
+      <div class="ty"><span class="m"><b>Überschrift</b>17 · 700</span><span style="font-size:17px;font-weight:700">Auf einen Blick</span></div>
+      <div class="ty"><span class="m"><b>Text</b>15 · 400</span><span style="font-size:15px">Dein Schlaf liegt über deinem Bereich, HRV und Ruhepuls sind typisch.</span></div>
+      <div class="ty"><span class="m"><b>Klein</b>13 · 500</span><span style="font-size:13px;font-weight:500;color:var(--text-2)">im Ziel · vom Bedarf</span></div>
+      <div class="ty"><span class="m"><b>Hinweis</b>12 · 400</span><span style="font-size:12px;color:var(--muted)">Garmin · Stand 9:12 · Vorschlag, keine Diagnose</span></div>
+      <div class="ty"><span class="m"><b>Eyebrow</b>11 · 700 · Sperrung</span><span class="eyebrow" style="color:var(--text)">Mehr dazu im Coach</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Raster, Radien, Bewegung</h2>
+    <div class="principles" style="margin-top:16px">
+      <div class="pr"><b>Raster 4 px</b><span>Abstände 4 · 8 · 12 · 16 · 24 · 32. Seitenrand 16, zwischen Abschnitten 24–28, zwischen Kacheln 10.</span></div>
+      <div class="pr"><b>Radien</b><span>Karte 24 · Kachel 18 · Symbolfeld und Steuerelement 12 · Pillen rund.</span></div>
+      <div class="pr"><b>Tippen</b><span>Jedes Ziel mindestens 44 × 44 px. Alles, was antippbar ist, hat einen Pfeil oder sitzt in einer Kachel.</span></div>
+      <div class="pr"><b>Bewegung</b><span>Ringe füllen sich beim Öffnen einmal (600 ms), Seitenwechsel 280 ms. Bei „Bewegung reduzieren“ ohne Animation.</span></div>
+      <div class="pr"><b>Symbole</b><span>Linien im 24-px-Raster, Strich 1,8, runde Enden, im Feld 40 × 40. Sport immer mit Symbol.</span></div>
+      <div class="pr"><b>Seitenkopf</b><span>300 px Verlauf aus dem Familien-Grund: Heute Sage, Training Slate, Zyklus Terracotta, Gesundheit Fläche.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Offene Fragen an dich</h2>
+    <ol class="q">
+      <li><b>Immer dunkel auch im Browser</b> auf dem Mac, oder nur auf dem iPhone? Vorschlag: überall, dann gibt es nur ein Design zu pflegen.</li>
+      <li><b>Energie in Sage hell</b> (Familie Erholung, wie hier gezeigt) oder eine eigene Farbe?</li>
+      <li><b>Beere im Rand der Erklärkarte</b> als Zeichen, dass der Satz vom Coach kommt: ja oder nein?</li>
+    </ol>
+    <p style="margin-top:14px;font-size:14px">Im Repo: <code>docs/farb-und-designkonzept.md</code>. Der Entwurf für Heute nutzt diese Farben schon.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  const v = (n) => `var(--${n})`;
+  function ring({ size, pct, color, center, unit, target, split, stroke, track }) {
+    const sw = stroke || Math.max(4, Math.round(size * 0.05)), r = size / 2 - sw - (target ? 6 : 0), c = 2 * Math.PI * r, cx = size / 2;
+    let s = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true"><circle cx="${cx}" cy="${cx}" r="${r - sw / 2 - 2}" fill="${v("card")}"/>`;
+    s += `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${track || v("ring-track")}" stroke-width="${sw}"/>`;
+    if (split != null) s += `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${v("tr-alltag")}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c * pct} ${c}" transform="rotate(-90 ${cx} ${cx})"/>`;
+    s += `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c * (split ?? pct)} ${c}" transform="rotate(-90 ${cx} ${cx})"/>`;
+    if (target) { const rt = r + sw / 2 + 4, ct = 2 * Math.PI * rt; s += `<circle cx="${cx}" cy="${cx}" r="${rt}" fill="none" stroke="${v("tr-ziel")}" stroke-width="2" stroke-linecap="round" stroke-dasharray="0 ${ct * target[0]} ${ct * (target[1] - target[0])} ${ct}" transform="rotate(-90 ${cx} ${cx})"/>`; }
+    const len = String(center).length, fs = Math.round(size * (size > 150 ? 0.22 : 0.24) * Math.min(1, 4.2 / len)), us = size > 150 ? 13 : Math.max(9.5, Math.round(size * 0.1));
+    s += `<text x="${cx}" y="${cx + (unit ? -fs * 0.12 : fs * 0.06)}" text-anchor="middle" dominant-baseline="middle" fill="${v("text")}" font-size="${fs}" font-weight="800" font-family="Inter, system-ui, sans-serif">${center}</text>`;
+    if (unit) s += `<text x="${cx}" y="${cx + fs * 0.5 + us}" text-anchor="middle" fill="${v(size > 150 ? "text-2" : "muted")}" font-size="${us}" font-weight="${size > 150 ? 700 : 600}" letter-spacing="${size > 150 ? 1.5 : 0}" font-family="Inter, system-ui, sans-serif">${unit}</text>`;
+    return s + "</svg>";
+  }
+  function gauge({ w, pct, center, word, wordColor, sub, target, grad, color }) {
+    const cx = w / 2, cy = w * 0.5, r = w * 0.38, sw = 8, h = cy + r * Math.sin(Math.PI * 0.15) + 8, a0 = Math.PI * 0.85, a1 = Math.PI * 2.15;
+    const P = (t, rr = r) => [cx + rr * Math.cos(a0 + (a1 - a0) * t), cy + rr * Math.sin(a0 + (a1 - a0) * t)];
+    const arc = (t0, t1, rr = r) => { const s = P(t0, rr), e = P(t1, rr); return `M${s[0].toFixed(1)} ${s[1].toFixed(1)} A${rr} ${rr} 0 ${(t1 - t0) * (a1 - a0) > Math.PI ? 1 : 0} 1 ${e[0].toFixed(1)} ${e[1].toFixed(1)}`; };
+    let s = `<svg width="100%" style="max-width:${w}px" viewBox="0 0 ${w} ${h + 26}" aria-hidden="true">`;
+    if (grad) s += `<defs><linearGradient id="${grad[0]}" x1="0" x2="1"><stop offset="0" stop-color="${grad[1]}"/><stop offset="1" stop-color="${grad[2]}"/></linearGradient></defs>`;
+    s += `<path d="${arc(0, 1)}" fill="none" stroke="${v("ring-track")}" stroke-width="${sw}" stroke-linecap="round"/><path d="${arc(0, pct)}" fill="none" stroke="${grad ? `url(#${grad[0]})` : color}" stroke-width="${sw}" stroke-linecap="round"/>`;
+    if (target) s += `<path d="${arc(target[0], target[1], r + sw / 2 + 7)}" fill="none" stroke="${v("tr")}" stroke-width="3" stroke-linecap="round"/>`;
+    const [mx, my] = P(pct); s += `<circle cx="${mx}" cy="${my}" r="9" fill="${v("text")}" stroke="${v("card")}" stroke-width="3"/>`;
+    s += `<text x="${cx}" y="${cy - 4}" text-anchor="middle" fill="${v("text")}" font-size="50" font-weight="800" font-family="Inter, system-ui, sans-serif">${center}</text><text x="${cx}" y="${cy + 24}" text-anchor="middle" fill="${wordColor}" font-size="14" font-weight="800" letter-spacing="2" font-family="Inter, system-ui, sans-serif">${word}</text><text x="${cx}" y="${cy + 44}" text-anchor="middle" fill="${v("muted")}" font-size="12" font-family="Inter, system-ui, sans-serif">${sub}</text>`;
+    const [lx, ly] = P(0), [hx, hy] = P(1);
+    s += `<text x="${lx}" y="${ly + 24}" text-anchor="middle" fill="${v("axis")}" font-size="12" font-family="Inter">0</text><text x="${hx}" y="${hy + 24}" text-anchor="middle" fill="${v("axis")}" font-size="12" font-family="Inter">100</text>`;
+    return s + "</svg>";
+  }
+  const chip = (name, varn, hex, cr) => `<div class="chip"><i style="background:${v(varn)}"></i><span>${name}</span><code>${hex}${cr ? " · " + cr : ""}</code></div>`;
+  const scale = (vars, l, r) => `<div class="scale"><div class="bar">${vars.map((x) => `<i style="background:${v(x)}"></i>`).join("")}</div><div class="lab"><span>${l}</span><span>${r}</span></div></div>`;
+
+  const FAMS = [
+    { n: "Erholung", sub: "Sage", chips: [["Grund", "sage-g", "#173326"], ["Haupt", "sage", "#52B788", "7,2"], ["Hell · Energie", "sage-h", "#8FD5B0", "10,4"], ["Text", "sage-t", "#C7EBD7", "13,8"]],
+      scale: scale(["sage-1", "sage-2", "sage", "sage-h"], "Erholen", "Volle Kraft"),
+      uses: ["Readiness (Haupt), Energie/Body Battery (Hell, neu)", "HRV- und Ruhepuls-Linien, Band im Familien-Grund", "Kopf-Verlauf Heute, Vorschlagsfläche"],
+      demo: () => `${ring({ size: 84, pct: .78, color: v("sage"), center: "7,8", unit: "Bereit" })}${ring({ size: 84, pct: .64, color: v("sage-h"), center: "64", unit: "Energie" })}<span class="t">Zwei Werte, eine Familie: <b>Readiness</b> kräftig, <b>Energie</b> heller.</span>` },
+    { n: "Schlaf", sub: "Mondgrau, neutral", chips: [["Tief · Haupt", "moon", "#E5E7EB", "14,4"], ["REM", "rem", "#AEB6C2", "8,7"], ["Leicht", "leicht", "#7D8794", "4,9"], ["Wach", "wach", "#626B78", "3,3"]],
+      scale: scale(["wach", "leicht", "rem", "moon"], "wach", "Tiefschlaf"),
+      uses: ["Schlaf-Ring in % vom Bedarf, Schlafbedarf", "Schlafphasen von hell (tief) nach dunkel (wach)", "Nachtschweiß als Amber-Punkt"],
+      demo: () => `<div style="flex:1;min-width:0"><div class="hbar"><i style="flex:22;background:var(--wach)"></i><i style="flex:72;background:var(--moon)"></i><i style="flex:98;background:var(--rem)"></i><i style="flex:247;background:var(--leicht)"></i></div><div class="leg"><span><i style="background:var(--moon)"></i>Tief 72</span><span><i style="background:var(--rem)"></i>REM 98</span><span><i style="background:var(--leicht)"></i>Leicht 247</span><span><i style="background:var(--wach)"></i>Wach 22 min</span></div></div>` },
+    { n: "Training", sub: "Slate-Blau", chips: [["Grund", "tr-g", "#1B2438"], ["Ziel", "tr-ziel", "#3B5998", "2,6"], ["Haupt", "tr", "#7C9AE0", "6,4"], ["Alltag", "tr-alltag", "#C3D1F2", "12,0"]],
+      scale: scale(["z1", "z2", "z3", "z4", "z5"], "Pulszone 1", "Zone 5"),
+      uses: ["Belastung (Training kräftig, Alltag hell), Zielbogen", "Last, Korridor, Belastungsverhältnis", "Sport: Karate #A9BDF0 · Kettlebell #7C9AE0 · Klettern #5B78C4 · Ausdauer #D3DDF7"],
+      demo: () => `${ring({ size: 84, pct: .63, split: .48, color: v("tr"), center: "63 %", unit: "heute", target: [.4, .7] })}<span class="t"><b>Training 48 %</b> kräftig, <b>Alltag 15 %</b> hell, das Ziel 40–70 % als dünner Bogen außen. Der Zielbogen ist nur Rahmen, die Zahl steht im Ring.</span>` },
+    { n: "Stress", sub: "Türkis", chips: [["Grund", "st-g", "#12302F"], ["Ruhe", "st-ruhe", "#5C6571", "3,0"], ["Haupt", "st", "#45C4C0", "8,4"], ["Text", "st-t", "#9FE3E0", "12,3"]],
+      scale: scale(["st-ruhe", "st-1", "st-2", "st-3"], "Ruhe", "hoher Stress"),
+      uses: ["Stress-Ring, Halbbogen mit Verlauf", "Aufteilung Ruhe · niedrig · mittel · hoch", "Türkis gehört nur zu Stress"],
+      demo: () => `<div style="flex:1;min-width:0">${[["Ruhe", 58, "st-ruhe", "9 h 10"], ["niedrig", 27, "st-1", "4 h 20"], ["mittel", 11, "st-2", "1 h 50"], ["hoch", 4, "st-3", "38 min"]].map(([l, p, c, d]) => `<div class="sb"><span>${l}</span><span class="b"><i style="width:${p}%;background:var(--${c})"></i></span><span class="v">${d}</span></div>`).join("")}</div>` },
+    { n: "Zyklus", sub: "Terracotta", chips: [["Grund · Luteal", "cy-g", "#3A2318"], ["Haupt", "cy", "#E8845A", "6,7"], ["Menstruation", "mens", "#F28B8B", "7,5"], ["Text", "cy-t", "#F2B193", "9,7"]],
+      scale: scale(["mens-g", "foll", "cy", "cy-g"], "Menstruation · Follikel", "Eisprung · Luteal"),
+      uses: ["Zyklus-Ring, Zyklustag, Phasen im Kalender", "Hauttemperatur-Linie (zeigt den Zyklus)", "Kopf-Verlauf Zyklus"],
+      demo: () => `<div style="flex:1;min-width:0"><div class="hbar" style="height:22px"><i style="flex:5;background:var(--mens-g);box-shadow:inset 0 0 0 1px var(--mens)"></i><i style="flex:8;background:var(--foll)"></i><i style="flex:2;background:var(--cy);opacity:.6"></i><i style="flex:13;background:var(--cy-g)"></i></div><div class="leg"><span><i style="background:var(--mens)"></i>Menstruation</span><span><i style="background:var(--foll);box-shadow:inset 0 0 0 1px var(--line)"></i>Follikel</span><span><i style="background:var(--cy)"></i>Eisprung</span><span><i style="background:var(--cy-g);box-shadow:inset 0 0 0 1px var(--cy)"></i>Luteal</span></div></div>` },
+    { n: "Hinweis", sub: "Amber", chips: [["Grund", "wa-g", "#3A2A12"], ["Haupt", "wa", "#F0A24A", "8,5"], ["Text", "wa-t", "#F6C98E", "11,6"], ["Mobility", "mo", "#A98BE0", "6,3"]],
+      scale: scale(["wa-g", "wa", "wa-t"], "Fläche", "Schrift"),
+      uses: ["Symptome, Hitzewallungen, Nachtschweiß", "„seit 3 Tagen über deinem Bereich“", "Amber heißt „schau hin“, nie „krank“. Mobility bleibt Violett."],
+      demo: () => `<div class="hint" style="flex:1"><b>Ruhepuls seit 5 Tagen über deinem Bereich</b>Hält das an oder fühlst du dich krank, lass es ärztlich abklären.</div>` },
+  ];
+  document.getElementById("fams").innerHTML = FAMS.map((f) => `<div class="fam"><div class="head"><h3>${f.n}</h3><small>${f.sub}</small></div><div class="sw">${f.chips.map((c) => chip(...c)).join("")}</div>${f.scale}<ul class="uses">${f.uses.map((u) => `<li>${u}</li>`).join("")}</ul><div class="demo">${f.demo()}</div></div>`).join("");
+
+  const MAP = [
+    ["Readiness", "Erholung", "sage", "Sage #52B788", "Ring Mitte"],
+    ["Energie (Body Battery)", "Erholung", "sage-h", "Sage hell #8FD5B0", "Ring"],
+    ["HRV", "Erholung", "sage", "Linie Sage, Band Sage-Grund", "Kachel"],
+    ["Ruhepuls", "Erholung", "sage-h", "Linie Sage hell", "Kachel"],
+    ["Atemfrequenz", "Erholung", "text-2", "Linie Text 2", "Kachel"],
+    ["Hauttemperatur", "Zyklus", "cy", "Linie Terracotta", "Kachel"],
+    ["Schlaf, Schlafbedarf", "Schlaf", "moon", "Mondgrau #E5E7EB", "Ring, Kachel"],
+    ["Belastung heute", "Training", "tr", "Slate + Alltag hell, Ziel #3B5998", "Ring"],
+    ["Last 7 Tage, Verhältnis", "Training", "tr", "Slate", "–"],
+    ["Stress", "Stress", "st", "Türkis, Stufen heller", "Ring"],
+    ["Zyklustag, Phase", "Zyklus", "cy", "Terracotta", "Kachel"],
+    ["Symptome, Hitzewallungen", "Hinweis", "wa", "Amber", "–"],
+    ["Mobility", "Mobility", "mo", "Violett #A98BE0", "–"],
+    ["Gewicht, Medikamente", "neutral", "text", "Text-Farben, nur Trend bzw. Häkchen", "Zeile"],
+  ];
+  document.getElementById("map").innerHTML = MAP.map(([w, f, c, d, h]) => `<tr><td>${w}</td><td>${f}</td><td class="num"><span class="dot" style="background:var(--${c})"></span>${d}</td><td>${h}</td></tr>`).join("");
+
+  const KIT = [
+    [`<div class="ringrow">${[["Energie", .64, "sage-h", "64", "jetzt", 84], ["Readiness", .78, "sage", "7,8", "von 10", 112], ["Stress", .28, "st", "28", "von 100", 84]].map(([l, p, c, n, u, s]) => `<div class="rc"><span class="w">${l}</span>${ring({ size: s, pct: p, color: v(c), center: n, unit: u })}</div>`).join("")}</div>`, "Ring klein 84 · mittel 112 px. Strich 5 %, dezente Spur, runde Enden, Start oben. Wort darüber, Zahl darin."],
+    [`<div style="display:grid;justify-items:center">${ring({ size: 210, pct: 1, color: v("moon"), center: "102 %", unit: "VOM BEDARF", stroke: 9 })}</div>`, "Ring groß 210 px, Strich 9, für Detailseiten. Wort in Großbuchstaben unter der Zahl."],
+    [`<div style="display:grid;justify-items:center">${gauge({ w: 300, pct: .63, center: "63 %", word: "IM ZIEL", wordColor: v("tr"), sub: "Ziel 40–70 % · Stand 16:38", target: [.4, .7], color: v("tr") })}</div>`, "Halbbogen 234°, Strich 8, Punkt am Wert, Ziel als Bogen außen. 0 und Maximum beschriftet."],
+    [`<div style="display:grid;justify-items:center">${gauge({ w: 300, pct: .28, center: "28", word: "NIEDRIG", wordColor: v("st"), sub: "Tagesschnitt · Stand 15:05", grad: ["g1", "var(--st-1)", "var(--st-3)"] })}</div>`, "Halbbogen mit Verlauf: nur bei Stress, dunkles Türkis nach hellem Türkis (mehr ist heller)."],
+    [`<div class="explain">Heute <b>Bereit</b>. Dein Schlaf liegt über deinem Bereich, HRV und Ruhepuls sind typisch.<br><span class="more">Mehr dazu im Coach →</span></div><div class="suggest"><b>Normal trainieren</b>Frühe Lutealphase (geschätzt): eine etwas niedrigere HRV ist üblich.</div>`, "Erklärkarte: Rand-Verlauf von der Familienfarbe zur Beere (Coach). Darunter Vorschlag auf Familien-Grund."],
+    [`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${[["HRV", "44", "ms", "im Bereich"], ["Ruhepuls", "60", "bpm", "seit 3 Tagen über", true]].map(([l, n, u, w, h]) => `<div class="tile"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l2-5 3 10 2-5h7"/></svg></span><span><span class="tl">${l}</span><br><span class="tv">${n} <small>${u}</small></span><br><span class="ts" style="${h ? "color:var(--wa)" : ""}">${w}</span></span></div>`).join("")}</div>`, "Kachel: Symbolfeld neutral, Zahl weiß, Wort gedämpft. Nur ein Hinweis wird Amber."],
+    [`<div class="stages">${[["Erholen", "sage-1"], ["Behutsam", "sage-2"], ["Bereit", "sage"], ["Volle Kraft", "sage-h"]].map(([l, c], i) => `<div class="${i === 2 ? "on" : ""}"><i style="background:var(--${c});opacity:${i === 2 ? 1 : .45}"></i>${l}</div>`).join("")}</div>`, "Stufenleiste Readiness: vier Sage-Stufen, mehr ist heller. Die aktive Stufe voll und fett beschriftet."],
+    [`<div>${[["Stunden vs. Bedarf", "102 %", 2, "über deinem Bereich"], ["Tiefschlaf", "1 h 12", 1, "im Bereich"], ["Wach", "22 min", 0, "unter deinem Bereich"]].map(([l, n, s, w]) => `<div class="mrow"><span><span class="ml">${l}</span><br><span class="mw">${w}</span></span><span style="display:flex;gap:12px;align-items:center"><span class="seg3">${[0, 1, 2].map((i) => `<i style="${i === s ? "background:var(--moon)" : ""}"></i>`).join("")}</span><b>${n}</b></span></div>`).join("")}</div>`, "3-Stufen-Balken: unter · im · über deinem Bereich, nur die aktive Stufe in Familienfarbe. Keine Ampel."],
+    [`<div><div class="hbar">${[["z1", 30], ["z2", 35], ["z3", 20], ["z4", 10], ["z5", 5]].map(([c, f]) => `<i style="flex:${f};background:var(--${c})"></i>`).join("")}</div><div class="leg">${[1, 2, 3, 4, 5].map((z) => `<span><i style="background:var(--z${z})"></i>Zone ${z}</span>`).join("")}</div></div>`, "Pulszonen: fünf Slate-Stufen, mehr Puls ist heller. Immer mit Zonen-Nummer."],
+  ];
+  document.getElementById("kit").innerHTML = KIT.map(([html, cap]) => `<div>${html}<div class="cap">${cap}</div></div>`).join("");
+})();
+</script>
