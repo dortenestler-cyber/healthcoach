@@ -59,7 +59,7 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 ### 9. Zyklus aus Garmin und Abruf um 6:15 Uhr (PR #47, ersetzt PR #14)
 - [x] PR #47 gemergt (22. Nov.), Migration und Upload von `garmin-sync` grün (geprüft von Claude). Damit liefen die Migration `20261123120000_garmin_zyklus_morgenabruf.sql` (Tabellen, Schlüssel im Vault, Zeitplan, `pg_cron` und `pg_net`) und der Upload von `garmin-sync` automatisch
 - [x] PR #14 geschlossen, er ist durch #47 ersetzt
-- [ ] Am nächsten Morgen nach 6:15 Uhr die App öffnen: Die Daten sollten schon da sein. Steht auf Heute ein Hinweis zum Morgen-Abruf, Claude Bescheid geben
+- [x] Morgen-Abruf um 6:15 Uhr klappt (23. Nov., von dir bestätigt, Eintrag in `garmin_sync_runs` ohne Fehler)
 
 ### Farb- und Designkonzept „Nacht“ (PR #72, gemergt)
 - [x] Ansehen und drei Fragen beantworten (immer dunkel überall, Energie Sage hell, Beere im Rand der Erklärkarte)
@@ -106,6 +106,7 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 - [x] Entschieden (22. Nov.): Zone 1 zählt ab 10 Minuten am Stück, Readiness der Uhr wie in der App, Stresskurve reparieren
 - [x] PR #70 gemergt und synchronisiert (22. Nov.), Upload grün. 21 Tage schon mit der neuen Regel berechnet, die übrigen 36 folgen mit den nächsten Abrufen. Die Stresskurve gibt Garmin auch unter der zweiten Adresse nicht heraus (404)
 - [ ] Danach auf der Uhr nachsehen, ob die Readiness zur App passt (Zahl auf Heute)
+- [ ] PR #73 mergen (kleine Korrektur an `garmin-sync`: der heutige Tag gilt am Morgen nicht mehr als „Uhr nicht getragen“)
 - [ ] Nichts weiter tun: Jeder Abruf füllt bis zu 21 ältere Tage nach, nach etwa einer Woche Morgen-Abrufen sind die letzten 90 Tage berechnet
 
 ## Erledigt

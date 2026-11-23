@@ -1,5 +1,5 @@
 # Übergabe · Daten (DA)
-Zuletzt aktualisiert: 2026-11-22 · Sitzung: https://claude.ai/code/session_014pVPWdtTj7aEt1xwucQpp1
+Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014pVPWdtTj7aEt1xwucQpp1
 
 Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`, `.github/`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
@@ -14,13 +14,14 @@ PR #70 gemergt: Alltagslast Version 2 läuft (21 von 57 Tagen neu, Rest folgt), 
 - PR #70: Rechenweise Version 2 (`LOAD_VERSION` in `alltag.ts`): ohne Stressverlauf zählt Zone 1 ab 10 Minuten am Stück (`bewegung: "dauer"`), mit Stressverlauf nur Minuten mit Stresswert −2 (`"stress"`). Ältere Tage (v1) rechnet jeder Abruf nach (bis 21). Stress über `STRESS_PATHS` (zuerst `?date=`), gemeinsamer Zwischenspeicher für Stresskurve und Alltag. Schrittverlauf, Profil und Feldnamen-Suche entfernt; `diag` enthält nur noch `puls_pfad`, `stress_pfad`, `stress`.
   Uhr: `watch/target.ts` rechnet Bereiche wie `lib/baseline.ts` (30 Tage ab 7/stabil 14, je Phase 150 Tage ab 10, kranke Tage + 3 raus, Schlaf zyklusabhängig). Krankheiten werden dafür 180 Tage geladen.
   Ergebnis 22.11. 20:15: `version_2` 21, `dailyStress?date=` und `dailyStress/{Tag}` beide 404, `stress_pfad` null. Bewegung im Alltag also immer nach der 10-Minuten-Regel.
-  Nächster Schritt (beim nächsten PR an `garmin-sync`, kein Eilfall): `diag` entfernen, Stressabruf für den Alltag streichen (spart einen Abruf je Lauf). Auffällig: `bb_curve` nur an 3 Tagen, also kommt „Energie über den Tag“ nur teilweise. Prüfen, ob der Body-Battery-Pfad nur für kurze Zeiträume antwortet.
+  23.11. 6:39: Morgen-Abruf 6:15 ok, `version_2` 40 von 58. Heute galt am Morgen als `quelle: "schritte"` (374 Minuten Puls < 8 h): PR #73 misst heute an 60 % der Zeit seit Mitternacht und entfernt `diag`. Stressabruf bleibt drin (zwei Abrufe je Lauf, danach gesperrt), falls Garmin ihn freischaltet.
+  Offen, kein Eilfall: `bb_curve` nur an 3 Tagen, also kommt „Energie über den Tag“ nur teilweise. Prüfen, ob der Body-Battery-Pfad nur für kurze Zeiträume antwortet.
 - Stresskurve (`AUFGABEN.md` Abschnitt 11): Garmin Personal API liefert keinen Stressverlauf (`dailyStress/{Tag}` und `dailyStress?date=` 404). Nur die Tageswerte (Durchschnitt, Aufteilung) kommen.
 
 ## Wartet auf
 - Nutzerin: Rückmeldung, ob die Readiness auf der Uhr zur App passt (`AUFGABEN.md` Abschnitt 14)
 - Nutzerin: Secrets für Push und Eintrag `push_cron_secret` im Tresor (`AUFGABEN.md` Abschnitt 3 und 4)
-- Nutzerin: Rückmeldung, ob der Morgen-Abruf um 6:15 Uhr geklappt hat (`AUFGABEN.md` Abschnitt 9). Wenn nicht: Tabelle `garmin_sync_runs` und Zeitplan in `pg_cron` prüfen
+- Nutzerin: Merge von PR #73 (Korrektur heutiger Tag, `diag` raus)
 - Nutzerin: Rückmeldung, ob Atemfrequenz und Stress im Tagesverlauf ankommen (`AUFGABEN.md` Abschnitt 11)
 
 ## Für die andere Rolle
@@ -41,5 +42,7 @@ PR #70 gemergt: Alltagslast Version 2 läuft (21 von 57 Tagen neu, Rest folgt), 
 - Die Pfade für Tagespuls und Schrittverlauf der Garmin Personal API sind nicht dokumentiert, es werden Pfade aus Garmin Connect versucht. Ohne Schrittverlauf erkennt `garmin-sync` Bewegung am Stresswert −2, ohne beides zählt der Alltag erst ab Zone 2.
 
 ## Erledigt seit letzter Übergabe
+- Morgen-Abruf 6:15 Uhr läuft (23.11. bestätigt)
+- PR #70 gemergt: Alltag Version 2, Readiness der Uhr wie in der App
 - PR #66 gemergt: Ablauf „Daten prüfen“ (nur lesend)
 - PR #63 gemergt: Alltagslast Daten, Migration `20261124090000_alltagslast.sql` und Upload von `garmin-sync` grün

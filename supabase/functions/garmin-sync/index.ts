@@ -207,7 +207,6 @@ Deno.serve(async (req) => {
     let stressCurveDays = 0;
     let stressNote = "";
     let sleepTempKeys: string[] = [];
-    const diag: Diag = {};
     const stress: StressCache = { known: { path: null, failed: false }, days: new Map() };
 
     for (const w of windows) {
@@ -321,9 +320,8 @@ Deno.serve(async (req) => {
             row(day).stress_curve = curve;
             stressCurveDays++;
           }
-        } catch (e) {
+        } catch {
           stressNote = "Stress im Tagesverlauf ist bei Garmin nicht abrufbar.";
-          diag.stress ??= e instanceof Error ? e.message : String(e);
         }
       }
 
@@ -460,7 +458,7 @@ Deno.serve(async (req) => {
     let alltagNote = "";
     if (!alltagMissing) {
       try {
-        const res = await syncAlltag(sb, token, userId, [...daily.keys()], offset === 0, diag, stress);
+        const res = await syncAlltag(sb, token, userId, [...daily.keys()], offset === 0, stress);
         alltagDays = res.days;
         alltagNote = res.note;
       } catch (e) {
@@ -580,8 +578,8 @@ async function firstPath(token: string, paths: string[], day: string, known: { p
   throw lastError ?? new Error("nicht abrufbar");
 }
 
-async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: string[], backfill: boolean, diag: Diag, stress: StressCache): Promise<{ days: number; note: string }> {
-  const today = localDayMinute(Date.now()).day;
+async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: string[], backfill: boolean, stress: StressCache): Promise<{ days: number; note: string }> {
+  const { day: today, minute: nowMinute } = localDayMinute(Date.now());
   const earliest = shiftDay(today, -(LOAD_BACK_DAYS - 1));
   const days = [...new Set(rangeDays)].filter((d) => d >= earliest && d <= today).sort().reverse().slice(0, MAX_LOAD_DAYS);
   if (backfill && days.length < MAX_LOAD_DAYS) {
@@ -666,8 +664,8 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
           const lm = localDayMinute(v[0]);
           if (lm.day === day) moving.add(Math.floor(lm.minute / 15));
         }
-      } catch (e) {
-        diag.stress ??= e instanceof Error ? e.message : String(e);
+      } catch {
+        // Garmin liefert keinen Stressverlauf (Stand 22.11.: 404): es gilt die 10-Minuten-Regel
       }
     }
 
@@ -684,7 +682,9 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
     const steps = dayRow.get(day)?.steps;
     const actSteps = todays.reduce((s, a) => s + (Number(a.steps) || 0), 0);
     const stepsOutside = typeof steps === "number" ? Math.max(0, steps - actSteps) : null;
-    const viaPulse = c.abdeckung >= MIN_COVERAGE;
+    // Heute zählt nur die Zeit seit Mitternacht: um 6:15 Uhr reichen gut 3 Stunden Puls, nicht 8
+    const needed = day === today ? Math.min(MIN_COVERAGE, Math.round(nowMinute * 0.6)) : MIN_COVERAGE;
+    const viaPulse = c.abdeckung >= needed;
     results.push({
       day,
       curve: samples.length ? c.curve : null,
@@ -727,24 +727,14 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
   const f = conversionFactor((fRows ?? []) as Any[]);
   const factor = f.faktor ?? FACTOR_START;
 
-  diag.puls_pfad = hrKnown.path;
-  diag.stress_pfad = stress.known.path;
-  const newest = results.map((r) => r.day).sort().at(-1);
   const rows = results.map((r) => ({
     user_id: userId,
     day: r.day,
     hr_curve: r.curve,
     steps_outside_acts: r.stepsOutside,
-    load_daily_min: {
-      ...({ ...r.base, faktor: f.faktor, faktor_n: f.faktor ? f.n : 0, last_alltag: Math.round(r.base.pkt_alltag * factor * 10) / 10 } satisfies LoadDay),
-      // Fehlersuche: nur Pfade und Fehlermeldungen von Garmin, keine Werte, nur am neuesten Tag
-      ...(r.day === newest ? { diag } : {}),
-    },
+    load_daily_min: { ...r.base, faktor: f.faktor, faktor_n: f.faktor ? f.n : 0, last_alltag: Math.round(r.base.pkt_alltag * factor * 10) / 10 } satisfies LoadDay,
   }));
   const { error } = await sb.from("garmin_daily").upsert(rows, { onConflict: "user_id,day" });
   if (error) throw new Error(error.message);
   return { days: rows.length, note };
 }
-
-// Fehlersuche für die nicht dokumentierten Pfade der Garmin Personal API: nur Pfade und Fehlermeldungen, nie Werte
-type Diag = { stress?: string; puls_pfad?: string | null; stress_pfad?: string | null };
