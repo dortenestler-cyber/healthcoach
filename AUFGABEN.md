@@ -98,7 +98,7 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 - [x] Entschieden (22. Nov.): Zone 1 zählt ab 10 Minuten am Stück, Readiness der Uhr wie in der App, Stresskurve reparieren
 - [x] PR #70 gemergt und synchronisiert (22. Nov.), Upload grün. 21 Tage schon mit der neuen Regel berechnet, die übrigen 36 folgen mit den nächsten Abrufen. Die Stresskurve gibt Garmin auch unter der zweiten Adresse nicht heraus (404)
 - [ ] Danach auf der Uhr nachsehen, ob die Readiness zur App passt (Zahl auf Heute)
-- [ ] PR #72 mergen (kleine Korrektur an `garmin-sync`: der heutige Tag gilt am Morgen nicht mehr als „Uhr nicht getragen“)
+- [ ] PR #73 mergen (kleine Korrektur an `garmin-sync`: der heutige Tag gilt am Morgen nicht mehr als „Uhr nicht getragen“)
 - [ ] Nichts weiter tun: Jeder Abruf füllt bis zu 21 ältere Tage nach, nach etwa einer Woche Morgen-Abrufen sind die letzten 90 Tage berechnet
 
 ## Erledigt
