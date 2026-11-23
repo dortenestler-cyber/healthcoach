@@ -1,0 +1,202 @@
+<title>Training Insights Entwurf</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: Konzeptseite, drei Telefon-Ansichten nebeneinander (Einheit, Sportart, Muster), je mit kurzer Erklärung. Farben aus CLAUDE.md. Einzeldesign dunkel, wie die App. */
+:root {
+  --bg: #0b0d10; --card: #15181d; --tile: #1c2026; --fill: #262b33; --line: #2c323b;
+  --text: #f2f4f7; --text2: #c9cfd6; --muted: #9aa3ae;
+  --tr: #7c9ae0; --tr-bg: #1b2438; --tr-fg: #afc2ee; --z1: #2c3f68; --z2: #3b5998; --z3: #5b78c4; --z4: #8aa5e6; --z5: #d3ddf7;
+  --rec: #52b788; --rec-bg: #173326; --rec-fg: #8fd5b0;
+  --cyc: #e8845a; --cyc-bg: #3a2318; --cyc-fg: #f2b193;
+  --warn: #f0a24a; --warn-bg: #3a2a12; --warn-fg: #f6c98e;
+  --sleep: #e5e7eb;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-variant-numeric: tabular-nums; padding-block: 24px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font-size: 26px; margin: 0 0 6px; text-wrap: balance; }
+.lead { color: var(--muted); max-width: 62ch; margin: 0 0 8px; line-height: 1.5; }
+.flag { display: inline-block; background: var(--warn-bg); color: var(--warn-fg); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; margin-bottom: 24px; }
+.row { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; }
+.col { width: 360px; max-width: 100%; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.col > h2 { font-size: 15px; margin: 0; color: var(--text2); }
+.note { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0; }
+.phone { background: var(--bg); border: 1px solid var(--line); border-radius: 36px; padding: 14px 12px 18px; display: flex; flex-direction: column; gap: 12px; }
+.head { border-radius: 24px; padding: 16px 16px 18px; background: linear-gradient(180deg, var(--tr-bg), var(--card)); }
+.back { color: var(--muted); font-size: 13px; }
+.head h3 { font-size: 24px; margin: 8px 0 2px; font-weight: 700; }
+.sub { color: var(--muted); font-size: 13px; }
+.card { background: var(--card); border-radius: 24px; padding: 16px; }
+.card h4 { margin: 0 0 4px; font-size: 16px; font-weight: 700; text-wrap: balance; }
+.card p { margin: 0; color: var(--text2); font-size: 14px; line-height: 1.45; }
+.kicker { color: var(--muted); font-size: 12px; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.tile { background: var(--tile); border-radius: 18px; padding: 12px; min-width: 0; }
+.tile .l { color: var(--muted); font-size: 12px; }
+.tile .v { font-size: 28px; font-weight: 700; line-height: 1.15; margin-top: 2px; }
+.tile .v small { font-size: 14px; font-weight: 500; color: var(--muted); }
+.tile .c { font-size: 12px; margin-top: 2px; color: var(--tr-fg); }
+.zones { display: flex; height: 14px; border-radius: 7px; overflow: hidden; gap: 2px; margin: 12px 0 8px; }
+.zones i { display: block; }
+.legend { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; font-size: 11px; color: var(--muted); }
+.legend b { display: block; color: var(--text2); font-size: 13px; font-weight: 600; }
+.after { display: flex; flex-direction: column; margin-top: 8px; }
+.after div { display: flex; justify-content: space-between; gap: 10px; padding: 11px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.after div:first-child { border-top: 0; }
+.after span:last-child { text-align: right; color: var(--text2); }
+.pill { display: inline-block; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+.pill.rec { background: var(--rec-bg); color: var(--rec-fg); }
+.pill.cyc { background: var(--cyc-bg); color: var(--cyc-fg); }
+.pill.warn { background: var(--warn-bg); color: var(--warn-fg); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+.chip { border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; font-size: 14px; color: var(--muted); min-height: 36px; display: inline-flex; align-items: center; }
+.chip.on { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 600; }
+svg { display: block; width: 100%; height: auto; }
+svg text { font-family: var(--font); fill: var(--muted); font-size: 10px; }
+.bars { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.bar { display: grid; grid-template-columns: 84px 1fr 52px; align-items: center; gap: 8px; font-size: 13px; }
+.bar .t { height: 12px; background: var(--fill); border-radius: 6px; position: relative; }
+.bar .t u { position: absolute; top: 0; bottom: 0; border-radius: 6px; text-decoration: none; }
+.bar .n { text-align: right; font-weight: 600; }
+.bar small { color: var(--muted); font-weight: 400; }
+.basis { color: var(--muted); font-size: 12px; margin-top: 10px; }
+</style>
+
+<h1>Insights zu Trainingseinheiten</h1>
+<p class="lead">Entwurf zum Konzept <code>docs/konzept-training-insights.md</code>. Drei Ebenen: eine Einheit, eine Sportart, Muster über alle Einheiten.</p>
+<span class="flag">Beispieldaten, keine echten Werte</span>
+
+<div class="row">
+
+<!-- 1 EINHEIT -->
+<section class="col">
+  <h2>1 · Einheit (Tipp auf eine Aktivität)</h2>
+  <div class="phone">
+    <div class="head">
+      <div class="back">‹ Training</div>
+      <h3>Karate</h3>
+      <div class="sub">Montag, 16. November · 19:00 · Garmin</div>
+    </div>
+    <div class="card">
+      <div class="kicker">Ergebnis</div>
+      <h4>Etwas härter als deine letzten Karate-Einheiten.</h4>
+      <p>Länger und mit höherem Puls als üblich, die Belastung liegt knapp darüber.</p>
+      <div class="tiles">
+        <div class="tile"><div class="l">Dauer</div><div class="v">1:45 <small>h</small></div><div class="c">üblich 1:30 h</div></div>
+        <div class="tile"><div class="l">Puls Ø</div><div class="v">136 <small>bpm</small></div><div class="c">+5 zu deinem Schnitt</div></div>
+        <div class="tile"><div class="l">Puls max</div><div class="v">168 <small>bpm</small></div><div class="c">wie üblich</div></div>
+        <div class="tile"><div class="l">Belastung</div><div class="v">112</div><div class="c">üblich 96</div></div>
+      </div>
+      <div class="basis">Vergleich mit deinen letzten 5 Karate-Einheiten.</div>
+    </div>
+    <div class="card">
+      <h4>Die meiste Zeit in mittleren Zonen.</h4>
+      <div class="zones">
+        <i style="flex:8;background:var(--z1)"></i><i style="flex:41;background:var(--z2)"></i><i style="flex:38;background:var(--z3)"></i><i style="flex:15;background:var(--z4)"></i><i style="flex:3;background:var(--z5)"></i>
+      </div>
+      <div class="legend"><span>Z1<b>8 min</b></span><span>Z2<b>41 min</b></span><span>Z3<b>38 min</b></span><span>Z4<b>15 min</b></span><span>Z5<b>3 min</b></span></div>
+    </div>
+    <div class="card">
+      <h4>Knapp ein Drittel der Belastung kam zwischen 19:55 und 20:20.</h4>
+      <p>Zeitstrahl der Einheit: Puls je 5 Minuten (Balken, Farbe = Zone) und die bis dahin aufgebaute Belastung (Linie, am Ende 112).</p>
+      <svg viewBox="0 0 320 176" role="img" aria-label="Zeitstrahl der Karate-Einheit vom 16. November: Puls je 5 Minuten und aufgebaute Belastung, Beispieldaten">
+<g stroke="#2c323b" stroke-width="1"><line x1="28" y1="20" x2="312" y2="20"/><line x1="28" y1="80" x2="312" y2="80"/><line x1="28" y1="140" x2="312" y2="140"/></g>
+<text x="0" y="23">180</text><text x="0" y="83">120</text><text x="0" y="143">60</text>
+<rect x="29.0" y="102.0" width="11.5" height="38.0" rx="3" fill="#2c3f68"/><rect x="42.5" y="88.0" width="11.5" height="52.0" rx="3" fill="#3b5998"/><rect x="56.0" y="79.0" width="11.5" height="61.0" rx="3" fill="#3b5998"/><rect x="69.6" y="74.0" width="11.5" height="66.0" rx="3" fill="#5b78c4"/><rect x="83.1" y="82.0" width="11.5" height="58.0" rx="3" fill="#3b5998"/><rect x="96.6" y="68.0" width="11.5" height="72.0" rx="3" fill="#5b78c4"/><rect x="110.1" y="59.0" width="11.5" height="81.0" rx="3" fill="#8aa5e6"/><rect x="123.7" y="55.0" width="11.5" height="85.0" rx="3" fill="#8aa5e6"/><rect x="137.2" y="72.0" width="11.5" height="68.0" rx="3" fill="#5b78c4"/><rect x="150.7" y="62.0" width="11.5" height="78.0" rx="3" fill="#5b78c4"/><rect x="164.2" y="53.0" width="11.5" height="87.0" rx="3" fill="#8aa5e6"/><rect x="177.8" y="48.0" width="11.5" height="92.0" rx="3" fill="#8aa5e6"/><rect x="191.3" y="69.0" width="11.5" height="71.0" rx="3" fill="#5b78c4"/><rect x="204.8" y="57.0" width="11.5" height="83.0" rx="3" fill="#8aa5e6"/><rect x="218.3" y="50.0" width="11.5" height="90.0" rx="3" fill="#8aa5e6"/><rect x="231.9" y="42.0" width="11.5" height="98.0" rx="3" fill="#d3ddf7"/><rect x="245.4" y="65.0" width="11.5" height="75.0" rx="3" fill="#5b78c4"/><rect x="258.9" y="54.0" width="11.5" height="86.0" rx="3" fill="#8aa5e6"/><rect x="272.4" y="45.0" width="11.5" height="95.0" rx="3" fill="#d3ddf7"/><rect x="286.0" y="39.0" width="11.5" height="101.0" rx="3" fill="#d3ddf7"/><rect x="299.5" y="74.0" width="11.5" height="66.0" rx="3" fill="#5b78c4"/>
+<polyline fill="none" stroke="#f2f4f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="34.8,139.2 48.3,136.9 61.8,134.5 75.3,130.6 88.9,128.2 102.4,124.3 115.9,117.3 129.4,110.2 143.0,106.3 156.5,102.4 170.0,95.3 183.5,88.2 197.0,84.3 210.6,77.3 224.1,70.2 237.6,58.4 251.1,54.5 264.7,47.5 278.2,35.7 291.7,23.9 305.2,20.0"/>
+<circle cx="305.2" cy="20.0" r="4" fill="#f2f4f7"/>
+<g text-anchor="middle"><text x="28" y="158">19:00</text><text x="120" y="158">19:35</text><text x="212" y="158">20:10</text><text x="304" y="158">20:45</text></g>
+</svg>
+      <div class="basis">Tipp auf eine Stelle zeigt Uhrzeit, Puls und bisherige Belastung.</div>
+    </div>
+    <div class="card">
+      <h4>Am nächsten Morgen etwas unter deinem Bereich.</h4>
+      <div class="after">
+        <div><span>HRV</span><span>41 ms · <span class="pill warn">unter Bereich 44–58</span></span></div>
+        <div><span>Ruhepuls</span><span>61 · <span class="pill warn">über 56–60</span></span></div>
+        <div><span>Schlaf</span><span>6:48 h</span></div>
+        <div><span>Readiness</span><span>58 · <span class="pill rec">mittel</span></span></div>
+        <div><span>Zyklus</span><span><span class="pill cyc">Tag 11 · Follikelphase (geschätzt)</span></span></div>
+      </div>
+    </div>
+  </div>
+  <p class="note">Alles aus Daten, die schon in der App liegen. Die Pulszonen brauchen einen kleinen Datenbankschritt (Schritt 2).</p>
+</section>
+
+<!-- 2 SPORTART -->
+<section class="col">
+  <h2>2 · Sportart</h2>
+  <div class="phone">
+    <div class="head">
+      <div class="back">‹ Training</div>
+      <h3>Insights</h3>
+      <div class="sub">Was deine Einheiten zeigen</div>
+    </div>
+    <div class="chips"><span class="chip on">Karate</span><span class="chip">Kettlebell</span><span class="chip">Bouldern</span><span class="chip">Ausdauer</span></div>
+    <div class="card">
+      <h4>Bei Karate ist die Belastung in 8 Wochen leicht gestiegen, der Puls blieb gleich.</h4>
+      <p>Belastung je Einheit (Balken) und Puls Ø (Linie).</p>
+      <svg viewBox="0 0 320 170" role="img" aria-label="Belastung und Puls der letzten 8 Karate-Einheiten, Beispieldaten">
+        <g stroke="#2c323b" stroke-width="1"><line x1="28" y1="20" x2="312" y2="20"/><line x1="28" y1="65" x2="312" y2="65"/><line x1="28" y1="110" x2="312" y2="110"/><line x1="28" y1="140" x2="312" y2="140"/></g>
+        <text x="0" y="23">140</text><text x="0" y="68">100</text><text x="0" y="113">60</text><text x="0" y="143">0</text>
+        <g fill="#5b78c4">
+          <rect x="38" y="68" width="22" height="72" rx="5"/><rect x="73" y="62" width="22" height="78" rx="5"/><rect x="108" y="75" width="22" height="65" rx="5"/><rect x="143" y="58" width="22" height="82" rx="5"/>
+          <rect x="178" y="64" width="22" height="76" rx="5"/><rect x="213" y="52" width="22" height="88" rx="5"/><rect x="248" y="60" width="22" height="80" rx="5"/>
+        </g>
+        <rect x="283" y="37" width="22" height="103" rx="5" fill="#afc2ee"/>
+        <polyline fill="none" stroke="#f2f4f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="49,66 84,60 119,72 154,62 189,58 224,64 259,60 294,56"/>
+        <circle cx="294" cy="56" r="4" fill="#f2f4f7"/>
+        <g text-anchor="middle"><text x="49" y="158">28.9.</text><text x="119" y="158">12.10.</text><text x="189" y="158">26.10.</text><text x="294" y="158">16.11.</text></g>
+      </svg>
+      <div class="tiles">
+        <div class="tile"><div class="l">Pro Woche</div><div class="v">1,0 <small>×</small></div><div class="c">fest montags</div></div>
+        <div class="tile"><div class="l">Dauer Ø</div><div class="v">1:33 <small>h</small></div><div class="c">letzte 8 Einheiten</div></div>
+      </div>
+    </div>
+  </div>
+  <p class="note">Je Sportart dieselbe Seite. Die letzte Einheit ist hell hervorgehoben und führt in die Einheit-Ansicht.</p>
+</section>
+
+<!-- 3 MUSTER -->
+<section class="col">
+  <h2>3 · Muster über alle Einheiten</h2>
+  <div class="phone">
+    <div class="head">
+      <div class="back">‹ Gesundheit</div>
+      <h3>Weitere Muster</h3>
+      <div class="sub">Training und Erholung</div>
+    </div>
+    <div class="card">
+      <h4>Nach Karate liegt deine HRV am nächsten Morgen meist etwas tiefer.</h4>
+      <p>Abweichung der HRV vom Morgen danach zu deinem Bereich, in ms.</p>
+      <div class="bars">
+        <div class="bar"><span>Karate</span><div class="t"><u style="left:50%;width:22%;background:var(--warn)"></u></div><span class="n">−4 <small>·9</small></span></div>
+        <div class="bar"><span>Kettlebell</span><div class="t"><u style="left:50%;width:11%;background:var(--warn)"></u></div><span class="n">−2 <small>·11</small></span></div>
+        <div class="bar"><span>Bouldern</span><div class="t"><u style="left:50%;width:6%;background:var(--rec)"></u></div><span class="n">+1 <small>·6</small></span></div>
+        <div class="bar"><span>Ausdauer</span><div class="t"><u style="left:49%;width:2%;background:var(--muted)"></u></div><span class="n">0 <small>·7</small></span></div>
+      </div>
+      <div class="basis">Mitte = dein Bereich. Zahl nach dem Punkt: Anzahl Einheiten. Hinweis zu Zusammenhängen, kein Beweis für eine Ursache.</div>
+    </div>
+    <div class="card">
+      <h4>In der Lutealphase ist dein Puls bei Kettlebell im Schnitt höher.</h4>
+      <p>Puls Ø bei Kettlebell nach Zyklusphase.</p>
+      <div class="bars">
+        <div class="bar"><span>Menstruation</span><div class="t"><u style="left:0;width:56%;background:var(--z3)"></u></div><span class="n">122</span></div>
+        <div class="bar"><span>Follikel</span><div class="t"><u style="left:0;width:54%;background:var(--z3)"></u></div><span class="n">120</span></div>
+        <div class="bar"><span>Eisprung</span><div class="t"><u style="left:0;width:58%;background:var(--z3)"></u></div><span class="n">124</span></div>
+        <div class="bar"><span>Luteal</span><div class="t"><u style="left:0;width:66%;background:var(--z4)"></u></div><span class="n">128</span></div>
+      </div>
+      <div class="basis">Basis: 11 Einheiten in 4 Zyklen. Phasen geschätzt.</div>
+    </div>
+    <div class="card">
+      <div class="kicker">Noch zu wenig Daten</div>
+      <h4>Schlaf nach Abendtraining</h4>
+      <p>Dafür braucht es mindestens 5 Einheiten nach 20 Uhr. Bisher 3.</p>
+    </div>
+  </div>
+  <p class="note">Muster erscheinen erst ab 5 Einheiten je Gruppe, mit Angabe der Basis. Keine Diagnosen, keine Vorgaben.</p>
+</section>
+
+</div>

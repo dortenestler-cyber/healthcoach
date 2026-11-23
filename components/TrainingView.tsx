@@ -18,16 +18,18 @@ import CalendarSection from "@/components/training/CalendarSection";
 import KettlebellSection from "@/components/training/KettlebellSection";
 import ClimbSection from "@/components/training/ClimbSection";
 import KarateSection from "@/components/training/KarateSection";
+import InsightsSection from "@/components/training/InsightsSection";
 
 const TABS: [string, string][] = [
   ["kalender", "Kalender"],
   ["auswertung", "Auswertung"],
+  ["insights", "Insights"],
   ["kettlebell", "Kettlebell"],
   ["klettern", "Bouldern"],
   ["karate", "Karate"],
 ];
 
-// Training: Status oben, darunter Reiter Kalender · Auswertung · die drei Sportarten mit eigenen Zielen.
+// Training: Status oben, darunter Reiter Kalender · Auswertung · Insights · die drei Sportarten mit eigenen Zielen.
 // Auswertung bündelt Tagesziel, Lastkurve, Wochenlast, Trainingstage und Monatsrückblick.
 const TAB_FEATURE: Record<string, Feature> = {kettlebell: "kettlebell", klettern: "bouldern", karate: "karate"};
 
@@ -112,6 +114,7 @@ export default function TrainingView({ initial }: { initial: string }) {
           }
         />
       )}
+      {shown === "insights" && <InsightsSection data={data} />}
       {shown === "kettlebell" && <KettlebellSection />}
       {shown === "klettern" && <ClimbSection />}
       {shown === "karate" && <KarateSection />}

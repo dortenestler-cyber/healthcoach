@@ -14,7 +14,7 @@
 // Die Funktion läuft ohne JWT-Prüfung am Eingang (siehe Workflow), weil sie Login oder Schlüssel selbst prüft.
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { activityIntervals, computeDay, conversionFactor, FACTOR_START, HR_MAX_START, HR_REST_START, LOAD_VERSION, type LoadDay, MIN_COVERAGE, pointsFromSteps, type Sample } from "./alltag.ts";
+import { actDetailRow, type ActDetail, activityIntervals, computeDay, mergeActDetail, conversionFactor, FACTOR_START, HR_MAX_START, HR_REST_START, LOAD_VERSION, type LoadDay, MIN_COVERAGE, pointsFromSteps, type Sample } from "./alltag.ts";
 
 const GARMIN = "https://personal.connectapi.garmin.com";
 const WINDOW_DAYS = 28; // Garmin erlaubt höchstens 28 Tage pro Abfrage
@@ -564,6 +564,7 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
   const hrKnown = { path: null as string | null, failed: false };
   const results: { day: string; base: Omit<LoadDay, "faktor" | "faktor_n" | "last_alltag">; curve: (number | null)[] | null; stepsOutside: number | null }[] = [];
   const actPoints = new Map<number, number>();
+  const actDetail = new Map<number, ActDetail>();
   let note = "";
 
   for (const day of days) {
@@ -608,6 +609,7 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
     const rest = Number(hrData?.restingHeartRate) || Number(dayRow.get(day)?.resting_hr) || restFallback;
     const c = computeDay(samples, intervals, rest, hrMax, bewegung === "stress" ? (m) => moving.has(Math.floor(m / 15)) : null);
     for (const [id, p] of c.actPoints) actPoints.set(id, (actPoints.get(id) ?? 0) + p);
+    mergeActDetail(actDetail, c.actDetail);
 
     const todays = dayActs.filter((a) => String(a.start_local ?? "").slice(0, 10) === day);
     const steps = dayRow.get(day)?.steps;
@@ -640,10 +642,19 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
   if (!results.length) return { days: 0, note };
 
   // Pulspunkte je Aktivität speichern, dann den persönlichen Faktor aus den letzten 30 Trainings bilden
+  // Dazu Zonen und Pulsverlauf je Einheit (Training-Insights). Fehlen die Spalten noch, nur die Pulspunkte.
   if (actPoints.size) {
-    const { error } = await sb
-      .from("garmin_activities")
-      .upsert([...actPoints].map(([activity_id, p]) => ({ user_id: userId, activity_id, hr_points: Math.round(p * 10) / 10 })), { onConflict: "user_id,activity_id" });
+    const durOf = new Map<number, number | null>(acts.map((a) => [Number(a.activity_id), Number(a.duration_s) || null]));
+    const rows = [...actPoints].map(([activity_id, p]) => {
+      const d = actDetail.get(activity_id);
+      return { user_id: userId, activity_id, hr_points: Math.round(p * 10) / 10, ...(d ? actDetailRow(d, durOf.get(activity_id) ?? null) : {}) };
+    });
+    let { error } = await sb.from("garmin_activities").upsert(rows, { onConflict: "user_id,activity_id" });
+    if (error && /hr_zones|hr_series/.test(error.message)) {
+      ({ error } = await sb
+        .from("garmin_activities")
+        .upsert(rows.map(({ user_id, activity_id, hr_points }) => ({ user_id, activity_id, hr_points })), { onConflict: "user_id,activity_id" }));
+    }
     if (error) throw new Error("Pulspunkte der Aktivitäten: " + error.message);
   }
   const { data: fRows, error: fErr } = await sb

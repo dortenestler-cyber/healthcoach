@@ -37,7 +37,7 @@ export default function RecentActivities({ day, data }: { day: string; data: Dat
           if (a.duration_s) parts.push(hm(a.duration_s / 3600));
           if (a.training_load) parts.push(`Belastung ${Math.round(a.training_load)}`);
           return (
-            <Link key={a.activity_id} href="/training" className="today-act">
+            <Link key={a.activity_id} href={`/training/einheit/${a.activity_id}`} className="today-act">
               <span className="today-act-icon is-training" aria-hidden="true">
                 <SportIcon sport={sport} size={20} />
               </span>
