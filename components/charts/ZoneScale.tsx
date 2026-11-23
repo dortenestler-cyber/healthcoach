@@ -1,7 +1,10 @@
+"use client";
+
 // Zonen-Skala: waagrechte Skala mit benannten Zonen und einem Punkt für den heutigen Wert.
 // Beispiel Belastungsverhältnis: unter 0,8 · 0,8–1,3 · über 1,3. Der Zielbereich ist hervorgehoben, jede Zone hat ihr Wort.
 
-import { W, linear, type Tone } from "@/components/charts/scale";
+import { linear, type Tone } from "@/components/charts/scale";
+import { useChartWidth } from "@/components/charts/useChartWidth";
 
 export type Zone = { to: number; label: string; target?: boolean };
 
@@ -20,6 +23,7 @@ const BAR_Y = 20;
 const BAR_H = 12;
 
 export default function ZoneScale({ value, min, max, zones, fmt, label, tone = "training" }: Props) {
+  const { ref, w: W } = useChartWidth();
   const x = linear(min, max, 8, W - 8);
   const clamp = (v: number) => Math.min(max, Math.max(min, v));
   let from = min;
@@ -30,7 +34,7 @@ export default function ZoneScale({ value, min, max, zones, fmt, label, tone = "
   });
 
   return (
-    <svg className={`cb cb-${tone}`} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
+    <svg ref={ref} className={`cb cb-${tone}`} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
       {parts.map((p, i) => (
         <g key={i}>
           <rect x={x(p.from) + (i ? 1 : 0)} width={Math.max(1, x(p.to) - x(p.from) - (i ? 1 : 0))} y={BAR_Y} height={BAR_H} className={p.target ? "cb-zone-target" : "cb-zone-off"} />

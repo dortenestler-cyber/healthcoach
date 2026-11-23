@@ -1,11 +1,13 @@
 "use client";
 
-import { extent, linear, niceTicks, segments, W, type Tone } from "@/components/charts/scale";
+import { extent, grownHeight, linear, niceTicks, segments, type Tone } from "@/components/charts/scale";
+import { useChartWidth } from "@/components/charts/useChartWidth";
+
 import { ChartTip, usePick } from "@/components/charts/pick";
 import { PHASE_GROUP_LABEL } from "@/lib/cycle";
 import type { ByCycleDay } from "@/lib/zyklusSeite";
 
-const H = 170;
+const H0 = 170;
 const PAD_L = 4;
 const PAD_R = 52;
 const PAD_T = 14;
@@ -14,6 +16,8 @@ const PAD_B = 22;
 // Wert nach Zyklustag: laufender Zyklus (Farbe des Werts) über dem Schnitt der früheren Zyklen (grau).
 // Phasen als Leiste unter der Achse, Antippen zeigt Zyklustag, Wert und Schnitt.
 export default function CycleDayChart({ d, fmt, label, tone, zeroLine }: { d: ByCycleDay; fmt: (v: number) => string; label: string; tone: Tone; zeroLine?: boolean }) {
+  const { ref, w: W } = useChartWidth();
+  const H = grownHeight(H0, W);
   const n = d.length;
   const ext = extent(d.current, d.usual, zeroLine ? [0] : []);
   const ticks = ext ? niceTicks(ext[0], ext[1]) : [];
@@ -23,7 +27,7 @@ export default function CycleDayChart({ d, fmt, label, tone, zeroLine }: { d: By
   const pts = (v: (number | null)[]) => segments(v.map((val, i) => (val === null ? null : { x: x(i), y: y(val) })));
   const last = [...d.current.keys()].reverse().find((i) => d.current[i] !== null);
   const lastV = last !== undefined ? (d.current[last] as number) : null;
-  const pick = usePick(n, PAD_L, step);
+  const pick = usePick(n, PAD_L, step, W);
   const sel = pick.sel;
   const runs: { p: (typeof d.phases)[number]; from: number; to: number }[] = [];
   d.phases.forEach((p, i) => {
@@ -33,7 +37,7 @@ export default function CycleDayChart({ d, fmt, label, tone, zeroLine }: { d: By
   });
 
   return (
-    <svg className={`cb cb-${tone} cb-pickable`} viewBox={`0 0 ${W} ${H + 24}`} role="img" aria-label={label} {...pick.handlers}>
+    <svg ref={ref} className={`cb cb-${tone} cb-pickable`} viewBox={`0 0 ${W} ${H + 24}`} role="img" aria-label={label} {...pick.handlers}>
       {ticks.map((t) => (
         <g key={t}>
           <line x1={PAD_L} x2={W - PAD_R} y1={y(t)} y2={y(t)} className={zeroLine && t === 0 ? "cb-zero" : "cb-grid"} />
@@ -67,6 +71,7 @@ export default function CycleDayChart({ d, fmt, label, tone, zeroLine }: { d: By
           <line x1={x(sel)} x2={x(sel)} y1={PAD_T - 6} y2={H - PAD_B} className="cb-pick-line" />
           {d.current[sel] !== null && <circle cx={x(sel)} cy={y(d.current[sel] as number)} r={5} className="cb-pick-dot" />}
           <ChartTip
+            w={W}
             x={x(sel)}
             lines={[
               `Tag ${sel + 1} · ${d.current[sel] === null ? "kein Wert" : fmt(d.current[sel] as number)}`,

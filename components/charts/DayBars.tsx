@@ -5,7 +5,8 @@
 // Markierung (z. B. Nachtschweiß) als Punkt über der Säule, immer mit Legende im Text darunter.
 
 import type { Range } from "@/lib/baseline";
-import { W, extent, linear, niceTicks, type Tone } from "@/components/charts/scale";
+import { extent, grownHeight, linear, niceTicks, type Tone } from "@/components/charts/scale";
+import { useChartWidth } from "@/components/charts/useChartWidth";
 import { ChartTip, tipDate, usePick } from "@/components/charts/pick";
 
 export type Bar = { label: string; value: number | null; today?: boolean; marker?: boolean; part?: number | null; date?: string; tip?: string }; // part: kräftiger Teil unten (Training), der Rest hell (Alltag)
@@ -28,7 +29,9 @@ const PAD_R = 4;
 const PAD_T = 18;
 const PAD_B = 22;
 
-export default function DayBars({ bars, fmt, label, tone = "training", band, corridor, target, targetLabel, markerLabel, height = 160 }: Props) {
+export default function DayBars({ bars, fmt, label, tone = "training", band, corridor, target, targetLabel, markerLabel, height: baseHeight = 160 }: Props) {
+  const { ref, w } = useChartWidth();
+  const height = grownHeight(baseHeight, w);
   const n = Math.max(bars.length, 1);
   const ext = extent(
     bars.map((b) => b.value),
@@ -40,12 +43,12 @@ export default function DayBars({ bars, fmt, label, tone = "training", band, cor
   const ticks = ext ? niceTicks(Math.min(0, ext[0]), ext[1]) : [0, 1];
   const d1 = ticks[ticks.length - 1] || 1;
   const x0 = PAD_L;
-  const x1 = W - PAD_R;
+  const x1 = w - PAD_R;
   const step = (x1 - x0) / n;
   const bw = Math.min(28, step * 0.62);
   const y = linear(0, d1, height - PAD_B, PAD_T);
   const hasMarker = bars.some((b) => b.marker);
-  const pick = usePick(n, x0, step);
+  const pick = usePick(n, x0, step, w);
   const sel = pick.sel;
   const tipLines = (b: Bar): string[] => {
     if (!b.date && b.tip) return [`${b.tip} · ${b.value === null ? "kein Wert" : fmt(b.value)}`];
@@ -63,7 +66,7 @@ export default function DayBars({ bars, fmt, label, tone = "training", band, cor
 
   return (
     <figure className={`cb-figure cb-${tone}`}>
-      <svg className="cb cb-pickable" viewBox={`0 0 ${W} ${height}`} role="img" aria-label={label} {...pick.handlers}>
+      <svg ref={ref} className="cb cb-pickable" viewBox={`0 0 ${w} ${height}`} role="img" aria-label={label} {...pick.handlers}>
         {ticks.map((t) => (
           <g key={t}>
             <line x1={x0} x2={x1} y1={y(t)} y2={y(t)} className="cb-grid" />
@@ -106,7 +109,7 @@ export default function DayBars({ bars, fmt, label, tone = "training", band, cor
         {sel !== null && bars[sel] && (
           <g aria-hidden="true">
             <rect x={x0 + sel * step} y={PAD_T - 4} width={step} height={height - PAD_B - PAD_T + 4} rx={4} className="cb-pick-col" />
-            <ChartTip x={x0 + (sel + 0.5) * step} lines={tipLines(bars[sel])} />
+            <ChartTip w={w} x={x0 + (sel + 0.5) * step} lines={tipLines(bars[sel])} />
           </g>
         )}
       </svg>

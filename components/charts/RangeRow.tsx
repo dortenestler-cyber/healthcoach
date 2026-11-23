@@ -1,9 +1,12 @@
+"use client";
+
 // Bereichszeile: Name, heutiger Wert und Einordnung in Worten, darunter eine Spur mit dem eigenen Bereich und einem Punkt.
 // Gibt es einen Bereich der heutigen Zyklusphase, stehen beide da: der Phasen-Bereich (gilt heute) und der 30-Tage-Bereich.
 // Ein vorläufiger Bereich (unter 14 Tagen) ist als solcher benannt.
 
 import { NO_RANGE_TEXT, positionIn, positionText, type Range } from "@/lib/baseline";
-import { W, extent, linear, type Tone } from "@/components/charts/scale";
+import { extent, linear, type Tone } from "@/components/charts/scale";
+import { useChartWidth } from "@/components/charts/useChartWidth";
 
 type Props = {
   label: string;
@@ -18,6 +21,7 @@ type Props = {
 const H = 26;
 
 export default function RangeRow({ label, value, fmt, range, phase, phaseName = "Phase", tone = "recovery" }: Props) {
+  const { ref, w: W } = useChartWidth();
   const active = phase ?? range;
   const pos = value !== null && active ? positionIn(value, active) : null;
   const ext = extent([value], range ? [range.lo, range.hi] : [], phase ? [phase.lo, phase.hi] : []);
@@ -39,7 +43,7 @@ export default function RangeRow({ label, value, fmt, range, phase, phaseName = 
         <span>{rangeText}</span>
       </div>
       {active && (
-        <svg className="cb" viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
+        <svg ref={ref} className="cb" viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
           <line x1={7} x2={W - 7} y1={H / 2} y2={H / 2} className="cb-track" />
           {range && phase && <rect x={x(range.lo)} width={Math.max(2, x(range.hi) - x(range.lo))} y={H / 2 - 5} height={10} rx={5} className="cb-range-ghost" />}
           <rect x={x(active.lo)} width={Math.max(2, x(active.hi) - x(active.lo))} y={H / 2 - 5} height={10} rx={5} className={phase ? "cb-range-luteal" : "cb-range"} />
