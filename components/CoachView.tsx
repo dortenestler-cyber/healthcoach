@@ -9,6 +9,41 @@ import { getCoachPrefs, useCoachPrefs } from "@/lib/prefs";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
+// Leichtes Markdown der Antworten: **fett** und Listen mit „- “, sonst reiner Text
+function Inline({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(/(\*\*[^*]+\*\*)/g).map((p, i) =>
+        p.startsWith("**") && p.endsWith("**") && p.length > 4 ? <strong key={i}>{p.slice(2, -2)}</strong> : <span key={i}>{p}</span>,
+      )}
+    </>
+  );
+}
+
+function Answer({ text }: { text: string }) {
+  const blocks: { list: boolean; lines: string[] }[] = [];
+  for (const raw of text.split("\n")) {
+    const line = raw.trimEnd();
+    const item = /^\s*[-*•]\s+/.test(line);
+    if (!line.trim()) { blocks.push({ list: false, lines: [] }); continue; }
+    const last = blocks[blocks.length - 1];
+    const content = item ? line.replace(/^\s*[-*•]\s+/, "") : line.replace(/^#+\s*/, "");
+    if (last && last.list === item && last.lines.length) last.lines.push(content);
+    else blocks.push({ list: item, lines: [content] });
+  }
+  return (
+    <div className="answer">
+      {blocks.filter((b) => b.lines.length).map((b, i) =>
+        b.list ? (
+          <ul key={i}>{b.lines.map((l, j) => <li key={j}><Inline text={l} /></li>)}</ul>
+        ) : (
+          <p key={i}>{b.lines.map((l, j) => <span key={j}>{j > 0 && <br />}<Inline text={l} /></span>)}</p>
+        ),
+      )}
+    </div>
+  );
+}
+
 // Kleines Coach-Zeichen vor jeder Antwort (Markenfarbe Beere, wie der Coach-Knopf)
 function CoachMark() {
   return (
@@ -36,6 +71,7 @@ export default function CoachView({ panel, onClose }: { panel?: boolean; onClose
   const [error, setError] = useState("");
   const [prefilled, setPrefilled] = useState(false);
   const context = useRef<Promise<string> | null>(null);
+  const contextAt = useRef(0);
   const end = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLTextAreaElement>(null);
   const prefs = useCoachPrefs();
@@ -53,6 +89,7 @@ export default function CoachView({ panel, onClose }: { panel?: boolean; onClose
       });
     // Zusammenfassung schon vorbereiten, damit die erste Antwort schneller kommt
     context.current = buildCoachContext().catch(() => "");
+    contextAt.current = Date.now();
     // Coach-Einstieg aus einer Karte: Frage vorbelegen, gesendet wird erst nach deinem Tippen
     const frage = panel ? null : new URLSearchParams(window.location.search).get("frage");
     if (frage) {
@@ -97,7 +134,12 @@ export default function CoachView({ panel, onClose }: { panel?: boolean; onClose
     setError("");
     setMsgs((m) => [...m, { role: "user", content: question }]);
     setBusy(true);
-    const ctx = await (context.current ?? Promise.resolve(""));
+    // Zusammenfassung älter als 2 Minuten (Coach-Spalte bleibt lange offen, Garmin synchronisiert): neu bauen
+    if (!context.current || Date.now() - contextAt.current > 120_000) {
+      context.current = buildCoachContext().catch(() => "");
+      contextAt.current = Date.now();
+    }
+    const ctx = await context.current;
     const { data, error: e } = await sb.functions.invoke("coach", { body: { message: question, context: ctx, limit: getCoachPrefs().dailyLimit } });
     setBusy(false);
     let detail = data?.error as string | undefined;
@@ -166,8 +208,7 @@ export default function CoachView({ panel, onClose }: { panel?: boolean; onClose
         )}
         {msgs.map((m, i) => (
           <div key={i} className={m.role === "user" ? "bubble bubble-user" : "bubble bubble-assistant"}>
-            {m.role === "assistant" && <CoachMark />}
-            {m.content}
+            {m.role === "assistant" ? (<><CoachMark /><Answer text={m.content} /></>) : m.content}
           </div>
         ))}
         {busy && (
@@ -188,9 +229,11 @@ export default function CoachView({ panel, onClose }: { panel?: boolean; onClose
       </div>
       {prefilled && text && <span className="meta">Frage vorbereitet. Sie geht erst an den Coach, wenn du auf Senden tippst.</span>}
       <form className="chat-input" onSubmit={submit}>
-        <textarea ref={field} className="input" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="Frag deinen Coach" aria-label="Frage an den Coach" maxLength={2000} />
-        <button type="submit" className="btn btn-primary chat-send" disabled={busy || !text.trim()}>
-          Senden
+        <textarea ref={field} className="input" rows={1} value={text} onChange={(e) => setText(e.target.value)} placeholder="Frag deinen Coach" aria-label="Frage an den Coach" maxLength={2000} />
+        <button type="submit" className="chat-send" disabled={busy || !text.trim()} aria-label="Senden">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 19V5M5.5 11.5 12 5l6.5 6.5" />
+          </svg>
         </button>
       </form>
       <span className="hint">Antworten kommen von Claude. Pro Frage geht nur eine kurze Zusammenfassung deiner Daten mit.</span>
