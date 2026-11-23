@@ -139,7 +139,8 @@ function beforeLine(inp: KorridorInput): Line | null {
   const r = rate(inp, addDays(inp.today, -LOOK_DAYS));
   const bad = r.filter((x) => x.bad);
   if (bad.length < 4) return null;
-  const diaryBy = new Map(inp.diary.filter((d) => !d.garminOnly).map((d) => [d.day, d]));
+  // Auch Tage nur aus Garmin: Sport und Stress von garmin-sync zählen als Faktor (Periode aus Garmin hat keine Gewohnheiten)
+  const diaryBy = new Map(inp.diary.map((d) => [d.day, d]));
   const ctxDay = (day: string) => (inp.nightValue ? addDays(day, -1) : day);
   const factorsOf = (day: string): string[] => {
     const c = ctxDay(day);

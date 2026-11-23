@@ -29,7 +29,7 @@ export default function TodayPlan({ children }: { children?: ReactNode }) {
       const day = isoDay();
       const [p, a, il, inj, so] = await Promise.all([
         sb.from("planned_sessions").select("*").eq("day", day),
-        sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load").gte("start_local", day).lte("start_local", day + "T23:59:59"),
+        sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load, sport_override, sport_label").gte("start_local", day).lte("start_local", day + "T23:59:59"),
         sb.from("illnesses").select("*").is("ended_on", null).limit(1),
         sb.from("injuries").select("*").is("ended_on", null),
         loadActivityOverrides(sb, day),

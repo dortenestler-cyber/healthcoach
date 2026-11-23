@@ -10,6 +10,7 @@ import { baselineFor, RANGE_PHASE_NAMES, type Baseline, type Range } from "@/lib
 
 export type Diary = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[]; fromGarmin?: boolean; garminOnly?: boolean; ovulation?: string[] };
 // fromGarmin: Blutung an diesem Tag stammt aus Garmin · garminOnly: kein eigener Tagebucheintrag an diesem Tag
+// (Periode aus Garmin oder nur Sport/Stress von garmin-sync, Spalte manual = false)
 export type Checkin = { day: string; energy: number | null; sleep: number | null; mood: number | null };
 export type Hub = { day: string };
 
@@ -382,4 +383,9 @@ export function patterns(data: Data): Pattern[] {
   });
 
   return out;
+}
+
+// Einträge, die nur garmin-sync angelegt hat (manual = false), zählen in Auswertungen nicht als eigener Tagebuch-Tag
+export function markAutoRows<T extends { manual?: boolean | null }>(rows: T[]): (T & { garminOnly?: boolean })[] {
+  return rows.map((r) => (r.manual === false ? { ...r, garminOnly: true } : r));
 }

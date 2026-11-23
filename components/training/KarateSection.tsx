@@ -27,7 +27,7 @@ export default function KarateSection() {
       loadSettings(sb),
       sb.from("karate_items").select("id, label, category, done").order("created_at"),
       sb.from("planned_sessions").select("day").eq("sport", "karate").eq("status", "erledigt").gte("day", from),
-      sb.from("garmin_activities").select("type_key, start_local").gte("start_local", from),
+      sb.from("garmin_activities").select("type_key, start_local, sport_override").gte("start_local", from),
       sb.from("injuries").select("*").is("ended_on", null),
     ]);
     setSettings(s);
@@ -35,7 +35,7 @@ export default function KarateSection() {
     setItems((it.data ?? []) as Item[]);
     setInjuries((inj.data ?? []) as Injury[]);
     const days = new Set<string>(((p.data ?? []) as { day: string }[]).map((r) => r.day));
-    for (const r of (a.data ?? []) as { type_key: string | null; start_local: string | null }[]) {
+    for (const r of (a.data ?? []) as { type_key: string | null; start_local: string | null; sport_override?: string | null }[]) {
       if (sportOf(r) === "karate" && r.start_local) days.add(r.start_local.slice(0, 10));
     }
     const now = weekStart(new Date()).getTime();

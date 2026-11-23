@@ -187,8 +187,11 @@ const TYPE_LABELS: Record<string, string> = {
   other: "Sonstiges",
 };
 
+// Name einer Aktivität: eigener Name, sonst eigene Sportart (Karate …), sonst die Garmin-Sportart
+const OWN_LABELS: Record<string, string> = { karate: "Karate", kettlebell: "Kettlebell", klettern: "Bouldern", ausdauer: "Ausdauer" };
 export function activityLabel(a: Activity): string {
   if (a.sport_label) return a.sport_label;
+  if (a.sport_override && OWN_LABELS[a.sport_override]) return OWN_LABELS[a.sport_override];
   const k = a.type_key ?? "other";
   return TYPE_LABELS[k] ?? (a.name || k.replace(/_/g, " "));
 }

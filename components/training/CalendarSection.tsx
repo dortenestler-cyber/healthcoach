@@ -68,7 +68,7 @@ export default function CalendarSection({ data }: { data: Data | null }) {
     }
     const [p, a, d, il, inj] = await Promise.all([
       sb.from("planned_sessions").select("*").gte("day", first).lte("day", last).order("day"),
-      sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load").gte("start_local", first).lte("start_local", last + "T23:59:59"),
+      sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load, sport_override, sport_label").gte("start_local", first).lte("start_local", last + "T23:59:59"),
       loadPeriodDays(sb, first, last),
       sb.from("illnesses").select("*").is("ended_on", null).limit(1),
       sb.from("injuries").select("*").is("ended_on", null),
