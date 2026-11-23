@@ -9,9 +9,12 @@ Konzept „Heute als Einstiegsseite“ liegt zur Sichtung vor (nur Doku und Entw
 ## In Arbeit
 - Konzept Heute als Einstiegsseite, Zweig `claude/determined-davinci-s4e3l7`: `docs/konzept-heute-einstieg.md`, Entwurf `docs/entwurf-heute-einstieg.html` (veröffentlicht: https://claude.ai/artifact/HtFtkHrKKDQJaBQmiuLHEQ), Prompt `docs/prompt-heute-einstieg.md`. Fünf Ringe (Energie, Schlaf, Readiness, Belastung, Stress), eine Erklärkarte, Kacheln „Auf einen Blick“, Heute steht an, Letzte Aktivitäten; Detailseiten je Ring.
   Nächster Schritt: Antworten auf die fünf offenen Fragen, nach Freigabe ein PR für Heute, dann Detailseiten.
+- Farb- und Designkonzept „Nacht“, gleicher Zweig: `docs/farb-und-designkonzept.md`, Ansicht `docs/entwurf-farbkonzept.html` (https://claude.ai/artifact/JAF54suDGLf1afKAyjjNQN). Immer dunkel, sechs Farbfamilien, „mehr ist heller“, Energie in Sage hell, neue Variablen `--card-2`, `--axis`, Stufen für Readiness, Pulszonen, Schlafphasen. Heute-Entwurf nutzt die Farben schon.
+  Nächster Schritt nach Freigabe: PR „Immer dunkel“ (helles Thema, `lib/themeBoot.ts`, Einstellung Darstellung entfernen, `CLAUDE.md` anpassen), dann PR „Farben Nacht“, dann Heute.
 - Korridore Schritt 4 (Zweig `claude/confident-fermat-wy3iur`): nichts aus dem Konzept offen, Rückmeldung abwarten.
 
 ## Wartet auf
+- Nutzerin: Sichtung und Antworten zum Farbkonzept „Nacht“
 - Nutzerin: Sichtung und Antworten zum Konzept Heute (`AUFGABEN.md` Abschnitt „Heute als Einstiegsseite“)
 - Nutzerin: Rückmeldung zu Heute, Zyklus und Training im Design „dunkel 2“ (`AUFGABEN.md` Abschnitt 10)
 - Nutzerin: Rückmeldung zur Seite Zyklus (`AUFGABEN.md` Abschnitt 6)

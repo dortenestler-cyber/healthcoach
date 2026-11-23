@@ -61,6 +61,10 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 - [x] PR #14 geschlossen, er ist durch #47 ersetzt
 - [ ] Am nächsten Morgen nach 6:15 Uhr die App öffnen: Die Daten sollten schon da sein. Steht auf Heute ein Hinweis zum Morgen-Abruf, Claude Bescheid geben
 
+### Farb- und Designkonzept „Nacht“ (Konzept, noch kein Code)
+- [ ] Ansehen: `docs/entwurf-farbkonzept.html` (auch als Seite in Claude), Text `docs/farb-und-designkonzept.md`
+- [ ] Drei offene Fragen beantworten (immer dunkel auch im Browser, Farbe für Energie, Beere im Rand der Erklärkarte), dann „Freigabe“ sagen
+
 ### Heute als Einstiegsseite (Konzept, noch kein Code)
 - [ ] Entwurf ansehen: `docs/entwurf-heute-einstieg.html` (auch als Seite in Claude), Konzept `docs/konzept-heute-einstieg.md`
 - [ ] Die fünf offenen Fragen am Ende des Konzepts beantworten, dann „Freigabe“ sagen

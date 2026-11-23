@@ -16,3 +16,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-22 · DA · Nutzerin: Readiness der Uhr an die App angleichen (Bereiche je Zyklusphase, Schlaf zyklusabhängig, Krankheitstage raus)
 2026-11-22 · DA · Nutzerin: Alltagslast ohne Schrittverlauf: Zone 1 zählt, wenn sie mindestens 10 Minuten am Stück anhält, Zone 2 und höher immer · Garmin liefert keinen Schrittverlauf (404)
 2026-11-22 · DA · Nutzerin: Stresskurve über den Tag reparieren
+2026-11-23 · OF · Nutzerin: App auf dem iPhone immer dunkel, dazu ein vollständiges Farb- und Designkonzept · Umsetzung nach Freigabe von `docs/farb-und-designkonzept.md`

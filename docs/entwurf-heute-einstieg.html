@@ -28,18 +28,7 @@
   --a-st: #45c4c0; --a-st-bg: #12302f; --a-st-fg: #9fe3e0; --a-st-1: #2f6e6c; --a-st-2: #3c9e9a; --a-st-3: #6fd8d4;
   --a-glow-heute: #173326; --a-glow-tr: #1b2438; --a-glow-st: #12302f; --a-glow-g: #262b33;
   --a-brand: #a3234f; --a-hatch: #2a3038; --a-frame: #000000;
-}
-.app-light {
-  --a-bg: #f2f2f7; --a-card: #ffffff; --a-fill: #e9e9ee; --a-line: #e5e5ea; --a-line-soft: #efeff4;
-  --a-text: #1c1c1e; --a-text-2: #3c4043; --a-muted: #5f6368; --a-primary: #1c1c1e;
-  --a-rec: #2d6a4f; --a-rec-bg: #e3f1e8; --a-rec-fg: #1e5a3f;
-  --a-cyc: #b4491f; --a-cyc-bg: #fbe9e2; --a-cyc-fg: #8f3a18;
-  --a-tr: #3b5998; --a-tr-bg: #e4eaf7; --a-tr-fg: #2b4378; --a-tr-zone: #c9d5ee; --a-tr-alltag: #8ea4d6;
-  --a-warn: #b45309; --a-warn-bg: #fdf0d5;
-  --a-sleep: #48505a;
-  --a-st: #0e7470; --a-st-bg: #ddf2f1; --a-st-fg: #0b5a57; --a-st-1: #a9dcd9; --a-st-2: #4fa9a5; --a-st-3: #0e7470;
-  --a-glow-heute: #e3f1e8; --a-glow-tr: #e4eaf7; --a-glow-st: #ddf2f1; --a-glow-g: #e9e9ee;
-  --a-brand: #a3234f; --a-hatch: #dcdce2; --a-frame: #1c1c1e;
+  --a-rec-h: #8fd5b0; --a-beere-h: #e0527f; --a-st-ruhe: #5c6571; --a-rem: #aeb6c2; --a-leicht: #7d8794; --a-wach: #626b78; --a-axis: #7a838f;
 }
 
 * { box-sizing: border-box; }
@@ -124,7 +113,7 @@ details.p > summary { cursor: pointer; font-weight: 600; min-height: 44px; displ
 .ring-num { font-weight: 800; letter-spacing: -0.02em; }
 
 /* Erklärkarte */
-.explain { position: relative; border-radius: 18px; padding: 14px 16px 6px; margin-top: 14px; background: linear-gradient(var(--a-bg), var(--a-bg)) padding-box, linear-gradient(135deg, var(--ex-a, var(--a-rec)), var(--a-line) 55%, var(--ex-b, var(--a-tr))) border-box; border: 1.5px solid transparent; font-size: 14.5px; line-height: 1.45; }
+.explain { position: relative; border-radius: 18px; padding: 14px 16px 6px; margin-top: 14px; background: linear-gradient(var(--a-bg), var(--a-bg)) padding-box, linear-gradient(120deg, var(--ex-a, var(--a-rec)), var(--a-line) 50%, var(--a-beere-h)) border-box; border: 1.5px solid transparent; font-size: 14.5px; line-height: 1.45; }
 .explain b { font-weight: 700; }
 .explain .more { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--a-text); min-height: 40px; text-decoration: none; }
 
@@ -216,14 +205,10 @@ details.p > summary { cursor: pointer; font-weight: 600; min-height: 44px; displ
 <div class="wrap">
   <span class="eyebrow">Health Coach · Konzept zur Sichtung · 23.11.2026</span>
   <h1>Heute als ruhige Einstiegsseite</h1>
-  <p class="lead">Oben fünf Ringe für deinen Tag, darunter vier Abschnitte. Alles Weitere liegt einen Tipp tiefer, auf Detailseiten im Stil von Whoop. Der Aufbau folgt der Startseite von Sonar (dein letzter Screenshot).</p>
+  <p class="lead">Die App ist immer dunkel, Farben nach dem Farbkonzept „Nacht“. Oben fünf Ringe für deinen Tag, darunter vier Abschnitte. Alles Weitere liegt einen Tipp tiefer, auf Detailseiten im Stil von Whoop. Der Aufbau folgt der Startseite von Sonar (dein letzter Screenshot).</p>
   <p><span class="tag">Alle Zahlen sind Beispieldaten</span></p>
 
   <div class="toolbar">
-    <div class="seg" role="group" aria-label="Darstellung im Telefon">
-      <button type="button" id="th-dark" aria-pressed="true">Dunkel</button>
-      <button type="button" id="th-light" aria-pressed="false">Hell</button>
-    </div>
     <div class="seg" role="group" aria-label="Nummern im Telefon">
       <button type="button" id="nums-on" aria-pressed="true">Nummern zeigen</button>
       <button type="button" id="nums-off" aria-pressed="false">Ohne Nummern</button>
@@ -243,7 +228,7 @@ details.p > summary { cursor: pointer; font-weight: 600; min-height: 44px; displ
         <div class="note"><h3><span class="num">2</span>Dein Tag: fünf Ringe</h3>
           <p>Die wichtigsten Tageswerte in einer Reihe. Wort über dem Ring, Zahl im Ring, Zustand darunter. Die Readiness steht groß in der Mitte, links und rechts schauen Ringe am Rand hervor, damit klar ist: hier lässt sich wischen. Mit dem Stift legst du Reihenfolge und Mitte fest.</p>
           <dl>
-            <dt>Energie</dt><dd>Body Battery jetzt (0–100). Ring = Füllstand. Tipp: Kurve über den Tag.</dd>
+            <dt>Energie</dt><dd>Body Battery jetzt (0–100), Sage hell. Ring = Füllstand. Tipp: Kurve über den Tag.</dd>
             <dt>Schlaf</dt><dd>Letzte Nacht in % vom Schlafbedarf. Tipp: Schlaf-Detail.</dd>
             <dt>Readiness</dt><dd>0–10 aus HRV, Ruhepuls, Schlaf, Last. Wort = Stufe. Tipp: Faktoren.</dd>
             <dt>Belastung</dt><dd>Heute in %, Zielbogen außen. Wort = unter / im / über dem Ziel. Tipp: Halbbogen.</dd>
@@ -451,7 +436,7 @@ Umsetzung, Liste „was wandert wohin“, höchstens fünf offene Fragen.</pre>
 
   // ---------- Bildschirm: Heute ----------
   const RINGS = [
-    { k: "energie", label: "Energie", word: "jetzt", pct: 0.64, color: C("rec"), center: "64", unit: "von 100" },
+    { k: "energie", label: "Energie", word: "jetzt", pct: 0.64, color: C("rec-h"), center: "64", unit: "von 100" },
     { k: "schlaf", label: "Schlaf", word: "vom Bedarf", pct: 1, color: C("sleep"), center: "102 %", unit: "7 h 39" },
     { k: "readiness", label: "Readiness", word: "Bereit", pct: 0.78, color: C("rec"), center: "7,8", unit: "von 10", main: true },
     { k: "belastung", label: "Belastung", word: "im Ziel", pct: 0.63, color: C("tr"), center: "63 %", unit: "heute", target: [0.4, 0.7], split: 0.48 },
@@ -513,7 +498,7 @@ Umsetzung, Liste „was wandert wohin“, höchstens fünf offene Fragen.</pre>
       <div class="metrics">${rows.map(([l, v, s]) => `<div class="mrow" style="grid-template-columns:1fr auto auto"><span class="ml">${l}</span><span class="seg3" style="grid-row:1/span 2;grid-column:2">${[0,1,2].map((i) => `<i class="${i === s ? "on" : ""}"></i>`).join("")}</span><span class="mv" style="grid-column:3;min-width:62px;justify-content:flex-end">${v}</span><span class="mw">${words[s]}</span></div>`).join("")}
         <div class="legend"><span class="seg3" style="width:40px"><i class="on"></i><i></i><i></i></span> unter · im · über deinem Bereich</div></div>
       <div class="chart-card"><div class="h">Schlafphasen</div><div class="s">22:58 bis 6:37</div>
-        <div class="stagebar"><i style="flex:22;background:var(--a-sleep);opacity:.45"></i><i style="flex:72;background:var(--a-sleep)"></i><i style="flex:98;background:var(--a-sleep);opacity:.7"></i><i style="flex:247;background:var(--a-fill)"></i></div>
+        <div class="stagebar"><i style="flex:22;background:var(--a-wach)"></i><i style="flex:72;background:var(--a-sleep)"></i><i style="flex:98;background:var(--a-rem)"></i><i style="flex:247;background:var(--a-leicht)"></i></div>
         <div class="legend" style="background:transparent;padding:6px 0 0">Wach 22 · Tief 72 · REM 98 · Leicht 247 min</div></div>
       <div class="need"><span class="eyebrow" style="font-size:11px;letter-spacing:.12em;color:var(--a-muted);font-weight:700">SCHLAFBEDARF HEUTE NACHT</span><span class="big">etwa 7 h 32</span>
         <span style="font-size:13px;color:var(--a-text-2)">Diese Woche etwa 1 h 27 unter deinem Grundbedarf.</span>
@@ -536,7 +521,7 @@ Umsetzung, Liste „was wandert wohin“, höchstens fünf offene Fragen.</pre>
 
   // ---------- Detail: Stress ----------
   function stress() {
-    const parts = [["Ruhe", 0.58, "9 h 10", C("line")], ["niedrig", 0.27, "4 h 20", C("st-1")], ["mittel", 0.11, "1 h 50", C("st-2")], ["hoch", 0.04, "38 min", C("st-3")]];
+    const parts = [["Ruhe", 0.58, "9 h 10", C("st-ruhe")], ["niedrig", 0.27, "4 h 20", C("st-1")], ["mittel", 0.11, "1 h 50", C("st-2")], ["hoch", 0.04, "38 min", C("st-3")]];
     return `${dhead("Stress", "glow-st")}${sample}${dayswitch()}
       <div class="hero" style="margin-top:6px">${gauge({ w: 300, pct: 0.28, center: "28", word: "NIEDRIG", wordColor: C("st"), sub: "Tagesschnitt · Stand 15:05", lo: "0", hi: "100", grad: { id: "stg" + Math.random().toString(36).slice(2, 7), from: C("st-1"), to: C("st-3") } })}</div>
       ${explain("Du warst die meiste Zeit <b>in Ruhe</b>. Hoher Stress insgesamt <b>38 Minuten</b>, etwas weniger als an einem üblichen Montag.", "Mehr dazu im Coach", C("st"), C("st-1"))}
@@ -574,7 +559,7 @@ Umsetzung, Liste „was wandert wohin“, höchstens fünf offene Fragen.</pre>
     ["0", "6", "12", "18", "24"].forEach((l, k) => { s += `<text x="${x(Math.min(n - 1, k * 24))}" y="${H - 4}" text-anchor="middle" fill="${C("muted")}" font-size="10" font-family="Inter, system-ui, sans-serif">${l}</text>`; });
     s += `</svg>`;
     return `${dhead("Energie", "glow-heute")}${sample}${dayswitch()}
-      <div class="hero">${ring({ size: 190, pct: 0.64, color: C("rec"), center: "64", unit: "BODY BATTERY", stroke: 15 })}</div>
+      <div class="hero">${ring({ size: 190, pct: 0.64, color: C("rec-h"), center: "64", unit: "BODY BATTERY", stroke: 15 })}</div>
       <div class="chart-card"><div class="h">Deine Energie liegt 6 Punkte unter deinem üblichen Tag.</div><div class="s">Hochgerechnet bist du um 22 Uhr bei etwa 38.</div>${s}
         <div class="legend" style="background:transparent;padding:4px 0 0"><span>━ heute</span><span>┅ üblich (30 Tage)</span><span>··· Hochrechnung</span></div></div>
       <div class="two"><div class="kt"><div class="kl">Aufgeladen</div><div class="kv">+64</div></div><div class="kt"><div class="kl">Verbraucht</div><div class="kv">−18</div></div></div>
@@ -620,21 +605,12 @@ Umsetzung, Liste „was wandert wohin“, höchstens fünf offene Fragen.</pre>
   }
 
   // ---------- Umschalter ----------
-  let theme = "app-dark";
-  function setTheme(t) {
-    theme = t;
-    live.className = "phone " + t + (document.getElementById("nums-off").getAttribute("aria-pressed") === "true" ? " show-nums-off" : "");
-    document.getElementById("th-dark").setAttribute("aria-pressed", t === "app-dark");
-    document.getElementById("th-light").setAttribute("aria-pressed", t === "app-light");
-    renderGallery(t);
-  }
+  const theme = "app-dark";
   function setNums(on) {
     document.getElementById("nums-on").setAttribute("aria-pressed", on);
     document.getElementById("nums-off").setAttribute("aria-pressed", !on);
     live.classList.toggle("show-nums-off", !on);
   }
-  document.getElementById("th-dark").addEventListener("click", () => setTheme("app-dark"));
-  document.getElementById("th-light").addEventListener("click", () => setTheme("app-light"));
   document.getElementById("nums-on").addEventListener("click", () => setNums(true));
   document.getElementById("nums-off").addEventListener("click", () => setNums(false));
 
