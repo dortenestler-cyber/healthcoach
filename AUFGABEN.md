@@ -129,6 +129,11 @@ Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst d
 - [x] PR #73 gemergt (23. Nov.), Upload grün
 - [ ] Nichts weiter tun: Jeder Abruf füllt bis zu 21 ältere Tage nach, nach etwa einer Woche Morgen-Abrufen sind die letzten 90 Tage berechnet
 
+### 15. Schlafphasen mit Uhrzeit und Hauttemperatur, Daten (PR #84, DA)
+Enthält eine Migration und ändert die Funktion `garmin-sync`, deshalb mergst du ihn selbst. In der App ist noch nichts Neues zu sehen, die Zeitachse baut danach die Rolle Oberfläche.
+- [ ] PR #84 ansehen und mergen. Danach laufen die Migration `20261125090000_schlaf_detail.sql` und der Upload von `garmin-sync` automatisch
+- [ ] In der App einmal synchronisieren (auf Heute nach unten ziehen) und Claude Bescheid geben. Claude prüft dann mit „Daten prüfen“, ob die Schlafphasen mit Uhrzeit und die Hauttemperatur ankommen
+
 ## Erledigt
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)
 - [x] PR #34, #35, #36, #37 gemergt (Konzept, `CLAUDE.md`, Fundament, Merge-Regel)

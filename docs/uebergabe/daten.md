@@ -7,7 +7,8 @@ Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`
 Korridore Teil B Daten ist fertig und läuft (PR #63–#73): Alltagslast aus dem Tagespuls, Readiness der Uhr wie in der App, Morgen-Abruf 6:15 Uhr bestätigt. Push eingerichtet (Secrets, Tresor, Testmitteilung angekommen, 23.11.). Keine offenen PRs.
 
 ## In Arbeit
-- Nichts. Nächste mögliche Aufgaben, kein Eilfall:
+- PR #84 (wartet auf Merge der Nutzerin): je Nacht `dailySleepData` (Pfade `SLEEP_PATHS`), Zeitachse in `sleep_levels`, Hauttemperatur aus der Nacht, Fehlersuche in `sleep_detail_diag` (nur Feldnamen). Nach Merge und Synchronisieren „Daten prüfen“ starten: Abschnitte „Einzelne Nächte“ und „Fehlersuche Schlaf-Detail“. Je nach Ergebnis Feldnamen in `findSkinTemp`/`sleepLevels` anpassen, danach `sleep_detail_diag` wieder entfernen (Spalte bleibt leer oder per Migration löschen).
+- Sonst nichts. Nächste mögliche Aufgaben, kein Eilfall:
   - „Energie über den Tag“: `bb_curve` nur an wenigen Tagen. Prüfen, ob der Body-Battery-Pfad nur für kurze Zeiträume antwortet (mit „Daten prüfen“ zählen, Spalte `energiekurve`).
   - Uhr: Belastungsring mit Alltag (Konzept Teil B, „später“), sinnvoll nach Teil B Anzeige der Oberfläche.
 
@@ -20,9 +21,10 @@ Korridore Teil B Daten ist fertig und läuft (PR #63–#73): Alltagslast aus dem
 - Alltagslast Version 2: ohne Bewegungsdaten zählt Zone 1 ab 10 Minuten am Stück, Zone 2 und höher immer (`bewegung: "dauer"`). Ältere Tage (v1) rechnet jeder Abruf nach.
 
 ## Wartet auf
-- Nutzerin: Zeigt Garmin Connect auf dem Handy unter Schlaf eine Hauttemperatur? Und Freigabe für die Fehlersuche in `garmin-sync` (Hauttemperatur, siehe „Was Garmin liefert“)
+- Nutzerin: Merge von PR #84 und einmal synchronisieren (`AUFGABEN.md` Abschnitt 15). Garmin Connect zeigt die Hauttemperatur-Veränderung (bestätigt 23.11.), die Daten sind also da.
 
 ## Für die andere Rolle
+- Oberfläche: Wunsch der Nutzerin (23.11.): Wachphasen in der Nacht darstellen. Ab PR #84 liegt in `garmin_daily.sleep_levels` die Zeitachse `{ start_min, seg: [[ab Minute, Dauer, Phase]] }` (Phase `d`/`l`/`r`/`w`). Erst nutzen, wenn „Daten prüfen“ zeigt, dass sie ankommt (steht dann hier). Typ in `lib/garmin.ts` fehlt noch.
 - Oberfläche: Dein Wunsch „Readiness der Uhr angleichen“ ist mit PR #70 erledigt (gemergt). Die Stresskurve (`stress_curve`) bleibt leer, Garmin liefert sie nicht: Karte „Stress im Tagesverlauf“ entsprechend erklären. `lib/alltagslast.ts`: `v` kann 1 oder 2 sein, `bewegung` neu „stress“ oder „dauer“ (Zone 1 ab 10 Minuten am Stück).
 - Oberfläche: PR #63 ist gemergt (Migration grün). Ab dem nächsten Abruf liegt die Alltagslast in `garmin_daily.load_daily_min` (Typ und `readLoadDay` in `lib/alltagslast.ts`). Tageslast = `last_training + last_alltag` (gleiche Einheit wie Garmin-Last, ÷ 150 = %). `quelle: "schritte"` heißt „geschätzt aus Schritten“. Außerdem neu: `hr_curve` (96 Werte), `steps_outside_acts`, `active_s`, `highly_active_s`, `active_kcal`. `faktor = null` heißt: noch Startwert (unter 3 Trainings mit Puls). Für Einstellungen: `LOAD_ZONES`, `puls_ruhe`, `puls_max`, `puls_max_quelle`.
 - Oberfläche: `lib/insights.ts` `loadPercent` und `lib/today.ts` `loadByDay` sind deine (Teil B Anzeige), ich ändere sie nicht.
