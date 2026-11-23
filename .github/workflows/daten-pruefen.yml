@@ -58,5 +58,14 @@ jobs:
                count(*) filter (where day >= current_date - 89 and skin_temp_delta is not null) as mit_temperatur_90_tage,
                max(day) filter (where skin_temp_delta is not null) as letzte_nacht_mit_temperatur
              from public.garmin_daily;"
+          echo "== Einzelne Nächte: Schlafphasen mit Uhrzeit (nur Anzahl) =="
+          q "select
+               count(*) filter (where sleep_levels is not null) as naechte_mit_zeitachse,
+               count(*) filter (where sleep_detail_diag is not null) as naechte_abgefragt,
+               max(day) filter (where sleep_levels is not null) as letzte_nacht_mit_zeitachse
+             from public.garmin_daily where day >= current_date - 13;"
+          echo "== Fehlersuche Schlaf-Detail (nur Feldnamen, neueste Nacht) =="
+          q "select day, jsonb_pretty(sleep_detail_diag) as felder from public.garmin_daily
+             where sleep_detail_diag is not null order by day desc limit 1;"
           echo "== Morgen-Abrufe (letzte 5) =="
           q "select at, ok, left(message, 200) as meldung from public.garmin_sync_runs order by at desc limit 5;"
