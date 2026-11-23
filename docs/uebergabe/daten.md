@@ -7,7 +7,8 @@ Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`
 Korridore Teil B Daten ist fertig und läuft (PR #63–#73): Alltagslast aus dem Tagespuls, Readiness der Uhr wie in der App, Morgen-Abruf 6:15 Uhr bestätigt. Push eingerichtet (Secrets, Tresor, Testmitteilung angekommen, 23.11.). Keine offenen PRs.
 
 ## In Arbeit
-- PR #84 (wartet auf Merge der Nutzerin): je Nacht `dailySleepData` (Pfade `SLEEP_PATHS`), Zeitachse in `sleep_levels`, Hauttemperatur aus der Nacht, Fehlersuche in `sleep_detail_diag` (nur Feldnamen). Nach Merge und Synchronisieren „Daten prüfen“ starten: Abschnitte „Einzelne Nächte“ und „Fehlersuche Schlaf-Detail“. Je nach Ergebnis Feldnamen in `findSkinTemp`/`sleepLevels` anpassen, danach `sleep_detail_diag` wieder entfernen (Spalte bleibt leer oder per Migration löschen).
+- Ergebnis PR #84 (23.11. 12:00): `dailySleepData` unter allen vier Pfaden 404 (wie `dailyStress`). Hauttemperatur weiter 0 Nächte, obwohl Garmin Connect sie zeigt. PR #85: Feldnamen der Schlafübersicht (`keyPaths`, nur Namen) in `sleep_detail_diag.uebersicht_felder`, Zeitachse auch aus der Übersicht lesen, zwei weitere Pfade (`dailySleep?date=`).
+- PR #84 (gemergt): je Nacht `dailySleepData` (Pfade `SLEEP_PATHS`), Zeitachse in `sleep_levels`, Hauttemperatur aus der Nacht, Fehlersuche in `sleep_detail_diag` (nur Feldnamen). Nach Merge und Synchronisieren „Daten prüfen“ starten: Abschnitte „Einzelne Nächte“ und „Fehlersuche Schlaf-Detail“. Je nach Ergebnis Feldnamen in `findSkinTemp`/`sleepLevels` anpassen, danach `sleep_detail_diag` wieder entfernen (Spalte bleibt leer oder per Migration löschen).
 - Sonst nichts. Nächste mögliche Aufgaben, kein Eilfall:
   - „Energie über den Tag“: `bb_curve` nur an wenigen Tagen. Prüfen, ob der Body-Battery-Pfad nur für kurze Zeiträume antwortet (mit „Daten prüfen“ zählen, Spalte `energiekurve`).
   - Uhr: Belastungsring mit Alltag (Konzept Teil B, „später“), sinnvoll nach Teil B Anzeige der Oberfläche.
@@ -21,7 +22,7 @@ Korridore Teil B Daten ist fertig und läuft (PR #63–#73): Alltagslast aus dem
 - Alltagslast Version 2: ohne Bewegungsdaten zählt Zone 1 ab 10 Minuten am Stück, Zone 2 und höher immer (`bewegung: "dauer"`). Ältere Tage (v1) rechnet jeder Abruf nach.
 
 ## Wartet auf
-- Nutzerin: Merge von PR #84 und einmal synchronisieren (`AUFGABEN.md` Abschnitt 15). Garmin Connect zeigt die Hauttemperatur-Veränderung (bestätigt 23.11.), die Daten sind also da.
+- Nutzerin: Merge von PR #85 und einmal synchronisieren (`AUFGABEN.md` Abschnitt 15). Garmin Connect zeigt die Hauttemperatur-Veränderung (bestätigt 23.11.), die Daten sind also da.
 
 ## Für die andere Rolle
 - Oberfläche: Wunsch der Nutzerin (23.11.): Wachphasen in der Nacht darstellen. Ab PR #84 liegt in `garmin_daily.sleep_levels` die Zeitachse `{ start_min, seg: [[ab Minute, Dauer, Phase]] }` (Phase `d`/`l`/`r`/`w`). Erst nutzen, wenn „Daten prüfen“ zeigt, dass sie ankommt (steht dann hier). Typ in `lib/garmin.ts` fehlt noch.

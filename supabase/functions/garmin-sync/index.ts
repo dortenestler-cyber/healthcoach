@@ -100,6 +100,21 @@ function tempKeys(obj: Any, prefix = "", depth = 0, out: string[] = []): string[
   return out.slice(0, 10);
 }
 
+// Nur für die Fehlersuche: alle Feldnamen einer Antwort (Listen als name[] mit dem ersten Eintrag), keine Werte
+function keyPaths(obj: Any, prefix = "", depth = 0, out: string[] = []): string[] {
+  if (!obj || typeof obj !== "object" || depth > 3 || out.length >= 200) return out;
+  for (const [k, v] of Object.entries(obj)) {
+    if (Array.isArray(v)) {
+      out.push(prefix + k + "[]");
+      if (v[0] && typeof v[0] === "object") keyPaths(v[0], prefix + k + "[].", depth + 1, out);
+    } else {
+      out.push(prefix + k);
+      if (v && typeof v === "object") keyPaths(v, prefix + k + ".", depth + 1, out);
+    }
+  }
+  return out.slice(0, 200);
+}
+
 // Ortszeit für den Tagesverlauf: Minuten seit Mitternacht in Europe/Berlin
 const TZ = "Europe/Berlin";
 const localParts = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
@@ -207,6 +222,8 @@ Deno.serve(async (req) => {
     let stressCurveDays = 0;
     let stressNote = "";
     let sleepTempKeys: string[] = [];
+    let summaryFields: string[] = [];
+    let summaryFieldsDay = "";
     const stress: StressCache = { known: { path: null, failed: false }, days: new Map() };
 
     for (const w of windows) {
@@ -266,6 +283,14 @@ Deno.serve(async (req) => {
           r.skin_temp_delta = Math.round(t.value * 100) / 100;
           skinKeys.add(t.key);
         } else if (!sleepTempKeys.length) sleepTempKeys = tempKeys(s);
+        // Zeitachse, falls die Übersicht sie schon enthält
+        const lv = sleepLevels(s);
+        if (lv) r.sleep_levels = lv;
+        // Fehlersuche: Feldnamen der jüngsten Nacht
+        if (String(day) > summaryFieldsDay) {
+          summaryFieldsDay = String(day);
+          summaryFields = keyPaths(s);
+        }
       }
 
       // Body Battery im Tagesverlauf (für „Energie über den Tag“). Garmin dokumentiert den Pfad der Personal API nicht;
@@ -382,7 +407,7 @@ Deno.serve(async (req) => {
     let sleepDetailNights = 0;
     if (offset === 0) {
       try {
-        const res = await syncSleepDetail(sb, token, userId, daily, skinKeys);
+        const res = await syncSleepDetail(sb, token, userId, daily, skinKeys, summaryFields);
         sleepDetailNights = res.nights;
         skinNote = res.note;
       } catch (e) {
@@ -515,6 +540,8 @@ const SLEEP_PATHS = [
   "/sleep-service/sleep/dailySleepData?date=",
   "/wellness-service/wellness/dailySleepData/",
   "/sleep-service/sleep/dailySleepData/",
+  "/wellness-service/wellness/dailySleep?date=",
+  "/sleep-service/sleep/dailySleep?date=",
 ];
 // Garmin: activityLevel 0 = Tief, 1 = Leicht, 2 = REM, 3 = Wach
 const STAGE: Record<number, string> = { 0: "d", 1: "l", 2: "r", 3: "w" };
@@ -539,7 +566,7 @@ function sleepLevels(detail: Any): { start_min: number; seg: [number, number, st
   return { start_min: localDayMinute(t0).minute, seg };
 }
 
-async function syncSleepDetail(sb: Any, token: string, userId: string, daily: Map<string, Record<string, unknown>>, skinKeys: Set<string>): Promise<{ nights: number; note: string }> {
+async function syncSleepDetail(sb: Any, token: string, userId: string, daily: Map<string, Record<string, unknown>>, skinKeys: Set<string>, summaryFields: string[]): Promise<{ nights: number; note: string }> {
   const { day: today } = localDayMinute(Date.now());
   const earliest = shiftDay(today, -(SLEEP_DETAIL_BACK - 1));
   // Nur Tage aus dem Abrufzeitraum, damit beim Speichern keine anderen Spalten leer überschrieben werden
@@ -555,20 +582,20 @@ async function syncSleepDetail(sb: Any, token: string, userId: string, daily: Ma
   const days = inRange.filter((d, i) => i === 0 || !have.has(d)).slice(0, SLEEP_DETAIL_MAX);
   const known = { path: null as string | null, failed: false };
   let nights = 0;
-  for (const day of days) {
+  for (const [i, day] of days.entries()) {
     const r = daily.get(day)!;
     let detail: Any;
     try {
       detail = await firstPath(token, SLEEP_PATHS, day, known);
     } catch (e) {
-      r.sleep_detail_diag = { fehler: e instanceof Error ? e.message : String(e) };
+      r.sleep_detail_diag = { fehler: e instanceof Error ? e.message : String(e), uebersicht_felder: i === 0 ? summaryFields : [] };
       if (known.failed) return { nights, note: "Einzelne Nächte sind bei Garmin nicht abrufbar." };
       continue;
     }
     const dto = detail?.dailySleepDTO ?? {};
     const lv = sleepLevels(detail);
-    if (lv) {
-      r.sleep_levels = lv;
+    if (lv || r.sleep_levels) {
+      if (lv) r.sleep_levels = lv;
       nights++;
     }
     if (typeof r.skin_temp_delta !== "number") {
@@ -588,6 +615,7 @@ async function syncSleepDetail(sb: Any, token: string, userId: string, daily: Ma
       hauttemp_feld: [...skinKeys][0] ?? null,
       phasen_n: Array.isArray(rawLevels) ? rawLevels.length : null,
       phasen_felder: Array.isArray(rawLevels) && rawLevels[0] ? Object.keys(rawLevels[0]) : [],
+      uebersicht_felder: i === 0 ? summaryFields : [],
       phasen_stufen: Array.isArray(rawLevels) ? [...new Set(rawLevels.map((x: Any) => x?.activityLevel))].slice(0, 8) : [],
     };
   }
