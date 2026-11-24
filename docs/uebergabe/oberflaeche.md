@@ -4,6 +4,11 @@ Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014p
 
 
 
+
+## Belastung über die Zeit (PR #129, 24.11.)
+- Konzept `docs/konzept-belastung-ueber-zeit.md`. `BelastungZeitCard` ersetzt `LoadTrendCard` (gelöscht). Rechnung `lib/belastungZeit.ts` (`series`, `cardioPerDay`, `tiredCheck`, `musclePerDay`, `verteilung`). Die Karte lädt `kb_sets` und `rpe` selbst (180 Tage). Coach bekommt beide Zustände.
+- Geprüft mit Beispieldaten auf einer Testseite (gelöscht). Nächster Schritt: Rückmeldung der Nutzerin, vor allem zu den Startwerten der Muskelpunkte (÷ 40, Karate halb, Anstrengung 5).
+
 ## Säulen-Diagramme: Achse rechts (24.11.)
 - `DayBars`: Achsenbeschriftung in einem Rand rechts (Breite aus der längsten Beschriftung), stand vorher links über der ersten Säule (Intensität, Diese Woche).
 

@@ -8,7 +8,7 @@ import { useFeatures, type Feature } from "@/lib/prefs";
 import TargetSection from "@/components/training/TargetSection";
 import WeekLoadCard from "@/components/training/WeekLoadCard";
 import RatioCard from "@/components/training/RatioCard";
-import LoadTrendCard from "@/components/training/LoadTrendCard";
+import BelastungZeitCard from "@/components/training/BelastungZeitCard";
 import HabitCard from "@/components/training/HabitCard";
 import MonthReviewCard from "@/components/training/MonthReviewCard";
 import { isoDay } from "@/lib/dates";
@@ -102,7 +102,7 @@ export default function TrainingView({ initial }: { initial: string }) {
           left={
             <>
               {feat.tagesziel && data && <TargetSection data={data} />}
-              {data && <LoadTrendCard today={isoDay()} data={data} alltag={withAlltag} />}
+              {data && <BelastungZeitCard today={isoDay()} data={data} alltag={withAlltag} />}
             </>
           }
           right={
