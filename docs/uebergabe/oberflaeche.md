@@ -1,5 +1,5 @@
 # Übergabe · Oberfläche (OF)
-Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ · seit 2026-11-24 20:08 (Bündeln Baustein 4: Kalender mit Ebenen)
+Belegt: frei
 Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ
 
 
@@ -8,6 +8,12 @@ Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014p
 
 
 
+
+
+## Bündeln Baustein Kalender mit Ebenen (PR #136, 24.11.)
+- `components/kalender/Monatskalender.tsx`: Monat mit Phasenbändern (Vorlage 02), Ebenen Zyklus · Training · Symptome als Tasten, Punkte je Sportart (voll erledigt, hohl geplant), Symptome Amber, gewählter Tag hell, Tipp → `onPick`. Props `ebenen`, `start`, `punkte`, `onMonth`, `head`, `footer`.
+- Training: alles an, Kalender links, Tagesblatt rechts. Zyklus (`CycleCalendar` ist jetzt ein dünner Rahmen): Zyklus und Symptome an, Training zuschaltbar (aus `data.acts` und `data.done`), Tipp öffnet Tagesblatt im Blatt.
+- Entfernt: altes Raster und Filter Alles/Training/Zyklus im Trainingskalender, tote Stile (`cal-dots`, `ph-*-bg`, `data-phase`, `segmented-3`, `legend-period`). Garmin-Perioden kommen über `data.diary` (schon zusammengeführt), `loadPeriodDays` dort nicht mehr nötig.
 
 ## Bündeln Baustein Tagesblatt (PR #135, 24.11.)
 - `components/tag/Tagesblatt.tsx`: Kopf mit Zyklustag (Vorlage 02), Auf einen Blick (Readiness, Schlaf, Belastung, HRV, Ruhepuls, Stress; Kacheln `--card-2`, Vorlage 09), Training (`TagTraining.tsx`, aus `CalendarSection` herausgelöst: planen, erfassen, Garmin), Tagebuch (Zusammenfassung, „Im Tagebuch bearbeiten ›“ → `/tagebuch?tag=`), Besonderes (Krank, Verletzt, Wadenkrampf, Hitzewallungen). Prop `bare` ohne Karte und Datum.

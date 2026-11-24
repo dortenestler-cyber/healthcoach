@@ -86,7 +86,7 @@ export default function CalendarSection({ data }: { data: Data | null }) {
           <Monatskalender
             today={today}
             diary={data?.diary ?? []}
-            ebenen={data ? ["training", "zyklus", "symptome"] : ["training"]}
+            ebenen={["training", "zyklus", "symptome"]}
             punkte={punkte}
             selected={selected}
             onPick={setSelected}

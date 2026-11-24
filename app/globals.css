@@ -3056,5 +3056,6 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .mk-dots i { width: 6px; height: 6px; border-radius: 3px; border: 1.5px solid transparent; box-sizing: border-box; }
 .mk-dots i.mk-sym { background: var(--warn); border-color: var(--warn); }
 .legend .mk-key-sym { width: 6px !important; height: 6px !important; border-radius: 3px; background: var(--warn); }
-.mk-sel .cal-num { background: var(--text); color: var(--bg); }
 .mk-plain .cal-num { color: var(--text); }
+.mk-plain.cal-future .cal-num { border: 0; color: var(--text-2); }
+.mk .mk-sel .cal-num { background: var(--text); color: var(--bg); border-color: var(--text); }
