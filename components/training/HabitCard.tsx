@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Data } from "@/lib/insights";
-import { DEFAULT_WEEK, loadSettings } from "@/lib/training";
+import { DEFAULT_TRAINING_DAYS, loadSettings, saveSettings } from "@/lib/training";
 
 const WEEKS = 24;
 const MONTHS = ["Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sep.", "Okt.", "Nov.", "Dez."];
@@ -14,23 +14,32 @@ const addDays = (iso: string, n: number) => {
 };
 
 // Trainingstage als Raster (Konzept dunkel 2, Muster 15): ein Feld je Tag, eine Spalte je Woche, letzte 24 Wochen.
-// Ziel = Trainingstage deiner Wochenvorlage. Serie und Bestwert zählen Wochen, in denen das Ziel erreicht war.
+// Ziel = Trainingstage pro Woche, hier mit − und + einstellbar (Einstellung trainingDaysGoal, Startwert 4).
+// Ein Tag zählt mit Garmin-Aktivität oder mit einer im Kalender erfassten Einheit.
+// Serie und Bestwert zählen Wochen, in denen das Ziel erreicht war.
 export default function HabitCard({ today, data }: { today: string; data: Data }) {
-  const [goal, setGoal] = useState(Object.keys(DEFAULT_WEEK).length);
+  const [goal, setGoal] = useState(DEFAULT_TRAINING_DAYS);
 
   useEffect(() => {
     const sb = supabase();
     if (!sb) return;
     loadSettings(sb)
       .then((s) => {
-        const week = s.week ?? DEFAULT_WEEK;
-        const n = Object.values(week).filter((v) => Array.isArray(v) && v.length > 0).length;
-        if (n > 0) setGoal(n);
+        if (typeof s.trainingDaysGoal === "number") setGoal(s.trainingDaysGoal);
       })
       .catch(() => undefined);
   }, []);
 
-  const trained = new Set(data.acts.map((a) => (a.start_local ?? "").slice(0, 10)).filter(Boolean));
+  const changeGoal = async (n: number) => {
+    const next = Math.max(1, Math.min(7, n));
+    setGoal(next);
+    const sb = supabase();
+    if (!sb) return;
+    const s = await loadSettings(sb);
+    await saveSettings(sb, { ...s, trainingDaysGoal: next });
+  };
+
+  const trained = new Set([...data.acts.map((a) => (a.start_local ?? "").slice(0, 10)), ...(data.done ?? []).map((d) => d.day)].filter(Boolean));
   const mon = addDays(today, -((new Date(today + "T12:00:00").getDay() + 6) % 7));
   const start = addDays(mon, -7 * (WEEKS - 1));
   const weeks = Array.from({ length: WEEKS }, (_, w) => Array.from({ length: 7 }, (_, d) => addDays(start, w * 7 + d)));
@@ -71,6 +80,14 @@ export default function HabitCard({ today, data }: { today: string; data: Data }
           <text x="28" y="32" textAnchor="middle" className="habit-ring-text">{pct}%</text>
         </svg>
       </div>
+      <div className="card-row habit-goal">
+        <span className="meta">Ziel pro Woche</span>
+        <div className="stepper" role="group" aria-label="Trainingstage pro Woche">
+          <button type="button" aria-label="Ein Tag weniger" disabled={goal <= 1} onClick={() => changeGoal(goal - 1)}>−</button>
+          <span className="row-strong" aria-live="polite">{goal} {goal === 1 ? "Tag" : "Tage"}</span>
+          <button type="button" aria-label="Ein Tag mehr" disabled={goal >= 7} onClick={() => changeGoal(goal + 1)}>+</button>
+        </div>
+      </div>
       <div className="habit-stats">
         <span>Serie <strong>{streak} {streak === 1 ? "Woche" : "Wochen"}</strong></span>
         <span>Bestwert <strong>{best} {best === 1 ? "Woche" : "Wochen"}</strong></span>
@@ -89,8 +106,8 @@ export default function HabitCard({ today, data }: { today: string; data: Data }
         <span><i className="habit-key-off" />kein Training</span>
         <span><i className="habit-key-on" />Training</span>
       </div>
-      {weeksWithData < 4 && <span className="meta">Das Raster füllt sich mit deinen Garmin-Aktivitäten der letzten Wochen.</span>}
-      <span className="meta">Ziel aus deiner Wochenvorlage. Tage mit mindestens einer Garmin-Aktivität.</span>
+      {weeksWithData < 4 && <span className="meta">Das Raster füllt sich mit deinen Garmin-Aktivitäten und den im Kalender erfassten Einheiten.</span>}
+      <span className="meta">Ein Tag zählt mit mindestens einer Garmin-Aktivität oder einer im Kalender erfassten Einheit.</span>
     </section>
   );
 }

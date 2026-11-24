@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay } from "@/lib/dates";
 import { loadActivityOverrides, withOverrides, type Activity, type Daily } from "@/lib/garmin";
 import type { Illness } from "@/lib/health";
-import { markAutoRows, type Checkin, type Data, type Diary, type Hub } from "@/lib/insights";
+import { markAutoRows, type Checkin, type Data, type Diary, type DoneSession, type Hub } from "@/lib/insights";
 import { mergeGarminCycles, type GarminCycle } from "@/lib/garminZyklus";
 import { shortName } from "@/lib/intakes";
 import { sickDays } from "@/lib/baseline";
@@ -16,7 +16,7 @@ export async function loadInsightData(days = 180): Promise<Data | null> {
   const sb = supabase();
   if (!sb) return null;
   const from = isoDay(daysAgo(days - 1));
-  const [g, a, d, c, h, il, gc, ill, ov, so] = await Promise.all([
+  const [g, a, d, c, h, il, gc, ill, ov, so, ps] = await Promise.all([
     sb.from("garmin_daily").select("*").gte("day", from).order("day"),
     sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load, sport_override, sport_label").gte("start_local", from),
     sb.from("diary_entries").select("*").gte("day", from).order("day"),
@@ -27,6 +27,7 @@ export async function loadInsightData(days = 180): Promise<Data | null> {
     sb.from("illnesses").select("started_on, ended_on").or(`ended_on.is.null,ended_on.gte.${from}`),
     loadOvulation(sb, from),
     loadActivityOverrides(sb, from),
+    sb.from("planned_sessions").select("*").eq("status", "erledigt").gte("day", from),
   ]);
   if (g.error) throw new Error(g.error.message);
   return {
@@ -37,6 +38,7 @@ export async function loadInsightData(days = 180): Promise<Data | null> {
     checkins: (c.data ?? []) as Checkin[],
     hubs: (h.data ?? []) as Hub[],
     illness: ((il.data ?? []) as Illness[])[0] ?? null,
+    done: ((ps.error ? [] : ps.data ?? []) as DoneSession[]).map((r) => ({ day: r.day, sport: r.sport, duration_min: r.duration_min ?? null, rpe: r.rpe ?? null })),
     sick: sickDays((ill.data ?? []) as Pick<Illness, "started_on" | "ended_on">[], isoDay()),
   };
 }
