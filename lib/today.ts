@@ -5,7 +5,7 @@
 import { baselineFor, metricBaseline, positionIn, metricRangeSeries, middleHalf, seriesOf, type Baseline, type Range } from "@/lib/baseline";
 import { badStreak } from "@/lib/korridor";
 import { METRICS, type Activity, type Daily, type MetricKey } from "@/lib/garmin";
-import { loadPercent, type Data } from "@/lib/insights";
+import { HARD_DAY_PCT, loadPercent, MID_DAY_PCT, type Data } from "@/lib/insights";
 import { readLoadDay } from "@/lib/alltagslast";
 
 const addDays = (iso: string, n: number) => {
@@ -20,8 +20,6 @@ const sleepHours = (d: Daily | undefined) => (d?.sleep_seconds ? d.sleep_seconds
 
 export const DEFAULT_NEED_H = 7.5; // Startwert, solange es weniger als 14 Nächte gibt
 const DEBT_CAP_MIN = 60; // höchstens eine Stunde Zuschlag aus der Schlafschuld
-const HARD_DAY_PCT = 70; // Belastung gestern ab hier: harte Einheit
-const MID_DAY_PCT = 40;
 
 export type SleepNeed = {
   hours: number; // gesamter Bedarf in Stunden
@@ -141,6 +139,16 @@ export function targetText(t: { pause: boolean; lo: number; hi: number }, load: 
   if (load <= t.hi) return "Du bist im Zielbereich. Ab jetzt nur noch locker, etwa Gehen.";
   return "Über dem Ziel. Plane morgen eher leicht.";
 }
+
+// Woher das Ziel kommt (Konzept docs/konzept-belastung-skala.md)
+export function targetBasisText(t: { pause: boolean; usual: number | null; brake: boolean; label: string }): string | null {
+  if (t.pause) return null;
+  if (t.usual === null) return "Das Ziel richtet sich nach deiner Readiness. Ab 14 Tagen mit Daten kommt deine übliche Belastung dazu.";
+  const brake = t.brake ? " Deine Belastung ist in den letzten 7 Tagen schnell gestiegen, deshalb liegt das Ziel heute nicht höher als sonst." : "";
+  return `Das Ziel richtet sich nach deiner Readiness (${t.label}) und deiner üblichen Belastung von ${t.usual} %.${brake}`;
+}
+
+export const LOAD_CURVE_TEXT = "Je höher die Belastung schon ist, desto weniger bringt jede weitere Minute. 100 % entspricht einem harten Trainingstag, an sehr langen Tagen geht es darüber.";
 
 // ---------- Werte, die seit Tagen auf der ungünstigen Seite ihres Bereichs liegen (Heute)
 

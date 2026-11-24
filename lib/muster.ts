@@ -5,7 +5,7 @@
 import { INFLUENCES } from "@/lib/catalog";
 import { cycleToday, groupOf, type PhaseGroup } from "@/lib/cycle";
 import type { Illness } from "@/lib/health";
-import { cycleInfo, loadPercent, type Data } from "@/lib/insights";
+import { cycleInfo, HARD_DAY_PCT, loadPercent, type Data } from "@/lib/insights";
 import { load7 } from "@/lib/today";
 import { sportOf } from "@/lib/training";
 
@@ -60,7 +60,7 @@ export function conditions(data: Data, extra: MusterExtra): Condition[] {
   out.push({ key: "luteal", group: "zyklus", label: "Tage der Lutealphase", has: (d) => group(d) === "luteal" });
 
   // Training am selben Tag (der Krampf kommt meist am Abend danach)
-  out.push({ key: "hart", group: "training", label: "Tage mit hoher Belastung", has: (d) => loadPercent(d, data.daily, data.acts) >= 70 });
+  out.push({ key: "hart", group: "training", label: "Tage mit hoher Belastung", has: (d) => loadPercent(d, data.daily, data.acts) >= HARD_DAY_PCT });
   const sportDays = new Map<string, Set<string>>();
   for (const a of data.acts) {
     const k = a.type_key && /run/.test(a.type_key) ? "ausdauer" : sportOf(a);

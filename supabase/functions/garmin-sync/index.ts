@@ -643,6 +643,7 @@ async function syncAlltag(sb: Any, token: string, userId: string, rangeDays: str
         bewegung,
         training: c.training,
         alltag: c.alltag,
+        leicht: c.leicht,
         ohne_bewegung: c.ohne_bewegung,
         pkt_training: c.pkt_training,
         pkt_alltag: viaPulse ? c.pkt_alltag : pointsFromSteps(stepsOutside),

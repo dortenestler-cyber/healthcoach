@@ -1,7 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabase";
-import { readLoadDay } from "@/lib/alltagslast";
+import { loadToPct, readLoadDay } from "@/lib/alltagslast";
 
 export type Daily = {
   day: string;
@@ -80,11 +80,11 @@ function minutes(v: number): string {
   return m >= 60 ? `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, "0")}` : `${m} min`;
 }
 
-// Belastung in % (150 Garmin-Last = 100 %) aus Training und Alltag des Tages
+// Belastung in % (abflachende Skala, 150 Garmin-Last = 100 %) aus Training und Alltag des Tages
 function dayLoadPct(d: Daily): number | null {
   const ld = readLoadDay(d.load_daily_min);
   if (!ld) return null;
-  return Math.min(100, ((ld.last_training ?? 0) + Math.max(0, ld.last_alltag ?? 0)) / 1.5);
+  return loadToPct((ld.last_training ?? 0) + Math.max(0, ld.last_alltag ?? 0));
 }
 
 // higherIsBetter steuert, ob "unter dem Schnitt" als Hinweis gilt

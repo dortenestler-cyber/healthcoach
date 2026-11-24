@@ -4,12 +4,11 @@
 
 import { personalRange, positionIn, type Point, type Position, type Range } from "@/lib/baseline";
 import type { Activity, Daily } from "@/lib/garmin";
-import { loadPercent, type Diary } from "@/lib/insights";
+import { HARD_DAY_PCT, loadPercent, type Diary } from "@/lib/insights";
 
 const SHARE_DAYS = 30; // „so oft im Bereich“
 const LOOK_DAYS = 180; // Erholungszeit und „was davor war“
 const SHIFT_DAYS = 90; // Vergleich mit vor 3 Monaten
-const HARD_DAY_PCT = 70; // Belastung ab hier (Training und Alltag): Tag mit hoher Belastung
 
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");

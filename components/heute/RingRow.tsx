@@ -6,7 +6,7 @@ import { ValueRing } from "@/components/charts";
 import type { Tone } from "@/components/charts/scale";
 import type { DayRule, Phase } from "@/lib/cycle";
 import { energyDay } from "@/lib/energie";
-import { dayLoad, type Data } from "@/lib/insights";
+import { dayLoad, loadLabel, ringSplit, type Data } from "@/lib/insights";
 import { stressDay } from "@/lib/stress";
 import { sleepAchieved } from "@/lib/today";
 import { weekIntensity, WHO_MINUTES } from "@/lib/trainingLoad";
@@ -72,7 +72,7 @@ export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarm
     const t = rule.target;
     const dl = dayLoad(day, data.daily, data.acts);
     const word = t.pause ? "Pause" : dl.pct < t.lo ? "unter Ziel" : dl.pct <= t.hi ? "im Ziel" : "über Ziel";
-    items.push({ key: "belastung", href: `/heute/belastung${q}`, label: "Belastung", tone: "training", value: dl.pct / 100, split: dl.quelle ? dl.pctTraining / 100 : null, target: t.pause ? null : { lo: t.lo / 100, hi: t.hi / 100 }, center: `${dl.pct} %`, word, aria: `Belastung ${dl.pct} Prozent, ${word}${t.pause ? "" : `, Ziel ${t.lo} bis ${t.hi} Prozent`}` });
+    items.push({ key: "belastung", href: `/heute/belastung${q}`, label: "Belastung", tone: "training", value: dl.pct / 100, split: ringSplit(dl), target: t.pause ? null : { lo: t.lo / 100, hi: t.hi / 100 }, center: loadLabel(dl), word, aria: `Belastung ${dl.pct} Prozent, ${word}${t.pause ? "" : `, Ziel ${t.lo} bis ${t.hi} Prozent`}` });
   }
 
   if (showGarmin) {

@@ -3,6 +3,7 @@ import SportIcon from "@/components/ui/SportIcon";
 import type { Data } from "@/lib/insights";
 import { hm } from "@/lib/today";
 import { sportOf, SPORTS } from "@/lib/training";
+import { loadToPct } from "@/lib/alltagslast";
 
 const WEEKDAY = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 
@@ -35,7 +36,7 @@ export default function RecentActivities({ day, data }: { day: string; data: Dat
           const sport = sportOf(a);
           const parts = [when((a.start_local as string).slice(0, 10), day)];
           if (a.duration_s) parts.push(hm(a.duration_s / 3600));
-          if (a.training_load) parts.push(`Belastung ${Math.round(a.training_load)}`);
+          if (a.training_load) parts.push(`Belastung ${Math.round(loadToPct(a.training_load))} %`);
           return (
             <Link key={a.activity_id} href={`/training/einheit/${a.activity_id}`} className="today-act">
               <span className="today-act-icon is-training" aria-hidden="true">

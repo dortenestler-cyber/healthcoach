@@ -1,8 +1,14 @@
 # Übergabe · Daten (DA)
-Belegt: frei (Belegt-Zeile eingeführt 24.11., die nächste Sitzung setzt sie)
-Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWcoQbeic2ASdj68xrC
+Belegt: frei
+Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ
 
 Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`, `.github/`. Regeln: `docs/konzept-zwei-instanzen.md`.
+
+
+## Belastung wie bei Bevel (PR #127, 24.11.)
+- `garmin-sync/alltag.ts`: Stufe „leicht“ ab 20 % Herzfrequenzreserve, halbes Gewicht, nur in Abschnitten ab 10 Minuten. `LOAD_VERSION` 3, Feld `leicht`. Alte Tage rechnet der Abruf nach (21 je Abruf, 90 Tage).
+- `watch/target.ts`: `loadToPct`, `dayLoadPct`, `usualLoad`, persönliches Ziel wie in der App. Glance kappt die Anzeige weiter bei 99.
+- Nächster Schritt: nach dem Hochladen prüfen, ob `load_daily_min.v` = 3 ankommt (Daten prüfen).
 
 ## Stand in einem Satz
 Korridore Teil B Daten ist fertig und läuft (PR #63–#73): Alltagslast aus dem Tagespuls, Readiness der Uhr wie in der App, Morgen-Abruf 6:15 Uhr bestätigt. Push eingerichtet (Secrets, Tresor, Testmitteilung angekommen, 23.11.). Keine offenen PRs.
