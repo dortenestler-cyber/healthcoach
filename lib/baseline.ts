@@ -7,6 +7,7 @@
 // Reine Berechnungen ohne Netzwerk.
 
 import { cycleToday } from "@/lib/cycle";
+import { bereichWort } from "@/lib/einordnung";
 import type { Diary } from "@/lib/insights";
 import type { Daily, MetricKey } from "@/lib/garmin";
 import { METRICS } from "@/lib/garmin";
@@ -166,9 +167,9 @@ export function positionIn(value: number, range: Range): Position {
   return value < range.lo ? "unter" : value > range.hi ? "über" : "im";
 }
 
-// Kurzes Wort für die Bereichszeile, z. B. „im Bereich“
+// Kurzes Wort für die Bereichszeile, z. B. „im Bereich“ (Wortschatz aus lib/einordnung.ts)
 export function positionText(p: Position): string {
-  return p === "im" ? "im Bereich" : p === "über" ? "über dem Bereich" : "unter dem Bereich";
+  return bereichWort(p);
 }
 
 // Name des Bereichs, an dem heute gemessen wird, z. B. „Bereich Lutealphase“ oder „Dein Bereich“

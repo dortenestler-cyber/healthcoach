@@ -12,7 +12,9 @@ import { DEFAULT_HABITS, loadHabits, type Habit } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
 import VerlaufDetail, { HISTORY } from "@/components/verlauf/VerlaufDetail";
 import VerlaufGroup, { GROUPS, groupOfMetric, type GroupKey } from "@/components/verlauf/VerlaufGroup";
-import { SPANS, spanOf, type Span } from "@/lib/verlauf";
+import { spanOf, type Span } from "@/lib/verlauf";
+import SpanSwitch from "@/components/ui/SpanSwitch";
+import { STANDARD } from "@/lib/zeitraum";
 import type { Diary } from "@/lib/insights";
 import { loadGarminCycles, mergeGarminCycles } from "@/lib/garminZyklus";
 
@@ -23,7 +25,7 @@ export default function VerlaufView({ initial }: { initial: string | null }) {
   const start = initial && initial in METRICS ? (initial as MetricKey) : null;
   const [metric, setMetric] = useState<MetricKey | null>(start);
   const [group, setGroup] = useState<GroupKey>(start ? groupOfMetric(start) : "herz");
-  const [span, setSpan] = useState<Span>("M");
+  const [span, setSpan] = useState<Span>("30T");
   const [rows, setRows] = useState<Daily[]>([]);
   const [diary, setDiary] = useState<Diary[]>([]);
   const [acts, setActs] = useState<Activity[]>([]);
@@ -107,13 +109,7 @@ export default function VerlaufView({ initial }: { initial: string | null }) {
         </div>
       )}
 
-      <div className="segmented segmented-5" role="group" aria-label="Zeitraum">
-        {SPANS.map((s) => (
-          <button key={s.key} type="button" aria-pressed={span === s.key} aria-label={s.name} onClick={() => setSpan(s.key)}>
-            {s.label}
-          </button>
-        ))}
-      </div>
+      <SpanSwitch value={span} onChange={setSpan} options={["heute", ...STANDARD]} />
 
       {metric ? (
         <>

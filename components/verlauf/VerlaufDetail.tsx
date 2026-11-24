@@ -82,7 +82,7 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
   // Jeder Tag zählt gegen den Bereich, der an diesem Tag galt
   const rangeFor = (d: string) => bandMap.get(d) ?? null;
   const sum = summarize(span, points, base.active, rangeFor, m.fmt, m.label, metric === "schlaf" ? sweatNights : 0);
-  const phases = weekly || span === "T" ? undefined : points.map((p) => groupOf(cycleToday(p.day, diary).phase));
+  const phases = weekly || span === "heute" ? undefined : points.map((p) => groupOf(cycleToday(p.day, diary).phase));
   const hasPhase = !!phases?.some(Boolean);
 
   // Vergleich nach Zyklusphase: immer die letzten 6 Monate, unabhängig vom Zeitraum
@@ -107,7 +107,7 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
     <>
       <section className="card">
         <ValueHeader
-          meta={`${m.label} · ${span === "T" ? "heute" : weekly ? `${spanOf(span).name}, Wochenmittel` : `letzte ${spanOf(span).days} Tage`}`}
+          meta={`${m.label} · ${span === "heute" ? "heute" : weekly ? `${spanOf(span).name}, Wochenmittel` : spanOf(span).last}`}
           sentence={sum.sentence}
           value={sum.big ? `${sum.big}` : null}
           fmt={m.fmt}
@@ -115,7 +115,7 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
           phase={base.phase}
           phaseName={phaseName}
         >
-          {span === "T" ? (
+          {span === "heute" ? (
             <>
               <RangeRow label={m.label} value={value(today)} fmt={m.fmt} range={base.range} phase={base.phase} phaseName={phaseName} tone={metricTone(metric)} />
               {stages && <SleepStagesBar minutes={stages} />}
@@ -153,7 +153,7 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
           )}
           {metric === "schlaf" && !weekly && sweatNights > 0 && <span><i className="legend-sweat" />Nachtschweiß</span>}
         </div>
-        {span !== "T" && pointBands.some(Boolean) && (
+        {span !== "heute" && pointBands.some(Boolean) && (
           <div className="segmented" role="group" aria-label="Bereich im Diagramm">
             <button type="button" aria-pressed={bandMode === "zeit"} onClick={() => setBandMode("zeit")}>
               Bereich über die Zeit

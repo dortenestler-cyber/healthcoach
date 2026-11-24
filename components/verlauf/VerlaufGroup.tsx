@@ -73,13 +73,13 @@ export default function VerlaufGroup({ group, span, rows, diary, sick, onOpen, m
   );
 
   const first = charts[0];
-  const phases = !first || weekly || span === "T" ? undefined : first.points.map((p) => groupOf(cycleToday(p.day, diary).phase));
+  const phases = !first || weekly || span === "heute" ? undefined : first.points.map((p) => groupOf(cycleToday(p.day, diary).phase));
   const hasPhase = !!phases?.some(Boolean);
 
   return (
     <>
       <p className="meta verlauf-group-note">
-        {g.name} · {span === "T" ? "heute" : weekly ? `${spanOf(span).name}, Wochenmittel` : `letzte ${spanOf(span).days} Tage`}. Tippen auf einen Tag zeigt ihn in allen Charts, auf eine Überschrift öffnet den Wert groß.
+        {g.name} · {span === "heute" ? "heute" : weekly ? `${spanOf(span).name}, Wochenmittel` : spanOf(span).last}. Tippen auf einen Tag zeigt ihn in allen Charts, auf eine Überschrift öffnet den Wert groß.
       </p>
       <div className="verlauf-grid">
         {charts.map((c) => (
@@ -89,7 +89,7 @@ export default function VerlaufGroup({ group, span, rows, diary, sick, onOpen, m
               <span className="verlauf-mini-sentence">{c.sum.sentence}</span>
               <span className="verlauf-mini-more" aria-hidden="true">›</span>
             </button>
-            {span === "T" ? (
+            {span === "heute" ? (
               <RangeRow
                 label={c.m.label}
                 value={c.value(today)}
@@ -118,7 +118,7 @@ export default function VerlaufGroup({ group, span, rows, diary, sick, onOpen, m
           </section>
         ))}
       </div>
-      {span !== "T" && (
+      {span !== "heute" && (
         <div className="legend">
           <span><i className="legend-band" />Dein Bereich, wie er jeweils galt</span>
           {hasPhase && <span>Phasen geschätzt</span>}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { countInRange, positionIn } from "@/lib/baseline";
+import { bereichSeit, bereichWort } from "@/lib/einordnung";
 import type { Data } from "@/lib/insights";
 import { hm, offStreaks, sleepNeed, vitalRows } from "@/lib/today";
 
@@ -22,7 +23,7 @@ export default function GlanceTiles({ day, data, showGarmin }: { day: string; da
   for (const r of rows) {
     const st = streaks.find((s) => s.key === r.key);
     const pos = r.value !== null && r.base.active ? positionIn(r.value, r.base.active) : null;
-    const word = st ? `seit ${st.days} Tagen ${st.side} Bereich` : pos === null ? (r.value === null ? "kein Wert" : "Bereich ab 14 Tagen") : pos === "im" ? "im Bereich" : `${pos} deinem Bereich`;
+    const word = st ? bereichSeit(st.side, st.days) : pos === null ? (r.value === null ? "kein Wert" : "Bereich ab 14 Tagen") : bereichWort(pos);
     const [num, ...unit] = r.value === null ? ["–"] : r.fmt(r.value).split(" ");
     tiles.push({ key: r.key, label: r.key === "hrv" ? "HRV" : "Ruhepuls", value: num, unit: unit.join(" "), word, alert: !!st, href: r.href ?? `/verlauf?m=${r.key}`, icon: r.key === "hrv" ? ICON.hrv : ICON.puls });
   }

@@ -5,6 +5,7 @@
 // Markierung (z. B. Nachtschweiß) als Punkt über der Säule, immer mit Legende im Text darunter.
 
 import type { Range } from "@/lib/baseline";
+import { bereichWort, lageIn, zielWort } from "@/lib/einordnung";
 import { extent, grownHeight, linear, niceTicks, type Tone } from "@/components/charts/scale";
 import { useChartWidth } from "@/components/charts/useChartWidth";
 import { ChartTip, tipDate, usePick } from "@/components/charts/pick";
@@ -59,8 +60,8 @@ export default function DayBars({ bars, fmt, label, tone = "training", band, cor
     if (b.tip) parts.push(b.tip);
     else {
       if (b.value !== null && b.part != null && b.part < b.value) parts.push(`Training ${fmt(b.part)} · Alltag ${fmt(b.value - b.part)}`);
-      if (b.value !== null && band) parts.push(b.value < band.lo ? "unter deinem Bereich" : b.value > band.hi ? "über deinem Bereich" : "im Bereich");
-      if (b.value !== null && corridor) parts.push(b.value < corridor.lo ? "unter dem Ziel" : b.value > corridor.hi ? "über dem Ziel" : "im Ziel");
+      if (b.value !== null && band) parts.push(bereichWort(lageIn(b.value, band)));
+      if (b.value !== null && corridor) parts.push(zielWort(b.value, corridor));
       if (b.marker && markerLabel) parts.push(markerLabel);
     }
     return parts.length ? [head, parts.join(" · ")] : [head];

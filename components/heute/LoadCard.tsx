@@ -2,6 +2,7 @@ import Link from "next/link";
 import { HalfGauge } from "@/components/charts";
 import ExplainCard from "@/components/ui/ExplainCard";
 import { clock } from "@/lib/dates";
+import { gross, zielWort } from "@/lib/einordnung";
 import { dayLoad, firstAlltagDay, loadLabel, ringSplit, type Data, type Target } from "@/lib/insights";
 import { LOAD_CURVE_TEXT, targetBasisText, targetText } from "@/lib/today";
 
@@ -17,7 +18,7 @@ export default function LoadCard({ day, data, target: t }: { day: string; data: 
   const shareWord = share >= 0.9 ? "fast ganz" : share >= 0.6 ? "zum größten Teil" : share >= 0.4 ? "etwa zur Hälfte" : share >= 0.25 ? "zu etwa einem Drittel" : share > 0 ? "zu einem kleinen Teil" : null;
   const today = data.daily.find((d) => d.day === day);
   const synced = data.daily.reduce((m, r) => Math.max(m, new Date(r.synced_at).getTime()), 0);
-  const word = t.pause ? "Pause" : load < t.lo ? "Unter dem Ziel" : load <= t.hi ? "Im Ziel" : "Über dem Ziel";
+  const word = gross(zielWort(load, t));
   const activeMin = data.acts.filter((a) => (a.start_local ?? "").slice(0, 10) === day).reduce((s, a) => s + (a.duration_s ?? 0) / 60, 0);
 
   return (
@@ -77,7 +78,7 @@ export default function LoadCard({ day, data, target: t }: { day: string; data: 
           targetText(t, load)
         ) : (
           <>
-            Mit <strong>{load} %</strong> liegst du {load < t.lo ? "unter dem" : load <= t.hi ? "im" : "über dem"} Ziel von <strong>{t.lo} bis {t.hi} %</strong>. {load < t.lo ? "Eine Einheit wie geplant bringt dich hinein." : load <= t.hi ? "Für den Rest des Tages reicht leichte Bewegung, etwa Gehen." : "Plane morgen eher leicht."}
+            Mit <strong>{load} %</strong> liegst du {zielWort(load, t).replace(/ Ziel$/, "")} Ziel von <strong>{t.lo} bis {t.hi} %</strong>. {load < t.lo ? "Eine Einheit wie geplant bringt dich hinein." : load <= t.hi ? "Für den Rest des Tages reicht leichte Bewegung, etwa Gehen." : "Plane morgen eher leicht."}
           </>
         )}
       </ExplainCard>

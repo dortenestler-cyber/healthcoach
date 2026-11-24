@@ -7,6 +7,7 @@
 // Zeichnet in echter Breite (Punkt 15), 2–3 beschriftete Hilfslinien (Zahl links über der Linie), letzter Wert als Zahl am Punkt.
 
 import type { Range } from "@/lib/baseline";
+import { bereichWort, lageIn } from "@/lib/einordnung";
 import { PHASE_GROUP_LABEL, type PhaseGroup } from "@/lib/cycle";
 import { extent, grownHeight, linear, niceTicks, segments, smoothBand, type Tone } from "@/components/charts/scale";
 import { useChartWidth } from "@/components/charts/useChartWidth";
@@ -108,7 +109,7 @@ export default function LineBand({ values, fmt, label, tone = "recovery", band, 
     const v = values[i];
     const r = moving ? moving[i] : fixed;
     const parts: string[] = [];
-    if (v !== null && r) parts.push(v < r.lo ? "unter deinem Bereich" : v > r.hi ? "über deinem Bereich" : "im Bereich");
+    if (v !== null && r) parts.push(bereichWort(lageIn(v, r)));
     const p = phases?.[i];
     if (p) parts.push(PHASE_GROUP_LABEL[p] + (futureFrom !== undefined && i >= futureFrom ? " (geschätzt)" : ""));
     return parts.join(" · ");
