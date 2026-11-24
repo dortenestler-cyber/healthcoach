@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { isoDay } from "@/lib/dates";
 import { activityLabel, durationText, loadActivityOverrides, withOverrides, type Activity } from "@/lib/garmin";
 import type { Illness, Injury } from "@/lib/health";
-import { ensurePlanned, healthEffect, loadSettings, sportOf, SPORTS, type Session } from "@/lib/training";
+import { healthEffect, sportOf, SPORTS, type Session } from "@/lib/training";
 
 // Training heute: Einheiten des Tages mit Hinweis aus Gesundheit und Garmin. Teil der Karte „Heute steht an“.
 // children: z. B. die Zeile zur Belastung.
@@ -21,11 +21,6 @@ export default function TodayPlan({ children }: { children?: ReactNode }) {
     const sb = supabase();
     if (!sb) return;
     (async () => {
-      try {
-        await ensurePlanned(sb, await loadSettings(sb));
-      } catch {
-        // Plan wird im Kalender erneut angelegt
-      }
       const day = isoDay();
       const [p, a, il, inj, so] = await Promise.all([
         sb.from("planned_sessions").select("*").eq("day", day),

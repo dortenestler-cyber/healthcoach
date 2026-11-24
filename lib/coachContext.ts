@@ -72,7 +72,7 @@ export async function buildCoachContext(): Promise<string> {
     p?.zustand ? `${name}: ${Math.round(p.value ?? 0)}${unit} (${ZUSTAND_NAMEN[p.zustand]}${p.lo !== null ? `, optimal ${Math.round(p.lo)}–${Math.round(p.hi!)}${unit}` : ""})` : null;
   const cp = cardioPerDay(data, true);
   const rpe = new Map(((rpeRows.error ? [] : rpeRows.data ?? []) as { activity_id: number; rpe: number }[]).map((x) => [x.activity_id, x.rpe]));
-  const mp = musclePerDay(data.acts.map((a) => ({ ...a, rpe: rpe.get(a.activity_id) ?? null })), (kbAll.data ?? []) as KbSet[]);
+  const mp = musclePerDay(data.acts.map((a) => ({ ...a, rpe: rpe.get(a.activity_id) ?? null })), (kbAll.data ?? []) as KbSet[], data.done);
   const zz = [zLine("Cardio-Belastung (Schnitt 7 Tage)", series(cp.perDay, [day], cp.first, tiredCheck(data))[0], " %"), zLine("Muskelbelastung (Schnitt 7 Tage)", series(mp.perDay, [day], mp.first)[0], " Punkte")].filter(Boolean);
   if (zz.length) lines.push(zz.join("; ") + ".");
   if (acts.length) lines.push("Aktivitäten letzte 14 Tage (Garmin): " + acts.map((a) => `${(a.start_local ?? "").slice(5, 10)} ${activityLabel(a)} ${Math.round((a.duration_s ?? 0) / 60)} min`).join("; ") + ".");

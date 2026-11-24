@@ -9,22 +9,13 @@ import { activityLabel, durationText, type Activity } from "@/lib/garmin";
 import { SPOTS, type Illness, type Injury } from "@/lib/health";
 import type { Data } from "@/lib/insights";
 import { cycleToday, dayRule, PHASES, type Phase } from "@/lib/cycle";
-import {
-  applyWeek,
-  DEFAULT_TIMES,
-  DEFAULT_WEEK,
-  ensurePlanned,
-  fromIso,
-  healthEffect,
-  loadSettings,
-  sportOf,
-  SPORTS,
-  WEEKDAY_LABELS,
-  type Session,
-  type Settings,
-  type Sport,
-  type WeekTemplate,
-} from "@/lib/training";
+import EditSheet from "@/components/ui/EditSheet";
+import { announceNewData } from "@/lib/refresh";
+import { DEFAULT_TIMES, fromIso, healthEffect, sportOf, SPORTS, WEEKDAY_LABELS, type Session, type Sport } from "@/lib/training";
+
+// Einheit erfassen (heute und früher) oder abhaken: Dauer und Anstrengung, beides freiwillig
+type Log = { id: string | null; day: string; sport: Sport; duration: string; rpe: number | null };
+const DURATIONS = [30, 45, 60, 90];
 
 const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 const ADDABLE: Sport[] = ["karate", "kettlebell", "klettern", "ausdauer"];
@@ -50,8 +41,8 @@ export default function CalendarSection({ data }: { data: Data | null }) {
   const [period, setPeriod] = useState<Set<string>>(new Set());
   const [illness, setIllness] = useState<Illness | null>(null);
   const [injuries, setInjuries] = useState<Injury[]>([]);
-  const [settings, setSettings] = useState<Settings | null>(null);
-  const [editWeek, setEditWeek] = useState<WeekTemplate | null>(null);
+  const [log, setLog] = useState<Log | null>(null);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   const first = isoDay(new Date(month.getFullYear(), month.getMonth(), 1));
@@ -60,12 +51,6 @@ export default function CalendarSection({ data }: { data: Data | null }) {
   const load = useCallback(async () => {
     const sb = supabase();
     if (!sb) return;
-    try {
-      const s = await ensurePlanned(sb, await loadSettings(sb));
-      setSettings(s);
-    } catch (e) {
-      setError("Plan konnte nicht angelegt werden: " + (e instanceof Error ? e.message : String(e)));
-    }
     const [p, a, d, il, inj] = await Promise.all([
       sb.from("planned_sessions").select("*").gte("day", first).lte("day", last).order("day"),
       sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load, sport_override, sport_label").gte("start_local", first).lte("start_local", last + "T23:59:59"),
@@ -153,18 +138,33 @@ export default function CalendarSection({ data }: { data: Data | null }) {
     run(sb.from("planned_sessions").update({ day: isoDay(d), source: "eigen" }).eq("id", s.id));
   };
 
-  const saveWeek = async () => {
-    if (!editWeek || !settings) return;
-    try {
-      const s = await applyWeek(sb, settings, { ...editWeek, "1": Array.from(new Set(["karate" as Sport, ...(editWeek["1"] ?? [])])) });
-      setSettings(s);
-      setEditWeek(null);
-      setError("");
-      load();
-    } catch (e) {
-      setError("Vorlage konnte nicht gespeichert werden: " + (e instanceof Error ? e.message : String(e)));
+  // Erfassen speichert als erledigt. Neu: Zeile anlegen, vorhanden (geplant oder erledigt): Zeile ändern.
+  const saveLog = async () => {
+    if (!log) return;
+    setSaving(true);
+    const min = Number(log.duration);
+    const fields = { status: "erledigt" as const, duration_min: Number.isFinite(min) && min >= 1 && min <= 600 ? Math.round(min) : null, rpe: log.rpe };
+    const q = log.id
+      ? sb.from("planned_sessions").update(fields).eq("id", log.id)
+      : sb.from("planned_sessions").insert({ day: log.day, sport: log.sport, time: null, source: "eigen", ...fields });
+    const { error: e } = await q;
+    setSaving(false);
+    if (e) {
+      setError("Das hat nicht geklappt: " + (/duration_min|rpe/.test(e.message) ? "Die Datenbank kennt Dauer und Anstrengung noch nicht. Bitte den PR mit der Migration mergen." : e.message));
+      return;
     }
+    setError("");
+    setLog(null);
+    load();
+    announceNewData();
   };
+  const removeLog = async () => {
+    if (!log?.id) return;
+    await run(sb.from("planned_sessions").delete().eq("id", log.id));
+    setLog(null);
+    announceNewData();
+  };
+  const openLog = (s: Session) => setLog({ id: s.id, day: s.day, sport: s.sport, duration: s.duration_min ? String(s.duration_min) : "", rpe: s.rpe ?? null });
 
   return (
     <>
@@ -263,7 +263,9 @@ export default function CalendarSection({ data }: { data: Data | null }) {
                 <span className="row-strong">
                   <i className="dot" style={{ background: SPORTS[s.sport].color }} />
                   {SPORTS[s.sport].label}
-                  {s.time ? " · " + s.time : ""}
+                  {s.time && s.status === "geplant" ? " · " + s.time : ""}
+                  {s.duration_min ? " · " + s.duration_min + " min" : ""}
+                  {s.rpe ? " · Anstrengung " + s.rpe : ""}
                 </span>
                 <span className={done ? "badge badge-ok" : s.status === "ausgelassen" ? "badge" : eff?.kind === "pause" || eff?.kind === "gesperrt" ? "badge badge-warn" : "badge badge-training"}>
                   {done ? (garmin ? "erledigt · Garmin" : "erledigt") : s.status === "ausgelassen" ? "ausgelassen" : eff?.kind === "pause" ? "Pause" : eff?.kind === "gesperrt" ? "pausiert" : "geplant"}
@@ -273,7 +275,10 @@ export default function CalendarSection({ data }: { data: Data | null }) {
               {!garmin && (
                 <div className="footer-links left">
                   {isPastOrToday && s.status !== "erledigt" && (
-                    <button type="button" className="btn btn-link" onClick={() => run(sb.from("planned_sessions").update({ status: "erledigt" }).eq("id", s.id))}>Erledigt</button>
+                    <button type="button" className="btn btn-link" onClick={() => openLog(s)}>Erledigt</button>
+                  )}
+                  {s.status === "erledigt" && (
+                    <button type="button" className="btn btn-link" onClick={() => openLog(s)}>Bearbeiten</button>
                   )}
                   {s.status === "geplant" && (
                     <button type="button" className="btn btn-link" onClick={() => run(sb.from("planned_sessions").update({ status: "ausgelassen" }).eq("id", s.id))}>Auslassen</button>
@@ -284,7 +289,7 @@ export default function CalendarSection({ data }: { data: Data | null }) {
                   {s.status === "geplant" && s.day >= isoDay() && (
                     <button type="button" className="btn btn-link" onClick={() => moveTomorrow(s)}>Auf morgen</button>
                   )}
-                  {s.source === "eigen" && (
+                  {s.status !== "erledigt" && (
                     <button type="button" className="btn btn-link" onClick={() => run(sb.from("planned_sessions").delete().eq("id", s.id))}>Löschen</button>
                   )}
                 </div>
@@ -304,72 +309,66 @@ export default function CalendarSection({ data }: { data: Data | null }) {
             </span>
           </Link>
         ))}
-        {selected >= isoDay() && (
-          <div className="pills wrap">
-            {ADDABLE.map((sp) => (
-              <button
-                key={sp}
-                type="button"
-                className="pill pill-sm"
-                disabled={selSessions.some((s) => s.sport === sp && s.source === "eigen")}
-                onClick={() => run(sb.from("planned_sessions").insert({ day: selected, sport: sp, time: DEFAULT_TIMES[sp] ?? null, source: "eigen" }))}
-              >
-                + {SPORTS[sp].label}
-              </button>
-            ))}
-          </div>
-        )}
+        <span className="meta">{selected > isoDay() ? "Planen:" : "Erfassen:"}</span>
+        <div className="pills wrap">
+          {ADDABLE.map((sp) => (
+            <button
+              key={sp}
+              type="button"
+              className="pill pill-sm"
+              disabled={selSessions.some((s) => s.sport === sp && s.source === "eigen")}
+              onClick={() =>
+                selected > isoDay()
+                  ? run(sb.from("planned_sessions").insert({ day: selected, sport: sp, time: DEFAULT_TIMES[sp] ?? null, source: "eigen" }))
+                  : setLog({ id: null, day: selected, sport: sp, duration: "", rpe: null })
+              }
+            >
+              + {SPORTS[sp].label}
+            </button>
+          ))}
+        </div>
+        <span className="meta">{selected > isoDay() ? "Tippe auf eine Sportart, um sie für diesen Tag zu planen." : "Erfasste Einheiten zählen bei den Trainingstagen und in der Muskelbelastung. Hat Garmin die Einheit schon, brauchst du nichts einzutragen."}</span>
       </section>
 
-      <section className="card">
-        <div className="card-row">
-          <h2>Wochenvorlage</h2>
-          {!editWeek && (
-            <button type="button" className="btn btn-link" onClick={() => setEditWeek(settings?.week ?? DEFAULT_WEEK)}>
-              Ändern
-            </button>
-          )}
-        </div>
-        {WEEKDAY_LABELS.map((w, i) => {
-          const key = String(i + 1);
-          const week = editWeek ?? settings?.week ?? DEFAULT_WEEK;
-          const list = week[key] ?? [];
-          return (
-            <div key={w} className="card-row list-line">
-              <span className="row-label">{w}</span>
-              {editWeek ? (
-                <div className="pills wrap right-pills">
-                  {ADDABLE.map((sp) => {
-                    const on = list.includes(sp);
-                    const locked = key === "1" && sp === "karate";
-                    return (
-                      <button
-                        key={sp}
-                        type="button"
-                        className="pill pill-sm"
-                        aria-pressed={on}
-                        disabled={locked}
-                        onClick={() => setEditWeek({ ...editWeek, [key]: on ? list.filter((x) => x !== sp) : [...list, sp] })}
-                      >
-                        {SPORTS[sp].label}
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <span className="meta">{list.length ? list.map((sp) => SPORTS[sp].label).join(", ") : "frei"}</span>
-              )}
+      <EditSheet
+        title={log ? `${SPORTS[log.sport].label} · ${longDate(fromIso(log.day))}` : "Einheit erfassen"}
+        open={!!log}
+        onClose={() => setLog(null)}
+        onSave={saveLog}
+        onDelete={log?.id ? removeLog : undefined}
+        deleteQuestion="Diese Einheit löschen?"
+        saving={saving}
+      >
+        {log && (
+          <>
+            <div className="day-pick">
+              <span className="label">Dauer</span>
+              <div className="pills wrap">
+                {DURATIONS.map((m) => (
+                  <button key={m} type="button" className="pill pill-sm" aria-pressed={log.duration === String(m)} onClick={() => setLog({ ...log, duration: String(m) })}>
+                    {m} min
+                  </button>
+                ))}
+              </div>
+              <label className="field">
+                <span className="meta">oder Minuten eintippen</span>
+                <input className="input" inputMode="numeric" value={log.duration} onChange={(e) => setLog({ ...log, duration: e.target.value.replace(/[^0-9]/g, "").slice(0, 3) })} aria-label="Dauer in Minuten" />
+              </label>
             </div>
-          );
-        })}
-        {editWeek && (
-          <div className="footer-links left">
-            <button type="button" className="btn btn-dark" onClick={saveWeek}>Speichern</button>
-            <button type="button" className="btn btn-link" onClick={() => setEditWeek(null)}>Abbrechen</button>
-          </div>
+            <div className="day-pick">
+              <span className="label">Anstrengung (1–10)</span>
+              <div className="pills wrap">
+                {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                  <button key={n} type="button" className="pill pill-sm" aria-pressed={log.rpe === n} aria-label={`Anstrengung ${n}`} onClick={() => setLog({ ...log, rpe: log.rpe === n ? null : n })}>
+                    {n}
+                  </button>
+                ))}
+              </div>
+              <span className="meta">1 sehr leicht · 5 mittel · 10 maximal. Freiwillig.</span>
+            </div>
+          </>
         )}
-        <span className="meta">Montag Karate ist fest. Die Vorlage plant 4 Wochen voraus. Einzelne Tage änderst du oben im Kalender.</span>
-      </section>
+      </EditSheet>
     </>
   );
 }

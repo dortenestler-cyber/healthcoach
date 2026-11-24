@@ -23,6 +23,8 @@ export type Session = {
   source: "vorlage" | "eigen";
   status: "geplant" | "erledigt" | "ausgelassen";
   note: string | null;
+  duration_min?: number | null; // erfasste Dauer (ohne Uhr), ab Migration 20261128110000
+  rpe?: number | null; // eigene Anstrengung 1–10
 };
 
 // Garmin-Sportarten den Bereichen der App zuordnen
@@ -44,16 +46,16 @@ export function sportOf(a: { type_key: string | null; sport_override?: string | 
   return sportOfGarmin(a.type_key);
 }
 
-// Wochenvorlage: Wochentag (1 = Montag … 7 = Sonntag) → Sportarten. Montag Karate ist fest.
-export type WeekTemplate = Record<string, Sport[]>;
-export const DEFAULT_WEEK: WeekTemplate = { "1": ["karate"], "3": ["kettlebell"], "5": ["kettlebell"], "6": ["klettern"] };
+// Die Wochenvorlage ist entfallen (Nutzerin 24.11.): Training wird im Kalender geplant und erfasst.
 export const DEFAULT_TIMES: Partial<Record<Sport, string>> = { karate: "19:00", kettlebell: "18:00", klettern: "10:00" };
 export const WEEKDAY_LABELS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
 export const isoWeekday = (d: Date) => ((d.getDay() + 6) % 7) + 1;
 export const fromIso = (s: string) => new Date(s + "T12:00:00");
 
-export type Settings = { week?: WeekTemplate; generatedUntil?: string; examDate?: string; [k: string]: unknown };
+// trainingDaysGoal: Trainingstage pro Woche (Karte Trainingstage), Startwert 4
+export type Settings = { trainingDaysGoal?: number; examDate?: string; [k: string]: unknown };
+export const DEFAULT_TRAINING_DAYS = 4;
 
 export async function loadSettings(sb: SupabaseClient): Promise<Settings> {
   const { data } = await sb.from("settings").select("data").maybeSingle();
@@ -62,35 +64,6 @@ export async function loadSettings(sb: SupabaseClient): Promise<Settings> {
 
 export async function saveSettings(sb: SupabaseClient, s: Settings) {
   return sb.from("settings").upsert({ data: s, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
-}
-
-// Legt Einheiten aus der Wochenvorlage für die nächsten 4 Wochen an, nur für Tage, die noch nicht erzeugt wurden.
-export async function ensurePlanned(sb: SupabaseClient, settings: Settings): Promise<Settings> {
-  const week = settings.week ?? DEFAULT_WEEK;
-  const until = isoDay(daysAgo(-28));
-  const startAfter = settings.generatedUntil && settings.generatedUntil >= isoDay(daysAgo(1)) ? settings.generatedUntil : isoDay(daysAgo(1));
-  if (startAfter >= until) return settings;
-  const rows: { day: string; sport: Sport; time: string | null; source: "vorlage" }[] = [];
-  for (let i = 0; i <= 28; i++) {
-    const d = daysAgo(-i);
-    const day = isoDay(d);
-    if (day <= startAfter) continue;
-    for (const sport of week[String(isoWeekday(d))] ?? []) rows.push({ day, sport, time: DEFAULT_TIMES[sport] ?? null, source: "vorlage" });
-  }
-  if (rows.length) {
-    const { error } = await sb.from("planned_sessions").upsert(rows, { onConflict: "user_id,day,sport,source", ignoreDuplicates: true });
-    if (error) throw new Error(error.message);
-  }
-  const next = { ...settings, week, generatedUntil: until };
-  await saveSettings(sb, next);
-  return next;
-}
-
-// Neue Wochenvorlage: künftige, noch offene Vorlage-Einheiten ersetzen
-export async function applyWeek(sb: SupabaseClient, settings: Settings, week: WeekTemplate): Promise<Settings> {
-  const { error } = await sb.from("planned_sessions").delete().eq("source", "vorlage").eq("status", "geplant").gte("day", isoDay());
-  if (error) throw new Error(error.message);
-  return ensurePlanned(sb, { ...settings, week, generatedUntil: isoDay(daysAgo(1)) });
 }
 
 // Gesundheit wirkt auf den Plan: Pause bei Krankheit, Sperre bei Verletzung

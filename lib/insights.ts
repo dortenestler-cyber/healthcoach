@@ -22,7 +22,9 @@ export type Data = {
   hubs: Hub[]; // Bedarfs-Einnahmen
   illness: Illness | null;
   sick?: Set<string>; // Krankheitstage und 3 Tage danach: zählen nicht zum persönlichen Bereich
+  done?: DoneSession[]; // im Kalender erfasste oder abgehakte Einheiten (planned_sessions, Status erledigt)
 };
+export type DoneSession = { day: string; sport: string; duration_min?: number | null; rpe?: number | null };
 
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");

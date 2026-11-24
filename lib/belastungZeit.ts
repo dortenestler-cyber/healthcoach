@@ -5,7 +5,7 @@ import type { Activity } from "@/lib/garmin";
 import { baselineFor } from "@/lib/baseline";
 import { loadToPct, readLoadDay } from "@/lib/alltagslast";
 import { sportOf, type Sport } from "@/lib/training";
-import type { Data } from "@/lib/insights";
+import type { Data, DoneSession } from "@/lib/insights";
 import { RATIO_HI, RATIO_LO } from "@/lib/trainingLoad";
 
 export type Zustand = "kalibrieren" | "abbau" | "optimal" | "muede" | "steigt";
@@ -105,10 +105,12 @@ export const MUSCLE_SPORTS: Partial<Record<Sport, number>> = { kettlebell: 1, kl
 export const DEFAULT_RPE = 5;
 export const KG_PER_POINT = 40;
 export const BODYWEIGHT_KG = 8;
+export const DEFAULT_MIN = 60; // im Kalender abgehakt ohne Dauer: 60 Minuten
 
 export type MuscleDay = { points: number; estimated: boolean }; // estimated: Anstrengung fehlte, mit 5 gerechnet
 
-export function musclePerDay(units: MuscleUnit[], sets: KbSet[]): { perDay: Map<string, number>; first: string | null; last: string | null; days: Map<string, MuscleDay> } {
+// done: im Kalender erfasste Einheiten. Sie zählen nur, wenn Garmin an dem Tag keine Einheit derselben Sportart hat.
+export function musclePerDay(units: MuscleUnit[], sets: KbSet[], done: DoneSession[] = []): { perDay: Map<string, number>; first: string | null; last: string | null; days: Map<string, MuscleDay> } {
   const days = new Map<string, MuscleDay>();
   const add = (d: string, p: number, est: boolean) => {
     const cur = days.get(d) ?? { points: 0, estimated: false };
@@ -124,6 +126,16 @@ export function musclePerDay(units: MuscleUnit[], sets: KbSet[]): { perDay: Map<
     // Kettlebell ohne Anstrengung, aber mit Sätzen: die Sätze zählen (unten), die Einheit nicht doppelt
     if (sportOf(u) === "kettlebell" && rpe === null && sets.some((s) => s.day === d)) continue;
     add(d, ((u.duration_s / 60) * (rpe ?? DEFAULT_RPE) * w) / 10, rpe === null);
+  }
+  for (const s of done) {
+    const sport = s.sport as Sport;
+    const w = MUSCLE_SPORTS[sport];
+    if (!w) continue;
+    if (units.some((u) => (u.start_local ?? "").slice(0, 10) === s.day && sportOf(u) === sport)) continue;
+    const rpe = s.rpe ?? null;
+    if (sport === "kettlebell" && rpe !== null) kbWithRpe.add(s.day);
+    if (sport === "kettlebell" && rpe === null && sets.some((x) => x.day === s.day)) continue;
+    add(s.day, ((s.duration_min ?? DEFAULT_MIN) * (rpe ?? DEFAULT_RPE) * w) / 10, rpe === null || s.duration_min == null);
   }
   const vol = new Map<string, number>();
   for (const s of sets) vol.set(s.day, (vol.get(s.day) ?? 0) + s.reps * (s.weight_kg || BODYWEIGHT_KG));

@@ -3102,3 +3102,7 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .bz-dist-name { white-space: nowrap; }
 .bz-dot.bz-muede { fill: var(--bz); }
 .legend .bz-key.bz-muede, .bz-dist .bz-key.bz-muede { background: var(--bz); }
+
+/* Trainingstage: Wochenziel einstellen (Tap-Ziel 44 px) */
+.habit-goal { margin: 4px 0 2px; }
+.habit-goal .stepper button { width: 44px; height: 44px; }
