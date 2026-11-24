@@ -1,11 +1,19 @@
 # Übergabe · Oberfläche (OF)
-Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ · seit 2026-11-24 18:48 (Bündeln Baustein 2: Eintragen-Blatt)
+Belegt: frei
 Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ
 
 
 
 
 
+
+
+## Bündeln Baustein Eintragen-Blatt (PR #134, 24.11.)
+- `components/ui/EditSheet`: neue Props `instant` (nur „Fertig“, jede Änderung speichert sofort), `saveLabel`, `error`; `onSave` optional.
+- Medikamente: `MedSheet` ersetzt `AddMed` und `EditMed` (Anlegen und Ändern, Löschen nur bei früheren Mitteln). Körper: Liste „Ändern“ öffnet Blatt mit Stepper und Löschen (vorher Sprung nach oben und Browser-Rückfrage). Wadenkrampf: Ändern im Blatt mit `instant`, Löschen mit Rückfrage im Blatt.
+- Bewusst nicht: Krank & verletzt (geführter Ablauf, Ändern schon im Blatt), Körper-Stepper zum Eintragen, Tipp-Felder im Tagebuch, Periode nachtragen (Tagebuch mit Datum), Kettlebell-Plan, Bouldern, Karate (Listen-Zeilen).
+- Testumgebung für Fotos mit Beispieldaten: Playwright fängt Supabase-Aufrufe ab (Skripte nicht im Repo; Aufbau: Sitzung in localStorage `sb-localhost-auth-token`, `page.route` auf `http://localhost:3999/**`, Dev-Server mit `NEXT_PUBLIC_SUPABASE_URL=http://localhost:3999`).
+- Nächster Baustein: 3 Tagesblatt.
 
 ## Bündeln Baustein Einordnung und Zeitraum (PR #133, 24.11.)
 - `lib/einordnung.ts` (`bereichWort`, `bereichSeit`, `zielWort`, `lageIn`, `gross`): genutzt von `positionText`, Korridor, FactorList, GlanceTiles, DayBars, LineBand, RingRow, LoadCard. Einheitlich „über/unter deinem Bereich“, „unter/im/über dem Ziel“.
