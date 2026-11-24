@@ -110,7 +110,7 @@ Ein Ablauf für jedes Formular: Blatt von unten, Titel, Tipp-Felder zuerst, Deta
 1. ✅ **Einordnung** und **Zeitraum-Umschalter** (PR #133): `lib/einordnung.ts`, `lib/zeitraum.ts`, `components/ui/SpanSwitch.tsx`
 2. ✅ **Eintragen-Blatt** (PR #134): `EditSheet` mit Variante „Fertig“ (sofort speichern); Medikamente (ein Blatt für Anlegen und Ändern), Körper-Einträge, Wadenkrampf, Training erfassen. Fotos: `docs/bilder/buendeln-eintragen/`
 3. ✅ **Tagesblatt** (PR #135): `components/tag/Tagesblatt.tsx` und `TagTraining.tsx`. Trainingskalender (am Computer daneben) und Zyklus-Kalender (Tipp öffnet es im Blatt). Fotos: `docs/bilder/buendeln-tagesblatt/`
-4. **Kalender mit Ebenen** (ersetzt die vier Raster)
+4. ✅ **Kalender mit Ebenen** (PR #136): `components/kalender/Monatskalender.tsx` für Training und Zyklus. Ebenen Zyklus, Training, Symptome. Bei der Bestandsaufnahme zeigte sich: Karate und Wadenkrampf hatten keinen eigenen Kalender, der Monatsrückblick gehört zu Baustein 7. Fotos: `docs/bilder/buendeln-kalender/`
 5. **Wert-Seite** (`/wert/[name]`, Weiterleitungen)
 6. **Zusammenhänge**
 7. **Raster und Rückblick**
