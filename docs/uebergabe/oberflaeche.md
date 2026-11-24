@@ -1,5 +1,5 @@
 # Übergabe · Oberfläche (OF)
-Belegt: frei
+Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ · seit 2026-11-24 19:59 (Bündeln Baustein 3: Tagesblatt)
 Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ
 
 
