@@ -2,7 +2,7 @@ import Link from "next/link";
 import { HalfGauge } from "@/components/charts";
 import ExplainCard from "@/components/ui/ExplainCard";
 import { clock } from "@/lib/dates";
-import { dayLoad, firstAlltagDay, ringSplit, type Data, type Target } from "@/lib/insights";
+import { dayLoad, firstAlltagDay, loadLabel, ringSplit, type Data, type Target } from "@/lib/insights";
 import { LOAD_CURVE_TEXT, targetBasisText, targetText } from "@/lib/today";
 
 // Belastung heute als Halbbogen mit Zielbereich, Kacheln und Erklärkarte (Konzept dunkel 2, Muster 2 und 3).
@@ -29,7 +29,7 @@ export default function LoadCard({ day, data, target: t }: { day: string; data: 
           value={load / 100}
           split={ringSplit(dl)}
           target={t.pause ? null : { lo: t.lo / 100, hi: t.hi / 100 }}
-          center={`${load} %`}
+          center={loadLabel(dl)}
           caption={word}
           label={`Belastung ${load} Prozent${dl.pctAlltag ? `, davon Alltag ${dl.pctAlltag} Prozent` : ""}, ${word}${t.pause ? "" : `, Ziel ${t.lo} bis ${t.hi} Prozent`}`}
         />
@@ -41,7 +41,7 @@ export default function LoadCard({ day, data, target: t }: { day: string; data: 
       {dl.quelle && (
         <>
           <p className="load-split">
-            {shareWord ? `Heute kam deine Belastung ${shareWord} aus dem Alltag.` : "Heute kam deine Belastung nur aus dem Training."}
+            {dl.training + dl.alltag <= 0 ? "Bisher ist heute keine Belastung gemessen." : shareWord ? `Heute kam deine Belastung ${shareWord} aus dem Alltag.` : "Heute kam deine Belastung nur aus dem Training."}
             {dl.quelle === "schritte" ? " Alltag geschätzt aus Schritten, weil die Uhr kaum Puls hat." : ""}
           </p>
           <div className="legend cb-training">

@@ -73,6 +73,11 @@ export function dayLoad(day: string, daily: Daily[], acts: Activity[]): DayLoad 
   return { training, alltag, pct, pctTraining, pctAlltag: pct - pctTraining, quelle: ld.quelle, alltagMin: alltagMinutes(ld), steps: d?.steps_outside_acts ?? null };
 }
 
+// Zahl für Ring und Bogen: kleine Belastung, die auf 0 % gerundet wäre, heißt „unter 1 %“
+export function loadLabel(dl: DayLoad): string {
+  return dl.pct === 0 && dl.training + dl.alltag > 0 ? "unter 1 %" : `${dl.pct} %`;
+}
+
 // Anteil Training am gezeichneten Ring (0–1): Über 100 % ist der Ring voll, Training und Alltag teilen ihn nach ihrem Anteil
 export function ringSplit(dl: DayLoad): number | null {
   if (!dl.quelle) return null;

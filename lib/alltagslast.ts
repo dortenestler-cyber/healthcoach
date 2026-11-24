@@ -3,8 +3,8 @@
 // Konzept: docs/konzept-korridore-alltagslast.md, Teil B. Ab Migration 20261124090000_alltagslast.
 
 export type LoadDay = {
-  /** 1: erste Fassung (Alltag ab Zone 2) · 2: ab 22.11., Zone 1 zählt ab 10 Minuten am Stück */
-  v: 1 | 2;
+  /** 1: erste Fassung (Alltag ab Zone 2) · 2: ab 22.11., Zone 1 zählt ab 10 Minuten am Stück · 3: ab 24.11., leichte Bewegung zählt halb */
+  v: 1 | 2 | 3;
   /** "puls": aus dem Tagespuls · "schritte": Uhr kaum getragen, Alltag geschätzt aus Schritten */
   quelle: "puls" | "schritte";
   /** woran Bewegung im Alltag erkannt wurde: "stress" = Stresswert „Bewegung“ von Garmin,
@@ -14,9 +14,11 @@ export type LoadDay = {
   training: number[];
   /** Minuten je Zone 0–5 außerhalb von Aktivitäten, die zählen (ab Zone 1, Regel siehe bewegung) */
   alltag: number[];
+  /** Minuten leichte Bewegung im Alltag (ab 20 %, unter Zone 1, halbes Gewicht), erst ab Version 3 */
+  leicht?: number;
   /** Minuten ab Zone 1, die nicht zur Belastung zählen (ohne Bewegung oder Zone 1 kürzer als 10 Minuten) */
   ohne_bewegung: number;
-  /** Pulspunkte = Minuten × Zonengewicht (Zone 1 = 1 … Zone 5 = 5) */
+  /** Pulspunkte = Minuten × Zonengewicht (leicht = 0,5, Zone 1 = 1 … Zone 5 = 5) */
   pkt_training: number;
   pkt_alltag: number;
   /** Minuten mit Pulsdaten */
@@ -58,11 +60,11 @@ export const LOAD_ZONES = [
 export function readLoadDay(v: unknown): LoadDay | null {
   if (!v || typeof v !== "object") return null;
   const o = v as Partial<LoadDay>;
-  if ((o.v !== 1 && o.v !== 2) || !Array.isArray(o.training) || !Array.isArray(o.alltag)) return null;
+  if ((o.v !== 1 && o.v !== 2 && o.v !== 3) || !Array.isArray(o.training) || !Array.isArray(o.alltag)) return null;
   return o as LoadDay;
 }
 
-/** Minuten in Bewegung im Alltag (ab Zone 1) */
+/** Minuten in Bewegung im Alltag (leichte Bewegung und ab Zone 1) */
 export function alltagMinutes(l: LoadDay): number {
-  return Math.round(l.alltag.slice(1).reduce((a, b) => a + b, 0));
+  return Math.round(l.alltag.slice(1).reduce((a, b) => a + b, 0) + (l.leicht ?? 0));
 }

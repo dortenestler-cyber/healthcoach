@@ -65,3 +65,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-24 · OF/DA · Nutzerin: Belastung darf über 100 % gehen, Skala flacht nach oben ab (wie Bevel) · 150 Last bleibt 100 %, harte Tage sollen weiter sichtbar steigen
 2026-11-24 · OF/DA · Nutzerin: Belastungsziel persönlich: übliche Tagesbelastung der letzten 28 Tage × Faktor aus der Readiness, Bereich ± 10
 2026-11-24 · OF/DA · Nutzerin: Bremse beim Ziel: Last der letzten 7 Tage über 130 % der 4 Wochen davor, dann Ziel nicht über der üblichen Belastung
+2026-11-24 · DA · Nutzerin: leichte Bewegung im Alltag zählt ab 20 % Herzfrequenzreserve mit halbem Gewicht · Vergleich mit Bevel: 5.832 Schritte ergaben 0 Minuten

@@ -1,6 +1,11 @@
 # Übergabe · Oberfläche (OF)
-Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ · seit 2026-11-24 18:03 (Belastung: Skala und persönliches Ziel)
-Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWfNqpNJkPsx5iQm7e7
+Belegt: frei
+Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ
+
+
+## Belastung wie bei Bevel (PR #127, 24.11.)
+- Konzept `docs/konzept-belastung-skala.md`. Abflachende Skala (`loadToPct` in `lib/alltagslast.ts`), persönliches Ziel (`usualLoad`, `targetBand` in `lib/insights.ts`), `loadLabel` („unter 1 %“), `ringSplit` (Ring über 100 % voll, Anteile bleiben). `HARD_DAY_PCT`/`MID_DAY_PCT` zentral in `lib/insights.ts`. Wert je Einheit in % (Heute, Einheit-Seite mit Garmin-Last als Notiz). Satz „Bisher ist heute keine Belastung gemessen.“ statt „nur aus dem Training“ bei 0.
+- Nächster Schritt: Rückmeldung der Nutzerin nach ein paar Abrufen (Vergleich mit Bevel).
 
 ## Keine Hinweise zu fehlenden Garmin-Daten (PR #123, 24.11.)
 - Wunsch der Nutzerin: Zeilen wie „Stress im Tagesverlauf ist bei Garmin nicht abrufbar.“ nicht mehr zeigen. `useGarminSync` liefert kein `note` mehr, `HeuteView` zeigt nur noch echte Fehler. Die Funktion `garmin-sync` schickt die Hinweise weiter mit, sie werden ignoriert.
