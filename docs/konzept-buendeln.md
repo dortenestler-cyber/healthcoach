@@ -107,7 +107,7 @@ Ein Ablauf für jedes Formular: Blatt von unten, Titel, Tipp-Felder zuerst, Deta
 - Keine Funktion fällt weg, ohne dass du zustimmst
 
 ## Reihenfolge (je ein Pull Request)
-1. **Einordnung** und **Zeitraum-Umschalter** (klein, wirkt sofort überall)
+1. ✅ **Einordnung** und **Zeitraum-Umschalter** (PR #133): `lib/einordnung.ts`, `lib/zeitraum.ts`, `components/ui/SpanSwitch.tsx`
 2. **Eintragen-Blatt** (Grundlage für 3)
 3. **Tagesblatt**. Planen und Erfassen von Training gibt es schon im Trainingskalender (PR #130), es zieht ins Tagesblatt um
 4. **Kalender mit Ebenen** (ersetzt die vier Raster)

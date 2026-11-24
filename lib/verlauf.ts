@@ -1,19 +1,13 @@
-// Detailansicht (Verlauf): Zeiträume T · W · M · 6M · J, ab 6M Wochenmittel, Satz und Highlights je Zeitraum.
+// Detailansicht (Verlauf): Zeiträume Heute · 7 T · 30 T · 3 M · 6 M · 1 J, ab 6 M Wochenmittel, Satz und Highlights je Zeitraum.
 // Reine Berechnungen ohne Netzwerk. Der persönliche Bereich kommt fest aus lib/baseline.ts und hängt nicht am Zeitraum.
 
 import { positionIn, type Range } from "@/lib/baseline";
+import { bereichWort } from "@/lib/einordnung";
+import { zeitraum, type Zeitraum } from "@/lib/zeitraum";
 
-export type Span = "T" | "W" | "M" | "6M" | "J";
-
-export const SPANS: { key: Span; label: string; name: string; days: number; weekly: boolean }[] = [
-  { key: "T", label: "T", name: "Tag", days: 1, weekly: false },
-  { key: "W", label: "W", name: "Woche", days: 7, weekly: false },
-  { key: "M", label: "M", name: "Monat", days: 30, weekly: false },
-  { key: "6M", label: "6M", name: "Halbjahr", days: 182, weekly: true },
-  { key: "J", label: "J", name: "Jahr", days: 365, weekly: true },
-];
-
-export const spanOf = (k: Span) => SPANS.find((s) => s.key === k)!;
+// Zeiträume kommen aus lib/zeitraum.ts (ein Umschalter für die ganze App), „heute“ zeigt den Wert von heute im Bereich.
+export type Span = Zeitraum;
+export const spanOf = zeitraum;
 
 export type Point = { day: string; label: string; value: number | null; n: number };
 
@@ -42,7 +36,7 @@ export function buildPoints(span: Span, today: string, value: (day: string) => n
   if (!spanOf(span).weekly) {
     return days.map((d) => {
       const v = value(d);
-      return { day: d, label: span === "W" ? WD[date(d).getDay()] : dayLabel(d), value: v, n: v === null ? 0 : 1 };
+      return { day: d, label: span === "7T" ? WD[date(d).getDay()] : dayLabel(d), value: v, n: v === null ? 0 : 1 };
     });
   }
   const weeks = new Map<string, number[]>();
@@ -59,7 +53,7 @@ export function buildPoints(span: Span, today: string, value: (day: string) => n
 // Beschriftung der x-Achse: Anfang, Mitte, Ende (bei 6M und J Monatsnamen)
 export function axisLabels(points: Point[], span: Span): { index: number; text: string }[] {
   if (!points.length) return [];
-  if (span === "W") return points.map((p, i) => ({ index: i, text: p.label }));
+  if (span === "7T") return points.map((p, i) => ({ index: i, text: p.label }));
   const last = points.length - 1;
   const idx = [0, Math.round(last / 2), last];
   return idx.map((i) => ({ index: i, text: i === last && !spanOf(span).weekly ? "heute" : points[i].label }));
@@ -85,9 +79,9 @@ export function summarize(
   const highlights: Highlight[] = [];
   let sentence = "";
 
-  if (span === "T") {
+  if (span === "heute") {
     const pos = range ? positionIn(lastP.value, range) : null;
-    sentence = !range ? `${label} heute. Dein Bereich entsteht ab 14 Tagen Daten.` : pos === "im" ? `${label} liegt heute in deinem Bereich.` : `${label} liegt heute ${pos} deinem Bereich.`;
+    sentence = !range ? `${label} heute. Dein Bereich entsteht ab 14 Tagen Daten.` : `${label} liegt heute ${!pos || pos === "im" ? "in deinem Bereich" : bereichWort(pos)}.`;
     return { sentence, big: fmt(lastP.value), bigNote: "heute", highlights };
   }
 
@@ -99,7 +93,7 @@ export function summarize(
     if (first !== null && last !== null && withValue.length >= 8) {
       const diff = last - first;
       const same = width !== null ? Math.abs(diff) < width / 2 : Math.abs(diff) < Math.abs(first) * 0.05;
-      sentence = same ? `${label} ist im ${spanOf(span).name} etwa gleich geblieben.` : `${label} ist im ${spanOf(span).name} ${diff > 0 ? "gestiegen" : "gesunken"}: von ${fmt(first)} auf ${fmt(last)} im Wochenschnitt.`;
+      sentence = same ? `${label} ist ${spanOf(span).inText} etwa gleich geblieben.` : `${label} ist ${spanOf(span).inText} ${diff > 0 ? "gestiegen" : "gesunken"}: von ${fmt(first)} auf ${fmt(last)} im Wochenschnitt.`;
       highlights.push({ label: "Erste 4 Wochen", value: fmt(first) }, { label: "Letzte 4 Wochen", value: fmt(last) });
     } else sentence = `${label}: für einen Trend fehlen noch Wochen.`;
   } else if (range) {

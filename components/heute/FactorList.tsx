@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { positionIn } from "@/lib/baseline";
+import { bereichWort } from "@/lib/einordnung";
 import type { Row } from "@/lib/today";
 
 // Kennzahlen-Liste im Stil von Whoop (Detailseiten hinter den Ringen auf Heute).
@@ -11,7 +12,7 @@ export default function FactorList({ rows, mode = "pfeil", tone = "recovery", le
     <div className={`factor-table tone-${tone}`}>
       {rows.map((r) => {
         const pos = r.value !== null && r.base.active ? positionIn(r.value, r.base.active) : null;
-        const word = r.value === null ? "kein Wert" : pos === null ? "Bereich ab 14 Tagen" : pos === "im" ? "im Bereich" : `${pos} deinem Bereich`;
+        const word = r.value === null ? "kein Wert" : pos === null ? "Bereich ab 14 Tagen" : bereichWort(pos);
         const body = (
           <>
             <span className="factor-name">{r.label}</span>

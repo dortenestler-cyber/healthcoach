@@ -8,6 +8,8 @@ import { useEffect, useMemo, useState } from "react";
 import { grownHeight, linear, monotoneCurve, niceTicks, segments } from "@/components/charts/scale";
 import { useChartWidth } from "@/components/charts/useChartWidth";
 import { ChartTip, tipDate, usePick } from "@/components/charts/pick";
+import SpanSwitch from "@/components/ui/SpanSwitch";
+import { zeitraum, type Zeitraum } from "@/lib/zeitraum";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay } from "@/lib/dates";
 import type { Data } from "@/lib/insights";
@@ -26,13 +28,8 @@ import {
   type ZeitPunkt,
 } from "@/lib/belastungZeit";
 
-const SPANS = [
-  { key: "7 T", days: 7, name: "7 Tage" },
-  { key: "30 T", days: 30, name: "30 Tage" },
-  { key: "3 M", days: 90, name: "3 Monate" },
-  { key: "6 M", days: 150, name: "6 Monate" },
-] as const;
-type SpanKey = (typeof SPANS)[number]["key"];
+// Zeiträume aus lib/zeitraum.ts. Ohne „1 J“: die App lädt für Training 180 Tage.
+const OPTIONS: Zeitraum[] = ["7T", "30T", "3M", "6M"];
 const MONTHS = ["Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sep.", "Okt.", "Nov.", "Dez."];
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");
@@ -69,9 +66,9 @@ function useMuscleInput(data: Data): { units: MuscleUnit[]; sets: KbSet[] } | nu
 
 export default function BelastungZeitCard({ today, data, alltag = true }: { today: string; data: Data; alltag?: boolean }) {
   const [kind, setKind] = useState<"cardio" | "muskeln">("cardio");
-  const [span, setSpan] = useState<SpanKey>("30 T");
+  const [span, setSpan] = useState<Zeitraum>("30T");
   const muscleIn = useMuscleInput(data);
-  const n = SPANS.find((s) => s.key === span)!.days;
+  const n = Math.min(zeitraum(span).days, 178);
   const days = useMemo(() => Array.from({ length: n }, (_, i) => addDays(today, i - (n - 1))), [n, today]);
 
   const cardio = useMemo(() => {
@@ -104,7 +101,7 @@ export default function BelastungZeitCard({ today, data, alltag = true }: { toda
   const bandBot = pts.flatMap((p, i) => (p.lo === null ? [] : [{ x: x(i), y: y(p.lo) }])).reverse();
   const pick = usePick(n, 4, step, W);
   const sel = pick.sel;
-  const dotR = n > 90 ? 0 : n > 30 ? 2.5 : 4;
+  const dotR = n > 100 ? 0 : n > 30 ? 2.5 : 4;
   const dist = verteilung(pts);
   const label = kind === "cardio" ? "Cardio-Belastung" : "Muskelbelastung";
   const sentence = kind === "muskeln" && !muscle ? "Lädt …" : zustandSatz(now?.zustand ?? null, kind);
@@ -139,7 +136,7 @@ export default function BelastungZeitCard({ today, data, alltag = true }: { toda
         className="cb cb-training cb-pickable"
         viewBox={`0 0 ${W} ${H}`}
         role="img"
-        aria-label={`${label} über ${SPANS.find((s) => s.key === span)!.name}: heute ${now?.value != null ? r0(now.value) + unit : "kein Wert"}${now?.zustand ? `, ${ZUSTAND_NAMEN[now.zustand]}` : ""}${now?.lo != null ? `, optimal ${r0(now.lo)} bis ${r0(now.hi!)}` : ""}`}
+        aria-label={`${label} über ${zeitraum(span).name}: heute ${now?.value != null ? r0(now.value) + unit : "kein Wert"}${now?.zustand ? `, ${ZUSTAND_NAMEN[now.zustand]}` : ""}${now?.lo != null ? `, optimal ${r0(now.lo)} bis ${r0(now.hi!)}` : ""}`}
         {...pick.handlers}
       >
         {ticks.map((t) => (
@@ -165,13 +162,7 @@ export default function BelastungZeitCard({ today, data, alltag = true }: { toda
         )}
       </svg>
 
-      <div className="segmented" role="group" aria-label="Zeitraum">
-        {SPANS.map((s) => (
-          <button key={s.key} type="button" aria-pressed={span === s.key} aria-label={s.name} onClick={() => setSpan(s.key)}>
-            {s.key}
-          </button>
-        ))}
-      </div>
+      <SpanSwitch value={span} onChange={setSpan} options={OPTIONS} />
 
       <div className="legend cb-training">
         {ZUSTAND_REIHE.map((z) => (

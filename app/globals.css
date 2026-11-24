@@ -3106,3 +3106,8 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 /* Trainingstage: Wochenziel einstellen (Tap-Ziel 44 px) */
 .habit-goal { margin: 4px 0 2px; }
 .habit-goal .stepper button { width: 44px; height: 44px; }
+
+/* Zeitraum-Umschalter (SpanSwitch): gleich breite Tasten, 44 px hoch */
+.segmented-4:not(.segmented-tabs), .segmented-6 { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+.segmented-4:not(.segmented-tabs) button, .segmented-6 button { min-height: 44px; font-size: 15px; }
+.segmented-6 button { font-size: 14px; padding-left: 2px; padding-right: 2px; }

@@ -4,6 +4,7 @@
 
 import { personalRange, positionIn, type Point, type Position, type Range } from "@/lib/baseline";
 import type { Activity, Daily } from "@/lib/garmin";
+import { bereichWort } from "@/lib/einordnung";
 import { HARD_DAY_PCT, loadPercent, type Diary } from "@/lib/insights";
 
 const SHARE_DAYS = 30; // „so oft im Bereich“
@@ -53,7 +54,7 @@ function rate(inp: KorridorInput, from: string): Rated[] {
     });
 }
 
-const posWord = (p: Position) => (p === "im" ? "im Bereich" : p === "über" ? "über dem Bereich" : "unter dem Bereich");
+const posWord = (p: Position) => bereichWort(p);
 
 // So oft im Bereich in den letzten 30 Tagen
 function shareLine(inp: KorridorInput): Line | null {

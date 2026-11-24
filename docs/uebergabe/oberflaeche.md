@@ -6,6 +6,13 @@ Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014p
 
 
 
+
+## Bündeln Baustein Einordnung und Zeitraum (PR #133, 24.11.)
+- `lib/einordnung.ts` (`bereichWort`, `bereichSeit`, `zielWort`, `lageIn`, `gross`): genutzt von `positionText`, Korridor, FactorList, GlanceTiles, DayBars, LineBand, RingRow, LoadCard. Einheitlich „über/unter deinem Bereich“, „unter/im/über dem Ziel“.
+- `lib/zeitraum.ts` + `components/ui/SpanSwitch.tsx`: Heute · 7 T · 30 T · 3 M · 6 M · 1 J. Verlauf nutzt alle (Heute zuschaltbar, Standard 30 T), Belastung über die Zeit ohne 1 J (180 Tage Daten). `lib/verlauf.ts` `Span` = `Zeitraum`.
+- Bewusst noch nicht: Zustände (Cardio/Muskeln) und Readiness-Stufen bleiben in `lib/belastungZeit.ts` und `lib/cycle.ts`; feste Fenster (Tagebuch 4 Wochen, Ziel und Ist 14 Tage) kommen mit Wert-Seite und Raster.
+- Nächster Baustein: 2 Eintragen-Blatt.
+
 ## Wochenvorlage raus, Training im Kalender (PR #130, 24.11.)
 - `CalendarSection`: Karte Wochenvorlage entfernt, „+ Sport“ an jedem Tag: kommende Tage planen, heute und früher erfassen im `EditSheet` (Dauer 30/45/60/90 oder eingetippt, Anstrengung 1–10, beides freiwillig). „Erledigt“ und „Bearbeiten“ öffnen dasselbe Blatt. `HabitCard`: Wochenziel mit − und + (`settings.trainingDaysGoal`, Start 4), zählt erfasste Einheiten. `Data.done` (erledigte `planned_sessions`) fließt in Trainingstage, Muskelbelastung und Coach.
 - Konzept Bündeln: `docs/konzept-buendeln.md`, Prompt `docs/prompt-buendeln.md`, Entwurf, wartet auf Freigabe (4 offene Fragen).
