@@ -2221,6 +2221,7 @@ body { overflow-x: clip; }
   flex-direction: column;
   gap: 6px;
 }
+.explain[data-tone="energy"] { --a: var(--energy); }
 .explain[data-tone="training"] { --a: var(--training); }
 .explain[data-tone="cycle"] { --a: var(--cycle); }
 .explain[data-tone="stress"] { --a: var(--stress); }
@@ -2679,6 +2680,9 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
 /* Ein Satz zum Tag */
 .day-sentence .explain { padding: 16px 18px 10px; }
 .day-sentence.suggest { display: flex; flex-direction: column; gap: 4px; }
+.day-sentence-fade { animation: day-sentence-in 0.28s ease; }
+@keyframes day-sentence-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .day-sentence-fade { animation: none; } }
 
 /* Auf einen Blick: 2 × 2 Kacheln */
 .today-glance { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -2907,15 +2911,15 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
 }
 .refresh-btn { width: auto; margin: 0 8px 0 0; min-height: 44px; padding: 0 14px; flex: none; }
 @media (min-width: 768px) { .day-head .gear-btn { display: none; } }
-@media (min-width: 768px) {
-  .ring-strip { margin: 0; padding: 8px 0 6px; justify-content: space-around; overflow: visible; scroll-snap-type: none; }
-  .ring-strip-cell.is-copy { display: none; }
-  .ring-strip-cell { --s: 0.77; flex: 0 1 auto; padding: 6px 2px 8px; }
-  .ring-strip-cell.is-main { --s: 1; }
-  .ring-strip-ring { opacity: 1; margin: 0 calc(-60px * (1 - var(--s))); }
-  .ring-strip-cell.is-main .ring-strip-label { font-size: 13.5px; color: var(--text); }
-  .ring-strip-cell:hover { background: var(--card); }
-}
+/* Genug Platz (Computer): alle Ringe nebeneinander, Readiness groß (RingRow setzt .is-static) */
+.ring-strip.is-static { margin: 0; padding: 8px 0 6px; justify-content: space-around; overflow: visible; scroll-snap-type: none; }
+.ring-strip.is-static .ring-strip-cell.is-copy { display: none; }
+.ring-strip.is-static .ring-strip-cell { --s: 0.77; flex: 0 1 auto; padding: 6px 2px 8px; }
+.ring-strip.is-static .ring-strip-cell.is-main { --s: 1; }
+.ring-strip.is-static .ring-strip-ring { opacity: 1; margin: 0 calc(-60px * (1 - var(--s))); }
+.ring-strip.is-static .ring-strip-cell .ring-strip-label { font-size: 12.5px; color: var(--text-2); }
+.ring-strip.is-static .ring-strip-cell.is-main .ring-strip-label { font-size: 13.5px; color: var(--text); }
+@media (hover: hover) { .ring-strip.is-static .ring-strip-cell:hover { background: var(--card); } }
 @media (min-width: 768px) {
   .segmented-tabs { max-width: 640px; }
 }

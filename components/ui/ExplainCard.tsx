@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { useCoachPrefs } from "@/lib/prefs";
 
-export type ExplainTone = "recovery" | "training" | "cycle" | "stress" | "sleep";
+export type ExplainTone = "recovery" | "energy" | "training" | "cycle" | "stress" | "sleep";
 
 // Erklärkarte unter einem großen Wert (Konzept dunkel 2, Muster 3): ein Satz zum Ergebnis, wichtige Zahlen fett.
 // Darunter der Coach-Einstieg: öffnet den Coach mit einer passenden Frage. Gesendet wird erst nach deinem Tippen.
