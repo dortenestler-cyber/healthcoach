@@ -1,6 +1,6 @@
 name: Daten prüfen
 
-# Liest nur, ändert nichts. Gibt Zählwerte aus, keine Gesundheitswerte:
+# Liest nur, ändert nichts. Gibt Zählwerte aus, keine Gesundheitswerte (auch: Läuft die Push-Erinnerung?):
 # Wie viele Tage haben Werte in den neuen Spalten, wann lief der letzte Abruf.
 # Start von Hand: Actions → „Daten prüfen“ → Run workflow.
 # Voraussetzung: GitHub-Secret SUPABASE_DB_URL (wie bei den Migrationen).
@@ -59,3 +59,18 @@ jobs:
              from public.garmin_daily where day >= current_date - 13;"
           echo "== Morgen-Abrufe (letzte 5) =="
           q "select at, ok, left(message, 200) as meldung from public.garmin_sync_runs order by at desc limit 5;"
+          echo "== Push: Zeitplan =="
+          q "select jobid, schedule, active from cron.job where jobname = 'health-coach-push';" || echo "Zeitplan nicht lesbar"
+          echo "== Push: letzte Läufe des Zeitplans (UTC) =="
+          q "select d.start_time, d.status, left(d.return_message, 150) as meldung
+             from cron.job_run_details d join cron.job j on j.jobid = d.jobid
+             where j.jobname = 'health-coach-push' order by d.start_time desc limit 8;" || echo "Laufliste nicht lesbar"
+          echo "== Push: Passwort im Tresor vorhanden? =="
+          q "select count(*) as eintraege from vault.secrets where name = 'push_cron_secret';" || echo "Tresor nicht lesbar"
+          echo "== Push: Antworten der Funktion (UTC, letzte 8) =="
+          q "select created, status_code, left(content::text, 150) as antwort, left(error_msg, 150) as fehler
+             from net._http_response order by created desc limit 8;" || echo "Antworten nicht lesbar"
+          echo "== Push: angemeldete Geräte =="
+          q "select remind_at, time_zone, checkin_reminder, last_sent_on, created_at from public.push_subscriptions;" || echo "Geräte nicht lesbar"
+          echo "== Push: Check-ins der letzten 2 Tage (nur Zeitpunkt und Quelle) =="
+          q "select day, source, updated_at from public.checkins where day >= current_date - 1 order by day desc;" || echo "Check-ins nicht lesbar"
