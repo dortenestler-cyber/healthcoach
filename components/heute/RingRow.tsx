@@ -58,32 +58,32 @@ export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarm
   if (showGarmin) {
     const e = energyDay(day, data.daily, data.acts, nowMinute);
     const last = [...e.today].reverse().find((v) => v !== null) ?? null;
-    items.push({ key: "energie", href: `/heute/energie${q}`, label: "Energie", tone: "energy", value: (last ?? 0) / 100, center: last === null ? "–" : String(Math.round(last)), word: last === null ? "kein Wert" : "Body Battery", aria: last === null ? "Energie: noch kein Wert" : `Energie, Body Battery ${Math.round(last)} von 100` });
+    items.push({ key: "energie", href: `/wert/energie${q}`, label: "Energie", tone: "energy", value: (last ?? 0) / 100, center: last === null ? "–" : String(Math.round(last)), word: last === null ? "kein Wert" : "Body Battery", aria: last === null ? "Energie: noch kein Wert" : `Energie, Body Battery ${Math.round(last)} von 100` });
   }
 
   const slept = sleepAchieved(day, data);
   const sleepPct = slept.ratio === null ? null : Math.round(slept.ratio * 100);
-  items.push({ key: "schlaf", href: `/heute/schlaf${q}`, label: "Schlaf", tone: "sleep", value: slept.ratio ?? 0, center: sleepPct === null ? "–" : `${sleepPct} %`, word: sleepPct === null ? "kein Wert" : "vom Bedarf", aria: sleepPct === null ? "Schlaf: noch kein Wert für letzte Nacht" : `Schlaf ${sleepPct} Prozent vom Bedarf` });
+  items.push({ key: "schlaf", href: `/wert/schlaf${q}`, label: "Schlaf", tone: "sleep", value: slept.ratio ?? 0, center: sleepPct === null ? "–" : `${sleepPct} %`, word: sleepPct === null ? "kein Wert" : "vom Bedarf", aria: sleepPct === null ? "Schlaf: noch kein Wert für letzte Nacht" : `Schlaf ${sleepPct} Prozent vom Bedarf` });
 
   const r = rule.readiness;
   const warn = rule.level === "warnzeichen";
-  items.push({ key: "readiness", href: `/heute/readiness${q}`, label: "Readiness", tone: "recovery", value: warn ? 0 : r.value / 10, center: warn ? "–" : de1(r.value), word: warn ? "Hinweis" : r.label, aria: warn ? "Readiness: siehe Hinweis" : `Readiness ${de1(r.value)} von 10, ${r.label}`, main: true });
+  items.push({ key: "readiness", href: `/wert/readiness${q}`, label: "Readiness", tone: "recovery", value: warn ? 0 : r.value / 10, center: warn ? "–" : de1(r.value), word: warn ? "Hinweis" : r.label, aria: warn ? "Readiness: siehe Hinweis" : `Readiness ${de1(r.value)} von 10, ${r.label}`, main: true });
 
   if (showLoad) {
     const t = rule.target;
     const dl = dayLoad(day, data.daily, data.acts);
     const word = zielWort(dl.pct, t);
-    items.push({ key: "belastung", href: `/heute/belastung${q}`, label: "Belastung", tone: "training", value: dl.pct / 100, split: ringSplit(dl), target: t.pause ? null : { lo: t.lo / 100, hi: t.hi / 100 }, center: loadLabel(dl), word, aria: `Belastung ${dl.pct} Prozent, ${word}${t.pause ? "" : `, Ziel ${t.lo} bis ${t.hi} Prozent`}` });
+    items.push({ key: "belastung", href: `/wert/belastung${q}`, label: "Belastung", tone: "training", value: dl.pct / 100, split: ringSplit(dl), target: t.pause ? null : { lo: t.lo / 100, hi: t.hi / 100 }, center: loadLabel(dl), word, aria: `Belastung ${dl.pct} Prozent, ${word}${t.pause ? "" : `, Ziel ${t.lo} bis ${t.hi} Prozent`}` });
   }
 
   if (showGarmin) {
     const im = weekIntensity(day, data);
-    items.push({ key: "intensitaet", href: `/heute/intensitaet${q}`, label: "Intensität", tone: "training", value: im / WHO_MINUTES, center: String(im), word: `von ${WHO_MINUTES} min`, aria: `Intensitätsminuten diese Woche ${im} von ${WHO_MINUTES}` });
+    items.push({ key: "intensitaet", href: `/wert/intensitaet${q}`, label: "Intensität", tone: "training", value: im / WHO_MINUTES, center: String(im), word: `von ${WHO_MINUTES} min`, aria: `Intensitätsminuten diese Woche ${im} von ${WHO_MINUTES}` });
   }
 
   if (showGarmin) {
     const s = stressDay(day, data.daily);
-    items.push({ key: "stress", href: `/heute/stress${q}`, label: "Stress", tone: "stress", value: (s.value ?? 0) / 100, center: s.value === null ? "–" : String(s.value), word: s.word ?? "kein Wert", aria: s.value === null ? "Stress: noch kein Wert" : `Stress ${s.value} von 100, ${s.word}` });
+    items.push({ key: "stress", href: `/wert/stress${q}`, label: "Stress", tone: "stress", value: (s.value ?? 0) / 100, center: s.value === null ? "–" : String(s.value), word: s.word ?? "kein Wert", aria: s.value === null ? "Stress: noch kein Wert" : `Stress ${s.value} von 100, ${s.word}` });
   }
 
   const n = items.length;

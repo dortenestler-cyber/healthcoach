@@ -71,7 +71,7 @@ export default function LoadCard({ day, data, target: t }: { day: string; data: 
       </div>
       {targetBasisText(t) && <p className="meta">{targetBasisText(t)}</p>}
       <p className="meta">{LOAD_CURVE_TEXT}</p>
-      <Link href="/verlauf?m=belastung" className="settings-link">Belastung im Verlauf ›</Link>
+      <a href="#verlauf" className="settings-link">Belastung über die Zeit ↓</a>
       {recentStart && <span className="meta">Seit {Number(first!.slice(8, 10))}.{Number(first!.slice(5, 7))}. zählt auch Bewegung im Alltag. Deine Werte sind deshalb etwas höher als vorher.</span>}
       <ExplainCard tone="training" question={`Meine Belastung liegt heute bei ${load} %${dl.pctAlltag ? ` (davon Alltag ${dl.pctAlltag} %)` : ""}, Ziel ${t.pause ? "Pause" : `${t.lo}–${t.hi} %`}. Was passt heute noch?`}>
         {t.pause ? (

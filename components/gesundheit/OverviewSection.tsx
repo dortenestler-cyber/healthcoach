@@ -143,7 +143,7 @@ export default function OverviewSection() {
         {!freq.length && <p>Trag Gewohnheiten wie Sauna oder Alkohol im Tagebuch ein, dann erscheinen sie hier.</p>}
         <div className="factor-list">
           {freq.map(({ h, f }) => (
-            <Link key={h.key} href={`/gesundheit/gewohnheit?k=${encodeURIComponent(h.key)}`} className="habit-month-row">
+            <Link key={h.key} href={`/wert/gewohnheit-${encodeURIComponent(h.key)}`} className="habit-month-row">
               <span className="row-strong habit-month-name">{h.label}</span>
               <span className="habit-weeks" role="img" aria-label={`Letzte 4 Wochen: ${f.weeks.join(", ")} Mal`}>
                 {f.weeks.map((n, i) => (

@@ -25,11 +25,11 @@ export default function GlanceTiles({ day, data, showGarmin }: { day: string; da
     const pos = r.value !== null && r.base.active ? positionIn(r.value, r.base.active) : null;
     const word = st ? bereichSeit(st.side, st.days) : pos === null ? (r.value === null ? "kein Wert" : "Bereich ab 14 Tagen") : bereichWort(pos);
     const [num, ...unit] = r.value === null ? ["–"] : r.fmt(r.value).split(" ");
-    tiles.push({ key: r.key, label: r.key === "hrv" ? "HRV" : "Ruhepuls", value: num, unit: unit.join(" "), word, alert: !!st, href: r.href ?? `/verlauf?m=${r.key}`, icon: r.key === "hrv" ? ICON.hrv : ICON.puls });
+    tiles.push({ key: r.key, label: r.key === "hrv" ? "HRV" : "Ruhepuls", value: num, unit: unit.join(" "), word, alert: !!st, href: r.href ?? `/wert/${r.key}`, icon: r.key === "hrv" ? ICON.hrv : ICON.puls });
   }
 
   const need = sleepNeed(day, data.daily, data.acts);
-  tiles.push({ key: "schlafbedarf", label: "Schlafbedarf", value: hm(need.hours), word: "heute Nacht", href: `/heute/schlaf?tag=${day}`, icon: ICON.mond });
+  tiles.push({ key: "schlafbedarf", label: "Schlafbedarf", value: hm(need.hours), word: "heute Nacht", href: `/wert/schlaf?tag=${day}`, icon: ICON.mond });
 
   const count = countInRange(rows.map((r) => ({ value: r.value, range: r.base.active })));
   const longHigh = streaks.some((s) => s.key === "ruhepuls" && s.days >= 5);

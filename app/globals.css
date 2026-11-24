@@ -3059,3 +3059,7 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .mk-plain .cal-num { color: var(--text); }
 .mk-plain.cal-future .cal-num { border: 0; color: var(--text-2); }
 .mk .mk-sel .cal-num { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+/* Wert-Seite: Dieser Monat */
+.monat-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.monat-val { font-size: 22px; font-variant-numeric: tabular-nums; }

@@ -200,7 +200,7 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
           <span><i className="cb-key-line" />Dieser Zyklus</span>
           <span><i className="cb-key-usual" />Schnitt aus {bcd.cycles} früheren Zyklen</span>
         </div>
-        <Link href={`/verlauf?m=${metric}`} className="settings-link">{m.label} im Verlauf ›</Link>
+        <Link href={`/wert/${metric}`} className="settings-link">{m.label} im Verlauf ›</Link>
       </section>
 
       <CycleHistory today={today} diary={longDiary} flashes={flashes} showFlashes={showFlashes} muscle={extra ? muscle : undefined} />
