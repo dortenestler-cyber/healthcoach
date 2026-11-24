@@ -134,7 +134,7 @@ Auf Grundlage von 16 Vorlagen aus Whoop, Bevel und Sonar (`docs/bilder/vorlagen/
 | 9 | Monatskalender mit Phasen als Bändern, geschätzte Tage gestrichelt, Punkt für Symptome | 02 | Zyklus (`CycleCalendar`) |
 | 10 | Seitenkopf mit Farbverlauf in der Bereichsfarbe | 02, 07 | Heute, Zyklus, Training, Tagesziel, Gesundheit (`PageHead tone`) |
 | 11 | Balken um den Nullpunkt auf schraffierter Spur, „Neu“, Anzahl Nächte | 03 | Zyklus › Was dir guttut (`DivergingBars`) |
-| 12 | Lastkurve mit Korridor, 1M · 3M · 6M | 08, 13 | Training (`LoadTrendCard`) |
+| 12 | Belastung über die Zeit (Cardio, Muskeln, Zustand je Tag), 7 T · 30 T · 3 M · 6 M | 08, 13 | Training (`BelastungZeitCard`, ersetzt `LoadTrendCard`) |
 | 13 | Statuswort groß, Ring, „Was das heißt“ | 13 | Training (`RatioCard`) |
 | 14 | Liste „Was beitrug“ mit +Last je Einheit | 13 | Training › Wochenlast (`WeekLoadView`) |
 | 15 | Raster mit einem Feld je Tag, Serie und Bestwert | 12 | Training (`HabitCard`) |

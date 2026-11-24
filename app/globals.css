@@ -3069,3 +3069,36 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 /* Check-in: Symptome von gestern bestätigen */
 .checkin-yesterday { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line-soft); }
 .checkin-yesterday .pill { min-height: 44px; }
+
+/* Belastung über die Zeit (Cardio und Muskeln): Zustände in der Familie Training, „Steigt schnell“ als Hinweis in Amber */
+.bz-card .segmented { margin: 8px 0; }
+.bz-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin: 8px 0 4px; }
+.bz-head > div { display: flex; flex-direction: column; gap: 2px; }
+.bz-head-right { align-items: flex-end; text-align: right; flex-shrink: 0; }
+.bz-head-right .meta { white-space: nowrap; }
+.bz-value { font-size: 44px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; font-variant-numeric: tabular-nums; }
+.bz-value small { font-size: 18px; color: var(--muted); font-weight: 600; margin-left: 2px; }
+.bz-word { font-size: 20px; font-weight: 700; }
+.bz-line { stroke: var(--muted); stroke-width: 1.5; }
+.bz-dot { fill: var(--card); stroke-width: 2; }
+.bz-dot-now { stroke-width: 3; }
+.bz-optimal { --bz: var(--training); }
+.bz-abbau { --bz: var(--training-zone); }
+.bz-muede { --bz: var(--training-fg); }
+.bz-steigt { --bz: var(--warn); }
+.bz-kalibrieren { --bz: var(--muted); }
+.bz-dot.bz-optimal, .bz-dot.bz-abbau, .bz-dot.bz-muede, .bz-dot.bz-steigt, .bz-dot.bz-kalibrieren { stroke: var(--bz); }
+.bz-word.bz-optimal, .bz-word.bz-abbau, .bz-word.bz-muede, .bz-word.bz-steigt, .bz-word.bz-kalibrieren { color: var(--bz); }
+.bz-word.bz-abbau { color: var(--training-fg); }
+.bz-strip-ok { fill: var(--training-zone); }
+.bz-strip-cal { fill: var(--fill); }
+.legend .bz-key, .bz-dist .bz-key { background: transparent; border: 2px solid var(--bz); border-radius: 50%; width: 10px; height: 10px; flex: 0 0 10px; box-sizing: border-box; }
+.bz-dist { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.bz-dist-row { display: grid; grid-template-columns: 124px 36px minmax(0, 1fr) 48px; align-items: center; gap: 8px; min-height: 28px; }
+.bz-dist-name { display: flex; align-items: center; gap: 6px; }
+.bz-dist-days, .bz-dist-pct { color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.bz-dist-bar { height: 8px; background: var(--fill); border-radius: 4px; overflow: hidden; }
+.bz-fill { display: block; height: 100%; background: var(--bz); border-radius: 4px; }
+.bz-dist-name { white-space: nowrap; }
+.bz-dot.bz-muede { fill: var(--bz); }
+.legend .bz-key.bz-muede, .bz-dist .bz-key.bz-muede { background: var(--bz); }
