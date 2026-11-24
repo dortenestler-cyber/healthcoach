@@ -51,7 +51,7 @@ export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarm
   if (showCycle) {
     const c = rule.cycle;
     const word = c.cycleDay === null ? "kein Wert" : c.phase ? PHASE_WORD[c.phase] : "Phase offen";
-    items.push({ key: "zyklus", href: "/zyklus", label: "Zyklus", tone: c.phase === "menstruation" ? "menses" : "cycle", value: c.cycleDay === null ? 0 : c.cycleDay / Math.max(c.length, c.cycleDay), center: c.cycleDay === null ? "–" : `Tag ${c.cycleDay}`, word, aria: c.cycleDay === null ? "Zyklus: noch kein Zyklustag" : `Zyklustag ${c.cycleDay} von etwa ${c.length}${c.phase ? `, ${word}` : ""}` });
+    items.push({ key: "zyklus", href: "/zyklus", label: "Zyklus", tone: c.phase === "menstruation" ? "menses" : "cycle", value: c.cycleDay === null ? 0 : c.cycleDay / Math.max(c.length, c.cycleDay), center: c.cycleDay === null ? "–" : String(c.cycleDay), word, aria: c.cycleDay === null ? "Zyklus: noch kein Zyklustag" : `Zyklustag ${c.cycleDay} von etwa ${c.length}${c.phase ? `, ${word}` : ""}` });
   }
 
   if (showGarmin) {
