@@ -37,7 +37,6 @@ export type MorningRun = { at: string; ok: boolean; message: string | null };
 export function useGarminSync(data: Data | null, enabled: boolean) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [note, setNote] = useState("");
   const [morning, setMorning] = useState<MorningRun | null>(null);
   const autoDone = useRef(false);
 
@@ -63,11 +62,6 @@ export function useGarminSync(data: Data | null, enabled: boolean) {
         setError("Synchronisieren hat nicht geklappt: " + res.error);
         return;
       }
-      const parts: string[] = [];
-      if (res.sleepStagesNote) parts.push(res.sleepStagesNote);
-      if (res.energyNote) parts.push(res.energyNote);
-      if (res.stressNote) parts.push(res.stressNote);
-      setNote(parts.join(" "));
       announceNewData();
     },
     [],
@@ -116,5 +110,5 @@ export function useGarminSync(data: Data | null, enabled: boolean) {
 
   const morningFailed = !!morning && !morning.ok && lastSync < new Date(morning.at).getTime();
 
-  return { busy, error, note, lastSync, morning, morningFailed, sync };
+  return { busy, error, lastSync, morning, morningFailed, sync };
 }

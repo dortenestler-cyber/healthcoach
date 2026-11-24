@@ -87,7 +87,6 @@ export default function HeuteView() {
           Der Abruf heute Morgen um {clock(new Date(gsync.morning.at))} hat nicht geklappt. Zieh die Seite nach unten, um es jetzt zu versuchen. ({gsync.morning.message ?? "unbekannter Fehler"})
         </p>
       )}
-      {gsync.note && <span className="meta">{gsync.note}</span>}
 
       {data && rule && <RingRow day={day} data={data} rule={rule} nowMinute={nowMinute} showLoad={feat.tagesziel} showGarmin={feat.garmin} showCycle={feat.zyklus} onCenter={setFocus} />}
 
