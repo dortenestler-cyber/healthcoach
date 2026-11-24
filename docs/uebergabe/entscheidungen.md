@@ -72,3 +72,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-24 · OF/DA · Nutzerin: Wochenvorlage entfällt, Training wird im Kalender geplant (kommende Tage) und erfasst (heute und früher, mit Dauer und Anstrengung)
 2026-11-24 · OF/DA · Nutzerin: von der Vorlage schon geplante offene Einheiten werden gelöscht · kein „jede Woche“, Termine plant sie einzeln
 2026-11-24 · DA · Nutzerin: Migration für Dauer und Anstrengung in planned_sessions freigegeben
+2026-11-24 · OF · Nutzerin: Konzept Bündeln: Wert-Seite unter neuer Adresse `/wert/…`, Reihenfolge der Bausteine wie im Konzept
