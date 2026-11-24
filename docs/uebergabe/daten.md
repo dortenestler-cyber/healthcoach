@@ -1,4 +1,5 @@
 # Übergabe · Daten (DA)
+Belegt: frei (Belegt-Zeile eingeführt 24.11., die nächste Sitzung setzt sie)
 Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWcoQbeic2ASdj68xrC
 
 Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`, `.github/`. Regeln: `docs/konzept-zwei-instanzen.md`.
