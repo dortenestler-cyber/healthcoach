@@ -289,7 +289,7 @@ function StressDetail({ day, data }: { day: string; data: Data }) {
         </section>
       )}
 
-      <p className="meta"><Link href="/verlauf?m=stress">Stress im Verlauf ›</Link></p>
+      <p className="meta"><a href="#verlauf">Stress über die Zeit ↓</a></p>
     </>
   );
 }

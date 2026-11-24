@@ -24,7 +24,7 @@ export default function EnergyCard({ day, data, nowMinute, hideValue = false }: 
   const rhythm = usualRhythm(e.usual);
 
   return (
-    <Link href="/verlauf?m=bb" className="card chart-card">
+    <Link href="/wert/bb" className="card chart-card">
       <span className="eyebrow">Energie über den Tag · Body Battery ›</span>
       <h2>{sentence}</h2>
       {!hideValue && <p className="value-big">{now ?? "–"}</p>}

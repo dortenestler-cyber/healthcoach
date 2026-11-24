@@ -10,6 +10,8 @@ import { METRICS, OPTIONAL_METRICS, syncGarmin, type Activity, type Daily, type 
 import { sickDays } from "@/lib/baseline";
 import { DEFAULT_HABITS, loadHabits, type Habit } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
+import DieserMonat from "@/components/wert/DieserMonat";
+import { useRouter } from "next/navigation";
 import VerlaufDetail, { HISTORY } from "@/components/verlauf/VerlaufDetail";
 import VerlaufGroup, { GROUPS, groupOfMetric, type GroupKey } from "@/components/verlauf/VerlaufGroup";
 import { spanOf, type Span } from "@/lib/verlauf";
@@ -21,7 +23,10 @@ import { loadGarminCycles, mergeGarminCycles } from "@/lib/garminZyklus";
 // Verlauf: vier Gruppen mit kleinen Charts (Sammelliste Punkt 16), Tippen öffnet die Detailansicht eines Werts:
 // Zeitraum T · W · M · 6M · J, persönlicher Bereich als Band, Zyklusphasen, Vergleich nach Zyklusphase und Highlights. Ab 6M Wochenmittel.
 // Mit ?m=<Wert> öffnet die Seite direkt die Detailansicht (Links von Heute, Zyklus usw.).
-export default function VerlaufView({ initial }: { initial: string | null }) {
+// mode „uebersicht“: Gruppen, Tippen öffnet /wert/<Wert>. „wert“: ein Wert als eigene Seite (Wert-Seite, Konzept Bündeln Baustein 3).
+// „eingebettet“: unter einer Detailseite mit Ring (Schlaf, Stress, Belastung), ohne Seitenkopf.
+export default function VerlaufView({ initial, mode = "uebersicht" }: { initial: string | null; mode?: "uebersicht" | "wert" | "eingebettet" }) {
+  const router = useRouter();
   const start = initial && initial in METRICS ? (initial as MetricKey) : null;
   const [metric, setMetric] = useState<MetricKey | null>(start);
   const [group, setGroup] = useState<GroupKey>(start ? groupOfMetric(start) : "herz");
@@ -85,6 +90,35 @@ export default function VerlaufView({ initial }: { initial: string | null }) {
   const oldest = rows[0]?.day;
   const missingHistory = spanOf(span).days > 30 && (!oldest || oldest > isoDay(daysAgo(spanOf(span).days - 8)));
 
+  const ctx = { diary, sick };
+  if (mode !== "uebersicht" && metric) {
+    return (
+      <>
+        {mode === "wert" ? (
+          <>
+            <Link href="/verlauf" className="back-link">‹ Alle Werte</Link>
+            <PageHead title={METRICS[metric].label} sub="Dein Wert über die Zeit" />
+          </>
+        ) : (
+          <h2 className="sec-title" id="verlauf">{METRICS[metric].label} über die Zeit</h2>
+        )}
+        {error && <p className="alert" role="alert">{error}</p>}
+        <SpanSwitch value={span} onChange={setSpan} options={["heute", ...STANDARD]} />
+        <VerlaufDetail metric={metric} span={span} rows={rows} diary={diary} acts={acts} sick={sick} habits={habits} />
+        <DieserMonat metric={metric} rows={rows} ctx={ctx} today={isoDay()} />
+        {missingHistory && (
+          <section className="card">
+            <h2>Ältere Daten fehlen</h2>
+            <p>Bisher sind nur die letzten Wochen geladen. Willst du ein ganzes Jahr von Garmin holen? Das dauert etwa eine Minute.</p>
+            <button type="button" className="btn btn-dark" disabled={busy} onClick={loadYear}>
+              {busy ? "Lädt …" : "Ein Jahr laden"}
+            </button>
+          </section>
+        )}
+      </>
+    );
+  }
+
   return (
     <>
       <Link href="/" className="back-link">‹ Heute</Link>
@@ -99,26 +133,9 @@ export default function VerlaufView({ initial }: { initial: string | null }) {
         ))}
       </div>
 
-      {metric && (
-        <div className="pills scroll">
-          {available(GROUPS.find((g) => g.key === group)!.metrics).map((k) => (
-            <button key={k} type="button" className="pill" aria-pressed={metric === k} onClick={() => setMetric(k)}>
-              {METRICS[k].label}
-            </button>
-          ))}
-        </div>
-      )}
-
       <SpanSwitch value={span} onChange={setSpan} options={["heute", ...STANDARD]} />
 
-      {metric ? (
-        <>
-          <button type="button" className="back-link" onClick={() => setMetric(null)}>‹ Alle Werte · {GROUPS.find((g) => g.key === group)!.name}</button>
-          <VerlaufDetail metric={metric} span={span} rows={rows} diary={diary} acts={acts} sick={sick} habits={habits} />
-        </>
-      ) : (
-        <VerlaufGroup group={group} span={span} rows={rows} diary={diary} sick={sick} metrics={available(GROUPS.find((g) => g.key === group)!.metrics)} onOpen={(k) => { setMetric(k); window.scrollTo({ top: 0 }); }} />
-      )}
+      <VerlaufGroup group={group} span={span} rows={rows} diary={diary} sick={sick} metrics={available(GROUPS.find((g) => g.key === group)!.metrics)} onOpen={(k) => router.push(`/wert/${k}`)} />
 
       {missingHistory && (
         <section className="card">

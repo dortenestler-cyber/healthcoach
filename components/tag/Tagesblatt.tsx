@@ -102,15 +102,15 @@ export default function Tagesblatt({ day, data, onChanged, intro, bare = false }
     const t = computeTarget(day, data);
     if (d && t.factors.length) {
       const r = readinessFrom(t);
-      tiles.push({ key: "readiness", label: "Readiness", value: de1(r.value), word: r.label, href: `/heute/readiness${q}` });
+      tiles.push({ key: "readiness", label: "Readiness", value: de1(r.value), word: r.label, href: `/wert/readiness${q}` });
     }
-    if (d?.sleep_score != null) tiles.push({ key: "schlaf", label: "Schlaf", value: String(d.sleep_score), word: d.sleep_seconds ? `${Math.floor(d.sleep_seconds / 3600)} h ${String(Math.round((d.sleep_seconds % 3600) / 60)).padStart(2, "0")}` : "Punkte", href: `/heute/schlaf${q}` });
+    if (d?.sleep_score != null) tiles.push({ key: "schlaf", label: "Schlaf", value: String(d.sleep_score), word: d.sleep_seconds ? `${Math.floor(d.sleep_seconds / 3600)} h ${String(Math.round((d.sleep_seconds % 3600) / 60)).padStart(2, "0")}` : "Punkte", href: `/wert/schlaf${q}` });
     const dl = dayLoad(day, data.daily, data.acts);
-    if (d || dl.training) tiles.push({ key: "belastung", label: "Belastung", value: `${dl.pct} %`, word: zielWort(dl.pct, t), href: `/heute/belastung${q}` });
+    if (d || dl.training) tiles.push({ key: "belastung", label: "Belastung", value: `${dl.pct} %`, word: zielWort(dl.pct, t), href: `/wert/belastung${q}` });
     for (const r of vitalRows(day, data).filter((x) => x.key === "hrv" || x.key === "ruhepuls" || x.key === "stress")) {
       if (r.value === null) continue;
       const pos = r.base.active ? positionIn(r.value, r.base.active) : null;
-      tiles.push({ key: r.key, label: r.label, value: r.fmt(r.value), word: pos ? bereichWort(pos) : "Bereich ab 14 Tagen", href: r.key === "stress" ? `/heute/stress${q}` : (r.href ?? `/verlauf?m=${r.key}`) });
+      tiles.push({ key: r.key, label: r.label, value: r.fmt(r.value), word: pos ? bereichWort(pos) : "Bereich ab 14 Tagen", href: r.key === "stress" ? `/wert/stress${q}` : (r.href ?? `/wert/${r.key}`) });
     }
   }
 

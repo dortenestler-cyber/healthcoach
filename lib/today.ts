@@ -107,7 +107,7 @@ const today = (key: MetricKey, day: string, daily: Daily[]) => {
 };
 
 export function metricRow(key: MetricKey, day: string, data: Data, label = METRICS[key].label): Row {
-  return { key, label, value: today(key, day, data.daily), fmt: METRICS[key].fmt, base: metricBaseline(key, data.daily, { diary: data.diary, sick: data.sick }, day), href: `/verlauf?m=${key}` };
+  return { key, label, value: today(key, day, data.daily), fmt: METRICS[key].fmt, base: metricBaseline(key, data.daily, { diary: data.diary, sick: data.sick }, day), href: `/wert/${key}` };
 }
 
 const plain = (range: Range | null): Baseline => ({ range, phase: null, phaseKey: null, active: range });

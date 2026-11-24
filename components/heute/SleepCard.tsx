@@ -59,7 +59,7 @@ export default function SleepCard({ data }: { data: Data }) {
           bars={days.map((d) => ({ label: WD[new Date(d + "T12:00:00").getDay()], value: hours(d), today: d === today, marker: sweat.has(d), date: d }))}
         />
       </ValueHeader>
-      <Link href="/verlauf?m=schlaf" className="settings-link">Schlaf im Verlauf ›</Link>
+      <a href="#verlauf" className="settings-link">Schlaf über die Zeit ↓</a>
     </div>
   );
 }

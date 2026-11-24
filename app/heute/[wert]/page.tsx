@@ -1,14 +1,8 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import HeuteDetail from "@/components/heute/HeuteDetail";
-import { DETAILS, type DetailKey } from "@/lib/heuteDetails";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Heute · Health Coach" };
-
-// Detailseiten hinter den Ringen auf Heute: /heute/readiness, /heute/schlaf, /heute/belastung, /heute/stress, /heute/energie, /heute/intensitaet
+// Alte Adresse: die Detailseiten liegen jetzt unter /wert/<wert> (Konzept Bündeln, Baustein 3)
 export default async function Page({ params, searchParams }: { params: Promise<{ wert: string }>; searchParams: Promise<{ tag?: string }> }) {
   const { wert } = await params;
   const { tag } = await searchParams;
-  if (!(wert in DETAILS)) notFound();
-  return <HeuteDetail k={wert as DetailKey} day={tag} />;
+  redirect(`/wert/${wert}${tag ? `?tag=${tag}` : ""}`);
 }
