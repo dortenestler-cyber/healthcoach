@@ -115,8 +115,8 @@ Ein Ablauf für jedes Formular: Blatt von unten, Titel, Tipp-Felder zuerst, Deta
 6. **Zusammenhänge**
 7. **Raster und Rückblick**
 
-## Offene Fragen an dich
-1. Soll das Tagesblatt Tagebuch-Einträge nur zeigen (Bearbeiten im Tagebuch) oder auch direkt bearbeiten lassen?
-2. Wert-Seite unter neuer Adresse `/wert/…` oder bei `/heute/…` bleiben?
-3. Monatsrückblick gesammelt auf Gesundheit › Überblick, oder als eigene Seite?
-4. Reihenfolge so, oder Tagesblatt (mit Training erfassen) zuerst, weil du das gerade brauchst?
+## Entscheidungen und offene Punkte
+- Wert-Seite unter neuer Adresse `/wert/…`, alte Adressen leiten weiter (Nutzerin 24.11.)
+- Reihenfolge der Bausteine wie oben (Nutzerin 24.11.)
+- Vorschlag, wartet auf Zustimmung: Das Tagesblatt zeigt Tagebuch-Einträge, „Bearbeiten ›“ öffnet das Tagebuch mit dem Datum. Training wird direkt im Tagesblatt geplant und erfasst.
+- Vorschlag, wartet auf Zustimmung: Rückblick als Abschnitt „Dieser Monat“ auf jeder Wert-Seite (Vergleich mit Vormonat). Dazu auf Gesundheit › Überblick „Dein Monat“: nur deutlich veränderte Werte, je ein Satz mit Link. Monatsrückblick Training und „Gewohnheiten im Monat“ gehen darin auf, keine eigene Seite.
