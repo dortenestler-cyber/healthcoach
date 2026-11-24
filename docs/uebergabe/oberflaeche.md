@@ -3,6 +3,10 @@ Belegt: frei
 Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ
 
 
+
+## Säulen-Diagramme: Achse rechts (24.11.)
+- `DayBars`: Achsenbeschriftung in einem Rand rechts (Breite aus der längsten Beschriftung), stand vorher links über der ersten Säule (Intensität, Diese Woche).
+
 ## Belastung wie bei Bevel (PR #127, 24.11.)
 - Konzept `docs/konzept-belastung-skala.md`. Abflachende Skala (`loadToPct` in `lib/alltagslast.ts`), persönliches Ziel (`usualLoad`, `targetBand` in `lib/insights.ts`), `loadLabel` („unter 1 %“), `ringSplit` (Ring über 100 % voll, Anteile bleiben). `HARD_DAY_PCT`/`MID_DAY_PCT` zentral in `lib/insights.ts`. Wert je Einheit in % (Heute, Einheit-Seite mit Garmin-Last als Notiz). Satz „Bisher ist heute keine Belastung gemessen.“ statt „nur aus dem Training“ bei 0.
 - Nächster Schritt: Rückmeldung der Nutzerin nach ein paar Abrufen (Vergleich mit Bevel).
