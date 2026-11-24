@@ -56,3 +56,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-24 · OF · Nutzerin: Ringreihe „Dein Tag“ als Rondell (Ring in der Mitte groß, außen kleiner, fließend beim Wischen) mit Endlos-Schleife · Tipp auf äußeren Ring dreht ihn erst in die Mitte, Tipp auf den mittleren öffnet die Detailseite · Computer/iPad unverändert
 2026-11-24 · OF · Nutzerin: Überschrift „Dein Tag“ über den Ringen auf Heute entfernen (für Vorlesehilfen bleibt der Name)
 2026-11-24 · OF · Nutzerin: Erklärkarte unter den Ringen zeigt den Text zum Ring in der Mitte (Texte je Ring wie vorgeschlagen) · neue Ringe Zyklus und Intensitätsminuten der Woche
+2026-11-24 · OF · Nutzerin: Kachel Zyklus aus „Auf einen Blick“ entfernt, weil der Zyklus jetzt als Ring oben steht (vorerst kein Ersatz)
