@@ -278,7 +278,17 @@ button {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
+
+/* Weicht beim Scrollen nach unten aus, damit er keine Knöpfe verdeckt */
+.coach-fab[data-hidden="true"] {
+  transform: translateY(24px) scale(0.6);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) { .coach-fab { transition: none; } }
 
 .coach-fab[data-open="true"] {
   background: var(--text);
