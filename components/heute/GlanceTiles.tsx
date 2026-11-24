@@ -1,22 +1,20 @@
 import Link from "next/link";
 import { countInRange, positionIn } from "@/lib/baseline";
-import { PHASES, type DayRule } from "@/lib/cycle";
 import type { Data } from "@/lib/insights";
 import { hm, offStreaks, sleepNeed, vitalRows } from "@/lib/today";
 
-type Tile = { key: string; label: string; value: string; unit?: string; word: string; alert?: boolean; href: string; icon: string; cycle?: boolean };
+type Tile = { key: string; label: string; value: string; unit?: string; word: string; alert?: boolean; href: string; icon: string };
 
 const ICON = {
   hrv: "M3 12h4l2-5 3 10 2-5h7",
   puls: "M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z",
-  zyklus: "M12 4a8 8 0 1 0 8 8M12 4a8 8 0 0 1 8 8",
   mond: "M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z",
 };
 
-// „Auf einen Blick“ (nach Sonar): vier Kacheln mit Symbol, Name, Zahl und einem Wort zur Einordnung.
-// HRV und Ruhepuls gegen deinen Bereich, Zyklustag und Phase, Schlafbedarf für heute Nacht.
+// „Auf einen Blick“ (nach Sonar): Kacheln mit Symbol, Name, Zahl und einem Wort zur Einordnung.
+// HRV und Ruhepuls gegen deinen Bereich, Schlafbedarf für heute Nacht. Der Zyklus steht als Ring in der Ringreihe.
 // Liegt ein Wert seit Tagen außerhalb, steht das Wort in Amber, ab 5 Tagen Ruhepuls der Hinweis auf ärztliche Abklärung.
-export default function GlanceTiles({ day, data, rule, showGarmin, showCycle }: { day: string; data: Data; rule: DayRule; showGarmin: boolean; showCycle: boolean }) {
+export default function GlanceTiles({ day, data, showGarmin }: { day: string; data: Data; showGarmin: boolean }) {
   const tiles: Tile[] = [];
   const rows = showGarmin ? vitalRows(day, data).filter((r) => r.key === "hrv" || r.key === "ruhepuls") : [];
   const streaks = showGarmin ? offStreaks(day, data) : [];
@@ -27,11 +25,6 @@ export default function GlanceTiles({ day, data, rule, showGarmin, showCycle }: 
     const word = st ? `seit ${st.days} Tagen ${st.side} Bereich` : pos === null ? (r.value === null ? "kein Wert" : "Bereich ab 14 Tagen") : pos === "im" ? "im Bereich" : `${pos} deinem Bereich`;
     const [num, ...unit] = r.value === null ? ["–"] : r.fmt(r.value).split(" ");
     tiles.push({ key: r.key, label: r.key === "hrv" ? "HRV" : "Ruhepuls", value: num, unit: unit.join(" "), word, alert: !!st, href: r.href ?? `/verlauf?m=${r.key}`, icon: r.key === "hrv" ? ICON.hrv : ICON.puls });
-  }
-
-  if (showCycle) {
-    const c = rule.cycle;
-    tiles.push({ key: "zyklus", label: "Zyklus", value: c.cycleDay === null ? "–" : `Tag ${c.cycleDay}`, word: c.phase ? PHASES[c.phase].label : c.cycleDay === null ? "Periode eintragen" : "Phase noch offen", href: "/zyklus", icon: ICON.zyklus, cycle: true });
   }
 
   const need = sleepNeed(day, data.daily, data.acts);
@@ -53,7 +46,7 @@ export default function GlanceTiles({ day, data, rule, showGarmin, showCycle }: 
       <div className="today-glance">
         {tiles.map((t) => (
           <Link key={t.key} href={t.href} className="today-tile">
-            <span className={"today-tile-icon" + (t.cycle ? " is-cycle" : "")} aria-hidden="true">
+            <span className="today-tile-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d={t.icon} />
               </svg>
