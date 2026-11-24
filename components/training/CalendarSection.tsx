@@ -9,6 +9,7 @@ import { SPOTS, type Injury } from "@/lib/health";
 import type { Data } from "@/lib/insights";
 import { cycleToday, dayRule, PHASES, type Phase } from "@/lib/cycle";
 import Tagesblatt from "@/components/tag/Tagesblatt";
+import TwoCol from "@/components/ui/TwoCol";
 import { fromIso, sportOf, SPORTS, WEEKDAY_LABELS, type Session, type Sport } from "@/lib/training";
 
 const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
@@ -114,89 +115,97 @@ export default function CalendarSection({ data }: { data: Data | null }) {
     <>
       {error && <p className="alert" role="alert">{error}</p>}
 
-      <section className="card">
-        <div className="card-row">
-          <button type="button" className="btn btn-link" aria-label="Voriger Monat" onClick={() => shift(-1)}>‹</button>
-          <h2>{MONTHS[month.getMonth()]} {month.getFullYear()}</h2>
-          <button type="button" className="btn btn-link" aria-label="Nächster Monat" onClick={() => shift(1)}>›</button>
-        </div>
-        <div className="segmented segmented-3">
-          {FILTERS.map(([k, l]) => (
-            <button key={k} type="button" aria-pressed={filter === k} onClick={() => setFilter(k)}>
-              {l}
-            </button>
-          ))}
-        </div>
-        <div className="cal-grid cal-head">
-          {WEEKDAY_LABELS.map((w) => (
-            <span key={w}>{w}</span>
-          ))}
-        </div>
-        <div className="cal-grid">
-          {cells.map((day, i) =>
-            day ? (
-              <button
-                key={day}
-                type="button"
-                className="cal-cell"
-                data-today={day === today}
-                data-selected={day === selected}
-                data-period={showPhase && period.has(day)}
-                data-phase={showPhase ? band(phaseOf(day)) : undefined}
-                data-future={day > today}
-                onClick={() => setSelected(day)}
-                aria-label={longDate(fromIso(day)) + (showPhase && phaseOf(day) ? ", " + PHASES[phaseOf(day)!].label + " geschätzt" : "") + (showPhase && symptomDays.has(day) ? ", Symptome eingetragen" : "")}
-              >
-                <span className="cal-num">{Number(day.slice(8, 10))}</span>
-                <span className="cal-dots">
-                  {showDots &&
-                    dotsFor(day).map((d) => (
-                      <i key={d.key} style={{ borderColor: d.color, background: d.filled ? d.color : "transparent" }} />
+      {/* Am Computer Kalender und Tagesblatt nebeneinander (TwoCol), auf dem iPhone untereinander */}
+      <TwoCol
+        left={
+          <>
+            <section className="card">
+              <div className="card-row">
+                <button type="button" className="btn btn-link" aria-label="Voriger Monat" onClick={() => shift(-1)}>‹</button>
+                <h2>{MONTHS[month.getMonth()]} {month.getFullYear()}</h2>
+                <button type="button" className="btn btn-link" aria-label="Nächster Monat" onClick={() => shift(1)}>›</button>
+              </div>
+              <div className="segmented segmented-3">
+                {FILTERS.map(([k, l]) => (
+                  <button key={k} type="button" aria-pressed={filter === k} onClick={() => setFilter(k)}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+              <div className="cal-grid cal-head">
+                {WEEKDAY_LABELS.map((w) => (
+                  <span key={w}>{w}</span>
+                ))}
+              </div>
+              <div className="cal-grid">
+                {cells.map((day, i) =>
+                  day ? (
+                    <button
+                      key={day}
+                      type="button"
+                      className="cal-cell"
+                      data-today={day === today}
+                      data-selected={day === selected}
+                      data-period={showPhase && period.has(day)}
+                      data-phase={showPhase ? band(phaseOf(day)) : undefined}
+                      data-future={day > today}
+                      onClick={() => setSelected(day)}
+                      aria-label={longDate(fromIso(day)) + (showPhase && phaseOf(day) ? ", " + PHASES[phaseOf(day)!].label + " geschätzt" : "") + (showPhase && symptomDays.has(day) ? ", Symptome eingetragen" : "")}
+                    >
+                      <span className="cal-num">{Number(day.slice(8, 10))}</span>
+                      <span className="cal-dots">
+                        {showDots &&
+                          dotsFor(day).map((d) => (
+                            <i key={d.key} style={{ borderColor: d.color, background: d.filled ? d.color : "transparent" }} />
+                          ))}
+                        {showPhase && symptomDays.has(day) && <i className="cal-dot-symptom" />}
+                      </span>
+                    </button>
+                  ) : (
+                    <span key={"e" + i} />
+                  )
+                )}
+              </div>
+              <div className="legend">
+                {showDots && (
+                  <>
+                    {ADDABLE.map((s) => (
+                      <span key={s}><i style={{ background: SPORTS[s].color }} />{SPORTS[s].label}</span>
                     ))}
-                  {showPhase && symptomDays.has(day) && <i className="cal-dot-symptom" />}
-                </span>
-              </button>
-            ) : (
-              <span key={"e" + i} />
-            )
-          )}
-        </div>
-        <div className="legend">
-          {showDots && (
-            <>
-              {ADDABLE.map((s) => (
-                <span key={s}><i style={{ background: SPORTS[s].color }} />{SPORTS[s].label}</span>
-              ))}
-              <span><i style={{ background: "transparent", border: "1.5px solid var(--muted)" }} />geplant</span>
-            </>
-          )}
-          {showPhase && (
-            <>
-              <span><i className="ph-menses-bg" />Menstruation</span>
-              <span><i className="ph-follikel-bg" />Follikel</span>
-              <span><i className="ph-eisprung-bg" />Eisprung</span>
-              <span><i className="ph-luteal-bg" />Luteal</span>
-              <span><i className="legend-period" />Periode (Tagebuch oder Garmin)</span>
-              <span><i className="cal-dot-symptom legend-dot" />Symptome</span>
-              <span>Phasen geschätzt, kommende Tage heller</span>
-            </>
-          )}
-        </div>
-      </section>
-
-      <Tagesblatt
-        key={selected}
-        day={selected}
-        data={data}
-        onChanged={load}
-        intro={
-          dayBlock && (
-            <div className={"suggest " + dayBlock.tone}>
-              <span className="row-strong">{dayBlock.title}</span>
-              <span>{dayBlock.text}</span>
-              {dayBlock.rpe && <span>Anstrengung (1–10): {dayBlock.rpe}</span>}
-            </div>
-          )
+                    <span><i style={{ background: "transparent", border: "1.5px solid var(--muted)" }} />geplant</span>
+                  </>
+                )}
+                {showPhase && (
+                  <>
+                    <span><i className="ph-menses-bg" />Menstruation</span>
+                    <span><i className="ph-follikel-bg" />Follikel</span>
+                    <span><i className="ph-eisprung-bg" />Eisprung</span>
+                    <span><i className="ph-luteal-bg" />Luteal</span>
+                    <span><i className="legend-period" />Periode (Tagebuch oder Garmin)</span>
+                    <span><i className="cal-dot-symptom legend-dot" />Symptome</span>
+                    <span>Phasen geschätzt, kommende Tage heller</span>
+                  </>
+                )}
+              </div>
+            </section>
+          </>
+        }
+        right={
+          <Tagesblatt
+            key={selected}
+            day={selected}
+            data={data}
+            onChanged={load}
+            intro={
+              dayBlock && (
+                <div className={"suggest " + dayBlock.tone}>
+                  <span className="row-strong">{dayBlock.title}</span>
+                  <span>{dayBlock.text}</span>
+                  {dayBlock.rpe && <span>Anstrengung (1–10): {dayBlock.rpe}</span>}
+                </div>
+              )
+            }
+          />
         }
       />
     </>

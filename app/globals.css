@@ -3121,7 +3121,7 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .tag-val { text-align: right; max-width: 62%; }
 .tag-act { display: inline-flex; align-items: center; gap: 10px; }
 .tag-act .today-act-icon { width: 32px; height: 32px; flex: 0 0 32px; }
-.tag-tile { min-height: 72px; }
+.tag-tile { min-height: 72px; background: var(--card-2); box-shadow: none; }
 /* Zyklus-Kalender: Tage antippbar (öffnet das Tagesblatt) */
 .cal-days > button.cal-cell { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; min-height: 44px; }
 .cal-days > button.cal-cell:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 10px; }
