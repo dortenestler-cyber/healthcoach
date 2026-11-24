@@ -211,3 +211,6 @@ Enthält eine Migration und ändert die Funktionen `garmin-sync` und `watch`, de
 - [x] PR #33 gemergt (Einstellungen, Backup, Push)
 - [x] PR #34, #35, #36, #37 gemergt (Konzept, `CLAUDE.md`, Fundament, Merge-Regel)
 - [x] PR #38 bis #44 gemergt (Heute, Verlauf, Training, Gesundheit, Zyklus, Einnahmen, Nachtragen)
+
+### Training im Kalender erfassen (24.11.)
+- [ ] PR #130 mergen (enthält die Migration `20261128110000_training_erfassen`: Dauer und Anstrengung, löscht offene Vorlage-Einheiten). Danach Claude Bescheid geben, Claude prüft den Lauf „Migrationen“.

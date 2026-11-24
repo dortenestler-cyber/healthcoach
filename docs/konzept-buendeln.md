@@ -2,6 +2,8 @@
 
 Stand: 24.11.2026 · Status: **Entwurf, wartet auf Freigabe** · Prompt: `docs/prompt-buendeln.md`
 
+Schon erledigt (PR #130, freigegeben 24.11.): Wochenvorlage entfernt, Training wird im Kalender geplant (kommende Tage) und erfasst (heute und früher, mit Dauer und Anstrengung im Bearbeiten-Bogen). Das ist der erste Teil von Baustein 1 (Tagesblatt) und 7 (Eintragen-Blatt).
+
 Die erste Aufräumrunde (`docs/aufraeumen-vorschlag.md`, 22.11.) hat Seiten und Karten sortiert. Diese zweite Runde geht eine Ebene tiefer: Viele Bereiche bauen dieselbe Sache auf eigene Art. Das kostet Pflege, und gleiche Dinge sehen an verschiedenen Stellen verschieden aus. Ziel sind **sieben gemeinsame Bausteine**, die jeder Bereich mit seinen eigenen Inhalten füllt.
 
 Grundsatz: **Ein Ding, ein Baustein, viele Orte.** Der Bereich entscheidet, *was* drinsteht (Farbe, Voreinstellung, Inhalt), der Baustein entscheidet, *wie* es aussieht und sich bedient.
@@ -107,7 +109,7 @@ Ein Ablauf für jedes Formular: Blatt von unten, Titel, Tipp-Felder zuerst, Deta
 ## Reihenfolge (je ein Pull Request)
 1. **Einordnung** und **Zeitraum-Umschalter** (klein, wirkt sofort überall)
 2. **Eintragen-Blatt** (Grundlage für 3)
-3. **Tagesblatt** mit Planen und Erfassen von Training, Wochenvorlage raus. Braucht eine Migration (`planned_sessions.duration_min`, `rpe`, Rolle Daten, deine Freigabe)
+3. **Tagesblatt**. Planen und Erfassen von Training gibt es schon im Trainingskalender (PR #130), es zieht ins Tagesblatt um
 4. **Kalender mit Ebenen** (ersetzt die vier Raster)
 5. **Wert-Seite** (`/wert/[name]`, Weiterleitungen)
 6. **Zusammenhänge**

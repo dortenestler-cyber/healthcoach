@@ -1,9 +1,15 @@
 # Übergabe · Oberfläche (OF)
-Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ · seit 2026-11-24 18:30 (Wochenvorlage raus, Training im Kalender erfassen)
+Belegt: frei
 Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ
 
 
 
+
+
+## Wochenvorlage raus, Training im Kalender (PR #130, 24.11.)
+- `CalendarSection`: Karte Wochenvorlage entfernt, „+ Sport“ an jedem Tag: kommende Tage planen, heute und früher erfassen im `EditSheet` (Dauer 30/45/60/90 oder eingetippt, Anstrengung 1–10, beides freiwillig). „Erledigt“ und „Bearbeiten“ öffnen dasselbe Blatt. `HabitCard`: Wochenziel mit − und + (`settings.trainingDaysGoal`, Start 4), zählt erfasste Einheiten. `Data.done` (erledigte `planned_sessions`) fließt in Trainingstage, Muskelbelastung und Coach.
+- Konzept Bündeln: `docs/konzept-buendeln.md`, Prompt `docs/prompt-buendeln.md`, Entwurf, wartet auf Freigabe (4 offene Fragen).
+- Nächster Schritt: nach dem Merge (Migration) im Kalender eine vergangene Einheit erfassen und prüfen.
 
 ## Belastung über die Zeit (PR #129, 24.11.)
 - Konzept `docs/konzept-belastung-ueber-zeit.md`. `BelastungZeitCard` ersetzt `LoadTrendCard` (gelöscht). Rechnung `lib/belastungZeit.ts` (`series`, `cardioPerDay`, `tiredCheck`, `musclePerDay`, `verteilung`). Die Karte lädt `kb_sets` und `rpe` selbst (180 Tage). Coach bekommt beide Zustände.
