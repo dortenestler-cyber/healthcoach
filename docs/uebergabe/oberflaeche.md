@@ -1,5 +1,8 @@
 # Übergabe · Oberfläche (OF)
-Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWgZAhynqNkDydvWuZP
+Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWfNqpNJkPsx5iQm7e7
+
+## Keine Hinweise zu fehlenden Garmin-Daten (PR #123, 24.11.)
+- Wunsch der Nutzerin: Zeilen wie „Stress im Tagesverlauf ist bei Garmin nicht abrufbar.“ nicht mehr zeigen. `useGarminSync` liefert kein `note` mehr, `HeuteView` zeigt nur noch echte Fehler. Die Funktion `garmin-sync` schickt die Hinweise weiter mit, sie werden ignoriert.
 
 ## Erklärkarte je Ring, Ringe Zyklus und Intensität (PR #119, 24.11.)
 - `RingRow` meldet nach dem Wischen den Ring in der Mitte (`onCenter`), `HeuteView` gibt ihn als `focus` an `DaySentence`. Texte je Ring in `components/heute/DaySentence.tsx` (Zubettgehzeit aus dem Median von `sleep_end_min` der letzten 14 Nächte minus Bedarf heute Nacht).
