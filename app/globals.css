@@ -3063,3 +3063,11 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 /* Wert-Seite: Dieser Monat */
 .monat-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .monat-val { font-size: 22px; font-variant-numeric: tabular-nums; }
+
+/* Zusammenhänge (Konzept Bündeln, Baustein 4) */
+.zh-liste { display: flex; flex-direction: column; gap: 12px; }
+.zh { display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 1px solid var(--line-soft); }
+.zh-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.zh-satz { font-size: 15px; line-height: 1.45; color: var(--text); }
+.zh-deutlich { background: var(--card-2); color: var(--text); }
+.zh-vorlaeufig { background: transparent; color: var(--muted); border: 1px solid var(--line); }

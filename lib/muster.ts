@@ -128,6 +128,7 @@ export type Finding = {
   more: boolean; // häufiger unter der Bedingung
   today: boolean; // Bedingung gilt heute
   text: string;
+  sicherheit: "vorläufig" | "deutlich"; // deutlich: mindestens 16 Ereignistage und je Seite 10 Tage
 };
 
 export type Analysis = {
@@ -187,6 +188,7 @@ export function analyze(eventDays: Set<string>, conds: Condition[], today: strin
         ratio,
         more,
         today: c.has(today),
+        sicherheit: we + oe >= 2 * MIN_EVENT_DAYS && wd >= 10 && od >= 10 ? "deutlich" : "vorläufig",
         text: `${c.label[0].toUpperCase() + c.label.slice(1)}: ${noun} ${frac(we, wd)}, sonst ${frac(oe, od)}.`,
       });
     }

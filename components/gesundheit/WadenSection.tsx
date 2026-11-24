@@ -8,6 +8,7 @@ import { isoDay } from "@/lib/dates";
 import { loadInsightData, loadMusterExtra } from "@/lib/insightData";
 import type { Data } from "@/lib/insights";
 import { MAX_FINDINGS, MIN_EVENT_DAYS, muscleAnalysis, muscleWarnings, muscleWeeks, type MusterExtra } from "@/lib/muster";
+import { ZusammenhangListe } from "@/components/ui/Zusammenhang";
 
 const MONTHS = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
 const short = (iso: string) => `${Number(iso.slice(8, 10))}. ${MONTHS[Number(iso.slice(5, 7)) - 1]}`;
@@ -99,24 +100,12 @@ export default function WadenSection() {
           {!a.ready
             ? `Muster erscheinen ab ${MIN_EVENT_DAYS} Tagen mit Zucken oder Krampf (bisher ${a.eventDays}).`
             : shown.length
-              ? `${shown.length === 1 ? "Ein deutlicher Zusammenhang" : `${shown.length} deutliche Zusammenhänge`} in ${a.windowDays} Tagen.`
+              ? `${shown.length === 1 ? "Ein Zusammenhang" : `${shown.length} Zusammenhänge`} in ${a.windowDays} Tagen.`
               : "Bisher kein deutlicher Zusammenhang mit Zyklus, Training, Erholung oder Tagebuch."}
         </h2>
-        {shown.map((f) => (
-          <div key={f.key} className="stack list-line">
-            <span className="row-strong">
-              {f.more ? "Häufiger" : "Seltener"}: {f.label}
-              {f.today ? " · trifft heute zu" : ""}
-            </span>
-            <span>{f.text}</span>
-          </div>
-        ))}
+        {a.ready && <ZusammenhangListe a={{ ...a, findings: shown }} mit="mit Zucken oder Krampf" start="" max={shown.length} leer="Verglichen werden Zyklusphase, Training am selben Tag, die Nacht davor, deine Einflüsse im Tagebuch, Krankheitstage und deine Einnahmen." />}
         {zyklus.length > 0 && <Link href="/zyklus" className="settings-link">Wadenkrämpfe im Zyklus ›</Link>}
-        <span className="meta">
-          {a.ready
-            ? `${a.checked} Vergleiche seit ${short(a.since!)}. Angezeigt wird nur, was mindestens doppelt so oft oder halb so oft vorkommt. Ein Zusammenhang, kein Beweis.`
-            : "Verglichen werden Zyklusphase, Training am selben Tag, die Nacht davor, deine Einflüsse im Tagebuch, Krankheitstage und deine Einnahmen, zum Beispiel Magnesium."}
-        </span>
+        {!a.ready && <span className="meta">Verglichen werden Zyklusphase, Training am selben Tag, die Nacht davor, deine Einflüsse im Tagebuch, Krankheitstage und deine Einnahmen, zum Beispiel Magnesium.</span>}
       </section>
     </>
   );

@@ -18,6 +18,7 @@ import { groupsFor } from "@/lib/intakes";
 import { ILLNESSES } from "@/lib/health";
 import { signAnalysis } from "@/lib/anzeichen";
 import { MIN_EVENT_DAYS } from "@/lib/muster";
+import { ZusammenhangListe } from "@/components/ui/Zusammenhang";
 
 const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 const ms = (v: number) => `${Math.round(v)} ms`;
@@ -163,18 +164,7 @@ export default function OverviewSection() {
           {signsShown && (
             <div className="pattern-block">
               <span className="eyebrow pattern-title">Anzeichen wie rauer Hals oder verstopfte Nase</span>
-              {!signsShown.ready ? (
-                <span className="meta">Muster erscheinen ab {MIN_EVENT_DAYS} Tagen mit Anzeichen, bisher {signsShown.eventDays}. Anzeichen trägst du im Tagebuch ein.</span>
-              ) : signsShown.findings.length ? (
-                <>
-                  {signsShown.findings.slice(0, 3).map((f) => (
-                    <span key={f.key} className="pattern-text">{f.text}</span>
-                  ))}
-                  <span className="meta">Grundlage: {signsShown.eventDays} Tage mit Anzeichen in {signsShown.windowDays} Tagen, ohne Krankheitstage. Ein Zusammenhang, kein Beweis.</span>
-                </>
-              ) : (
-                <span className="meta">Bei {signsShown.eventDays} Tagen mit Anzeichen zeigt sich bisher kein deutliches Muster.</span>
-              )}
+              <ZusammenhangListe a={signsShown} mit="mit Anzeichen" start="Anzeichen trägst du im Tagebuch ein. Krankheitstage zählen nicht mit." leer={`Bei ${signsShown.eventDays} Tagen mit Anzeichen zeigt sich bisher kein deutliches Muster.`} />
             </div>
           )}
           {more.map((p) => (
