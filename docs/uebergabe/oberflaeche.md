@@ -1,5 +1,10 @@
 # Übergabe · Oberfläche (OF)
-Zuletzt aktualisiert: 2026-11-23 · Sitzung: https://claude.ai/code/session_014pVPWfdKSxiXe7ibPTsTDa
+Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWgZAhynqNkDydvWuZP
+
+## Dein Tag als Rondell (PR #112, 24.11.)
+- `components/heute/RingRow.tsx`: fünf Kopien der Reihe (`COPIES`, echt nur `MID`, Kopien `aria-hidden`/`tabIndex -1`), nach dem Wischen (Scroll-Pause bzw. `scrollend`) Sprung zurück in die mittlere Kopie. Größe per CSS-Variable `--k` (JS, nur bis 767 px), Ringe immer 120 px, verkleinert mit `transform`.
+- Tipp auf äußeren Ring dreht ihn in die Mitte (`onTap`), Tastatur-Fokus ebenfalls. Ab 768 px Kopien ausgeblendet, Größe fest (`--s` 0,77 / Readiness 1).
+- Nächster Schritt: Rückmeldung der Nutzerin auf dem iPhone (Gefühl beim Wischen, Abstand der Ringe `flex: 0 0 112px`).
 
 Zuständig für `app/`, `components/`, `public/`, `app/globals.css`, `docs/design-*`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
