@@ -100,10 +100,10 @@ export default function WadenSection() {
           {!a.ready
             ? `Muster erscheinen ab ${MIN_EVENT_DAYS} Tagen mit Zucken oder Krampf (bisher ${a.eventDays}).`
             : shown.length
-              ? `${shown.length === 1 ? "Ein deutlicher Zusammenhang" : `${shown.length} deutliche Zusammenhänge`} in ${a.windowDays} Tagen.`
+              ? `${shown.length === 1 ? "Ein Zusammenhang" : `${shown.length} Zusammenhänge`} in ${a.windowDays} Tagen.`
               : "Bisher kein deutlicher Zusammenhang mit Zyklus, Training, Erholung oder Tagebuch."}
         </h2>
-        {a.ready && <ZusammenhangListe a={{ ...a, findings: shown }} noun="Tagen mit Zucken oder Krampf" start="" max={shown.length} leer="Verglichen werden Zyklusphase, Training am selben Tag, die Nacht davor, deine Einflüsse im Tagebuch, Krankheitstage und deine Einnahmen." />}
+        {a.ready && <ZusammenhangListe a={{ ...a, findings: shown }} mit="mit Zucken oder Krampf" start="" max={shown.length} leer="Verglichen werden Zyklusphase, Training am selben Tag, die Nacht davor, deine Einflüsse im Tagebuch, Krankheitstage und deine Einnahmen." />}
         {zyklus.length > 0 && <Link href="/zyklus" className="settings-link">Wadenkrämpfe im Zyklus ›</Link>}
         {!a.ready && <span className="meta">Verglichen werden Zyklusphase, Training am selben Tag, die Nacht davor, deine Einflüsse im Tagebuch, Krankheitstage und deine Einnahmen, zum Beispiel Magnesium.</span>}
       </section>

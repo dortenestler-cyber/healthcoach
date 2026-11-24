@@ -19,9 +19,9 @@ export function Zusammenhang({ titel, satz, sicherheit, heute }: { titel?: strin
   );
 }
 
-// Liste aus einer Auswertung. noun: „Tage mit Anzeichen“, wofür die Grundlage steht. max: höchstens so viele.
-export function ZusammenhangListe({ a, noun, start, max = 3, leer }: { a: Analysis; noun: string; start: string; max?: number; leer: string }) {
-  if (!a.ready) return <span className="meta">{`Muster erscheinen ab ${MIN_EVENT_DAYS} ${noun}, bisher ${a.eventDays}. ${start}`}</span>;
+// Liste aus einer Auswertung. mit: „mit Anzeichen“, wofür die Tage stehen. max: höchstens so viele.
+export function ZusammenhangListe({ a, mit, start, max = 3, leer }: { a: Analysis; mit: string; start: string; max?: number; leer: string }) {
+  if (!a.ready) return <span className="meta">{`Muster erscheinen ab ${MIN_EVENT_DAYS} Tagen ${mit}, bisher ${a.eventDays}. ${start}`.trim()}</span>;
   const shown = a.findings.slice(0, max);
   return (
     <div className="zh-liste">
@@ -31,7 +31,7 @@ export function ZusammenhangListe({ a, noun, start, max = 3, leer }: { a: Analys
         <span className="meta">{leer}</span>
       )}
       <span className="meta">
-        Grundlage: {a.eventDays} {noun} in {a.windowDays} Tagen, {a.checked} Vergleiche. Gezeigt wird nur, was mindestens doppelt oder halb so oft vorkommt. Ein Zusammenhang, kein Beweis.
+        Grundlage: {a.eventDays} {a.eventDays === 1 ? "Tag" : "Tage"} {mit} in {a.windowDays} Tagen, {a.checked} Vergleiche. Gezeigt wird nur, was mindestens doppelt oder halb so oft vorkommt. Ein Zusammenhang, kein Beweis.
       </span>
     </div>
   );

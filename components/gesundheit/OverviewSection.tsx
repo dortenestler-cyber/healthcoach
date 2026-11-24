@@ -164,7 +164,7 @@ export default function OverviewSection() {
           {signsShown && (
             <div className="pattern-block">
               <span className="eyebrow pattern-title">Anzeichen wie rauer Hals oder verstopfte Nase</span>
-              <ZusammenhangListe a={signsShown} noun="Tagen mit Anzeichen" start="Anzeichen trägst du im Tagebuch ein. Krankheitstage zählen nicht mit." leer={`Bei ${signsShown.eventDays} Tagen mit Anzeichen zeigt sich bisher kein deutliches Muster.`} />
+              <ZusammenhangListe a={signsShown} mit="mit Anzeichen" start="Anzeichen trägst du im Tagebuch ein. Krankheitstage zählen nicht mit." leer={`Bei ${signsShown.eventDays} Tagen mit Anzeichen zeigt sich bisher kein deutliches Muster.`} />
             </div>
           )}
           {more.map((p) => (

@@ -1,5 +1,5 @@
 # Übergabe · Oberfläche (OF)
-Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ · seit 2026-11-24 20:20 (Bündeln Baustein 6: Zusammenhänge)
+Belegt: frei
 Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ
 
 
@@ -10,6 +10,12 @@ Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014p
 
 
 
+
+
+## Bündeln Baustein Zusammenhänge (PR #138, 24.11.)
+- `components/ui/Zusammenhang.tsx`: `Zusammenhang` (Kopf, Satz, Sicherheit) und `ZusammenhangListe` (aus `Analysis`, mit Grundlage und „Ein Zusammenhang, kein Beweis“). `Finding.sicherheit` in `lib/muster.ts`: deutlich ab 16 Ereignistagen und je Seite 10 Tagen.
+- Eingesetzt: Gesundheit › Weitere Muster (Anzeichen), Körper › Wadenkrämpfe (Überschrift ohne „deutliche“, weil die Sicherheit jetzt je Eintrag steht).
+- Bewusst nicht: HRV-Vergleiche je Gewohnheit/Phase (Mittelwerte, keine Häufigkeiten), Korridor „Was davor war“, Training-Insights.
 
 ## Bündeln Baustein Wert-Seite (PR #137, 24.11.)
 - `app/wert/[name]/page.tsx`: Ring-Seiten (`HeuteDetail`), bei Schlaf/Stress/Belastung darunter `VerlaufView mode="eingebettet"` (Anker `#verlauf`); Werte aus `METRIC_NAMES` (`lib/heuteDetails.ts`, ohne „use client“, Typprüfung gegen `MetricKey` in `lib/garmin.ts`) mit `VerlaufView mode="wert"`; `gewohnheit-<key>` → `HabitDetail`.
