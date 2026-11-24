@@ -1,6 +1,11 @@
 # Übergabe · Oberfläche (OF)
 Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWgZAhynqNkDydvWuZP
 
+## Erklärkarte je Ring, Ringe Zyklus und Intensität (PR #119, 24.11.)
+- `RingRow` meldet nach dem Wischen den Ring in der Mitte (`onCenter`), `HeuteView` gibt ihn als `focus` an `DaySentence`. Texte je Ring in `components/heute/DaySentence.tsx` (Zubettgehzeit aus dem Median von `sleep_end_min` der letzten 14 Nächte minus Bedarf heute Nacht).
+- Neue Ringe: Zyklus (öffnet `/zyklus`, Terracotta, bei Menstruation `menses`) und Intensität (`weekIntensity` gegen 150 min, Detailseite `/heute/intensitaet`). Reihenfolge: Zyklus, Energie, Schlaf, Readiness, Belastung, Intensität, Stress.
+- Rondell oder alle nebeneinander hängt jetzt an der Breite (`staticMin`, Klasse `.is-static`), nicht mehr an 768 px: am Computer mit Coach-Spalte (1024) ist es das Rondell, bei 1440 stehen alle sieben nebeneinander.
+
 ## Dein Tag als Rondell (PR #112, 24.11.)
 - `components/heute/RingRow.tsx`: fünf Kopien der Reihe (`COPIES`, echt nur `MID`, Kopien `aria-hidden`/`tabIndex -1`), nach dem Wischen (Scroll-Pause bzw. `scrollend`) Sprung zurück in die mittlere Kopie. Größe per CSS-Variable `--k` (JS, nur bis 767 px), Ringe immer 120 px, verkleinert mit `transform`.
 - Tipp auf äußeren Ring dreht ihn in die Mitte (`onTap`), Tastatur-Fokus ebenfalls. Ab 768 px Kopien ausgeblendet, Größe fest (`--s` 0,77 / Readiness 1).

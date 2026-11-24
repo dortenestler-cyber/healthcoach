@@ -13,7 +13,6 @@ import ActivityQuestion from "@/components/heute/ActivityQuestion";
 import SignHintCard from "@/components/heute/SignHintCard";
 import TwoCol, { useTwoCols } from "@/components/ui/TwoCol";
 import PullToRefresh from "@/components/ui/PullToRefresh";
-import { readinessFactors } from "@/lib/today";
 import { loadInsightData } from "@/lib/insightData";
 import { dayRule } from "@/lib/cycle";
 import { SPOTS } from "@/lib/health";
@@ -32,6 +31,7 @@ export default function HeuteView() {
   const [rehaSports, setRehaSports] = useState<string[]>([]);
   const today = useToday();
   const [day, setDay] = useState(today);
+  const [focus, setFocus] = useState("readiness"); // Ring in der Mitte, steuert die Erklärkarte
   // Tageswechsel (A5): Wer gerade den alten Tag ansah, springt auf den neuen
   const prevToday = useRef(today);
   useEffect(() => {
@@ -89,9 +89,9 @@ export default function HeuteView() {
       )}
       {gsync.note && <span className="meta">{gsync.note}</span>}
 
-      {data && rule && <RingRow day={day} data={data} rule={rule} nowMinute={nowMinute} showLoad={feat.tagesziel} showGarmin={feat.garmin} />}
+      {data && rule && <RingRow day={day} data={data} rule={rule} nowMinute={nowMinute} showLoad={feat.tagesziel} showGarmin={feat.garmin} showCycle={feat.zyklus} onCenter={setFocus} />}
 
-      {data && rule && <DaySentence rule={rule} factors={readinessFactors(day, data)} showLoad={feat.tagesziel} />}
+      {data && rule && <DaySentence focus={focus} day={day} data={data} rule={rule} nowMinute={nowMinute} isToday={isToday} showLoad={feat.tagesziel} />}
       {isToday && data && <SignHintCard data={data} today={day} onSaved={loadData} />}
 
       {twoCols ? (

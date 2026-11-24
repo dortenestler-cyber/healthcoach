@@ -3,7 +3,8 @@
 import { useRefresh } from "@/lib/refresh";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { HalfGauge, ValueRing } from "@/components/charts";
+import { DayBars, HalfGauge, ValueRing } from "@/components/charts";
+import DaySentence from "@/components/heute/DaySentence";
 import FactorList from "@/components/heute/FactorList";
 import ExplainCard from "@/components/ui/ExplainCard";
 import LoadCard from "@/components/heute/LoadCard";
@@ -13,7 +14,8 @@ import { countInRange, positionIn } from "@/lib/baseline";
 import { energyDay } from "@/lib/energie";
 import { duration, stressDay, stressSentence } from "@/lib/stress";
 import { dayRule, PHASES, STAGES, windowText, type DayRule, type Stage } from "@/lib/cycle";
-import { clock, isoDay, longDate } from "@/lib/dates";
+import { clock, isoDay, longDate, shiftDay } from "@/lib/dates";
+import { weekIntensity, WHO_MINUTES } from "@/lib/trainingLoad";
 import type { Data } from "@/lib/insights";
 import { loadInsightData } from "@/lib/insightData";
 import { useFeatures } from "@/lib/prefs";
@@ -21,7 +23,7 @@ import { DETAILS, type DetailKey } from "@/lib/heuteDetails";
 import { hm, metricRow, readinessFactors, readinessWhy, sleepAchieved, sleepNeed, vitalRows } from "@/lib/today";
 
 
-const GLOW: Record<DetailKey, string> = { readiness: "heute", schlaf: "gesundheit", belastung: "training", stress: "stress", energie: "heute" };
+const GLOW: Record<DetailKey, string> = { readiness: "heute", schlaf: "gesundheit", belastung: "training", stress: "stress", energie: "heute", intensitaet: "training" };
 
 // Detailseite hinter einem Ring auf Heute (Aufbau nach Whoop: großer Wert, Einflussgrößen, ein Satz).
 // Zeigt den Tag aus ?tag=, sonst heute.
@@ -78,6 +80,8 @@ export default function HeuteDetail({ k, day: dayParam }: { k: DetailKey; day?: 
       {data && k === "stress" && <StressDetail day={day} data={data} />}
 
       {data && k === "energie" && <EnergyDetail day={day} data={data} nowMinute={nowMinute} />}
+
+      {data && rule && k === "intensitaet" && <IntensityDetail day={day} data={data} rule={rule} isToday={isToday} nowMinute={nowMinute} />}
     </>
   );
 }
@@ -300,6 +304,55 @@ function EnergyDetail({ day, data, nowMinute }: { day: string; data: Data; nowMi
         <ValueRing tone="energy" size={208} value={(last ?? 0) / 100} center={last === null ? "–" : String(Math.round(last))} caption="Body Battery" label={last === null ? "Energie: noch kein Wert" : `Body Battery ${Math.round(last)} von 100`} />
       </div>
       <EnergyCard day={day} data={data} nowMinute={nowMinute} hideValue />
+    </>
+  );
+}
+
+const WEEKDAY = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+const mondayOf = (iso: string) => shiftDay(iso, -((new Date(iso + "T12:00:00").getDay() + 6) % 7));
+
+// Intensitätsminuten der Woche (Montag bis heute) gegen die Empfehlung der WHO: großer Ring, Satz, Tage der Woche, 4 Wochen.
+function IntensityDetail({ day, data, rule, isToday, nowMinute }: { day: string; data: Data; rule: DayRule; isToday: boolean; nowMinute: number }) {
+  const im = weekIntensity(day, data);
+  const mon = mondayOf(day);
+  const byDay = new Map(data.daily.map((d) => [d.day, d.intensity_minutes]));
+  const week = Array.from({ length: 7 }, (_, i) => shiftDay(mon, i));
+  const weeks = Array.from({ length: 4 }, (_, i) => shiftDay(mon, -7 * (3 - i))).map((m) => ({ m, sum: weekIntensity(m === mon ? day : shiftDay(m, 6), data) }));
+  const reached = weeks.filter((w) => w.sum >= WHO_MINUTES).length;
+  return (
+    <>
+      <div className="ring-hero detail-hero">
+        <ValueRing tone="training" size={208} value={im / WHO_MINUTES} center={String(im)} caption={`von ${WHO_MINUTES} min`} label={`Intensitätsminuten diese Woche ${im} von ${WHO_MINUTES}`} />
+      </div>
+      <p className="gauge-meta detail-center">Montag bis {isToday ? "heute" : shortDay(day)} · Empfehlung der WHO</p>
+
+      <DaySentence focus="intensitaet" day={day} data={data} rule={rule} nowMinute={nowMinute} isToday={isToday} showLoad={false} />
+
+      <section className="card">
+        <span className="eyebrow">Diese Woche</span>
+        <h2>{im >= WHO_MINUTES ? "Wochenziel erreicht." : `Noch ${WHO_MINUTES - im} Minuten bis ${WHO_MINUTES}.`}</h2>
+        <DayBars
+          tone="training"
+          fmt={(v) => `${Math.round(v)} min`}
+          label={`Intensitätsminuten je Tag: ${week.map((d) => `${WEEKDAY[new Date(d + "T12:00:00").getDay()]} ${d > day ? "noch offen" : `${byDay.get(d) ?? 0} Minuten`}`).join(", ")}`}
+          bars={week.map((d) => ({ label: WEEKDAY[new Date(d + "T12:00:00").getDay()], value: d > day ? null : (byDay.get(d) ?? 0), today: d === day, date: d }))}
+        />
+      </section>
+
+      <section className="card">
+        <span className="eyebrow">Letzte 4 Wochen</span>
+        <h2>{reached === 0 ? "In keiner der letzten 4 Wochen 150 Minuten erreicht." : `In ${reached} von 4 Wochen 150 Minuten erreicht.`}</h2>
+        <DayBars
+          tone="training"
+          fmt={(v) => `${Math.round(v)} min`}
+          label={`Intensitätsminuten je Woche: ${weeks.map((w) => `Woche ab ${shortDay(w.m)} ${w.sum} Minuten`).join(", ")}`}
+          target={WHO_MINUTES}
+          targetLabel={`Empfehlung ${WHO_MINUTES} min`}
+          bars={weeks.map((w) => ({ label: shortDay(w.m), value: w.sum, today: w.m === mon, tip: `Woche ab ${shortDay(w.m)}` }))}
+        />
+      </section>
+
+      <p className="meta">Garmin zählt intensive Minuten doppelt. <Link href="/training">Training ›</Link></p>
     </>
   );
 }

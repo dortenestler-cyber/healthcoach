@@ -1,18 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useLayoutEffect, useRef, type FocusEvent, type MouseEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type MouseEvent } from "react";
 import { ValueRing } from "@/components/charts";
 import type { Tone } from "@/components/charts/scale";
-import type { DayRule } from "@/lib/cycle";
+import type { DayRule, Phase } from "@/lib/cycle";
 import { energyDay } from "@/lib/energie";
 import { dayLoad, type Data } from "@/lib/insights";
 import { stressDay } from "@/lib/stress";
 import { sleepAchieved } from "@/lib/today";
+import { weekIntensity, WHO_MINUTES } from "@/lib/trainingLoad";
 
 const de1 = (v: number) => v.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
-type RingItem = { key: string; label: string; tone: Tone; value: number; center: string; word: string; aria: string; split?: number | null; target?: { lo: number; hi: number } | null; main?: boolean };
+type RingItem = { key: string; href: string; label: string; tone: Tone; value: number; center: string; word: string; aria: string; split?: number | null; target?: { lo: number; hi: number } | null; main?: boolean };
 
 const COPIES = 5; // Endlos-Schleife: die Reihe liegt fünfmal nebeneinander, echt ist nur die mittlere
 const MID = 2;
@@ -23,48 +24,69 @@ function scaleAt(d: number) {
   return 1 - 0.26 * Math.min(d, 1) - 0.14 * Math.max(0, Math.min(d - 1, 1));
 }
 
-const carousel = () => typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches;
+// Kurzes Wort für die Zyklusphase im Ring
+const PHASE_WORD: Record<Phase, string> = { menstruation: "Periode", follikel: "Follikel", eisprung: "Eisprung", "luteal-frueh": "Luteal früh", "luteal-spaet": "Luteal spät" };
+
+// Breite, ab der alle Ringe nebeneinander passen (Readiness 120 px, die anderen 92 px). Darunter: Rondell.
+const staticMin = (n: number) => 128 + (n - 1) * 100;
 const calm = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// „Dein Tag“: fünf Ringe als Rondell. Der Ring in der Mitte ist groß, nach außen werden sie kleiner,
-// fließend beim Wischen. Hinter Stress kommt wieder Energie (Endlos-Schleife).
+// „Dein Tag“: Ringe als Rondell. Der Ring in der Mitte ist groß, nach außen werden sie kleiner,
+// fließend beim Wischen. Hinter dem letzten Ring kommt wieder der erste (Endlos-Schleife).
 // Tipp auf einen äußeren Ring dreht ihn in die Mitte, Tipp auf den mittleren öffnet die Detailseite.
-// Am Computer und iPad stehen die fünf Ringe nebeneinander, Readiness groß.
-export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarmin }: { day: string; data: Data; rule: DayRule; nowMinute: number; showLoad: boolean; showGarmin: boolean }) {
+// Nach dem Wischen meldet onCenter den Ring in der Mitte (für die Erklärkarte darunter).
+// Ist genug Platz (Computer), stehen alle Ringe nebeneinander, Readiness groß, und onCenter meldet Readiness.
+export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarmin, showCycle, onCenter }: { day: string; data: Data; rule: DayRule; nowMinute: number; showLoad: boolean; showGarmin: boolean; showCycle: boolean; onCenter?: (key: string) => void }) {
+  const wrapRef = useRef<HTMLElement>(null);
   const row = useRef<HTMLDivElement>(null);
+  const [isStatic, setStatic] = useState(false);
+  const centerCb = useRef(onCenter);
+  centerCb.current = onCenter;
   const frame = useRef(0);
   const idle = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const items: RingItem[] = [];
+  const q = `?tag=${day}`;
+
+  if (showCycle) {
+    const c = rule.cycle;
+    const word = c.cycleDay === null ? "kein Wert" : c.phase ? PHASE_WORD[c.phase] : "Phase offen";
+    items.push({ key: "zyklus", href: "/zyklus", label: "Zyklus", tone: c.phase === "menstruation" ? "menses" : "cycle", value: c.cycleDay === null ? 0 : c.cycleDay / Math.max(c.length, c.cycleDay), center: c.cycleDay === null ? "–" : `Tag ${c.cycleDay}`, word, aria: c.cycleDay === null ? "Zyklus: noch kein Zyklustag" : `Zyklustag ${c.cycleDay} von etwa ${c.length}${c.phase ? `, ${word}` : ""}` });
+  }
 
   if (showGarmin) {
     const e = energyDay(day, data.daily, data.acts, nowMinute);
     const last = [...e.today].reverse().find((v) => v !== null) ?? null;
-    items.push({ key: "energie", label: "Energie", tone: "energy", value: (last ?? 0) / 100, center: last === null ? "–" : String(Math.round(last)), word: last === null ? "kein Wert" : "Body Battery", aria: last === null ? "Energie: noch kein Wert" : `Energie, Body Battery ${Math.round(last)} von 100` });
+    items.push({ key: "energie", href: `/heute/energie${q}`, label: "Energie", tone: "energy", value: (last ?? 0) / 100, center: last === null ? "–" : String(Math.round(last)), word: last === null ? "kein Wert" : "Body Battery", aria: last === null ? "Energie: noch kein Wert" : `Energie, Body Battery ${Math.round(last)} von 100` });
   }
 
   const slept = sleepAchieved(day, data);
   const sleepPct = slept.ratio === null ? null : Math.round(slept.ratio * 100);
-  items.push({ key: "schlaf", label: "Schlaf", tone: "sleep", value: slept.ratio ?? 0, center: sleepPct === null ? "–" : `${sleepPct} %`, word: sleepPct === null ? "kein Wert" : "vom Bedarf", aria: sleepPct === null ? "Schlaf: noch kein Wert für letzte Nacht" : `Schlaf ${sleepPct} Prozent vom Bedarf` });
+  items.push({ key: "schlaf", href: `/heute/schlaf${q}`, label: "Schlaf", tone: "sleep", value: slept.ratio ?? 0, center: sleepPct === null ? "–" : `${sleepPct} %`, word: sleepPct === null ? "kein Wert" : "vom Bedarf", aria: sleepPct === null ? "Schlaf: noch kein Wert für letzte Nacht" : `Schlaf ${sleepPct} Prozent vom Bedarf` });
 
   const r = rule.readiness;
   const warn = rule.level === "warnzeichen";
-  items.push({ key: "readiness", label: "Readiness", tone: "recovery", value: warn ? 0 : r.value / 10, center: warn ? "–" : de1(r.value), word: warn ? "Hinweis" : r.label, aria: warn ? "Readiness: siehe Hinweis" : `Readiness ${de1(r.value)} von 10, ${r.label}`, main: true });
+  items.push({ key: "readiness", href: `/heute/readiness${q}`, label: "Readiness", tone: "recovery", value: warn ? 0 : r.value / 10, center: warn ? "–" : de1(r.value), word: warn ? "Hinweis" : r.label, aria: warn ? "Readiness: siehe Hinweis" : `Readiness ${de1(r.value)} von 10, ${r.label}`, main: true });
 
   if (showLoad) {
     const t = rule.target;
     const dl = dayLoad(day, data.daily, data.acts);
     const word = t.pause ? "Pause" : dl.pct < t.lo ? "unter Ziel" : dl.pct <= t.hi ? "im Ziel" : "über Ziel";
-    items.push({ key: "belastung", label: "Belastung", tone: "training", value: dl.pct / 100, split: dl.quelle ? dl.pctTraining / 100 : null, target: t.pause ? null : { lo: t.lo / 100, hi: t.hi / 100 }, center: `${dl.pct} %`, word, aria: `Belastung ${dl.pct} Prozent, ${word}${t.pause ? "" : `, Ziel ${t.lo} bis ${t.hi} Prozent`}` });
+    items.push({ key: "belastung", href: `/heute/belastung${q}`, label: "Belastung", tone: "training", value: dl.pct / 100, split: dl.quelle ? dl.pctTraining / 100 : null, target: t.pause ? null : { lo: t.lo / 100, hi: t.hi / 100 }, center: `${dl.pct} %`, word, aria: `Belastung ${dl.pct} Prozent, ${word}${t.pause ? "" : `, Ziel ${t.lo} bis ${t.hi} Prozent`}` });
+  }
+
+  if (showGarmin) {
+    const im = weekIntensity(day, data);
+    items.push({ key: "intensitaet", href: `/heute/intensitaet${q}`, label: "Intensität", tone: "training", value: im / WHO_MINUTES, center: String(im), word: `von ${WHO_MINUTES} min`, aria: `Intensitätsminuten diese Woche ${im} von ${WHO_MINUTES}` });
   }
 
   if (showGarmin) {
     const s = stressDay(day, data.daily);
-    items.push({ key: "stress", label: "Stress", tone: "stress", value: (s.value ?? 0) / 100, center: s.value === null ? "–" : String(s.value), word: s.word ?? "kein Wert", aria: s.value === null ? "Stress: noch kein Wert" : `Stress ${s.value} von 100, ${s.word}` });
+    items.push({ key: "stress", href: `/heute/stress${q}`, label: "Stress", tone: "stress", value: (s.value ?? 0) / 100, center: s.value === null ? "–" : String(s.value), word: s.word ?? "kein Wert", aria: s.value === null ? "Stress: noch kein Wert" : `Stress ${s.value} von 100, ${s.word}` });
   }
 
-  const q = `?tag=${day}`;
   const n = items.length;
+  const carousel = useCallback(() => (wrapRef.current?.clientWidth ?? 0) < staticMin(n), [n]);
   const mainIdx = Math.max(0, items.findIndex((it) => it.main));
 
   const cells = useCallback(() => Array.from(row.current?.querySelectorAll<HTMLElement>(".ring-strip-cell") ?? []), []);
@@ -130,12 +152,30 @@ export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarm
     r.scrollLeft += (MID - copy) * width;
   }, [cells, centerIndex, n]);
 
-  // Beim Öffnen und beim Tageswechsel steht Readiness in der Mitte
+  // Ring in der Mitte melden (nur wenn er wechselt). Ohne Rondell gilt Readiness.
+  const lastKey = useRef<string | null>(null);
+  const report = useCallback(() => {
+    const i = carousel() ? centerIndex() : -1;
+    const key = (i >= 0 ? cells()[i]?.dataset.key : null) ?? "readiness";
+    if (key !== lastKey.current) {
+      lastKey.current = key;
+      centerCb.current?.(key);
+    }
+  }, [carousel, centerIndex, cells]);
+
+  // Rondell oder alle nebeneinander, je nach Platz
   useLayoutEffect(() => {
-    if (!carousel()) return;
-    scrollToIdx(MID * n + mainIdx, false);
-    paint();
-  }, [day, n, mainIdx, scrollToIdx, paint]);
+    setStatic(!carousel());
+  }, [carousel]);
+
+  // Beim Öffnen, beim Tageswechsel und beim Umschalten des Modus steht Readiness in der Mitte
+  useLayoutEffect(() => {
+    if (carousel()) {
+      scrollToIdx(MID * n + mainIdx, false);
+      paint();
+    }
+    report();
+  }, [day, n, mainIdx, isStatic, carousel, scrollToIdx, paint, report]);
 
   useEffect(() => {
     const r = row.current;
@@ -144,6 +184,7 @@ export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarm
       clearTimeout(idle.current);
       wrap();
       paint();
+      report();
     };
     const onScroll = () => {
       if (!calm()) {
@@ -154,8 +195,11 @@ export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarm
       idle.current = setTimeout(settle, IDLE_MS);
     };
     const onResize = () => {
-      if (carousel()) scrollToIdx(centerIndex() < 0 ? MID * n + mainIdx : centerIndex(), false);
+      const c = carousel();
+      setStatic(!c);
+      if (c) scrollToIdx(centerIndex() < 0 ? MID * n + mainIdx : centerIndex(), false);
       paint();
+      report();
     };
     r.addEventListener("scroll", onScroll, { passive: true });
     r.addEventListener("scrollend", settle);
@@ -167,7 +211,7 @@ export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarm
       cancelAnimationFrame(frame.current);
       clearTimeout(idle.current);
     };
-  }, [wrap, paint, scrollToIdx, centerIndex, n, mainIdx]);
+  }, [wrap, paint, report, carousel, scrollToIdx, centerIndex, n, mainIdx]);
 
   // Äußerer Ring: erst in die Mitte drehen. Mittlerer Ring: Detailseite öffnen.
   const onTap = (e: MouseEvent<HTMLAnchorElement>, i: number) => {
@@ -182,8 +226,8 @@ export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarm
   };
 
   return (
-    <section className="ring-strip-wrap" aria-label="Dein Tag">
-      <div className="ring-strip" ref={row}>
+    <section className="ring-strip-wrap" aria-label="Dein Tag" ref={wrapRef}>
+      <div className={"ring-strip" + (isStatic ? " is-static" : "")} ref={row}>
         {Array.from({ length: COPIES }, (_, c) =>
           items.map((it, j) => {
             const i = c * n + j;
@@ -191,7 +235,8 @@ export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarm
             return (
               <Link
                 key={`${c}-${it.key}`}
-                href={`/heute/${it.key}${q}`}
+                href={it.href}
+                data-key={it.key}
                 className={"ring-strip-cell" + (it.main ? " is-main" : "") + (real ? "" : " is-copy")}
                 aria-label={`${it.aria}. Details öffnen`}
                 aria-hidden={real ? undefined : true}
