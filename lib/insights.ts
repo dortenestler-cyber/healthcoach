@@ -8,7 +8,7 @@ import { sportOf, type Sport } from "@/lib/training";
 import { alltagMinutes, readLoadDay } from "@/lib/alltagslast";
 import { baselineFor, RANGE_PHASE_NAMES, type Baseline, type Range } from "@/lib/baseline";
 
-export type Diary = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[]; fromGarmin?: boolean; garminOnly?: boolean; ovulation?: string[] };
+export type Diary = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[]; fromGarmin?: boolean; garminOnly?: boolean; ovulation?: string[]; symptoms_checked?: boolean };
 // fromGarmin: Blutung an diesem Tag stammt aus Garmin · garminOnly: kein eigener Tagebucheintrag an diesem Tag
 // (Periode aus Garmin oder nur Sport/Stress von garmin-sync, Spalte manual = false)
 export type Checkin = { day: string; energy: number | null; sleep: number | null; mood: number | null };
@@ -162,13 +162,13 @@ export function computeTarget(day: string, data: Data): Target {
     if (avg !== null) factors.push({ name: "Check-in", value: avg < 1.7 ? "niedrig" : avg < 2.4 ? "mittel" : "gut", note: "Dein eigenes Gefühl heute Morgen", effect: avg < 1.7 ? -10 : avg < 2.4 ? -3 : 3 });
   }
 
-  const di = data.diary.find((d) => d.day === day) ?? data.diary.find((d) => d.day === addDays(day, -1));
-  if (di) {
-    const strong = Object.values(di.symptoms ?? {}).filter((v) => v >= 3).length;
-    const mid = Object.values(di.symptoms ?? {}).filter((v) => v === 2).length;
-    const night = di.symptoms?.nacht ?? 0;
-    const eff = -Math.min(12, strong * 4 + mid * 2 + (night >= 2 ? 3 : 0));
-    if (eff < 0) factors.push({ name: "Symptome", value: strong ? `${strong} stark` : `${mid} mittel`, note: di.day === day ? "aus dem Tagebuch von heute" : "aus dem Tagebuch von gestern", effect: eff });
+  const sb = symptomBasis(data.diary, day);
+  if (sb) {
+    const strong = Object.values(sb.symptoms).filter((v) => v >= 3).length;
+    const mid = Object.values(sb.symptoms).filter((v) => v === 2).length;
+    const night = sb.symptoms.nacht ?? 0;
+    const eff = -Math.round(Math.min(12, strong * 4 + mid * 2 + (night >= 2 ? 3 : 0)) * sb.weight);
+    if (eff < 0) factors.push({ name: "Symptome", value: strong ? `${strong} stark` : `${mid} mittel`, note: sb.day === day ? "aus dem Tagebuch von heute" : "von gestern, im Check-in noch nicht bestätigt, zählt halb", effect: eff });
   }
 
   const cyc = cycleInfo(day, data.diary);
@@ -388,4 +388,17 @@ export function patterns(data: Data): Pattern[] {
 // Einträge, die nur garmin-sync angelegt hat (manual = false), zählen in Auswertungen nicht als eigener Tagebuch-Tag
 export function markAutoRows<T extends { manual?: boolean | null }>(rows: T[]): (T & { garminOnly?: boolean })[] {
   return rows.map((r) => (r.manual === false ? { ...r, garminOnly: true } : r));
+}
+
+// Welche Symptome zählen für einen Tag?
+// Heute eingetragen oder im Check-in beantwortet: die von heute, voll.
+// Sonst die von gestern, aber nur halb, bis du im Check-in sagst, ob sie noch da sind.
+export type SymptomBasis = { day: string; symptoms: Record<string, number>; weight: 1 | 0.5 };
+export function symptomBasis(diary: Diary[], day: string): SymptomBasis | null {
+  const has = (e: Diary | undefined) => !!e && Object.values(e.symptoms ?? {}).some((v) => v > 0);
+  const t = diary.find((d) => d.day === day);
+  if (has(t)) return { day, symptoms: t!.symptoms, weight: 1 };
+  if (t?.symptoms_checked) return null;
+  const y = diary.find((d) => d.day === addDays(day, -1));
+  return has(y) ? { day: y!.day, symptoms: y!.symptoms, weight: 0.5 } : null;
 }

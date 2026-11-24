@@ -33,7 +33,9 @@ const WATCH: { key: MetricKey; bad: "unter" | "über"; word: string }[] = [
 export function signHint(data: Data, today: string): SignHint | null {
   if (data.illness) return null; // krank: dafür gibt es die Krankheitskarte
   const byDay = new Map(data.diary.map((e) => [e.day, e]));
-  const day = signsOf(byDay.get(today)).length ? today : signsOf(byDay.get(addDays(today, -1))).length ? addDays(today, -1) : null;
+  const t = byDay.get(today);
+  // Im Check-in beantwortet und heute keine Anzeichen: gestern zählt nicht mehr
+  const day = signsOf(t).length ? today : !t?.symptoms_checked && signsOf(byDay.get(addDays(today, -1))).length ? addDays(today, -1) : null;
   if (!day) return null;
   const signs = signsOf(byDay.get(day)).sort((a, b) => b.level - a.level).map((s) => s.label);
   const ctx: BaseCtx = { diary: data.diary, sick: data.sick };
@@ -48,9 +50,12 @@ export function signHint(data: Data, today: string): SignHint | null {
   }
   const list = signs.slice(0, 2).join(" und ");
   const head = list[0].toUpperCase() + list.slice(1);
-  const text = values.length
-    ? `${head}${day === today ? "" : " seit gestern"}, dazu ${values.join(" und ")}. Heute lieber locker trainieren und früh schlafen.`
-    : `${head}${day === today ? "" : " seit gestern"}. Deine Werte sind noch im Bereich, hör trotzdem auf deinen Körper.`;
+  const text =
+    day !== today
+      ? `Gestern: ${list}${values.length ? `, heute dazu ${values.join(" und ")}` : ""}. Im Check-in kannst du sagen, ob es noch da ist.`
+      : values.length
+        ? `${head}, dazu ${values.join(" und ")}. Heute lieber locker trainieren und früh schlafen.`
+        : `${head}. Deine Werte sind noch im Bereich, hör trotzdem auf deinen Körper.`;
   return { day, signs, values, text };
 }
 
