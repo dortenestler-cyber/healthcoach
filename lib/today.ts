@@ -140,6 +140,16 @@ export function targetText(t: { pause: boolean; lo: number; hi: number }, load: 
   return "Über dem Ziel. Plane morgen eher leicht.";
 }
 
+// Woher das Ziel kommt (Konzept docs/konzept-belastung-skala.md)
+export function targetBasisText(t: { pause: boolean; usual: number | null; brake: boolean; label: string }): string | null {
+  if (t.pause) return null;
+  if (t.usual === null) return "Das Ziel richtet sich nach deiner Readiness. Ab 14 Tagen mit Daten kommt deine übliche Belastung dazu.";
+  const brake = t.brake ? " Deine Belastung ist in den letzten 7 Tagen schnell gestiegen, deshalb liegt das Ziel heute nicht höher als sonst." : "";
+  return `Das Ziel richtet sich nach deiner Readiness (${t.label}) und deiner üblichen Belastung von ${t.usual} %.${brake}`;
+}
+
+export const LOAD_CURVE_TEXT = "Je höher die Belastung schon ist, desto weniger bringt jede weitere Minute. 100 % entspricht einem harten Trainingstag, an sehr langen Tagen geht es darüber.";
+
 // ---------- Werte, die seit Tagen auf der ungünstigen Seite ihres Bereichs liegen (Heute)
 
 export type OffStreak = { key: MetricKey; label: string; days: number; side: "über" | "unter" };

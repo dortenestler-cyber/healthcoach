@@ -23,6 +23,7 @@ const arc = (r: number) => `M ${CX - r} ${CY} A ${r} ${r} 0 0 1 ${CX + r} ${CY}`
 
 export default function HalfGauge({ value, split, target, center, caption, label, tone = "training" }: Props) {
   const v = Math.max(0, Math.min(1, value));
+  target = target ? { lo: Math.min(target.lo, 0.99), hi: Math.min(target.hi, 1) } : target; // Ziel über 100 % endet am Bogenende
   return (
     <svg className={`cb cb-gauge cb-${tone}`} viewBox="0 0 260 150" role="img" aria-label={label}>
       {target && (

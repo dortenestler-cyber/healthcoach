@@ -2,8 +2,8 @@ import Link from "next/link";
 import { HalfGauge } from "@/components/charts";
 import ExplainCard from "@/components/ui/ExplainCard";
 import { clock } from "@/lib/dates";
-import { dayLoad, firstAlltagDay, type Data, type Target } from "@/lib/insights";
-import { targetText } from "@/lib/today";
+import { dayLoad, firstAlltagDay, ringSplit, type Data, type Target } from "@/lib/insights";
+import { LOAD_CURVE_TEXT, targetBasisText, targetText } from "@/lib/today";
 
 // Belastung heute als Halbbogen mit Zielbereich, Kacheln und Erklärkarte (Konzept dunkel 2, Muster 2 und 3).
 // Training kräftig, Alltag hell (Konzept Korridore und Alltagslast, Teil B).
@@ -27,7 +27,7 @@ export default function LoadCard({ day, data, target: t }: { day: string; data: 
         <HalfGauge
           tone="training"
           value={load / 100}
-          split={dl.quelle ? dl.pctTraining / 100 : null}
+          split={ringSplit(dl)}
           target={t.pause ? null : { lo: t.lo / 100, hi: t.hi / 100 }}
           center={`${load} %`}
           caption={word}
@@ -68,6 +68,8 @@ export default function LoadCard({ day, data, target: t }: { day: string; data: 
           </div>
         )}
       </div>
+      {targetBasisText(t) && <p className="meta">{targetBasisText(t)}</p>}
+      <p className="meta">{LOAD_CURVE_TEXT}</p>
       <Link href="/verlauf?m=belastung" className="settings-link">Belastung im Verlauf ›</Link>
       {recentStart && <span className="meta">Seit {Number(first!.slice(8, 10))}.{Number(first!.slice(5, 7))}. zählt auch Bewegung im Alltag. Deine Werte sind deshalb etwas höher als vorher.</span>}
       <ExplainCard tone="training" question={`Meine Belastung liegt heute bei ${load} %${dl.pctAlltag ? ` (davon Alltag ${dl.pctAlltag} %)` : ""}, Ziel ${t.pause ? "Pause" : `${t.lo}–${t.hi} %`}. Was passt heute noch?`}>

@@ -11,6 +11,7 @@ import type { Data } from "@/lib/insights";
 import { loadInsightData } from "@/lib/insightData";
 import { announceNewData, useRefresh } from "@/lib/refresh";
 import { SPORTS, sportOf, sportOfGarmin, type Sport } from "@/lib/training";
+import { loadToPct } from "@/lib/alltagslast";
 import {
   afterUnit,
   clockOf,
@@ -171,7 +172,7 @@ function ResultCard({ unit, data }: { unit: Unit; data: Data }) {
         <Tile label="Dauer" value={durationText(unit.duration_s) || "–"} note={durNote} />
         <Tile label="Puls Ø" value={unit.avg_hr ? `${unit.avg_hr}` : "–"} unit="bpm" note={diffNote(unit.avg_hr, c.avgHr, "", undefined, 2)} />
         <Tile label="Puls max" value={unit.max_hr ? `${unit.max_hr}` : "–"} unit="bpm" note={diffNote(unit.max_hr, c.maxHr, "", undefined, 3)} />
-        <Tile label="Belastung" value={unit.training_load ? `${Math.round(unit.training_load)}` : "–"} note={unit.training_load && c.load ? `üblich ${Math.round(c.load)}` : ""} />
+        <Tile label="Belastung" value={unit.training_load ? `${Math.round(loadToPct(unit.training_load))} %` : "–"} note={unit.training_load ? `Garmin-Last ${Math.round(unit.training_load)}${c.load ? ` · üblich ${Math.round(loadToPct(c.load))} %` : ""}` : ""} />
       </div>
       {c.n > 0 && <span className="meta">Vergleich mit deinen letzten {c.n} Einheiten dieser Sportart. Belastung wie bei Garmin.</span>}
       {unit.rpe && unit.training_load && c.verdict && (

@@ -20,6 +20,7 @@ export default function ValueRing({ value, split, target, center, caption, label
   const tr = 48; // Zielbogen außen
   const tc = 2 * Math.PI * tr;
   const v = Math.max(0, Math.min(1, value));
+  target = target ? { lo: Math.min(target.lo, 0.99), hi: Math.min(target.hi, 1) } : target; // Ziel über 100 % endet am Ringende
   const arc = (len: number, total: number, from = 0) => ({ strokeDasharray: `${len * total} ${total}`, strokeDashoffset: `${-from * total}` });
 
   return (

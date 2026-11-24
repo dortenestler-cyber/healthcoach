@@ -73,6 +73,12 @@ export function dayLoad(day: string, daily: Daily[], acts: Activity[]): DayLoad 
   return { training, alltag, pct, pctTraining, pctAlltag: pct - pctTraining, quelle: ld.quelle, alltagMin: alltagMinutes(ld), steps: d?.steps_outside_acts ?? null };
 }
 
+// Anteil Training am gezeichneten Ring (0–1): Über 100 % ist der Ring voll, Training und Alltag teilen ihn nach ihrem Anteil
+export function ringSplit(dl: DayLoad): number | null {
+  if (!dl.quelle) return null;
+  return dl.pct > 0 ? (Math.min(1, dl.pct / 100) * dl.pctTraining) / dl.pct : 0;
+}
+
 export function loadPercent(day: string, daily: Daily[], acts: Activity[]): number {
   return dayLoad(day, daily, acts).pct;
 }
