@@ -72,7 +72,7 @@ export default function HeuteView() {
   const nowMinute = isToday ? now.getHours() * 60 + now.getMinutes() : 24 * 60 - 1;
 
   // Auf dem iPhone untereinander wie bisher, am Computer links „Auf einen Blick“ und Aktivitäten, rechts „Heute steht an“
-  const glance = data && rule ? <GlanceTiles day={day} data={data} rule={rule} showGarmin={feat.garmin} showCycle={feat.zyklus} /> : null;
+  const glance = data && rule ? <GlanceTiles day={day} data={data} showGarmin={feat.garmin} /> : null;
   const agenda = isToday ? <TodayAgenda day={day} data={data} rule={rule} showPlan={feat.tagesplan} /> : null;
   const question = isToday && data && feat.garmin ? <ActivityQuestion acts={data.acts} onSaved={loadData} /> : null;
   const recent = data && feat.garmin ? <RecentActivities day={day} data={data} /> : null;
