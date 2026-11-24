@@ -1,6 +1,7 @@
 "use client";
 
 import DayPick from "@/components/ui/DayPick";
+import EditSheet from "@/components/ui/EditSheet";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { loadPeriodDays } from "@/lib/garminZyklus";
@@ -165,10 +166,22 @@ function TrendCard(props: {
   };
 
   const savedToday = points.some((p) => p.day === day) && value === null;
-  // Wert eines Tages löschen; ist der andere Wert auch leer, verschwindet die Zeile
+  // Eintrag im Eintragen-Blatt ändern oder löschen
+  const [sheet, setSheet] = useState<{ day: string; v: number } | null>(null);
+  const saveSheet = async () => {
+    const sb = supabase();
+    if (!sb || !sheet) return;
+    const { error: e } = await sb.from("body_measurements").upsert({ day: sheet.day, [field]: Math.round(sheet.v * 10) / 10 }, { onConflict: "user_id,day" });
+    if (e) return onError("Speichern hat nicht geklappt: " + e.message);
+    onError("");
+    setSheet(null);
+    onSaved();
+  };
+  // Wert eines Tages löschen; ist der andere Wert auch leer, verschwindet die Zeile (Rückfrage im Blatt)
   const removeDay = async (d: string) => {
     const sb = supabase();
-    if (!sb || !window.confirm(`${label} vom ${shortDate(new Date(d + "T12:00:00"))} löschen?`)) return;
+    if (!sb) return;
+    setSheet(null);
     const row = rows.find((r) => r.day === d);
     const other = field === "weight_kg" ? row?.waist_cm : row?.weight_kg;
     const { error: e } = other == null ? await sb.from("body_measurements").delete().eq("day", d) : await sb.from("body_measurements").update({ [field]: null }).eq("day", d);
@@ -218,13 +231,31 @@ function TrendCard(props: {
               <span>{shortDate(new Date(p.day + "T12:00:00"))}</span>
               <span className="footer-links">
                 <span className="row-strong">{fmt(p.v)}</span>
-                <button type="button" className="btn btn-link btn-44" onClick={() => { setDay(p.day); setValue(null); }}>Ändern</button>
-                <button type="button" className="btn btn-link btn-44" onClick={() => removeDay(p.day)}>Löschen</button>
+                <button type="button" className="btn btn-link btn-44" onClick={() => setSheet({ day: p.day, v: p.v })}>Ändern</button>
               </span>
             </div>
           ))}
         </details>
       )}
+      <EditSheet
+        title={sheet ? `${label} · ${shortDate(new Date(sheet.day + "T12:00:00"))}` : label}
+        open={!!sheet}
+        onClose={() => setSheet(null)}
+        onSave={saveSheet}
+        onDelete={sheet ? () => removeDay(sheet.day) : undefined}
+        deleteQuestion={sheet ? `${label} vom ${shortDate(new Date(sheet.day + "T12:00:00"))} löschen?` : undefined}
+      >
+        {sheet && (
+          <div className="card-row list-line">
+            <span className="row-label">Wert</span>
+            <div className="stepper">
+              <button type="button" aria-label="Weniger" onClick={() => setSheet({ ...sheet, v: Math.round((sheet.v - step) * 10) / 10 })}>−</button>
+              <span>{fmt(sheet.v)}</span>
+              <button type="button" aria-label="Mehr" onClick={() => setSheet({ ...sheet, v: Math.round((sheet.v + step) * 10) / 10 })}>+</button>
+            </div>
+          </div>
+        )}
+      </EditSheet>
     </section>
   );
 }
