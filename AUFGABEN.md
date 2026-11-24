@@ -7,6 +7,12 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Mehrere Claude-Konten (Regeln, 24.11.)
+- [ ] Im zweiten Konto unter claude.ai › Einstellungen › Connectors GitHub verbinden, mit Zugriff auf healthcoach und cashflow-app.
+- [ ] Ist es ein anderes GitHub-Konto: in beiden Repos als Collaborator mit Schreibrecht einladen.
+- [ ] Im zweiten Konto je Repo eine Umgebung anlegen, gleiche Einstellungen wie im ersten (Umgebungen werden nicht geteilt).
+- [ ] Bei Limit: im anderen Konto mit dem Übernahme-Satz aus `docs/konzept-zwei-instanzen.md`, Abschnitt 11 starten.
+
 ### Sport und Stress automatisch im Tagebuch (PR #108)
 - [x] PR #108 gemergt (23. Nov.), Migration und Upload der Funktion grün (geprüft von Claude). Er enthält die Migration `supabase/migrations/20261127110000_gewohnheiten_auto.sql` (drei Spalten im Tagebuch: von Garmin gesetzt, von dir abgewählt, eigener Eintrag) und eine Änderung an `garmin-sync`. Dein Merge ist die Freigabe
 - [x] Claude Bescheid gegeben, Läufe grün

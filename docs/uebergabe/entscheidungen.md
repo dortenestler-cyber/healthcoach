@@ -61,3 +61,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-24 · OF · Nutzerin: Im Zyklus-Ring nur die Zahl des Zyklustags, ohne „Tag“
 2026-11-24 · OF · Nutzerin: Hinweise wie „… ist bei Garmin nicht abrufbar“ gar nicht mehr anzeigen
 2026-11-24 · OF · Nutzerin: solche Hinweise auf allen Seiten entfernen (Wachphasen, Stress-Detail, Einheit)
+2026-11-24 · OF/DA · Nutzerin: Alle Claude-Konten dürfen jede Rolle übernehmen, z. B. wenn ein Konto sein Limit erreicht. Abstimmung über die Belegt-Zeile der Übergabe-Datei (Konzept Abschnitt 11)

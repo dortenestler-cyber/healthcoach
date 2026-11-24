@@ -155,3 +155,38 @@ Umgesetzt am 22. Nov. 2026:
 - Vorlage für PR-Texte: `.github/pull_request_template.md`
 
 Entschieden: Teilung Oberfläche / Daten. Die Instanzen dürfen sich direkt Nachrichten schicken (Abschnitt 8).
+
+## 11. Mehrere Konten und Ablösung bei Limit
+
+Stand: 24. Nov. 2026 · Freigegeben
+
+Jedes Claude-Konto der Nutzerin darf jede Rolle übernehmen, auch die Rolle **Kasse** `[CF]` im Repo cashflow-app (Übergabe dort: `UEBERGABE.md`). Rollen gehören zu Arbeitsbereichen, nicht zu Konten. Sitzungen verschiedener Konten können sich keine Nachrichten schicken, deshalb gilt Abschnitt 8 nur innerhalb eines Kontos.
+
+### Belegt-Zeile
+Zweite Zeile jeder Übergabe-Datei:
+
+```
+Belegt: Konto A · Sitzung <Link> · seit 2026-11-24 14:30
+Belegt: frei
+```
+
+- Beim Start nach dem Lesen setzen und sofort pushen (im Arbeitszweig und, wenn möglich, als kleiner Commit über den Entwurfs-PR). Zusammen mit dem Entwurfs-PR ist sie die Anmeldung.
+- Steht dort eine andere Sitzung: nur weitermachen, wenn die Nutzerin die Übernahme ausdrücklich sagt.
+- Konten nur als „Konto A“ / „Konto B“, nie mit E-Mail-Adresse.
+- Am Ende der Sitzung: `Belegt: frei`.
+
+### Laufend übergeben
+Ein Limit kommt ohne Vorwarnung. Deshalb die Übergabe nach jedem abgeschlossenen Schritt nachführen und pushen, nicht erst am Ende. „In Arbeit“ nennt immer den nächsten konkreten Schritt mit Datei. Zeigt Claude an, dass das Limit naht: sofort Übergabe schreiben, pushen, `· Limit erwartet` an die Belegt-Zeile hängen.
+
+### Übernahme
+1. Die Nutzerin startet im anderen Konto eine Sitzung:
+   > Übernahme: Das andere Konto hat sein Limit erreicht. Du übernimmst die Rolle **Oberfläche** (oder **Daten**, **Kasse**). Lies die Übergabe-Datei auf `main` und im offenen Zweig der Rolle, gleiche sie mit den Commits und dem PR ab, setz die Belegt-Zeile auf dein Konto („übernommen“) und mach beim nächsten Schritt weiter. Sag mir vorher in 2–3 Sätzen, wo du ansetzt.
+2. Ist der Zweig neuer als die Übergabe, den Rest aus `git log main..HEAD` und dem PR-Text rekonstruieren (Abschnitt 7).
+3. Belegt-Zeile: `Belegt: Konto B · Sitzung <Link> · seit … · übernommen von Konto A`, pushen.
+4. Auf dem vorhandenen Zweig weitermachen. Lässt die Sitzung nur ihren eigenen Zweig zu: vom alten abzweigen, neuen Entwurfs-PR öffnen, den alten mit Verweis schließen.
+
+### Rückkehr des ersten Kontos
+Nie einfach im alten Chat weitermachen. Neu starten, Belegt-Zeile lesen, nur übernehmen, wenn sie `frei` ist oder die Nutzerin es sagt.
+
+### Einrichtung (Nutzerin)
+Siehe `AUFGABEN.md`, Abschnitt „Mehrere Claude-Konten“.

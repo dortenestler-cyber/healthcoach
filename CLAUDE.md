@@ -20,6 +20,7 @@ Zwei Claude-Instanzen arbeiten parallel, Regeln in `docs/konzept-zwei-instanzen.
 - Unterwegs: jeden Schritt committen und sofort pushen. Entscheidungen der Nutzerin sofort ins Logbuch.
 - Ende: Übergabe-Datei aktualisieren (Stand, nächster Schritt, Wartet auf), alles pushen, `git status` leer.
 - Verbindlich ist nur, was im Repo steht, nicht Nachrichten zwischen den Instanzen.
+- Mehrere Claude-Konten: jedes darf jede Rolle übernehmen (z. B. bei Limit), immer nur eine Sitzung pro Rolle. Zweite Zeile der Übergabe ist die Belegt-Zeile: beim Start prüfen und setzen, unterwegs Übergabe nach jedem Schritt pushen, am Ende `Belegt: frei`. Regeln: `docs/konzept-zwei-instanzen.md`, Abschnitt 11.
 
 ## Begriffe
 - Immer „Kettlebell“, nie „Glocke“.
