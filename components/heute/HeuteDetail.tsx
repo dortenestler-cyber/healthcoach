@@ -196,7 +196,7 @@ function SleepDetail({ day, data }: { day: string; data: Data }) {
             {night.awake_count != null && night.sleep_awake_s ? <li>Wachzeit zusammen {duration(night.sleep_awake_s)}</li> : null}
             {night.spo2_avg != null && <li>Sauerstoff im Schlaf im Schnitt {Math.round(night.spo2_avg)} %{night.spo2_low != null ? `, niedrigster Wert ${Math.round(night.spo2_low)} %` : ""}</li>}
           </ul>
-          <span className="meta">Garmin liefert nur die Anzahl und die Summe, keine Uhrzeiten. Bei Auffälligkeiten sprich mit deiner Ärztin oder deinem Arzt, die App stellt keine Diagnose.</span>
+          <span className="meta">Bei Auffälligkeiten sprich mit deiner Ärztin oder deinem Arzt, die App stellt keine Diagnose.</span>
         </section>
       )}
 
@@ -289,7 +289,7 @@ function StressDetail({ day, data }: { day: string; data: Data }) {
         </section>
       )}
 
-      <p className="meta">Den Verlauf über den Tag liefert Garmin nicht. <Link href="/verlauf?m=stress">Stress im Verlauf ›</Link></p>
+      <p className="meta"><Link href="/verlauf?m=stress">Stress im Verlauf ›</Link></p>
     </>
   );
 }

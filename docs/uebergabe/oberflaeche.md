@@ -3,6 +3,7 @@ Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014p
 
 ## Keine Hinweise zu fehlenden Garmin-Daten (PR #123, 24.11.)
 - Wunsch der Nutzerin: Zeilen wie „Stress im Tagesverlauf ist bei Garmin nicht abrufbar.“ nicht mehr zeigen. `useGarminSync` liefert kein `note` mehr, `HeuteView` zeigt nur noch echte Fehler. Die Funktion `garmin-sync` schickt die Hinweise weiter mit, sie werden ignoriert.
+- PR #125: auch auf anderen Seiten raus: Wachphasen (`HeuteDetail`, nur der Satz „keine Diagnose“ bleibt), Stress-Detail (nur der Link zum Verlauf bleibt), Einheit-Seite („Garmin hat … keine Belastung geliefert“). `SyncResult` ohne Hinweisfelder. Echte Fehlermeldungen (z. B. fehlende Datenbank-Spalte beim Speichern) bleiben.
 
 ## Erklärkarte je Ring, Ringe Zyklus und Intensität (PR #119, 24.11.)
 - `RingRow` meldet nach dem Wischen den Ring in der Mitte (`onCenter`), `HeuteView` gibt ihn als `focus` an `DaySentence`. Texte je Ring in `components/heute/DaySentence.tsx` (Zubettgehzeit aus dem Median von `sleep_end_min` der letzten 14 Nächte minus Bedarf heute Nacht).
