@@ -10,6 +10,14 @@ Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014p
 
 
 
+
+## Bündeln Baustein Wert-Seite (PR #137, 24.11.)
+- `app/wert/[name]/page.tsx`: Ring-Seiten (`HeuteDetail`), bei Schlaf/Stress/Belastung darunter `VerlaufView mode="eingebettet"` (Anker `#verlauf`); Werte aus `METRIC_NAMES` (`lib/heuteDetails.ts`, ohne „use client“, Typprüfung gegen `MetricKey` in `lib/garmin.ts`) mit `VerlaufView mode="wert"`; `gewohnheit-<key>` → `HabitDetail`.
+- Wichtig: `lib/garmin.ts` ist „use client“, auf dem Server ist `METRICS` nur ein Platzhalter. Prüfungen in Server-Seiten nie mit `in METRICS`.
+- `lib/monat.ts` + `components/wert/DieserMonat.tsx`: Schnitt Monat/Vormonat, Tage im Bereich, bester Tag, Satz; `deutlich` für „Dein Monat“ (Baustein 7).
+- Verlauf-Übersicht öffnet Werte per Link auf `/wert/<name>`; alte Adressen leiten weiter; interne Links umgestellt.
+- Bewusst nicht: Punkte im Diagramm öffnen noch kein Tagesblatt; Highlights und Dieser Monat überschneiden sich teilweise (Highlights = gewählter Zeitraum, Monat = Kalendermonat).
+
 ## Bündeln Baustein Kalender mit Ebenen (PR #136, 24.11.)
 - `components/kalender/Monatskalender.tsx`: Monat mit Phasenbändern (Vorlage 02), Ebenen Zyklus · Training · Symptome als Tasten, Punkte je Sportart (voll erledigt, hohl geplant), Symptome Amber, gewählter Tag hell, Tipp → `onPick`. Props `ebenen`, `start`, `punkte`, `onMonth`, `head`, `footer`.
 - Training: alles an, Kalender links, Tagesblatt rechts. Zyklus (`CycleCalendar` ist jetzt ein dünner Rahmen): Zyklus und Symptome an, Training zuschaltbar (aus `data.acts` und `data.done`), Tipp öffnet Tagesblatt im Blatt.

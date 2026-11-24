@@ -1,5 +1,7 @@
 "use client";
 
+import type { MetricName } from "@/lib/heuteDetails";
+
 import { supabase } from "@/lib/supabase";
 import { loadToPct, readLoadDay } from "@/lib/alltagslast";
 
@@ -207,3 +209,8 @@ export function distanceText(m: number | null): string {
   if (!m || m < 50) return "";
   return `${(m / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 })} km`;
 }
+
+// Die Liste der Namen steht auch in lib/heuteDetails.ts (METRIC_NAMES, für die Seite auf dem Server).
+// Diese Prüfung schlägt bei tsc fehl, wenn die beiden Listen auseinanderlaufen.
+type SameNames = [MetricKey] extends [MetricName] ? ([MetricName] extends [MetricKey] ? true : false) : false;
+export const METRIC_NAMES_GLEICH: SameNames = true;
