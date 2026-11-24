@@ -60,7 +60,7 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 
 ### 4b. Morgen-Erinnerung kam am 24. Nov. nicht an
 - [x] Prüflauf „Daten prüfen“ ausgewertet (Claude, 24. Nov.): Supabase hat jeden Aufruf des Zeitplans mit „Missing authorization header“ abgelehnt
-- [x] Behoben: `push` wird jetzt ohne die Anmeldesperre von Supabase hochgeladen (PR #112), die Funktion prüft selbst
+- [x] Behoben: `push` wird jetzt ohne die Anmeldesperre von Supabase hochgeladen (PR #113), die Funktion prüft selbst
 - [ ] Morgen früh: Kommt die Erinnerung um 7:30 Uhr, wenn du noch nicht eingecheckt hast? Claude Bescheid geben
 
 ### 5. Heute im neuen Design (PR #38)
