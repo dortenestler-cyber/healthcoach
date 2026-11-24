@@ -339,7 +339,7 @@ function TimelineCard({ t }: { t: Timeline | null }) {
       </p>
       <span className="meta">
         Je höher der Puls, desto steiler steigt die Linie. Sie endet bei {total}
-        {t.usesGarmin ? ", der Garmin-Belastung der Einheit. Wie sie sich über die Zeit verteilt, schätzt die App aus den Pulszonen." : " Pulspunkten, Garmin hat für diese Einheit keine Belastung geliefert."}
+        {t.usesGarmin ? ", der Garmin-Belastung der Einheit. Wie sie sich über die Zeit verteilt, schätzt die App aus den Pulszonen." : " Pulspunkten."}
       </span>
     </section>
   );
