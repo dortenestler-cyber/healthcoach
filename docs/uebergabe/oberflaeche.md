@@ -8,6 +8,12 @@ Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014p
 
 
 
+
+## Bündeln Baustein Tagesblatt (PR #135, 24.11.)
+- `components/tag/Tagesblatt.tsx`: Kopf mit Zyklustag (Vorlage 02), Auf einen Blick (Readiness, Schlaf, Belastung, HRV, Ruhepuls, Stress; Kacheln `--card-2`, Vorlage 09), Training (`TagTraining.tsx`, aus `CalendarSection` herausgelöst: planen, erfassen, Garmin), Tagebuch (Zusammenfassung, „Im Tagebuch bearbeiten ›“ → `/tagebuch?tag=`), Besonderes (Krank, Verletzt, Wadenkrampf, Hitzewallungen). Prop `bare` ohne Karte und Datum.
+- Trainingskalender: Tagesblatt statt Tageskarte, `TwoCol` (ab 1360 px bzw. 1024 px ohne Coach-Spalte nebeneinander). Zyklus-Kalender: Tage sind Knöpfe, öffnen das Tagesblatt im `EditSheet` (`instant`, „Fertig“).
+- Bewusst noch nicht: Heute ‹ › bleibt bei Heute; Punkte in Diagrammen öffnen das Tagesblatt noch nicht (kommt mit der Wert-Seite).
+
 ## Bündeln Baustein Eintragen-Blatt (PR #134, 24.11.)
 - `components/ui/EditSheet`: neue Props `instant` (nur „Fertig“, jede Änderung speichert sofort), `saveLabel`, `error`; `onSave` optional.
 - Medikamente: `MedSheet` ersetzt `AddMed` und `EditMed` (Anlegen und Ändern, Löschen nur bei früheren Mitteln). Körper: Liste „Ändern“ öffnet Blatt mit Stepper und Löschen (vorher Sprung nach oben und Browser-Rückfrage). Wadenkrampf: Ändern im Blatt mit `instant`, Löschen mit Rückfrage im Blatt.
