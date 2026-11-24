@@ -2,7 +2,7 @@
 // Reine Berechnungen ohne Netzwerk. Alle Phasen sind geschätzt und werden so benannt.
 // Die Werte sind Startwerte zum Kalibrieren, nicht medizinisch geprüft. Die App schlägt vor, sie entscheidet nicht.
 
-import { computeTarget, cycleInfo, periodStarts, type Data, type Diary, type Target } from "@/lib/insights";
+import { computeTarget, cycleInfo, periodStarts, symptomBasis, type Data, type Diary, type Target } from "@/lib/insights";
 
 // ---------- Hilfen
 
@@ -199,9 +199,11 @@ function infectionFor(day: string, data: Data): boolean {
 
 // 4. Symptome plus niedrige HRV (beides muss zusammenkommen)
 function throttleFor(day: string, data: Data): boolean {
-  const di = data.diary.find((d) => d.day === day) ?? data.diary.find((d) => d.day === addDays(day, -1));
-  const s = di?.symptoms ?? {};
-  const symptoms = (s.nacht ?? 0) >= 2 || (s.schlaf ?? 0) >= 2 || Object.values(s).some((v) => v >= 3);
+  // Symptome von gestern ohne Bestätigung im Check-in zählen halb
+  const basis = symptomBasis(data.diary, day);
+  const w = basis?.weight ?? 1;
+  const s = basis?.symptoms ?? {};
+  const symptoms = (s.nacht ?? 0) * w >= 2 || (s.schlaf ?? 0) * w >= 2 || Object.values(s).some((v) => v * w >= 3);
   if (!symptoms) return false;
   const today = data.daily.find((r) => r.day === day);
   const hist = data.daily
