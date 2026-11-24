@@ -148,7 +148,7 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         <span className="meta">Phasen sind aus deinem Tagebuch geschätzt, Lücken füllt Garmin. Dein Tagebuch hat Vorrang. Vorschlag, keine Diagnose.</span>
       </section>
 
-      <CycleCalendar today={today} diary={longDiary} />
+      <CycleCalendar today={today} diary={longDiary} data={data} />
           </>
         }
         right={
