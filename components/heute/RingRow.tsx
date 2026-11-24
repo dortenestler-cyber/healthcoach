@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, type FocusEvent, type MouseEvent } from "react";
 import { ValueRing } from "@/components/charts";
 import type { Tone } from "@/components/charts/scale";
 import type { DayRule } from "@/lib/cycle";
@@ -14,17 +14,26 @@ const de1 = (v: number) => v.toLocaleString("de-DE", { minimumFractionDigits: 1,
 
 type RingItem = { key: string; label: string; tone: Tone; value: number; center: string; word: string; aria: string; split?: number | null; target?: { lo: number; hi: number } | null; main?: boolean };
 
-// „Dein Tag“: fünf Ringe in einer wischbaren Reihe (nach Sonar). Wort über dem Ring, Zahl und Zustand darin.
-// Readiness steht groß in der Mitte, links und rechts schauen die äußeren Ringe hervor. Ein Tipp öffnet die Detailseite.
+const COPIES = 5; // Endlos-Schleife: die Reihe liegt fünfmal nebeneinander, echt ist nur die mittlere
+const MID = 2;
+const IDLE_MS = 140;
+
+// Größe nach Abstand zur Mitte (in Ringen): Mitte 1, Nachbarn 0,74, danach 0,6
+function scaleAt(d: number) {
+  return 1 - 0.26 * Math.min(d, 1) - 0.14 * Math.max(0, Math.min(d - 1, 1));
+}
+
+const carousel = () => typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches;
+const calm = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// „Dein Tag“: fünf Ringe als Rondell. Der Ring in der Mitte ist groß, nach außen werden sie kleiner,
+// fließend beim Wischen. Hinter Stress kommt wieder Energie (Endlos-Schleife).
+// Tipp auf einen äußeren Ring dreht ihn in die Mitte, Tipp auf den mittleren öffnet die Detailseite.
+// Am Computer und iPad stehen die fünf Ringe nebeneinander, Readiness groß.
 export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarmin }: { day: string; data: Data; rule: DayRule; nowMinute: number; showLoad: boolean; showGarmin: boolean }) {
   const row = useRef<HTMLDivElement>(null);
-  const mid = useRef<HTMLAnchorElement>(null);
-
-  useEffect(() => {
-    const r = row.current;
-    const m = mid.current;
-    if (r && m) r.scrollLeft = m.offsetLeft - (r.clientWidth - m.offsetWidth) / 2;
-  }, [day]);
+  const frame = useRef(0);
+  const idle = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const items: RingItem[] = [];
 
@@ -55,17 +64,150 @@ export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarm
   }
 
   const q = `?tag=${day}`;
+  const n = items.length;
+  const mainIdx = Math.max(0, items.findIndex((it) => it.main));
+
+  const cells = useCallback(() => Array.from(row.current?.querySelectorAll<HTMLElement>(".ring-strip-cell") ?? []), []);
+
+  const centerIndex = useCallback(() => {
+    const r = row.current;
+    if (!r) return -1;
+    const mid = r.scrollLeft + r.clientWidth / 2;
+    let best = -1;
+    let bestD = Infinity;
+    cells().forEach((c, i) => {
+      const d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid);
+      if (d < bestD) {
+        bestD = d;
+        best = i;
+      }
+    });
+    return best;
+  }, [cells]);
+
+  // Größe, Helligkeit und Mitte nach der aktuellen Wischposition setzen
+  const paint = useCallback(() => {
+    const r = row.current;
+    if (!r || !carousel()) return;
+    const all = cells();
+    if (all.length < 2) return;
+    const step = all[1].offsetLeft - all[0].offsetLeft || 1;
+    const mid = r.scrollLeft + r.clientWidth / 2;
+    let best: HTMLElement | null = null;
+    let bestD = Infinity;
+    for (const c of all) {
+      const d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid) / step;
+      const k = scaleAt(d);
+      c.style.setProperty("--k", k.toFixed(3));
+      c.style.setProperty("--o", (0.62 + 0.38 * ((k - 0.6) / 0.4)).toFixed(3));
+      if (d < bestD) {
+        bestD = d;
+        best = c;
+      }
+    }
+    for (const c of all) c.classList.toggle("is-center", c === best);
+  }, [cells]);
+
+  const scrollToIdx = useCallback(
+    (i: number, smooth: boolean) => {
+      const r = row.current;
+      const c = cells()[i];
+      if (!r || !c) return;
+      r.scrollTo({ left: c.offsetLeft - (r.clientWidth - c.offsetWidth) / 2, behavior: smooth && !calm() ? "smooth" : "auto" });
+    },
+    [cells],
+  );
+
+  // Endlos-Schleife: nach dem Wischen unsichtbar zurück in die mittlere Reihe springen
+  const wrap = useCallback(() => {
+    const r = row.current;
+    if (!r || !carousel() || n === 0) return;
+    const all = cells();
+    const i = centerIndex();
+    const copy = Math.floor(i / n);
+    if (i < 0 || copy === MID || !all[n]) return;
+    const width = all[n].offsetLeft - all[0].offsetLeft;
+    r.scrollLeft += (MID - copy) * width;
+  }, [cells, centerIndex, n]);
+
+  // Beim Öffnen und beim Tageswechsel steht Readiness in der Mitte
+  useLayoutEffect(() => {
+    if (!carousel()) return;
+    scrollToIdx(MID * n + mainIdx, false);
+    paint();
+  }, [day, n, mainIdx, scrollToIdx, paint]);
+
+  useEffect(() => {
+    const r = row.current;
+    if (!r) return;
+    const settle = () => {
+      clearTimeout(idle.current);
+      wrap();
+      paint();
+    };
+    const onScroll = () => {
+      if (!calm()) {
+        cancelAnimationFrame(frame.current);
+        frame.current = requestAnimationFrame(paint);
+      }
+      clearTimeout(idle.current);
+      idle.current = setTimeout(settle, IDLE_MS);
+    };
+    const onResize = () => {
+      if (carousel()) scrollToIdx(centerIndex() < 0 ? MID * n + mainIdx : centerIndex(), false);
+      paint();
+    };
+    r.addEventListener("scroll", onScroll, { passive: true });
+    r.addEventListener("scrollend", settle);
+    window.addEventListener("resize", onResize);
+    return () => {
+      r.removeEventListener("scroll", onScroll);
+      r.removeEventListener("scrollend", settle);
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(frame.current);
+      clearTimeout(idle.current);
+    };
+  }, [wrap, paint, scrollToIdx, centerIndex, n, mainIdx]);
+
+  // Äußerer Ring: erst in die Mitte drehen. Mittlerer Ring: Detailseite öffnen.
+  const onTap = (e: MouseEvent<HTMLAnchorElement>, i: number) => {
+    if (!carousel() || centerIndex() === i) return;
+    e.preventDefault();
+    scrollToIdx(i, true);
+  };
+
+  // Mit Tastatur oder VoiceOver: der fokussierte Ring wandert in die Mitte
+  const onFocus = (e: FocusEvent<HTMLAnchorElement>, i: number) => {
+    if (carousel() && e.currentTarget.matches(":focus-visible") && centerIndex() !== i) scrollToIdx(i, true);
+  };
 
   return (
     <section className="ring-strip-wrap" aria-label="Dein Tag">
       <h2 className="sec-title">Dein Tag</h2>
       <div className="ring-strip" ref={row}>
-        {items.map((it) => (
-          <Link key={it.key} ref={it.main ? mid : undefined} href={`/heute/${it.key}${q}`} className={"ring-strip-cell" + (it.main ? " is-main" : "")} aria-label={`${it.aria}. Details öffnen`}>
-            <span className="ring-strip-label">{it.label}</span>
-            <ValueRing tone={it.tone} size={it.main ? 120 : 92} value={it.value} split={it.split} target={it.target} center={it.center} caption={it.word} label={it.aria} />
-          </Link>
-        ))}
+        {Array.from({ length: COPIES }, (_, c) =>
+          items.map((it, j) => {
+            const i = c * n + j;
+            const real = c === MID;
+            return (
+              <Link
+                key={`${c}-${it.key}`}
+                href={`/heute/${it.key}${q}`}
+                className={"ring-strip-cell" + (it.main ? " is-main" : "") + (real ? "" : " is-copy")}
+                aria-label={`${it.aria}. Details öffnen`}
+                aria-hidden={real ? undefined : true}
+                tabIndex={real ? undefined : -1}
+                onClick={(e) => onTap(e, i)}
+                onFocus={(e) => onFocus(e, i)}
+              >
+                <span className="ring-strip-label">{it.label}</span>
+                <span className="ring-strip-ring">
+                  <ValueRing tone={it.tone} size={120} value={it.value} split={it.split} target={it.target} center={it.center} caption={it.word} label={it.aria} />
+                </span>
+              </Link>
+            );
+          }),
+        )}
       </div>
     </section>
   );
