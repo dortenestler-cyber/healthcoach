@@ -54,3 +54,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-24 · OF · Fehler: Coach-Knopf verdeckte „Ändern“ der Wochenvorlage. Er blendet beim Scrollen nach unten aus, PR #115
 2026-11-24 · DA/OF · Nutzerin: Symptome von gestern nicht mehr still übernehmen. Frage nur im Morgen-Check-in (Noch da · Besser · Weg), ohne Antwort zählen sie halb (Readiness, Training, Hinweis auf Heute). Neue Spalte `diary_entries.symptoms_checked`
 2026-11-24 · OF · Nutzerin: Ringreihe „Dein Tag“ als Rondell (Ring in der Mitte groß, außen kleiner, fließend beim Wischen) mit Endlos-Schleife · Tipp auf äußeren Ring dreht ihn erst in die Mitte, Tipp auf den mittleren öffnet die Detailseite · Computer/iPad unverändert
+2026-11-24 · OF · Nutzerin: Überschrift „Dein Tag“ über den Ringen auf Heute entfernen (für Vorlesehilfen bleibt der Name)

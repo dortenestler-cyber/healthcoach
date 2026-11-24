@@ -183,7 +183,6 @@ export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarm
 
   return (
     <section className="ring-strip-wrap" aria-label="Dein Tag">
-      <h2 className="sec-title">Dein Tag</h2>
       <div className="ring-strip" ref={row}>
         {Array.from({ length: COPIES }, (_, c) =>
           items.map((it, j) => {
