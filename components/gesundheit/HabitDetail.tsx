@@ -13,9 +13,9 @@ import { flashesNextDay, frequency, hrvByPhase, MIN_NIGHTS, nightAfter, type Nig
 import { loadInsightData } from "@/lib/insightData";
 import type { Data } from "@/lib/insights";
 import { useFeatures } from "@/lib/prefs";
+import Raster from "@/components/ui/Raster";
 
 const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
-const MON_SHORT = ["Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sep.", "Okt.", "Nov.", "Dez."];
 const PHASE_LABEL = { menstruation: "Menstruation", follikel: "Follikelphase", eisprung: "Eisprung", luteal: "Lutealphase" } as const;
 const WEEKS = 13;
 const addDays = (iso: string, n: number) => {
@@ -85,7 +85,6 @@ export default function HabitDetail({ habitKey }: { habitKey: string }) {
   const mon = addDays(today, -((new Date(today + "T12:00:00").getDay() + 6) % 7));
   const start = addDays(mon, -7 * (WEEKS - 1));
   const grid = Array.from({ length: WEEKS * 7 }, (_, i) => addDays(start, i));
-  const monthMarks = Array.from({ length: WEEKS }, (_, w) => ({ w, m: Number(addDays(start, w * 7).slice(5, 7)) - 1 })).filter((x, i, all) => i === 0 || x.m !== all[i - 1].m);
 
   // Satz zur Nacht danach
   const notable = rows.filter((r) => r.c.diff !== null && note(r).tone);
@@ -124,20 +123,7 @@ export default function HabitDetail({ habitKey }: { habitKey: string }) {
               <span className="review-unit">Mal im {month}</span>
             </div>
             {facts.length > 0 && <span className="meta">{facts.join(" · ")}</span>}
-            <div className="habit-months" aria-hidden="true">
-              {monthMarks.map((x) => (
-                <span key={x.w} style={{ left: `${(x.w / WEEKS) * 100}%` }}>{MON_SHORT[x.m]}</span>
-              ))}
-            </div>
-            <div className="habit-grid habit-grid-13" role="img" aria-label={`${label} in den letzten ${WEEKS} Wochen: ${grid.filter((d) => f.days.has(d)).length} Tage`}>
-              {grid.map((d) => (
-                <span key={d} className={d > today ? "habit-cell habit-future" : f.days.has(d) ? "habit-cell habit-on-neutral" : "habit-cell"} />
-              ))}
-            </div>
-            <div className="legend habit-legend">
-              <span><i className="habit-key-off" />ohne</span>
-              <span><i className="habit-key-neutral" />{label}</span>
-            </div>
+            <Raster today={today} weeks={WEEKS} on={(d) => f.days.has(d)} tone="neutral" label={`${label} in den letzten ${WEEKS} Wochen: ${grid.filter((d) => f.days.has(d)).length} Tage`} keyOff="ohne" keyOn={label} />
           </section>
 
           <section className="card">

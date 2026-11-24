@@ -47,16 +47,19 @@ export function monatsBlick(key: MetricKey, daily: Daily[], ctx: BaseCtx, today:
   const vormonat = MONATE[prev.getMonth()];
   const width = ranges.filter(Boolean).map((r) => r!.hi - r!.lo);
   const halb = width.length ? (mean(width) ?? 0) / 2 : null;
+  // Satz ohne Verb, das zum Wert passen muss („Schlaf liegt“, aber „Schritte liegen“)
   let satz = `${m.label}: im ${monat} noch keine Werte.`;
   let deutlich = false;
   if (schnitt !== null) {
-    if (schnittVor === null) satz = `${m.label} liegt im ${monat} im Schnitt bei ${m.fmt(schnitt)}.`;
+    if (schnittVor === null) satz = `${m.label}: im ${monat} im Schnitt ${m.fmt(schnitt)}.`;
     else {
       const diff = schnitt - schnittVor;
-      deutlich = halb !== null ? Math.abs(diff) >= halb : Math.abs(diff) >= Math.abs(schnittVor) * 0.1;
+      // Deutlich: mindestens eine halbe Bereichsbreite (ohne Bereich 10 %) und nach dem Runden sichtbar
+      const schwelle = halb !== null && halb > 0 ? halb : Math.abs(schnittVor) * 0.1;
+      deutlich = diff !== 0 && Math.abs(diff) >= schwelle && m.fmt(schnitt) !== m.fmt(schnittVor);
       satz = deutlich
-        ? `${m.label} liegt im ${monat} im Schnitt bei ${m.fmt(schnitt)}, ${diff > 0 ? "höher" : "niedriger"} als im ${vormonat} (${m.fmt(schnittVor)}).`
-        : `${m.label} liegt im ${monat} im Schnitt bei ${m.fmt(schnitt)}, etwa wie im ${vormonat}.`;
+        ? `${m.label}: im ${monat} im Schnitt ${m.fmt(schnitt)}, ${diff > 0 ? "höher" : "niedriger"} als im ${vormonat} (${m.fmt(schnittVor)}).`
+        : `${m.label}: im ${monat} im Schnitt ${m.fmt(schnitt)}, etwa wie im ${vormonat}.`;
     }
   }
   return { monat, vormonat, schnitt, schnittVor, tage: now.length, imBereich: bewertet ? imBereich : null, bewertet, bester: sorted[0] ?? null, schwaechster: sorted.length > 1 ? sorted[sorted.length - 1] : null, satz, deutlich };

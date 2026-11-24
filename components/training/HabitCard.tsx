@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Data } from "@/lib/insights";
 import { DEFAULT_TRAINING_DAYS, loadSettings, saveSettings } from "@/lib/training";
+import Raster from "@/components/ui/Raster";
 
 const WEEKS = 24;
-const MONTHS = ["Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sep.", "Okt.", "Nov.", "Dez."];
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");
   d.setDate(d.getDate() + n);
@@ -59,7 +59,6 @@ export default function HabitCard({ today, data }: { today: string; data: Data }
   const pct = Math.min(100, Math.round((thisWeek / goal) * 100));
   const r = 23;
   const c = 2 * Math.PI * r;
-  const monthMarks = weeks.map((wk, i) => ({ i, m: Number(wk[0].slice(5, 7)) - 1 })).filter((x, i, all) => i === 0 || x.m !== all[i - 1].m);
   const weeksWithData = weeks.filter((wk) => wk.some((d) => d <= today && trained.has(d))).length;
 
   return (
@@ -92,20 +91,7 @@ export default function HabitCard({ today, data }: { today: string; data: Data }
         <span>Serie <strong>{streak} {streak === 1 ? "Woche" : "Wochen"}</strong></span>
         <span>Bestwert <strong>{best} {best === 1 ? "Woche" : "Wochen"}</strong></span>
       </div>
-      <div className="habit-months" aria-hidden="true">
-        {monthMarks.map((x) => (
-          <span key={x.i} style={{ left: `${(x.i / WEEKS) * 100}%` }}>{MONTHS[x.m]}</span>
-        ))}
-      </div>
-      <div className="habit-grid" role="img" aria-label={`Trainingstage der letzten ${WEEKS} Wochen. Ziel ${goal} Tage pro Woche, erreicht in ${met.filter(Boolean).length} Wochen.`}>
-        {weeks.flatMap((wk) =>
-          wk.map((d) => <span key={d} className={d > today ? "habit-cell habit-future" : trained.has(d) ? "habit-cell habit-on" : "habit-cell"} />),
-        )}
-      </div>
-      <div className="legend habit-legend">
-        <span><i className="habit-key-off" />kein Training</span>
-        <span><i className="habit-key-on" />Training</span>
-      </div>
+      <Raster today={today} weeks={WEEKS} on={(d) => trained.has(d)} label={`Trainingstage der letzten ${WEEKS} Wochen. Ziel ${goal} Tage pro Woche, erreicht in ${met.filter(Boolean).length} Wochen.`} keyOff="kein Training" keyOn="Training" />
       {weeksWithData < 4 && <span className="meta">Das Raster füllt sich mit deinen Garmin-Aktivitäten und den im Kalender erfassten Einheiten.</span>}
       <span className="meta">Ein Tag zählt mit mindestens einer Garmin-Aktivität oder einer im Kalender erfassten Einheit.</span>
     </section>

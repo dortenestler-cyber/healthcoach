@@ -2511,7 +2511,7 @@ body { overflow-x: clip; }
 .habit-add .btn { width: auto; margin-top: 0; }
 
 /* Gewohnheit im Detail */
-.habit-grid-13 { aspect-ratio: 13 / 7; }
+
 .habit-on-neutral { background: var(--sleep); }
 .legend .habit-key-neutral { background: var(--sleep); }
 .night-table { display: flex; flex-direction: column; }

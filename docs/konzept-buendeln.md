@@ -1,6 +1,6 @@
 # Konzept: Funktionen bündeln, Bereiche gemeinsam nutzen
 
-Stand: 24.11.2026 · Status: **Entwurf, wartet auf Freigabe** · Prompt: `docs/prompt-buendeln.md`
+Stand: 24.11.2026 · Status: **Freigegeben und umgesetzt (PR #133–#139)** · Prompt: `docs/prompt-buendeln.md`
 
 Schon erledigt (PR #130, freigegeben 24.11.): Wochenvorlage entfernt, Training wird im Kalender geplant (kommende Tage) und erfasst (heute und früher, mit Dauer und Anstrengung im Bearbeiten-Bogen). Das ist der erste Teil von Baustein 1 (Tagesblatt) und 7 (Eintragen-Blatt).
 
@@ -113,7 +113,7 @@ Ein Ablauf für jedes Formular: Blatt von unten, Titel, Tipp-Felder zuerst, Deta
 4. ✅ **Kalender mit Ebenen** (PR #136): `components/kalender/Monatskalender.tsx` für Training und Zyklus. Ebenen Zyklus, Training, Symptome. Bei der Bestandsaufnahme zeigte sich: Karate und Wadenkrampf hatten keinen eigenen Kalender, der Monatsrückblick gehört zu Baustein 7. Fotos: `docs/bilder/buendeln-kalender/`
 5. ✅ **Wert-Seite** (PR #137): `/wert/<name>` für Ring-Seiten, alle Werte mit Verlauf und Gewohnheiten (`/wert/gewohnheit-<key>`); Schlaf, Stress, Belastung mit eingebettetem Verlauf; Abschnitt „Dieser Monat“ (`lib/monat.ts`); `/heute/…`, `/verlauf?m=…`, `/gesundheit/gewohnheit?k=…` leiten weiter. Fotos: `docs/bilder/buendeln-wertseite/`
 6. ✅ **Zusammenhänge** (PR #138): `components/ui/Zusammenhang.tsx`, Sicherheit „vorläufig/deutlich“ in `lib/muster.ts`; eingesetzt bei Anzeichen (Gesundheit › Überblick) und Wadenkrämpfen. HRV-Vergleiche (Gewohnheit, Zyklus) sind eine andere Rechnung und bleiben. Fotos: `docs/bilder/buendeln-zusammenhaenge/`
-7. **Raster und Rückblick**
+7. ✅ **Raster und Rückblick** (PR #139): `components/ui/Raster.tsx` für Trainingstage und Gewohnheiten; „Dein Monat“ auf Gesundheit › Überblick (`lib/deinMonat.ts`). „Gewohnheiten im Monat“ und der Monatsrückblick Training bleiben (CLAUDE.md verlangt „Gewohnheiten im Monat“ im Überblick; der Rückblick ist ein Kalender je Sportart). Fotos: `docs/bilder/buendeln-raster-rueckblick/`
 
 ## Entscheidungen und offene Punkte
 - Wert-Seite unter neuer Adresse `/wert/…`, alte Adressen leiten weiter (Nutzerin 24.11.)
