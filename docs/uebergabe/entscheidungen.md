@@ -57,3 +57,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-24 · OF · Nutzerin: Überschrift „Dein Tag“ über den Ringen auf Heute entfernen (für Vorlesehilfen bleibt der Name)
 2026-11-24 · OF · Nutzerin: Erklärkarte unter den Ringen zeigt den Text zum Ring in der Mitte (Texte je Ring wie vorgeschlagen) · neue Ringe Zyklus und Intensitätsminuten der Woche
 2026-11-24 · OF · Nutzerin: Kachel Zyklus aus „Auf einen Blick“ entfernt, weil der Zyklus jetzt als Ring oben steht (vorerst kein Ersatz)
+2026-11-24 · DA · Zeitplan der Erinnerung wartet 60 statt 5 Sekunden auf die Funktion `push` (Freigabe 24.11.), Migration `20261128100000_push_zeitplan_wartezeit`
