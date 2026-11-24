@@ -185,7 +185,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
       <TwoCol
         left={
           <>
-      <CheckinCard key={"c" + day} day={day} isToday={day === today} />
+      <CheckinCard key={"c" + day} day={day} isToday={day === today} onSymptoms={load} />
 
       <section className="card">
         <div className="card-row">

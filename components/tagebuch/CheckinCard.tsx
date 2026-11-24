@@ -3,13 +3,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { CHECKIN_LEVELS, CHECKIN_QUESTIONS } from "@/lib/catalog";
+import YesterdaySymptoms from "@/components/tagebuch/YesterdaySymptoms";
 
 type Checkin = { energy: number | null; sleep: number | null; mood: number | null };
 const empty: Checkin = { energy: null, sleep: null, mood: null };
 
 // Check-in eines Tages: Energie, Schlafgefühl, Stimmung. Heute „Morgen-Check-in“, an vergangenen Tagen zum Nachtragen.
 // Speichert mit eigenem Knopf, unabhängig vom Tagebuch-Eintrag.
-export default function CheckinCard({ day, isToday }: { day: string; isToday: boolean }) {
+// Heute zusätzlich die Frage, ob die Symptome von gestern noch da sind (onSymptoms lädt das Tagebuch neu).
+export default function CheckinCard({ day, isToday, onSymptoms }: { day: string; isToday: boolean; onSymptoms?: () => void }) {
   const [checkin, setCheckin] = useState<Checkin>(empty);
   const [saved, setSaved] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -45,6 +47,7 @@ export default function CheckinCard({ day, isToday }: { day: string; isToday: bo
   };
 
   const complete = CHECKIN_QUESTIONS.every((q) => checkin[q.key] !== null);
+  const yesterday = isToday ? <YesterdaySymptoms day={day} onChanged={onSymptoms} /> : null;
 
   // Gespeichert: eine Zeile mit den Werten, Tipp zum Ändern
   if (saved && complete && !editing) {
@@ -58,6 +61,7 @@ export default function CheckinCard({ day, isToday }: { day: string; isToday: bo
           </span>
           <span className="link-small">Ändern</span>
         </button>
+        {yesterday}
       </section>
     );
   }
@@ -90,6 +94,7 @@ export default function CheckinCard({ day, isToday }: { day: string; isToday: bo
           </div>
         </div>
       ))}
+      {yesterday}
       {!saved && (
         <button type="button" className="btn btn-dark" disabled={!complete} onClick={save}>
           Check-in speichern

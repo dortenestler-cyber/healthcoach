@@ -33,7 +33,6 @@ Sammelliste Runde 2 (Punkte 14–21) umgesetzt in PR #83, inklusive Teil A der D
 - Detailseiten nach Whoop sind mit PR #78 gemergt (`FactorList`, `ReadinessCard`/`HrvCard`/`StressCard` entfernt). Stift zum Wählen von Ringen und Kacheln: noch nicht freigegeben, nur vorgeschlagen.
 
 ## Wartet auf
-- Entscheidung der Nutzerin zum Konzept „Symptome von gestern“ (24.11., Sitzung https://claude.ai/code/session_014pVPWcoQbeic2ASdj68xrC): Heute nimmt `lib/anzeichen.ts`, `lib/insights.ts` (Faktor Symptome) und `lib/cycle.ts` (`throttleFor`) die Symptome von gestern ohne Rückfrage, wenn heute keine da sind. Vorschlag: Frage auf Heute und im Check-in („Noch da / Besser / Weg“), Zeile „Gestern: … · Übernehmen“ im Tagebuch, unbestätigt nur halb zählen. Braucht eine Spalte für „bestätigt“ (Migration, Rolle Daten). Offen: halb/gar nicht/voll, wo fragen.
 - Nutzerin: Rückmeldung zu PR #83 (`AUFGABEN.md` Abschnitt „Sammelliste Runde 2“)
 - Daten: Teil B der Datenaktualisierung (siehe unten)
 - Daten: Spalten `garmin_activities.sport_override/sport_label` und `diary_entries.ovulation_signs` (siehe unten). Bis dahin blendet die Oberfläche beides aus.
@@ -63,6 +62,7 @@ Sammelliste Runde 2 (Punkte 14–21) umgesetzt in PR #83, inklusive Teil A der D
 - Keine festen Farbwerte in Komponenten, nur Variablen aus `app/globals.css`.
 
 ## Erledigt seit letzter Übergabe
+- Symptome von gestern (24.11.): `symptomBasis` in `lib/insights.ts` (heute voll, sonst gestern halb, nach Antwort im Check-in nur heute), genutzt in Readiness-Faktor, `throttleFor` (`lib/cycle.ts`) und `signHint` (`lib/anzeichen.ts`). Frage im Check-in: `components/tagebuch/YesterdaySymptoms.tsx` in `CheckinCard`, lädt das Tagebuch danach neu. Migration `20261128090000_symptome_bestaetigt` (Rolle Daten, mit Freigabe).
 - PR #115 (24.11.): Coach-Knopf blendet beim Scrollen nach unten aus (`useHideOnScrollDown` in `CoachButton.tsx`, `.coach-fab[data-hidden]`), weil er „Ändern“ der Wochenvorlage verdeckte.
 - PR #92: Schmerzwerte einer Verletzung im Bearbeiten-Bogen ändern, entfernen, nachtragen (`editPains`, gespeichert mit „Speichern“). Wadenzucken im Tagebuch: Tag (`DayPick`) und Uhrzeit änderbar; Uhrzeit vor 4 Uhr liegt am Kalendertag danach, zählt zum gewählten Abend.
 - PR #86 gemergt, Migration grün, von der Nutzerin in der App getestet (23. Nov.): Coach-Chats. Tabelle `coach_chats`, `coach_messages.chat_id` (on delete cascade). Funktion `coach` nimmt `chat_id`, legt neuen Chat erst nach der Antwort an, Verlauf nur aus dem Chat, gibt `chat_id` zurück; ohne Tabelle alter Verlauf. `CoachView`: Leiste Verlauf/Neuer Chat, Liste nach Heute/Gestern/Diese Woche/Älter, Löschen mit Rückfrage, nach 6 Stunden neuer Chat. Backup enthält `coach_chats` vor `coach_messages`.

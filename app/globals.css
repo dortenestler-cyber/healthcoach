@@ -3062,3 +3062,7 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .unit-sport-picker { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 6px; width: 100%; }
 .unit-sport-pills { justify-content: center; }
 .unit-sport-picker .act-q-own { width: 100%; }
+
+/* Check-in: Symptome von gestern bestätigen */
+.checkin-yesterday { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line-soft); }
+.checkin-yesterday .pill { min-height: 44px; }
