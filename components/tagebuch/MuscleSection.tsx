@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { isoDay, shiftDay, shortDate } from "@/lib/dates";
 import DayPick from "@/components/ui/DayPick";
+import EditSheet from "@/components/ui/EditSheet";
+import { gross } from "@/lib/einordnung";
 import { MUSCLE_DURATIONS, MUSCLE_LEVELS, MUSCLE_SIDES, MUSCLE_SITUATIONS, MUSCLE_SPOTS } from "@/lib/catalog";
 
 export type MuscleEvent = {
@@ -116,8 +118,8 @@ export default function MuscleSection({ day, onChanged }: { day: string; onChang
     await update(r.id, { day: newDay, at: d.toISOString() });
   };
 
+  // Rückfrage kommt aus dem Eintragen-Blatt
   const remove = async (id: string) => {
-    if (!window.confirm("Diesen Eintrag löschen?")) return;
     const { error: e } = await sb.from("muscle_events").delete().eq("id", id);
     if (e) setError("Das hat nicht geklappt: " + e.message);
     setOpen(null);
@@ -174,12 +176,19 @@ export default function MuscleSection({ day, onChanged }: { day: string; onChang
                 {r.duration ? " · " + label(MUSCLE_DURATIONS, r.duration) : ""} · {time(r.at)}
               </span>
             </div>
-            <button type="button" className="btn btn-link btn-44" aria-expanded={open === r.id} onClick={() => setOpen(open === r.id ? null : r.id)}>
-              {open === r.id ? "Fertig" : "Ändern"}
+            <button type="button" className="btn btn-link btn-44" onClick={() => setOpen(r.id)}>
+              Ändern
             </button>
           </div>
-          {open === r.id && (
-            <div className="form">
+          {/* Eintragen-Blatt: jeder Tipp speichert sofort, unten nur „Fertig“ */}
+          <EditSheet
+            title={`${gross(levelLabel(r.intensity))} ändern`}
+            open={open === r.id}
+            instant
+            onClose={() => setOpen(null)}
+            onDelete={() => remove(r.id)}
+            error={open === r.id ? error : undefined}
+          >
               <div className="field">
                 <span className="label">Intensität</span>
                 <div className="pills wrap">
@@ -210,11 +219,7 @@ export default function MuscleSection({ day, onChanged }: { day: string; onChang
                   </button>
                 </div>
               </div>
-              <button type="button" className="btn btn-quiet btn-44" onClick={() => remove(r.id)}>
-                Eintrag löschen
-              </button>
-            </div>
-          )}
+          </EditSheet>
         </div>
       ))}
 
