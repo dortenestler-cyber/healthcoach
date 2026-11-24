@@ -5,7 +5,7 @@ import type { Activity, Daily } from "@/lib/garmin";
 import { INFLUENCES } from "@/lib/catalog";
 import { illnessRule, type Illness } from "@/lib/health";
 import { sportOf, type Sport } from "@/lib/training";
-import { alltagMinutes, readLoadDay } from "@/lib/alltagslast";
+import { alltagMinutes, FULL_DAY_LOAD, loadToPct, readLoadDay } from "@/lib/alltagslast";
 import { baselineFor, RANGE_PHASE_NAMES, type Baseline, type Range } from "@/lib/baseline";
 
 export type Diary = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[]; fromGarmin?: boolean; garminOnly?: boolean; ovulation?: string[]; symptoms_checked?: boolean };
@@ -37,12 +37,15 @@ const sd = (v: number[]) => {
 
 // ---------- Belastung
 
-export const FULL_DAY_LOAD = 150; // 100 % entspricht grob einem harten Trainingstag: 150 Garmin-Last
+// Skala (abflachend, 150 Last = 100 %): loadToPct in lib/alltagslast.ts
+export { FULL_DAY_LOAD, loadToPct };
+export const HARD_DAY_PCT = Math.round(loadToPct(105)); // harter Tag ab 105 Last (früher 70 % der geraden Skala) = 78 %
+export const MID_DAY_PCT = Math.round(loadToPct(60)); // mittlerer Tag ab 60 Last (früher 40 %) = 51 %
 
 export type DayLoad = {
   training: number; // Garmin-Last der Trainings
   alltag: number; // Alltag in derselben Einheit (0 ohne Daten)
-  pct: number; // Belastung gesamt, 0–100
+  pct: number; // Belastung gesamt in %, 150 Last = 100 %, kann darüber liegen
   pctTraining: number; // davon Training
   pctAlltag: number; // davon Alltag
   quelle: "puls" | "schritte" | null; // null: Tag ohne Alltagsdaten (alte Berechnung)
@@ -51,21 +54,22 @@ export type DayLoad = {
 };
 
 // Belastung eines Tages aus Training und Alltag (Konzept Korridore und Alltagslast, Teil B).
-// Gibt es für den Tag keine Alltagsdaten, gilt die alte Rechnung: 60 Intensitätsminuten oder 150 Trainingslast = 100 %.
+// Gibt es für den Tag keine Alltagsdaten, zählen 60 Intensitätsminuten wie 150 Trainingslast.
+// Die Prozente kommen aus der Gesamtlast (abflachende Skala), Training und Alltag teilen sie nach ihrem Anteil an der Last.
 export function dayLoad(day: string, daily: Daily[], acts: Activity[]): DayLoad {
   const d = daily.find((r) => r.day === day);
   const tl = acts.filter((a) => (a.start_local ?? "").slice(0, 10) === day).reduce((s, a) => s + (a.training_load ?? 0), 0);
   const ld = readLoadDay(d?.load_daily_min);
-  const pctOf = (v: number) => (v / FULL_DAY_LOAD) * 100;
   if (!ld) {
     const im = d?.intensity_minutes ?? 0;
-    const pct = Math.round(Math.min(100, Math.max((im / 60) * 100, pctOf(tl))));
+    const pct = Math.round(loadToPct(Math.max((im / 60) * FULL_DAY_LOAD, tl)));
     return { training: tl, alltag: 0, pct, pctTraining: pct, pctAlltag: 0, quelle: null, alltagMin: null, steps: d?.steps_outside_acts ?? null };
   }
   const training = tl || ld.last_training || 0;
   const alltag = Math.max(0, ld.last_alltag ?? 0);
-  const pct = Math.round(Math.min(100, pctOf(training + alltag)));
-  const pctTraining = Math.min(pct, Math.round(pctOf(training)));
+  const total = training + alltag;
+  const pct = Math.round(loadToPct(total));
+  const pctTraining = total > 0 ? Math.round((pct * training) / total) : 0;
   return { training, alltag, pct, pctTraining, pctAlltag: pct - pctTraining, quelle: ld.quelle, alltagMin: alltagMinutes(ld), steps: d?.steps_outside_acts ?? null };
 }
 
@@ -105,7 +109,52 @@ export function cycleInfo(day: string, diary: Diary[]): { cycleDay: number | nul
 // ---------- Tagesziel
 
 export type Factor = { name: string; value: string; note: string; effect: number };
-export type Target = { score: number; label: string; lo: number; hi: number; factors: Factor[]; pause: boolean; enoughData: boolean };
+export type Target = {
+  score: number;
+  label: string;
+  lo: number;
+  hi: number;
+  factors: Factor[];
+  pause: boolean;
+  enoughData: boolean;
+  usual: number | null; // übliche Tagesbelastung in % (Schnitt der letzten 28 Tage), null: Ziel aus festen Stufen
+  brake: boolean; // Last der letzten 7 Tage über 130 % der 4 Wochen davor: Ziel nicht über der üblichen Belastung
+};
+
+// Persönliches Belastungsziel (Konzept docs/konzept-belastung-skala.md, Nutzerin 24.11.)
+export const TARGET_DAYS = 28; // übliche Belastung: Schnitt der letzten 28 Tage ohne heute und ohne kranke Tage
+export const TARGET_MIN_DAYS = 14; // darunter gelten die festen Stufen
+export const TARGET_HALF = 10; // Zielbereich: Mitte ± 10 Prozentpunkte
+export const TARGET_BRAKE = 1.3; // Bremse ab diesem Verhältnis 7 Tage zu den 4 Wochen davor
+export function readinessFactor(score: number): number {
+  return score >= 85 ? 1.15 : score >= 65 ? 1 : score >= 45 ? 0.75 : 0.5;
+}
+
+// Übliche Belastung und Bremse für das Ziel an `day`
+export function usualLoad(day: string, data: Data): { usual: number | null; brake: boolean } {
+  const has = new Set(data.daily.map((r) => r.day));
+  const pcts: number[] = [];
+  const raw: number[] = []; // Last je Tag, Tag 1 = gestern
+  for (let i = 1; i <= TARGET_DAYS; i++) {
+    const d = addDays(day, -i);
+    const dl = has.has(d) ? dayLoad(d, data.daily, data.acts) : null;
+    raw.push(dl ? dl.training + dl.alltag : 0);
+    if (dl && !data.sick?.has(d)) pcts.push(dl.pct);
+  }
+  if (pcts.length < TARGET_MIN_DAYS) return { usual: null, brake: false };
+  const acute = raw.slice(0, 7).reduce((a, b) => a + b, 0);
+  const chronic = raw.reduce((a, b) => a + b, 0) / 4;
+  return { usual: mean(pcts), brake: chronic > 0 && acute / chronic > TARGET_BRAKE };
+}
+
+// Zielbereich aus Readiness und üblicher Belastung, Grenzen 10 bis 140 %
+export function targetBand(score: number, usual: number, brake: boolean): { lo: number; hi: number } {
+  let mid = usual * readinessFactor(score);
+  if (brake) mid = Math.min(mid, usual);
+  const lo = Math.max(10, Math.round(mid - TARGET_HALF));
+  const hi = Math.min(140, Math.max(lo + 2 * TARGET_HALF, Math.round(mid + TARGET_HALF)));
+  return { lo: Math.min(lo, hi - 2 * TARGET_HALF), hi };
+}
 
 const BANDS = [
   { min: 85, label: "Hart möglich", lo: 65, hi: 85 },
@@ -188,9 +237,11 @@ export function computeTarget(day: string, data: Data): Target {
 
   const enoughData = hist.length >= 14; // ab 14 Tagen gibt es persönliche Bereiche
   const score = Math.max(0, Math.min(100, 80 + factors.reduce((s, f) => s + f.effect, 0)));
-  if (pause) return { score: 0, label: "Pause", lo: 0, hi: 15, factors, pause, enoughData };
+  if (pause) return { score: 0, label: "Pause", lo: 0, hi: 15, factors, pause, enoughData, usual: null, brake: false };
   const band = BANDS.find((b) => score >= b.min)!;
-  return { score, label: band.label, lo: band.lo, hi: band.hi, factors, pause, enoughData };
+  const { usual, brake } = usualLoad(day, data);
+  if (usual === null) return { score, label: band.label, lo: band.lo, hi: band.hi, factors, pause, enoughData, usual, brake };
+  return { score, label: band.label, ...targetBand(score, usual, brake), factors, pause, enoughData, usual: Math.round(usual), brake };
 }
 
 export function sportAdvice(t: Target, injuredSports: string[]): { sport: string; tip: string }[] {
@@ -276,7 +327,7 @@ export function patterns(data: Data): Pattern[] {
   const otherDays: string[] = [];
   for (const r of data.daily) {
     const l = loadPercent(r.day, data.daily, data.acts);
-    (l >= 70 ? hardDays : otherDays).push(r.day);
+    (l >= HARD_DAY_PCT ? hardDays : otherDays).push(r.day);
   }
   const nextScore = (days: string[]) => days.map((d) => dm.get(addDays(d, 1))?.sleep_score ?? null).filter((v): v is number => v !== null);
   const nextHrv = (days: string[]) => days.map((d) => dm.get(addDays(d, 1))?.hrv_last_night ?? null).filter((v): v is number => v !== null);

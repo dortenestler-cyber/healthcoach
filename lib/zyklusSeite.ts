@@ -4,7 +4,7 @@
 import { INFLUENCES } from "@/lib/catalog";
 import { cycleToday, groupOf, phaseFor, PHASES, type Phase, type PhaseGroup } from "@/lib/cycle";
 import { METRICS, type MetricKey } from "@/lib/garmin";
-import { loadPercent, periodStarts, type Data } from "@/lib/insights";
+import { HARD_DAY_PCT, loadPercent, periodStarts, type Data } from "@/lib/insights";
 
 const DAY_MS = 864e5;
 const addDays = (iso: string, n: number) => {
@@ -115,7 +115,7 @@ export function effectsByPhase(data: Data): PhaseEffect[] {
     rows.push({ key: i.key, label: i.label, withD, withoutD: diaryDays.filter((d) => !withD.includes(d)) });
   }
   const days = data.daily.map((d) => d.day);
-  const hard = days.filter((d) => loadPercent(d, data.daily, data.acts) >= 70);
+  const hard = days.filter((d) => loadPercent(d, data.daily, data.acts) >= HARD_DAY_PCT);
   rows.push({ key: "hart", label: "Harter Trainingstag", withD: hard, withoutD: days.filter((d) => !hard.includes(d)) });
   return rows.map((r) => {
     const f = diff(r.withD, r.withoutD, "follikel");

@@ -33,6 +33,17 @@ export type LoadDay = {
   last_alltag: number | null;
 };
 
+/** 100 % entspricht grob einem harten Trainingstag: 150 Garmin-Last */
+export const FULL_DAY_LOAD = 150;
+
+// Skala wie bei Bevel (Konzept docs/konzept-belastung-skala.md, Nutzerin 24.11.): Die Belastung flacht nach oben ab.
+// Prozent = 100 × ln(1 + Last ÷ 100) ÷ ln(1 + 150 ÷ 100). 150 Last bleibt 100 %, darüber geht es langsam weiter.
+// Gleiche Rechnung in supabase/functions/watch/index.ts (loadToPct).
+const LOAD_CURVE = 100;
+export function loadToPct(load: number): number {
+  return load > 0 ? (100 * Math.log(1 + load / LOAD_CURVE)) / Math.log(1 + FULL_DAY_LOAD / LOAD_CURVE) : 0;
+}
+
 /** Zonen für Anzeige und Einstellungen: Anteil zwischen Ruhepuls und Maximalpuls */
 export const LOAD_ZONES = [
   { zone: 0, name: "Ruhe", von: 0, bis: 0.3, gewicht: 0 },

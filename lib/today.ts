@@ -5,7 +5,7 @@
 import { baselineFor, metricBaseline, positionIn, metricRangeSeries, middleHalf, seriesOf, type Baseline, type Range } from "@/lib/baseline";
 import { badStreak } from "@/lib/korridor";
 import { METRICS, type Activity, type Daily, type MetricKey } from "@/lib/garmin";
-import { loadPercent, type Data } from "@/lib/insights";
+import { HARD_DAY_PCT, loadPercent, MID_DAY_PCT, type Data } from "@/lib/insights";
 import { readLoadDay } from "@/lib/alltagslast";
 
 const addDays = (iso: string, n: number) => {
@@ -20,8 +20,6 @@ const sleepHours = (d: Daily | undefined) => (d?.sleep_seconds ? d.sleep_seconds
 
 export const DEFAULT_NEED_H = 7.5; // Startwert, solange es weniger als 14 Nächte gibt
 const DEBT_CAP_MIN = 60; // höchstens eine Stunde Zuschlag aus der Schlafschuld
-const HARD_DAY_PCT = 70; // Belastung gestern ab hier: harte Einheit
-const MID_DAY_PCT = 40;
 
 export type SleepNeed = {
   hours: number; // gesamter Bedarf in Stunden
