@@ -1,6 +1,8 @@
 "use client";
 
-// Bearbeiten-Bogen (Sammelliste Punkt 20): ein Eintrag zum Ändern, unten Speichern, Abbrechen und Löschen mit Rückfrage.
+// Eintragen-Blatt (Konzept docs/konzept-buendeln.md, Baustein 7; vorher Sammelliste Punkt 20):
+// ein Ablauf für jedes Formular. Titel oben, Felder, unten Speichern und Abbrechen, Löschen mit Rückfrage.
+// instant: jede Änderung speichert sofort (z. B. Wadenkrampf), unten steht dann nur „Fertig“.
 // Natives <dialog>: Fokus bleibt im Bogen, Esc schließt.
 
 import { useEffect, useRef, type ReactNode } from "react";
@@ -9,15 +11,18 @@ type Props = {
   title: string;
   open: boolean;
   onClose: () => void;
-  onSave: () => void;
+  onSave?: () => void;
   onDelete?: () => void;
+  instant?: boolean; // speichert bei jedem Tipp, nur „Fertig“
+  saveLabel?: string; // z. B. „Hinzufügen“
+  error?: string; // Hinweis über den Knöpfen
   deleteQuestion?: string; // Rückfrage vor dem Löschen
   saving?: boolean;
   canSave?: boolean;
   children: ReactNode;
 };
 
-export default function EditSheet({ title, open, onClose, onSave, onDelete, deleteQuestion = "Diesen Eintrag löschen?", saving = false, canSave = true, children }: Props) {
+export default function EditSheet({ title, open, onClose, onSave, onDelete, instant = false, saveLabel = "Speichern", error, deleteQuestion = "Diesen Eintrag löschen?", saving = false, canSave = true, children }: Props) {
   const ref = useRef<HTMLDialogElement | null>(null);
   useEffect(() => {
     const d = ref.current;
@@ -33,7 +38,8 @@ export default function EditSheet({ title, open, onClose, onSave, onDelete, dele
         className="edit-sheet-body"
         onSubmit={(e) => {
           e.preventDefault();
-          if (canSave && !saving) onSave();
+          if (instant) onClose();
+          else if (canSave && !saving) onSave?.();
         }}
       >
         <div className="card-row">
@@ -43,14 +49,19 @@ export default function EditSheet({ title, open, onClose, onSave, onDelete, dele
           </button>
         </div>
         {children}
-        <div className="edit-sheet-actions">
-          <button type="submit" className="btn btn-dark" disabled={!canSave || saving}>
-            {saving ? "Speichert …" : "Speichern"}
-          </button>
-          <button type="button" className="btn btn-soft" onClick={onClose}>
-            Abbrechen
-          </button>
-        </div>
+        {error && <p className="alert alert-inline" role="alert">{error}</p>}
+        {instant ? (
+          <button type="submit" className="btn btn-dark">Fertig</button>
+        ) : (
+          <div className="edit-sheet-actions">
+            <button type="submit" className="btn btn-dark" disabled={!canSave || saving}>
+              {saving ? "Speichert …" : saveLabel}
+            </button>
+            <button type="button" className="btn btn-soft" onClick={onClose}>
+              Abbrechen
+            </button>
+          </div>
+        )}
         {onDelete && (
           <button
             type="button"

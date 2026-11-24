@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState } from "react";
+import EditSheet from "@/components/ui/EditSheet";
 import { supabase } from "@/lib/supabase";
 import { daysAgo } from "@/lib/dates";
 import { interactionNotes, MED_NOTES, MED_PRESETS, normTime, usualRange, weeklyCounts, weekStart, type Medication } from "@/lib/health";
@@ -28,8 +29,8 @@ export default function MedsSection() {
   const [meds, setMeds] = useState<Medication[] | null>(null);
   const [hubIntakes, setHubIntakes] = useState<{ at: string }[]>([]);
   const [open, setOpen] = useState<string | null>(null);
-  const [editing, setEditing] = useState<string | null>(null);
-  const [adding, setAdding] = useState(false);
+  // Eintragen-Blatt: neues Mittel (med = null) oder ein bestehendes ändern
+  const [sheet, setSheet] = useState<{ med: Medication | null } | null>(null);
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
@@ -112,25 +113,14 @@ export default function MedsSection() {
                 ) : (
                   <p>Für dieses Mittel hat die App keine geprüften Hinweise. Lies die Gebrauchsinformation oder frag in der Apotheke.</p>
                 )}
-                {editing === m.id ? (
-                  <EditMed
-                    med={m}
-                    onCancel={() => setEditing(null)}
-                    onSave={(patch) => {
-                      setEditing(null);
-                      run(sb.from("medications").update(patch).eq("id", m.id));
-                    }}
-                  />
-                ) : (
-                  <div className="footer-links left">
-                    <button type="button" className="btn btn-link" onClick={() => setEditing(m.id)}>
-                      Ändern
-                    </button>
-                    <button type="button" className="btn btn-link" onClick={() => run(sb.from("medications").update({ active: false }).eq("id", m.id))}>
-                      Nicht mehr nehmen
-                    </button>
-                  </div>
-                )}
+                <div className="footer-links left">
+                  <button type="button" className="btn btn-link" onClick={() => setSheet({ med: m })}>
+                    Ändern
+                  </button>
+                  <button type="button" className="btn btn-link" onClick={() => run(sb.from("medications").update({ active: false }).eq("id", m.id))}>
+                    Nicht mehr nehmen
+                  </button>
+                </div>
               </div>
             )}
           </section>
@@ -172,58 +162,55 @@ export default function MedsSection() {
         </section>
       )}
 
-      {adding ? (
-        <AddMed
-          onCancel={() => setAdding(false)}
-          onSave={(m) => {
-            setAdding(false);
-            run(sb.from("medications").insert(m));
-          }}
-        />
-      ) : (
-        <button type="button" className="btn btn-dashed" onClick={() => setAdding(true)}>
-          + Medikament oder Supplement hinzufügen
-        </button>
-      )}
+      <button type="button" className="btn btn-dashed" onClick={() => setSheet({ med: null })}>
+        + Medikament oder Supplement hinzufügen
+      </button>
 
       {inactive.length > 0 && (
         <section className="card">
           <details className="derive">
           <summary>Frühere Mittel ({inactive.length})</summary>
-          {inactive.map((m) =>
-            editing === m.id ? (
-              <EditMed
-                key={m.id}
-                med={m}
-                onCancel={() => setEditing(null)}
-                onSave={(patch) => {
-                  setEditing(null);
-                  run(sb.from("medications").update(patch).eq("id", m.id));
-                }}
-                onDelete={() => {
-                  setEditing(null);
-                  run(sb.from("medications").delete().eq("id", m.id));
-                }}
-              />
-            ) : (
-              <div key={m.id} className="card-row list-line">
-                <span>{m.name}</span>
-                <span className="footer-links">
-                  <button type="button" className="btn btn-link" onClick={() => setEditing(m.id)}>
-                    Ändern
-                  </button>
-                  <button type="button" className="btn btn-link" onClick={() => run(sb.from("medications").update({ active: true }).eq("id", m.id))}>
-                    Wieder aufnehmen
-                  </button>
-                </span>
-              </div>
-            ),
-          )}
+          {inactive.map((m) => (
+            <div key={m.id} className="card-row list-line">
+              <span>{m.name}</span>
+              <span className="footer-links">
+                <button type="button" className="btn btn-link" onClick={() => setSheet({ med: m })}>
+                  Ändern
+                </button>
+                <button type="button" className="btn btn-link" onClick={() => run(sb.from("medications").update({ active: true }).eq("id", m.id))}>
+                  Wieder aufnehmen
+                </button>
+              </span>
+            </div>
+          ))}
           </details>
         </section>
       )}
 
       <span className="hint">Die Menge trägst du selbst ein, wie sie verordnet ist. Die App schlägt keine Dosis vor.</span>
+
+      {sheet && (
+        <MedSheet
+          key={sheet.med?.id ?? "neu"}
+          med={sheet.med}
+          onClose={() => setSheet(null)}
+          onSave={(m) => {
+            const med = sheet.med;
+            setSheet(null);
+            run(med ? sb.from("medications").update(m).eq("id", med.id) : sb.from("medications").insert(m));
+          }}
+          // Löschen nur bei früheren Mitteln, aktive setzt man auf „Nicht mehr nehmen“
+          onDelete={
+            sheet.med && !sheet.med.active
+              ? () => {
+                  const id = sheet.med!.id;
+                  setSheet(null);
+                  run(sb.from("medications").delete().eq("id", id));
+                }
+              : undefined
+          }
+        />
+      )}
     </>
   );
 }
@@ -234,99 +221,58 @@ function parseTimes(text: string): string[] | null {
   return list.every(Boolean) ? (list as string[]).sort() : null;
 }
 
-// Mittel ändern (Sammelliste Punkt 20): Name, Art, regelmäßig/bei Bedarf, Uhrzeiten, Menge. Löschen nur bei früheren Mitteln.
-function EditMed({ med, onSave, onCancel, onDelete }: { med: Medication; onSave: (p: Partial<Medication>) => void; onCancel: () => void; onDelete?: () => void }) {
-  const [name, setName] = useState(med.name);
-  const [kind, setKind] = useState(med.kind);
-  const [regular, setRegular] = useState(med.regular);
-  const [asNeeded, setAsNeeded] = useState(med.as_needed);
-  const [times, setTimes] = useState(med.times.join(", "));
-  const [amount, setAmount] = useState(med.amount ?? "");
+// Ein Blatt zum Anlegen und Ändern (Eintragen-Blatt): Name, Art, regelmäßig/bei Bedarf, Uhrzeiten, Menge.
+// Löschen nur bei früheren Mitteln. Die Menge trägt die Nutzerin selbst ein, die App schlägt keine Dosis vor.
+type MedFields = Omit<Medication, "id" | "active">;
+function MedSheet({ med, onSave, onClose, onDelete }: { med: Medication | null; onSave: (m: MedFields) => void; onClose: () => void; onDelete?: () => void }) {
+  const [name, setName] = useState(med?.name ?? "");
+  const [kind, setKind] = useState<"medikament" | "supplement">(med?.kind ?? "medikament");
+  const [regular, setRegular] = useState(med?.regular ?? true);
+  const [asNeeded, setAsNeeded] = useState(med?.as_needed ?? false);
+  const [times, setTimes] = useState(med ? med.times.join(", ") : "08:00");
+  const [amount, setAmount] = useState(med?.amount ?? "");
   const [msg, setMsg] = useState("");
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
+  const submit = () => {
     if (!name.trim()) return setMsg("Bitte einen Namen eintragen.");
     if (!regular && !asNeeded) return setMsg("Bitte regelmäßig, bei Bedarf oder beides wählen.");
     const t = regular ? parseTimes(times) : [];
     if (t === null) return setMsg("Uhrzeiten bitte so: 07:30, 21:30");
-    onSave({ name: name.trim(), kind, regular, as_needed: asNeeded, times: t, amount: amount.trim() || null, notes_key: guessNotesKey(name) ?? med.notes_key });
+    onSave({ name: name.trim(), kind, regular, as_needed: asNeeded, times: t, amount: amount.trim() || null, notes_key: guessNotesKey(name) ?? med?.notes_key ?? null });
   };
+  const id = med?.id ?? "neu";
   return (
-    <form className="form" onSubmit={submit}>
-      <label className="label" htmlFor={"n" + med.id}>Name</label>
-      <input id={"n" + med.id} className="input" value={name} onChange={(e) => setName(e.target.value)} />
+    <EditSheet
+      title={med ? "Mittel ändern" : "Neues Mittel"}
+      open
+      onClose={onClose}
+      onSave={submit}
+      saveLabel={med ? "Speichern" : "Hinzufügen"}
+      onDelete={onDelete}
+      deleteQuestion={`„${med?.name ?? ""}“ löschen? Alle Einnahmen dazu werden mit gelöscht.`}
+      error={msg}
+    >
+      <label className="field">
+        <span className="label">Name</span>
+        <input id={"n" + id} className="input" value={name} onChange={(e) => setName(e.target.value)} />
+      </label>
       <div className="pills wrap" role="group" aria-label="Art">
-        <button type="button" className="pill pill-sm" aria-pressed={kind === "medikament"} onClick={() => setKind("medikament")}>Medikament</button>
-        <button type="button" className="pill pill-sm" aria-pressed={kind === "supplement"} onClick={() => setKind("supplement")}>Supplement</button>
+        <button type="button" className="pill btn-44" aria-pressed={kind === "medikament"} onClick={() => setKind("medikament")}>Medikament</button>
+        <button type="button" className="pill btn-44" aria-pressed={kind === "supplement"} onClick={() => setKind("supplement")}>Supplement</button>
       </div>
       <div className="pills wrap" role="group" aria-label="Wann">
-        <button type="button" className="pill pill-sm" aria-pressed={regular} onClick={() => setRegular(!regular)}>Regelmäßig</button>
-        <button type="button" className="pill pill-sm" aria-pressed={asNeeded} onClick={() => setAsNeeded(!asNeeded)}>Bei Bedarf</button>
+        <button type="button" className="pill btn-44" aria-pressed={regular} onClick={() => setRegular(!regular)}>Regelmäßig</button>
+        <button type="button" className="pill btn-44" aria-pressed={asNeeded} onClick={() => setAsNeeded(!asNeeded)}>Bei Bedarf</button>
       </div>
       {regular && (
-        <>
-          <label className="label" htmlFor={"t" + med.id}>Uhrzeiten</label>
-          <input id={"t" + med.id} className="input" value={times} onChange={(e) => setTimes(e.target.value)} placeholder="07:30, 21:30" />
-        </>
+        <label className="field">
+          <span className="label">Uhrzeiten</span>
+          <input id={"t" + id} className="input" value={times} onChange={(e) => setTimes(e.target.value)} placeholder="07:30, 21:30" />
+        </label>
       )}
-      <label className="label" htmlFor={"a" + med.id}>Menge (wie verordnet)</label>
-      <input id={"a" + med.id} className="input" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="z. B. 1 Hub" />
-      {msg && <p className="login-msg">{msg}</p>}
-      <div className="footer-links left">
-        <button type="submit" className="btn btn-dark">Speichern</button>
-        <button type="button" className="btn btn-link" onClick={onCancel}>Abbrechen</button>
-        {onDelete && (
-          <button type="button" className="btn btn-link edit-sheet-delete" onClick={() => window.confirm(`„${med.name}“ löschen? Alle Einnahmen dazu werden mit gelöscht.`) && onDelete()}>
-            Löschen
-          </button>
-        )}
-      </div>
-    </form>
-  );
-}
-
-function AddMed({ onSave, onCancel }: { onSave: (m: Omit<Medication, "id" | "active">) => void; onCancel: () => void }) {
-  const [name, setName] = useState("");
-  const [kind, setKind] = useState<"medikament" | "supplement">("medikament");
-  const [regular, setRegular] = useState(true);
-  const [asNeeded, setAsNeeded] = useState(false);
-  const [times, setTimes] = useState("08:00");
-  const [amount, setAmount] = useState("");
-  const [msg, setMsg] = useState("");
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return setMsg("Bitte einen Namen eintragen.");
-    if (!regular && !asNeeded) return setMsg("Bitte regelmäßig, bei Bedarf oder beides wählen.");
-    const t = regular ? parseTimes(times) : [];
-    if (t === null) return setMsg("Uhrzeiten bitte so: 07:30, 21:30");
-    onSave({ name: name.trim(), kind, regular, as_needed: asNeeded, times: t, amount: amount.trim() || null, notes_key: guessNotesKey(name) });
-  };
-  return (
-    <form className="card form" onSubmit={submit}>
-      <h2>Neues Mittel</h2>
-      <label className="label" htmlFor="mname">Name</label>
-      <input id="mname" className="input" value={name} onChange={(e) => setName(e.target.value)} />
-      <div className="pills">
-        <button type="button" className="pill" aria-pressed={kind === "medikament"} onClick={() => setKind("medikament")}>Medikament</button>
-        <button type="button" className="pill" aria-pressed={kind === "supplement"} onClick={() => setKind("supplement")}>Supplement</button>
-      </div>
-      <div className="pills">
-        <button type="button" className="pill" aria-pressed={regular} onClick={() => setRegular(!regular)}>Regelmäßig</button>
-        <button type="button" className="pill" aria-pressed={asNeeded} onClick={() => setAsNeeded(!asNeeded)}>Bei Bedarf</button>
-      </div>
-      {regular && (
-        <>
-          <label className="label" htmlFor="mtimes">Uhrzeiten</label>
-          <input id="mtimes" className="input" value={times} onChange={(e) => setTimes(e.target.value)} placeholder="07:30, 21:30" />
-        </>
-      )}
-      <label className="label" htmlFor="mamount">Menge (wie verordnet, freiwillig)</label>
-      <input id="mamount" className="input" value={amount} onChange={(e) => setAmount(e.target.value)} />
-      {msg && <p className="login-msg">{msg}</p>}
-      <div className="footer-links left">
-        <button type="submit" className="btn btn-dark">Hinzufügen</button>
-        <button type="button" className="btn btn-link" onClick={onCancel}>Abbrechen</button>
-      </div>
-    </form>
+      <label className="field">
+        <span className="label">Menge (wie verordnet, freiwillig)</span>
+        <input id={"a" + id} className="input" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="z. B. 1 Hub" />
+      </label>
+    </EditSheet>
   );
 }
