@@ -1,5 +1,5 @@
 # Übergabe · Oberfläche (OF)
-Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ · seit 2026-11-24 20:24 (Bündeln Baustein 7: Raster und Rückblick)
+Belegt: frei
 Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ
 
 
@@ -11,6 +11,13 @@ Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014p
 
 
 
+
+
+## Bündeln Baustein Raster und Rückblick (PR #139, 24.11.) · Konzept Bündeln fertig
+- `components/ui/Raster.tsx`: Kästchen-Raster (Wochen × 7, Monatsnamen, Legende), `tone` training/neutral. Genutzt in `HabitCard` (24 Wochen) und `HabitDetail` (13 Wochen). Tagebuch-Raster (Zeile je Symptom, Stärke) bleibt eigen.
+- `lib/deinMonat.ts` + Karte „Dein Monat“ auf Gesundheit › Überblick (vor „Gewohnheiten im …“): Werte mit deutlicher Änderung (`monatsBlick.deutlich`: halbe Bereichsbreite, sonst 10 %, nach Runden sichtbar), Training je Sportart und Gewohnheiten (bis heute gegen dieselben Tage im Vormonat, ab 2 bzw. 3 Unterschied). Sätze in `lib/monat.ts` ohne Verb („Schritte: im November im Schnitt …“).
+- Offene Frage an die Nutzerin: Laut Vorschlag sollten Monatsrückblick Training und „Gewohnheiten im Monat“ in „Dein Monat“ aufgehen. „Gewohnheiten im Monat“ verlangt CLAUDE.md im Überblick, deshalb beide vorerst geblieben.
+- Nächster Schritt: Sichtung durch die Nutzerin am 25.11. (PR #133–#139, Fotos in `docs/bilder/buendeln-*`).
 
 ## Bündeln Baustein Zusammenhänge (PR #138, 24.11.)
 - `components/ui/Zusammenhang.tsx`: `Zusammenhang` (Kopf, Satz, Sicherheit) und `ZusammenhangListe` (aus `Analysis`, mit Grundlage und „Ein Zusammenhang, kein Beweis“). `Finding.sicherheit` in `lib/muster.ts`: deutlich ab 16 Ereignistagen und je Seite 10 Tagen.
