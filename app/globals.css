@@ -1131,61 +1131,6 @@ button {
   color: var(--muted);
 }
 
-.cal-cell {
-  border: 0;
-  background: transparent;
-  border-radius: 10px;
-  min-height: 46px;
-  padding: 4px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  font-family: inherit;
-  color: var(--text);
-  position: relative;
-}
-
-.cal-cell[data-period="true"] .cal-num {
-  border-bottom: 2px solid var(--menses-fg);
-}
-
-.cal-cell[data-today="true"] .cal-num {
-  color: var(--text);
-  font-weight: 700;
-}
-
-.cal-cell[data-selected="true"] {
-  outline: 2px solid var(--text);
-  outline-offset: -2px;
-}
-
-.cal-num {
-  font-size: 13px;
-  line-height: 18px;
-}
-
-.cal-dots {
-  display: flex;
-  gap: 3px;
-  min-height: 7px;
-}
-
-.cal-dots i {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  border: 1.5px solid;
-  box-sizing: border-box;
-}
-
-.legend-period {
-  background: transparent !important;
-  border-bottom: 2px solid var(--menses-fg);
-  border-radius: 0 !important;
-}
-
 .right-pills {
   justify-content: flex-end;
   gap: 4px;
@@ -1585,9 +1530,6 @@ button {
 .ph-menses { fill: var(--menses-bg); }
 .ph-follikel { fill: var(--phase-follikel); }
 .ph-luteal { fill: var(--phase-luteal); }
-.legend .ph-menses-bg { background: var(--menses-bg); }
-.legend .ph-follikel-bg { background: var(--phase-follikel); border: 1px solid var(--cycle-bg); }
-.legend .ph-luteal-bg { background: var(--phase-luteal); }
 
 .chart-future {
   fill: var(--card);
@@ -1599,21 +1541,6 @@ button {
   stroke-width: 1;
   stroke-dasharray: 2 2;
   vector-effect: non-scaling-stroke;
-}
-
-/* Übernahme Schritt 4: Training und Kalender */
-.segmented-3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.cal-cell[data-phase="menses"] { background-color: var(--menses-bg); }
-.cal-cell[data-phase="follikel"] { background-color: var(--phase-follikel); }
-.cal-cell[data-phase="luteal"] { background-color: var(--cycle-bg); }
-.cal-cell[data-phase="eisprung"] { background-color: color-mix(in srgb, var(--cycle) 30%, var(--card)); }
-
-/* Kommende Tage sind nur geschätzt: heller */
-.cal-cell[data-future="true"][data-phase] {
-  background-image: linear-gradient(var(--future-veil), var(--future-veil));
 }
 
 .week-bars {
@@ -2140,9 +2067,6 @@ a.btn {
   background: var(--training);
   border-radius: 999px;
 }
-.cal-dots .cal-dot-symptom,
-.legend .cal-dot-symptom { background: var(--warn); border-color: var(--warn); border-radius: 50%; }
-.legend .legend-dot { width: 8px; height: 8px; }
 .segmented-tabs { display: flex; overflow-x: auto; scrollbar-width: none; }
 .segmented-tabs::-webkit-scrollbar { display: none; }
 .segmented-tabs button { flex: 1 0 auto; min-height: 44px; padding: 0 12px; }
@@ -2787,7 +2711,6 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
 .cb-tip-main { fill: var(--text); font-size: 11.5px; font-weight: 700; }
 .cb-tip-sub { fill: var(--muted); font-size: 10px; }
 .ph-eisprung { fill: color-mix(in srgb, var(--cycle) 30%, var(--card)); }
-.legend .ph-eisprung-bg { background: color-mix(in srgb, var(--cycle) 30%, var(--card)); }
 .cb-pick-col { fill: var(--text); fill-opacity: 0.06; }
 
 /* Frage zu einer unklaren Garmin-Aktivität (Sammelliste Punkt 6) */
@@ -3125,3 +3048,13 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 /* Zyklus-Kalender: Tage antippbar (öffnet das Tagesblatt) */
 .cal-days > button.cal-cell { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; min-height: 44px; }
 .cal-days > button.cal-cell:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 10px; }
+
+/* Kalender mit Ebenen (Monatskalender, Konzept Bündeln Baustein 2) */
+.mk-ebenen { margin: 4px 0 8px; }
+.mk .cal-days > button.cal-cell { height: 44px; }
+.mk-dots { position: absolute; bottom: -4px; left: 0; right: 0; display: flex; justify-content: center; gap: 3px; }
+.mk-dots i { width: 6px; height: 6px; border-radius: 3px; border: 1.5px solid transparent; box-sizing: border-box; }
+.mk-dots i.mk-sym { background: var(--warn); border-color: var(--warn); }
+.legend .mk-key-sym { width: 6px !important; height: 6px !important; border-radius: 3px; background: var(--warn); }
+.mk-sel .cal-num { background: var(--text); color: var(--bg); }
+.mk-plain .cal-num { color: var(--text); }
