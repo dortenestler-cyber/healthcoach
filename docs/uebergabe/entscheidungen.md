@@ -62,3 +62,6 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-24 · OF · Nutzerin: Hinweise wie „… ist bei Garmin nicht abrufbar“ gar nicht mehr anzeigen
 2026-11-24 · OF · Nutzerin: solche Hinweise auf allen Seiten entfernen (Wachphasen, Stress-Detail, Einheit)
 2026-11-24 · OF/DA · Nutzerin: Alle Claude-Konten dürfen jede Rolle übernehmen, z. B. wenn ein Konto sein Limit erreicht. Abstimmung über die Belegt-Zeile der Übergabe-Datei (Konzept Abschnitt 11)
+2026-11-24 · OF/DA · Nutzerin: Belastung darf über 100 % gehen, Skala flacht nach oben ab (wie Bevel) · 150 Last bleibt 100 %, harte Tage sollen weiter sichtbar steigen
+2026-11-24 · OF/DA · Nutzerin: Belastungsziel persönlich: übliche Tagesbelastung der letzten 28 Tage × Faktor aus der Readiness, Bereich ± 10
+2026-11-24 · OF/DA · Nutzerin: Bremse beim Ziel: Last der letzten 7 Tage über 130 % der 4 Wochen davor, dann Ziel nicht über der üblichen Belastung

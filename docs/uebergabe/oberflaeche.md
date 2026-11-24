@@ -1,5 +1,5 @@
 # Übergabe · Oberfläche (OF)
-Belegt: frei (Belegt-Zeile eingeführt 24.11., die nächste Sitzung setzt sie)
+Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ · seit 2026-11-24 18:03 (Belastung: Skala und persönliches Ziel)
 Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWfNqpNJkPsx5iQm7e7
 
 ## Keine Hinweise zu fehlenden Garmin-Daten (PR #123, 24.11.)
