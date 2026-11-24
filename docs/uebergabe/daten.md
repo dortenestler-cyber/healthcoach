@@ -1,5 +1,5 @@
 # Übergabe · Daten (DA)
-Belegt: frei
+Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ · seit 2026-11-24 18:30 (Wochenvorlage raus, Training im Kalender erfassen)
 Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ
 
 Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`, `.github/`. Regeln: `docs/konzept-zwei-instanzen.md`.
