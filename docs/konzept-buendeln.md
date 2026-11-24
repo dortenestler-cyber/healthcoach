@@ -109,7 +109,7 @@ Ein Ablauf für jedes Formular: Blatt von unten, Titel, Tipp-Felder zuerst, Deta
 ## Reihenfolge (je ein Pull Request)
 1. ✅ **Einordnung** und **Zeitraum-Umschalter** (PR #133): `lib/einordnung.ts`, `lib/zeitraum.ts`, `components/ui/SpanSwitch.tsx`
 2. ✅ **Eintragen-Blatt** (PR #134): `EditSheet` mit Variante „Fertig“ (sofort speichern); Medikamente (ein Blatt für Anlegen und Ändern), Körper-Einträge, Wadenkrampf, Training erfassen. Fotos: `docs/bilder/buendeln-eintragen/`
-3. **Tagesblatt**. Planen und Erfassen von Training gibt es schon im Trainingskalender (PR #130), es zieht ins Tagesblatt um
+3. ✅ **Tagesblatt** (PR #135): `components/tag/Tagesblatt.tsx` und `TagTraining.tsx`. Trainingskalender (am Computer daneben) und Zyklus-Kalender (Tipp öffnet es im Blatt). Fotos: `docs/bilder/buendeln-tagesblatt/`
 4. **Kalender mit Ebenen** (ersetzt die vier Raster)
 5. **Wert-Seite** (`/wert/[name]`, Weiterleitungen)
 6. **Zusammenhänge**

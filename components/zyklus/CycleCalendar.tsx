@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { useState } from "react";
 import { nextPeriodText, projectedPhase } from "@/lib/cycle";
-import type { Diary } from "@/lib/insights";
+import type { Data, Diary } from "@/lib/insights";
+import EditSheet from "@/components/ui/EditSheet";
+import Tagesblatt from "@/components/tag/Tagesblatt";
+import { longDate } from "@/lib/dates";
 import { PHASE4, PHASE4_LABEL, phase4Of, type Phase4 } from "@/components/zyklus/CycleRing";
 
 const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
@@ -15,8 +18,10 @@ type Cell = { day: string; n: number; phase: Phase4 | null; future: boolean; tod
 // Monatskalender mit den Zyklusphasen als durchgehende Bänder (Konzept dunkel 2, Muster 9).
 // Kommende Tage gestrichelt (geschätzt), heute mit Ring, Punkt = Symptome eingetragen, ✦ = Eisprung-Zeichen eingetragen.
 // Nach dem geschätzten nächsten Beginn rechnet der Kalender mit der üblichen Länge weiter (Vorschau, bis 3 Monate).
-export default function CycleCalendar({ today, diary }: { today: string; diary: Diary[] }) {
+// Tippen auf einen Tag öffnet das Tagesblatt (Konzept Bündeln, Baustein 1)
+export default function CycleCalendar({ today, diary, data }: { today: string; diary: Diary[]; data?: Data | null }) {
   const [offset, setOffset] = useState(0);
+  const [picked, setPicked] = useState<string | null>(null);
   const base = new Date(today + "T12:00:00");
   const first = new Date(base.getFullYear(), base.getMonth() + offset, 1, 12);
   const y = first.getFullYear();
@@ -68,7 +73,7 @@ export default function CycleCalendar({ today, diary }: { today: string; diary: 
       <div className="cal-grid cal-days">
         {cells.map((c, i) =>
           c ? (
-            <div key={c.day} className={`cal-cell${c.phase ? ` cal-${c.phase}` : ""}${c.future ? " cal-future" : ""}${segment(i)}`}>
+            <button key={c.day} type="button" onClick={() => setPicked(c.day)} className={`cal-cell${c.phase ? ` cal-${c.phase}` : ""}${c.future ? " cal-future" : ""}${segment(i)}`}>
               <span className="cal-band" aria-hidden="true" />
               <span className={`cal-num${c.today ? " cal-today" : ""}`}>
                 {c.n}
@@ -78,7 +83,7 @@ export default function CycleCalendar({ today, diary }: { today: string; diary: 
               </span>
               {c.symptom && <span className="cal-dot" aria-hidden="true" />}
               {c.ov && <span className="cal-ov" aria-hidden="true">✦</span>}
-            </div>
+            </button>
           ) : (
             <div key={"x" + i} className="cal-cell" aria-hidden="true" />
           ),
@@ -97,6 +102,9 @@ export default function CycleCalendar({ today, diary }: { today: string; diary: 
         <span className="add-row-label">Periode eintragen</span>
         <span className="add-row-plus" aria-hidden="true">+</span>
       </Link>
+      <EditSheet title={picked ? (picked === today ? "Heute" : longDate(new Date(picked + "T12:00:00"))) : "Tag"} open={!!picked} instant onClose={() => setPicked(null)}>
+        {picked && <Tagesblatt key={picked} day={picked} data={data ?? null} bare />}
+      </EditSheet>
     </section>
   );
 }

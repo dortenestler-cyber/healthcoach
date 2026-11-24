@@ -3111,3 +3111,17 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .segmented-4:not(.segmented-tabs), .segmented-6 { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
 .segmented-4:not(.segmented-tabs) button, .segmented-6 button { min-height: 44px; font-size: 15px; }
 .segmented-6 button { font-size: 14px; padding-left: 2px; padding-right: 2px; }
+
+/* Tagesblatt (Konzept Bündeln, Baustein 1): ein Tag mit allem darin */
+.tag-blatt { display: flex; flex-direction: column; gap: 18px; }
+.tag-head { display: flex; flex-direction: column; gap: 4px; }
+.tag-head h2 { margin: 0; }
+.tag-cycle { color: var(--cycle); font-weight: 600; font-size: 15px; }
+.tag-sec { display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
+.tag-val { text-align: right; max-width: 62%; }
+.tag-act { display: inline-flex; align-items: center; gap: 10px; }
+.tag-act .today-act-icon { width: 32px; height: 32px; flex: 0 0 32px; }
+.tag-tile { min-height: 72px; background: var(--card-2); box-shadow: none; }
+/* Zyklus-Kalender: Tage antippbar (öffnet das Tagesblatt) */
+.cal-days > button.cal-cell { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; min-height: 44px; }
+.cal-days > button.cal-cell:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 10px; }
