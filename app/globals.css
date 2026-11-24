@@ -2664,7 +2664,6 @@ details.derive[open] { display: flex; flex-direction: column; gap: 8px; }
 .sec-link { font-size: 13px; color: var(--text); min-height: 44px; display: inline-flex; align-items: center; text-decoration: none; }
 
 /* Dein Tag: Ringe als Rondell mit Endlos-Schleife (RingRow). --k und --o setzt das Wischen. */
-.ring-strip-wrap .sec-title { margin: 10px 0 6px; }
 .ring-strip { position: relative; display: flex; align-items: flex-end; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -20px; padding: 4px 0 6px; scrollbar-width: none; overscroll-behavior-x: contain; }
 .ring-strip::-webkit-scrollbar { display: none; }
 .ring-strip-cell { --s: var(--k, 0.6); flex: 0 0 112px; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; text-decoration: none; color: inherit; scroll-snap-align: center; border-radius: 18px; -webkit-tap-highlight-color: transparent; }
