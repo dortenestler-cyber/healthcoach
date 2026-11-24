@@ -157,6 +157,49 @@ function rangeEffect(v: number | null, range: Range | null, higherIsBetter: bool
   return 0;
 }
 
+// ---------- Belastung wie dayLoad und usualLoad in der App (lib/insights.ts, lib/alltagslast.ts)
+// Skala flacht nach oben ab: 150 Last = 100 %, darüber langsam weiter (Konzept docs/konzept-belastung-skala.md)
+export const FULL_DAY_LOAD = 150;
+const LOAD_CURVE = 100;
+export function loadToPct(load: number): number {
+  return load > 0 ? (100 * Math.log(1 + load / LOAD_CURVE)) / Math.log(1 + FULL_DAY_LOAD / LOAD_CURVE) : 0;
+}
+const okLoad = (ld: Any) => ld && typeof ld === "object" && [1, 2, 3].includes(ld.v) && Array.isArray(ld.training) && Array.isArray(ld.alltag);
+// Last eines Tages (Training + Alltag, Garmin-Einheit). Ohne Alltagsdaten: 60 Intensitätsminuten wie 150 Last.
+export function dayLoadRaw(day: string, g: Any, acts: Any[]): number {
+  const tl = acts.filter((a) => String(a.start_local ?? "").slice(0, 10) === day).reduce((s, a) => s + (Number(a.training_load) || 0), 0);
+  const ld = g?.load_daily_min;
+  if (!okLoad(ld)) return Math.max(((g?.intensity_minutes ?? 0) / 60) * FULL_DAY_LOAD, tl);
+  return (tl || ld.last_training || 0) + Math.max(0, ld.last_alltag ?? 0);
+}
+export const dayLoadPct = (day: string, g: Any, acts: Any[]) => Math.round(loadToPct(dayLoadRaw(day, g, acts)));
+
+// Übliche Belastung (Schnitt der letzten 28 Tage ohne kranke Tage, ab 14 Tagen) und Bremse (7 Tage über 130 % der 4 Wochen)
+export function usualLoad(day: string, rows: Any[], acts: Any[], sick: Set<string>): { usual: number | null; brake: boolean } {
+  const byDay = new Map(rows.map((r) => [r.day, r]));
+  const pcts: number[] = [];
+  const raw: number[] = [];
+  for (let i = 1; i <= 28; i++) {
+    const d = addDays(day, -i);
+    const g = byDay.get(d);
+    const l = g ? dayLoadRaw(d, g, acts) : 0;
+    raw.push(l);
+    if (g && !sick.has(d)) pcts.push(Math.round(loadToPct(l)));
+  }
+  if (pcts.length < 14) return { usual: null, brake: false };
+  const acute = raw.slice(0, 7).reduce((a, b) => a + b, 0);
+  const chronic = raw.reduce((a, b) => a + b, 0) / 4;
+  return { usual: mean(pcts), brake: chronic > 0 && acute / chronic > 1.3 };
+}
+const readinessFactor = (score: number) => (score >= 85 ? 1.15 : score >= 65 ? 1 : score >= 45 ? 0.75 : 0.5);
+function targetBand(score: number, usual: number, brake: boolean): { lo: number; hi: number } {
+  let mid = usual * readinessFactor(score);
+  if (brake) mid = Math.min(mid, usual);
+  const lo = Math.max(10, Math.round(mid - 10));
+  const hi = Math.min(140, Math.max(lo + 20, Math.round(mid + 10)));
+  return { lo: Math.min(lo, hi - 20), hi };
+}
+
 // Tagesziel 0–100 wie computeTarget in der App, dazu Bereich und Faktoren (kurz für den Glance)
 export type WatchFactor = { k: string; e: number };
 const BANDS = [
@@ -165,7 +208,7 @@ const BANDS = [
   { min: 45, lo: 25, hi: 45 },
   { min: -999, lo: 10, hi: 25 },
 ];
-export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checkin: Checkin, illness: Illness, starts: string[], sick: Set<string> = new Set()): { score: number; pause: boolean; lo: number; hi: number; factors: WatchFactor[] } {
+export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checkin: Checkin, illness: Illness, starts: string[], sick: Set<string> = new Set(), usual: { usual: number | null; brake: boolean } = { usual: null, brake: false }): { score: number; pause: boolean; lo: number; hi: number; factors: WatchFactor[] } {
   const today = daily.find((r) => r.day === day) ?? null;
   const phases = new Map<string, RangePhase | null>();
   const factors: WatchFactor[] = [];
@@ -201,7 +244,9 @@ export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checki
   if (pause) return { score: 0, pause, lo: 0, hi: 15, factors: shown };
   const score = Math.max(0, Math.min(100, 80 + factors.reduce((s, f) => s + f.e, 0)));
   const band = BANDS.find((b) => score >= b.min)!;
-  return { score, pause, lo: band.lo, hi: band.hi, factors: shown };
+  // Persönliches Ziel aus üblicher Belastung und Readiness (Nutzerin 24.11.), sonst feste Stufen
+  const b = usual.usual === null ? band : targetBand(score, usual.usual, usual.brake);
+  return { score, pause, lo: b.lo, hi: b.hi, factors: shown };
 }
 
 export const asDay = (r: Any): Day => ({

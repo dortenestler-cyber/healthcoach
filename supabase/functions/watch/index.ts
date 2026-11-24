@@ -6,7 +6,7 @@
 // Aktionen (POST, JSON): today, flash, intake, checkin, kbsets
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { asDay, cycleInfo, periodStarts, phaseShort, sickDays, targetScore } from "./target.ts";
+import { asDay, cycleInfo, dayLoadPct, periodStarts, phaseShort, sickDays, targetScore, usualLoad } from "./target.ts";
 import { fitnessAge, waistOn } from "./fitness.ts";
 
 const TZ = "Europe/Berlin";
@@ -50,22 +50,6 @@ const SPORT_LABEL: Record<string, string> = { karate: "KARATE", kettlebell: "KET
 
 // deno-lint-ignore no-explicit-any
 type Any = any;
-
-// 100 % entspricht grob einem harten Trainingstag (FULL_DAY_LOAD in lib/insights.ts)
-const FULL_DAY_LOAD = 150;
-function dayLoadPct(day: string, g: Any, acts: Any[]): number {
-  const tl = acts.filter((a) => String(a.start_local ?? "").slice(0, 10) === day).reduce((s, a) => s + (Number(a.training_load) || 0), 0);
-  const pctOf = (v: number) => (v / FULL_DAY_LOAD) * 100;
-  const ld = g?.load_daily_min;
-  const ok = ld && typeof ld === "object" && (ld.v === 1 || ld.v === 2) && Array.isArray(ld.training) && Array.isArray(ld.alltag);
-  if (!ok) {
-    const im = g?.intensity_minutes ?? 0;
-    return Math.round(Math.min(100, Math.max((im / 60) * 100, pctOf(tl))));
-  }
-  const training = tl || ld.last_training || 0;
-  const alltag = Math.max(0, ld.last_alltag ?? 0);
-  return Math.round(Math.min(100, pctOf(training + alltag)));
-}
 
 Deno.serve(async (req) => {
   try {
@@ -252,7 +236,8 @@ async function today(sb: Any, uid: string, day: string) {
   const days = (daily.data ?? []) as Any[];
   const g = days.find((r) => r.day === day) ?? null;
   // Tagesziel "Belastung heute" 0–100, wie in der App
-  const target = targetScore(day, days.map(asDay), di, (checkin.data ?? null) as Any, ill, starts, sickDays((ills.data ?? []) as Any[], day));
+  const sick = sickDays((ills.data ?? []) as Any[], day);
+  const target = targetScore(day, days.map(asDay), di, (checkin.data ?? null) as Any, ill, starts, sick, usualLoad(day, days, (acts.data ?? []) as Any[], sick));
   // Eigenes Fitness-Alter (HUNT-Modell, wie in der App)
   const by = (settings.data as Any)?.data?.birthYear;
   const w = waistOn(((body.data ?? []) as Any[]).map((r) => ({ day: r.day, waist_cm: r.waist_cm === null ? null : Number(r.waist_cm) })), day);
