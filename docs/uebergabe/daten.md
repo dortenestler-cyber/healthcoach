@@ -8,7 +8,7 @@ Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`
 
 ## Training erfassen (PR #130, 24.11.)
 - Migration `20261128110000_training_erfassen`: `planned_sessions.duration_min` (1–600), `rpe` (1–10), löscht offene Vorlage-Einheiten ab heute. `ensurePlanned`/`applyWeek` sind aus `lib/training.ts` entfernt.
-- Wartet auf: Merge durch die Nutzerin, danach Lauf „Migrationen“ prüfen.
+- Gemergt 24.11., Lauf „Supabase-Migrationen ausführen“ grün.
 
 ## Belastung wie bei Bevel (PR #127, 24.11.)
 - `garmin-sync/alltag.ts`: Stufe „leicht“ ab 20 % Herzfrequenzreserve, halbes Gewicht, nur in Abschnitten ab 10 Minuten. `LOAD_VERSION` 3, Feld `leicht`. Alte Tage rechnet der Abruf nach (21 je Abruf, 90 Tage).
