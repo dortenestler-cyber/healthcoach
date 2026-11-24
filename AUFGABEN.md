@@ -59,7 +59,7 @@ Den Zeitplan legt die Migration `20261122180000_push_zeitplan.sql` automatisch a
 - [x] Erinnerung in der App eingeschaltet, Testmitteilung ist angekommen (23. Nov., von dir bestätigt)
 
 ### 4b. Morgen-Erinnerung kam am 24. Nov. nicht an
-- [ ] Auf GitHub unter **Actions → „Daten prüfen“ → Run workflow** als Zweig `claude/practical-carson-bqpntf` wählen und starten. Der Lauf liest nur und zeigt unten im Teil „Push“, ob der Zeitplan lief und was die Funktion geantwortet hat
+- [ ] Auf GitHub unter **Actions → „Daten prüfen“ → Run workflow** starten (Zweig `main`). Der Lauf liest nur und zeigt unten im Teil „Push“, ob der Zeitplan lief und was die Funktion geantwortet hat
 - [ ] Claude Bescheid geben, dann wertet Claude den Lauf aus
 
 ### 5. Heute im neuen Design (PR #38)
