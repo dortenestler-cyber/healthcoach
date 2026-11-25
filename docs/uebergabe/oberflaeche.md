@@ -2,6 +2,13 @@
 Belegt: frei
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWcpKAVS1T6prb5SPNt
 
+## Coach schreibt Tagesempfehlung und Monatsrückblick (25.11.)
+- Variante A freigegeben. `lib/briefing.ts` (`useBriefing`): ruft die bestehende Funktion `coach` mit fester Frage und `buildCoachContext()` auf, speichert in `settings.data.briefing.{tag,monat}` mit Schlüssel (Tag; Monat: Tag + Anzahl Veränderungen), ↻ schreibt neu. Rendering `components/ui/CoachText.tsx` (erste Zeile Lage, „- “ Liste, **fett**).
+- Heute: `components/heute/Tagesempfehlung.tsx` „Für heute“ statt `DaySentence` (nur heute, nicht bei Warnzeichen; Coach aus oder Fehler → `DaySentence`). Gesundheit: `components/gesundheit/DeinMonatKarte.tsx`, Liste hinter `Details id="monat.liste"`, ohne Veränderungen keine Anfrage.
+- Nebenwirkung: jede Anfrage zählt zum Tageslimit und erscheint als eigener Chat im Coach-Verlauf.
+- Offen für Daten (Freigabe nötig): `supabase/functions/coach` – Ziele im SYSTEM-Text veraltet (5. Kyu, Frühjahr 2027), „2 bis 6 Sätze“; Schalter, damit Tagesempfehlung/Rückblick nicht im Chat-Verlauf landen.
+- Nächster Schritt: Erklärkarten (`ExplainCard`, 25 Stellen) prüfen: nur behalten, wo sie etwas Eigenes sagen, auf eigene Zahlen zuschneiden.
+
 ## Hinweistexte entfernt (25.11.)
 - Wunsch der Nutzerin, dauerhaft als Regel in `CLAUDE.md` (Arbeitsweise). `PageHead.sub` ist optional, alle festen Untertitel entfernt (bleiben: Coach „Ausgeschaltet“, Nutzung, neue Hinweise, Konto). Rund 55 Bedienhinweise, Rechenwege, Legenden-Sätze und „keine Diagnose“-Sätze entfernt, ebenso die Karte „So geht die App mit deinen Werten um“ (Körper).
 - Geblieben: Leerzustände, Warnzeichen (Fieber, lange erhöhte Werte), Medikamenten-Hinweis ohne geprüfte Quelle, Inhalt hinter „Details“ (Grundlagen, WHO-Quelle), Satz in Einstellungen „keine Diagnosen“.
