@@ -60,7 +60,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     const sb = supabase();
     if (!sb) return;
     const [h, d] = await Promise.all([
-      sb.from("diary_entries").select("day, bleeding, symptoms, influences").gte("day", isoDay(daysAgo(DAYS - 1))).order("day"),
+      sb.from("diary_entries").select("day, bleeding, symptoms, influences").gte("day", isoDay(daysAgo(120))).order("day"), // 4 Monate für die Phasen im Blatt
       sb.from("diary_entries").select("day, bleeding, symptoms, influences").eq("day", day).maybeSingle(),
     ]);
     if (h.error || d.error) {
@@ -153,11 +153,13 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     };
   }, [dirty, bleeding, symptoms, influences, details, ovSigns, autoSet, autoOff]);
 
-  // Oben die genutzten, Rest unter „Weitere anzeigen“ (Sammelliste 5e)
-  const usedSym = new Set<string>([...Object.keys(symptoms).filter((k) => symptoms[k] > 0), ...history.flatMap((e) => Object.keys(e.symptoms ?? {}).filter((k) => (e.symptoms[k] ?? 0) > 0))]);
+  // Oben die genutzten (letzte 4 Wochen)
+  const seit = isoDay(daysAgo(DAYS - 1));
+  const recent = history.filter((e) => e.day >= seit); // Rest unter „Weitere anzeigen“ (Sammelliste 5e)
+  const usedSym = new Set<string>([...Object.keys(symptoms).filter((k) => symptoms[k] > 0), ...recent.flatMap((e) => Object.keys(e.symptoms ?? {}).filter((k) => (e.symptoms[k] ?? 0) > 0))]);
   const symSplit = splitFrequent(SYMPTOMS, usedSym);
   const signSplit = splitFrequent(SIGNS, usedSym);
-  const usedHab = new Set<string>([...influences, ...history.flatMap((e) => e.influences ?? [])]);
+  const usedHab = new Set<string>([...influences, ...recent.flatMap((e) => e.influences ?? [])]);
   const habSplit = splitFrequent(habits.filter((h) => h.on || influences.includes(h.key)), usedHab);
 
   return (
