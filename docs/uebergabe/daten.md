@@ -1,6 +1,10 @@
 # Übergabe · Daten (DA)
-Belegt: frei
+Belegt: Konto A · Sitzung https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU · seit 2026-11-25
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU
+
+## In Arbeit: Tagesabschluss am Abend (25.11., Freigabe der Nutzerin)
+- Zweig `claude/training-detection-heart-rate-ypzut9`. Mitteilung am Abend (Belastung gegen Ziel, Schlafbedarf, ins Bett bis, offene Einnahmen), Karte im Tagebuch mit „Ein Wort zum Tag“.
+- Nächster Schritt: Migration `20261130110000_tagesabschluss`, `push/nachrichten.ts`, `components/tagebuch/AbschlussCard.tsx`.
 
 ## Tagesstart und Mitteilung nach dem Training (PR #179, 25.11., Freigabe der Nutzerin)
 - Migration `20261130100000_tagesstart_training`: `push_subscriptions.training_push`, `show_values` (beide Standard an), `garmin_activities.notified_at` (alle bisherigen gesetzt), Funktion `garmin_day_tick` und Zeitplan `garmin-tagsueber` (Minute 7, 22, 37, 52; nur 6–22 Uhr Berlin) ruft `garmin-sync` mit `{quick: true}`.

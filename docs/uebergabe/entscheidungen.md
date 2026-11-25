@@ -98,3 +98,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-25 · DA · Nutzerin: Funktion coach angepasst (Ziele aktuell, Form der Frage folgen, nichts erklären, Tagesempfehlung/Rückblick ohne Verlauf und außerhalb des Limits); Funktion watch schickt keine Uhrzeiten mehr
 2026-11-25 · DA/OF · Nutzerin: Abschnitte (Versuche, Sätze, Runden, Intervalle) nachträglich aus dem Puls erkennen und in der Einheit bestätigen · Konzept im Chat freigegeben
 2026-11-25 · DA/OF · Nutzerin: Mitteilung nach dem Training (Lösung A, Abruf tagsüber alle 15 Min) und „Tagesstart“ am Morgen statt der Check-in-Erinnerung · Vorschlag im Chat freigegeben
+2026-11-25 · DA/OF · Nutzerin: Tagesabschluss am Abend umsetzen (Mitteilung und Karte im Tagebuch) · im Chat freigegeben

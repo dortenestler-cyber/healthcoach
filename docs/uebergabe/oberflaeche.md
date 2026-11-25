@@ -1,6 +1,10 @@
 # Übergabe · Oberfläche (OF)
-Belegt: frei
+Belegt: Konto A · Sitzung https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU · seit 2026-11-25
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU
+
+## In Arbeit: Tagesabschluss am Abend (25.11., Freigabe der Nutzerin)
+- Zweig `claude/training-detection-heart-rate-ypzut9`. Mitteilung am Abend (Belastung gegen Ziel, Schlafbedarf, ins Bett bis, offene Einnahmen), Karte im Tagebuch mit „Ein Wort zum Tag“.
+- Nächster Schritt: Migration `20261130110000_tagesabschluss`, `push/nachrichten.ts`, `components/tagebuch/AbschlussCard.tsx`.
 
 ## Tagesstart und Mitteilung nach dem Training (PR #179, 25.11., Freigabe der Nutzerin)
 - `components/settings/PushRows.tsx`: Schalter Mitteilungen (Gerät), Tagesstart (`checkin_reminder`) mit Uhrzeit, Nach dem Training (`training_push`), Werte in Mitteilungen zeigen (`show_values`). `lib/push.ts` lädt `*`.
