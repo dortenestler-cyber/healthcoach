@@ -58,6 +58,62 @@ export async function tagesstart(sb: Any, uid: string, day: string): Promise<{ r
   };
 }
 
+// ---------- Tagesabschluss ----------
+
+const HARD_PCT = Math.round(loadToPct(105)); // wie HARD_DAY_PCT in lib/insights.ts
+const MID_PCT = Math.round(loadToPct(60)); // wie MID_DAY_PCT
+const median = (a: number[]) => {
+  if (!a.length) return null;
+  const b = [...a].sort((x, y) => x - y);
+  return b.length % 2 ? b[(b.length - 1) / 2] : (b[b.length / 2 - 1] + b[b.length / 2]) / 2;
+};
+const clock = (min: number) => {
+  const m = ((Math.round(min) % 1440) + 1440) % 1440;
+  return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+};
+export const hm = (hours: number) => {
+  const t = Math.round(hours * 60);
+  return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")} Std`;
+};
+const niceLabel = (s: string) => (s === "SUPPLEMENTS" ? "Supplements" : s.charAt(0) + s.slice(1).toLowerCase());
+
+// Schlafbedarf für die kommende Nacht wie sleepNeed in lib/today.ts (Grundbedarf als Median der letzten
+// 30 Nächte ab 14 Nächten, sonst 7,5 Std; ein Siebtel der Schlafschuld der letzten 7 Nächte, höchstens 60 Min;
+// 20 Min nach hartem, 10 Min nach mittlerem Tag). Ins Bett bis: übliche Aufwachzeit der letzten 14 Nächte minus Bedarf.
+export function sleepPlan(day: string, rows: { day: string; sleep_seconds?: number | null; sleep_end_min?: number | null }[], loadPct: number): { hours: number; bed: string | null } {
+  const back = (n: number) => new Date(Date.parse(day + "T12:00:00Z") - n * 864e5).toISOString().slice(0, 10);
+  const nights = rows.filter((r) => r.day > back(30) && r.day <= day && typeof r.sleep_seconds === "number" && r.sleep_seconds > 0);
+  const hrs = nights.map((r) => (r.sleep_seconds as number) / 3600);
+  const base = hrs.length >= 14 ? (median(hrs) as number) : 7.5;
+  let debt = 0;
+  for (const r of nights.filter((r) => r.day > back(7))) debt += Math.max(0, base - (r.sleep_seconds as number) / 3600);
+  const add = Math.min(60, Math.round((debt * 60) / 7)) + (loadPct >= HARD_PCT ? 20 : loadPct >= MID_PCT ? 10 : 0);
+  const hours = base + add / 60;
+  const wake = median(rows.filter((r) => r.day > back(14) && typeof r.sleep_end_min === "number").map((r) => r.sleep_end_min as number));
+  return { hours, bed: wake === null ? null : clock(wake + 24 * 60 - hours * 60) };
+}
+
+export async function tagesabschluss(sb: Any, uid: string, day: string): Promise<{ full: Msg; quiet: Msg }> {
+  const t = await today(sb, uid, day);
+  const back = new Date(Date.parse(day + "T12:00:00Z") - 31 * 864e5).toISOString().slice(0, 10);
+  const { data } = await sb.from("garmin_daily").select("day, sleep_seconds, sleep_end_min").eq("user_id", uid).gte("day", back);
+  const plan = sleepPlan(day, (data ?? []) as Any[], t.load ?? 0);
+  const [lo, hi] = t.band as [number, number];
+  const load = Math.round(t.load ?? 0);
+  const verdict = t.pause ? "heute Pause" : load < lo ? `Ziel ${lo}–${hi} %, noch Luft` : load > hi ? `über dem Ziel ${lo}–${hi} %` : `im Ziel ${lo}–${hi} %`;
+  const open = ((t.slots ?? []) as Any[]).filter((x) => !x.done).map((x) => niceLabel(String(x.label)));
+  const lines = [
+    verdict.charAt(0).toUpperCase() + verdict.slice(1),
+    `Schlafbedarf ${hm(plan.hours)}${plan.bed ? ` · ins Bett bis ${plan.bed}` : ""}`,
+    open.length ? `Offen: ${[...new Set(open)].join(", ")}` : null,
+  ].filter(Boolean);
+  const url = "/tagebuch?abschluss=1";
+  return {
+    full: { title: `Tagesabschluss · Belastung ${load} %`, body: lines.join("\n"), url },
+    quiet: { title: "Tagesabschluss", body: "Dein Tag ist bereit für den Abschluss.", url },
+  };
+}
+
 // ---------- Nach dem Training ----------
 
 // Sportart wie sportOf in lib/training.ts: eigene Zuordnung vor der Garmin-Sportart

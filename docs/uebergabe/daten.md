@@ -1,10 +1,12 @@
 # Übergabe · Daten (DA)
-Belegt: Konto A · Sitzung https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU · seit 2026-11-25
+Belegt: frei
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU
 
-## In Arbeit: Tagesabschluss am Abend (25.11., Freigabe der Nutzerin)
-- Zweig `claude/training-detection-heart-rate-ypzut9`. Mitteilung am Abend (Belastung gegen Ziel, Schlafbedarf, ins Bett bis, offene Einnahmen), Karte im Tagebuch mit „Ein Wort zum Tag“.
-- Nächster Schritt: Migration `20261130110000_tagesabschluss`, `push/nachrichten.ts`, `components/tagebuch/AbschlussCard.tsx`.
+## Tagesabschluss am Abend (PR #180, 25.11., Freigabe der Nutzerin)
+- Migration `20261130110000_tagesabschluss`: `push_subscriptions.evening_push` (an), `evening_at` ('21:00'), `evening_sent_on`. `garmin_day_tick` macht um 19:37, 20:37, 21:37 einen vollen Abruf `{days: 1}` (Belastung aus dem Alltag), sonst den kurzen.
+- `push`: `due` geht jetzt über alle Geräte; Tagesabschluss ab `evening_at` bis 23:30, einmal am Tag. `tagesabschluss`/`sleepPlan` in `push/nachrichten.ts` (Schlafbedarf wie `sleepNeed` in `lib/today.ts`, vereinfacht; ins Bett bis = übliche Aufwachzeit 14 Nächte minus Bedarf). Link `/tagebuch?abschluss=1`.
+- Geprüft: `deno check`, Text an Beispieldaten.
+- Wartet auf: Merge durch die Nutzerin (Migration), danach am Abend prüfen.
 
 ## Tagesstart und Mitteilung nach dem Training (PR #179, 25.11., Freigabe der Nutzerin)
 - Migration `20261130100000_tagesstart_training`: `push_subscriptions.training_push`, `show_values` (beide Standard an), `garmin_activities.notified_at` (alle bisherigen gesetzt), Funktion `garmin_day_tick` und Zeitplan `garmin-tagsueber` (Minute 7, 22, 37, 52; nur 6–22 Uhr Berlin) ruft `garmin-sync` mit `{quick: true}`.
@@ -12,7 +14,7 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017z
 - `push`: `due` schickt den Tagesstart ab `remind_at` (wartet bis 2 Std auf Garmin-Werte der Nacht), auch wenn der Check-in schon da ist. `training` meldet Einheiten ohne `notified_at`, die vor höchstens 6 Std endeten. Texte in `push/nachrichten.ts`, `show_values = false` → neutraler Satz.
 - `watch/today.ts`: Tagesrechnung aus `watch/index.ts` ausgelagert, nutzen Uhr und Tagesstart. `_shared/abschnitte.ts`: Erkennung für App und `push`; Lauf „Supabase-Funktionen hochladen“ überspringt Ordner mit `_`.
 - Geprüft: `deno check` für garmin-sync, watch, push; Texte an Beispieldaten. Ungeprüft: Hochladen mit `_shared` und `../watch` (erster Lauf nach dem Merge zeigt es).
-- Wartet auf: Merge durch die Nutzerin (Migration). Danach Läufe prüfen und am nächsten Morgen den Tagesstart.
+- PR #179 gemergt 25.11., Migration und Hochladen grün (auch mit `_shared`). Wartet auf: Tagesstart am Morgen und erste Trainingsmitteilung.
 
 ## Abschnitte aus dem Puls (PR #176, 25.11., Freigabe der Nutzerin)
 - Migration `20261130090000_abschnitte`: `garmin_activities.hr_fine` (Puls je 5 s ab Beginn, `[]` = Garmin liefert keinen), `garmin_sets` (aktive Sätze aus `/exerciseSets`: `{s, d, r}`), `segment_count` (0–200, nur App).

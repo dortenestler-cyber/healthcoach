@@ -16,7 +16,7 @@
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import webpush from "npm:web-push@3.6.7";
-import { tagesstart, trainingMessages } from "./nachrichten.ts";
+import { tagesabschluss, tagesstart, trainingMessages } from "./nachrichten.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -26,7 +26,7 @@ const cors = {
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
 
-type Sub = { id: string; user_id: string; endpoint: string; p256dh: string; auth: string; remind_at: string; time_zone: string; checkin_reminder: boolean; last_sent_on: string | null; training_push?: boolean; show_values?: boolean };
+type Sub = { id: string; user_id: string; endpoint: string; p256dh: string; auth: string; remind_at: string; time_zone: string; checkin_reminder: boolean; last_sent_on: string | null; training_push?: boolean; show_values?: boolean; evening_push?: boolean; evening_at?: string; evening_sent_on?: string | null };
 
 function serviceKey(): string {
   const legacy = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -91,15 +91,24 @@ Deno.serve(async (req) => {
       const secret = Deno.env.get("PUSH_CRON_SECRET");
       if (!secret || req.headers.get("x-cron-secret") !== secret) return json(401, { error: "Nicht erlaubt." });
       const admin = createClient(url, serviceKey());
-      const { data, error } = await admin.from("push_subscriptions").select("*").eq("checkin_reminder", true);
+      const { data, error } = await admin.from("push_subscriptions").select("*");
       if (error) return json(500, { error: error.message });
       let sent = 0;
       const cache = new Map<string, Awaited<ReturnType<typeof tagesstart>>>();
+      const evening = new Map<string, Awaited<ReturnType<typeof tagesabschluss>>>();
       for (const s of (data ?? []) as Sub[]) {
         const tz = safeTz(s.time_zone);
         const today = localDay(tz);
         const now = localTime(tz);
-        if (s.last_sent_on === today || now < s.remind_at) continue;
+        // Tagesabschluss am Abend, einmal am Tag (bis 23:30 Uhr, danach nicht mehr)
+        if (s.evening_push && s.evening_at && s.evening_sent_on !== today && now >= s.evening_at && now < "23:30") {
+          const key = s.user_id + today;
+          if (!evening.has(key)) evening.set(key, await tagesabschluss(admin, s.user_id, today));
+          const m = evening.get(key)!;
+          await admin.from("push_subscriptions").update({ evening_sent_on: today }).eq("id", s.id);
+          if (await send(admin, s, s.show_values === false ? m.quiet : m.full)) sent++;
+        }
+        if (!s.checkin_reminder || s.last_sent_on === today || now < s.remind_at) continue;
         const key = s.user_id + today;
         if (!cache.has(key)) cache.set(key, await tagesstart(admin, s.user_id, today));
         const m = cache.get(key)!;
