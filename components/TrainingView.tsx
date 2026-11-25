@@ -17,6 +17,7 @@ import { firstAlltagDay, type Data } from "@/lib/insights";
 import CalendarSection from "@/components/training/CalendarSection";
 import InsightsSection from "@/components/training/InsightsSection";
 import AlleAktivitaeten from "@/components/training/AlleAktivitaeten";
+import KarateStand from "@/components/training/KarateStand";
 import SportIcon from "@/components/ui/SportIcon";
 import { useAbschnitte } from "@/components/ui/Pille";
 import { sportOf, SPORTS, type Sport } from "@/lib/training";
@@ -122,8 +123,14 @@ export default function TrainingView({ initial }: { initial: string }) {
                         <SportIcon sport={s.sport} size={20} />
                       </span>
                       <span className="sport-kachel-name">{SPORTS[s.sport].label}</span>
-                      <span className="sport-kachel-wert">{n === null ? "–" : `${n} ${n === 1 ? "Tag" : "Tage"}`}</span>
-                      <span className="meta">in 4 Wochen</span>
+                      {s.sport === "karate" ? (
+                        <KarateStand ersatz={n === null ? "–" : `${n} ${n === 1 ? "Tag" : "Tage"}`} />
+                      ) : (
+                        <>
+                          <span className="sport-kachel-wert">{n === null ? "–" : `${n} ${n === 1 ? "Tag" : "Tage"}`}</span>
+                          <span className="meta">in 4 Wochen</span>
+                        </>
+                      )}
                     </Link>
                   );
                 })}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { KarateUebenZeile } from "@/components/training/KarateUeben";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 import { isoDay } from "@/lib/dates";
@@ -85,6 +86,7 @@ export default function TodayPlan({ children }: { children?: ReactNode }) {
             {!done && s.sport === "kettlebell" && !eff && (
               <Link href="/training/kettlebell" className="link-small">Einheit starten ›</Link>
             )}
+            {!done && s.sport === "karate" && eff?.kind !== "pause" && eff?.kind !== "gesperrt" && <KarateUebenZeile tag={s.day} />}
           </div>
         );
       })}
