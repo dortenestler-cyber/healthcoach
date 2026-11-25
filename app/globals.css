@@ -3045,3 +3045,6 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .zh-satz { font-size: 15px; line-height: 1.45; color: var(--text); }
 .zh-deutlich { background: var(--card-2); color: var(--text); }
 .zh-vorlaeufig { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+
+/* Gesundheit › Überblick: Wege zu jeder Gewohnheit als Tasten */
+.habit-link { text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; }
