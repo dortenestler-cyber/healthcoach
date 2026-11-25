@@ -6,7 +6,7 @@ Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`
 
 ## Karate-Prüfungen (PR #143, 25.11.)
 - Migration `20261129090000_karate_pruefungen`: neue Tabelle `karate_progress` (user_id, item_key, status offen/uebe/sitzt, RLS), `karate_items.kyu` (1–5, Standard 5) und `status` (alte Haken → sitzt), Kategorie „Begriffe“. `done` bleibt und wird mitgeschrieben. Backup enthält `karate_progress`.
-- Wartet auf: Merge durch die Nutzerin, danach Lauf „Supabase-Migrationen ausführen“ prüfen.
+- Gemergt 25.11., Lauf „Supabase-Migrationen ausführen“ grün.
 
 
 
