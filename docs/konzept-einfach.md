@@ -1,6 +1,6 @@
 # Konzept: Einfach bedienen (dritte Runde)
 
-Stand: 25. Nov. 2026 · Entwurf, wartet auf Freigabe · Rolle Oberfläche `[OF]`
+Stand: 25. Nov. 2026 · Freigegeben (25.11.), Umsetzung in Paketen · Rolle Oberfläche `[OF]`
 Prompt: `docs/prompt-einfach.md` · Skizze: `docs/entwurf-einfach.html` · Fotos: `docs/bilder/einfach/`
 
 Vorab entschieden (Logbuch 25.11.): Der zentrale Kalender öffnet sich über das Datum auf Heute und über ein Kalender-Symbol im Kopf jedes Bereichs, mit passender Ebene vorgewählt. Kein sechster Navigationspunkt. Pillen merken ihren Zustand.
@@ -223,10 +223,35 @@ Jedes Paket ist ein eigener PR mit Fotos vorher/nachher. Alle Pakete gehören zu
 | 6 | Zeitraum im Kalender | mittel | Mehrere Tage wählen: Periode, krank, Gewohnheit, vergleichen |
 | 7 | Tagebuch ruhiger | mittel | Datum als Kalender-Blatt, Hinweise raus, Verlauf raus, ein Speicherweg (siehe Frage 1) |
 | 8 | Details einklappen | mittel | Einblende-Pillen in Musterkarten, Auswertung, Detailseiten |
+| 9 | Karate | mittel | Zielkarte für alle Sportarten, ruhige Karate-Seite, „Heute üben“ und „Was saß heute?“ (Abschnitt H) |
 
-### Offene Fragen an die Nutzerin
+### Entscheidungen der Nutzerin (25.11.)
 
-1. **Tagebuch speichern:** Soll alles sofort speichern, wie heute schon Hitzewallungen, Medikamente und Krämpfe? Dann entfällt der Knopf „Speichern“.
-2. **Training:** Passt „Übersicht · Auswertung“ mit Sportarten als Kacheln und eigener Seite, statt sechs Reitern?
-3. **Zeitraum im Kalender (Paket 6):** Gewünscht, und reichen die vier Aktionen?
-4. **Reihenfolge:** wie in der Tabelle, oder zuerst Kalender (3) vor der Liste (2)?
+1. Tagebuch speichert alles sofort, der Knopf „Speichern“ entfällt (Paket 7).
+2. Training: Übersicht · Auswertung, Sportarten als eigene Seiten (Paket 4).
+3. Kalender mit Zeitraum-Auswahl und den vier Aktionen (Paket 6).
+4. Reihenfolge wie in der Tabelle: Pillen → Alle Aktivitäten → Kalender → Rest. Karate (Paket 9) nach Paket 4.
+
+### H Karate-Vorbereitung (Paket 9)
+
+Freigegeben: A und B, mit C als Rahmen.
+
+**C · Zielkarte für alle Sportarten** (`components/training/Zielkarte.tsx`)
+- Gleiche Karte für Karate, Bouldern und Kettlebell: Ziel, Datum, Ring „x von y“ mit Wort, ein Satz, „was noch fehlt“.
+- Karate: „5. Kyu · in 34 Tagen · 12 von 31 sitzen“. Bouldern: „Ziel 6A · 2 Boulder fehlen“. Kettlebell: „Plan Woche 3 von 8“.
+- Die Kachel unter „Deine Sportarten“ ist die verkleinerte Zielkarte.
+
+**A · Ruhige Seite `/training/karate`**
+1. Zielkarte oben, Datum offen als Pille „Datum eintragen“.
+2. Pillen Kihon · Kata · Anwendung · Kumite · Begriffe, immer eine Gruppe offen (gemerkt).
+3. Umschalter „Was ich übe“ (voreingestellt) · „Alles“.
+4. Unten: Wiederholung, eigene Punkte, Kyu wechseln.
+5. Hinter „Details“: Trainings pro Woche, Hinweis bei Verletzung, Hinweise zur Prüfungsordnung.
+6. Ziel: etwa 1,5 Bildschirme statt 3,7.
+
+**B · Üben im Alltag**
+- An Karate-Tagen steht unter „Heute steht an“ und im Tagesblatt: „Heute üben“ mit 3–5 Punkten. Auswahl: zuerst „übe ich“, dann „offen“, Punkte, die lange nicht dran waren, zuerst. Bei Verletzung nur, was der Hinweis erlaubt.
+- Nach einer Karate-Einheit (Garmin oder erfasst) fragt die Einheit-Seite: „Was saß heute?“ mit denselben Punkten, ein Tipp je Punkt setzt die Stufe.
+- Merkt sich, wann ein Punkt zuletzt dran war, in `settings.data.karate.zuletzt` (keine Migration).
+
+Behoben am 25.11. (vorab): Der Hinweis bei Verletzung nennt den Kyu der nächsten Prüfung statt fest den 5. Kyu (`kyuHinweis` in `lib/health.ts`, genutzt auf Gesundheit › Krank & verletzt und Training › Karate).

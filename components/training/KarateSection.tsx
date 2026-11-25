@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, longDate } from "@/lib/dates";
-import { SPOTS, weekStart, type Injury } from "@/lib/health";
+import { SPOTS, kyuHinweis, weekStart, type Injury } from "@/lib/health";
 import { fromIso, loadSettings, saveSettings, sportOf, type Settings } from "@/lib/training";
 import { GRUPPEN, HINWEISE, KUERZEL, NEXT, QUELLE, STATUS_WORT, grad, satz, stand, type Punkt, type Status } from "@/lib/karate/programm";
 
@@ -234,7 +234,7 @@ export default function KarateSection() {
       {injuries.map((inj) =>
         SPOTS[inj.spot] ? (
           <p key={inj.id} className="kyu">
-            {SPOTS[inj.spot].label} verletzt. {SPOTS[inj.spot].kyu.replace("5. Kyu", `${Math.max(ziel, 1)}. Kyu`)}
+            {SPOTS[inj.spot].label} verletzt. {kyuHinweis(inj.spot, ziel)}
           </p>
         ) : null
       )}

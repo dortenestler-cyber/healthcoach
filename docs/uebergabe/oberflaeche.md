@@ -6,13 +6,14 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014p
 - Dritte Runde nach Aufräumen und Bündeln. Prompt `docs/prompt-einfach.md`, Konzept `docs/konzept-einfach.md`, Skizze `docs/entwurf-einfach.html`, Fotos `docs/bilder/einfach/`.
 - Prüfung mit Beispieldaten über einen nachgebauten Supabase-Server (Playwright, 390 × 844). Größte Hürden: kein zentraler Kalender, keine Liste aller Aktivitäten („Alle ›“ auf Heute führt ins Leere), Status-Block über sechs Trainingsreitern, Zyklus 6,7 Bildschirme.
 - Vorschlag: `/kalender` mit Ebenen-Pillen und Zeitraum-Auswahl, Training nur noch Übersicht · Auswertung (Sportarten als eigene Seiten, Alle Aktivitäten am Ende), Pillen-Baustein mit drei Arten, gemerkt in `settings.data.ansicht` (keine Migration). Acht Pakete, alle OF.
-- Wartet auf: Freigabe der Nutzerin und Antworten auf die vier offenen Fragen am Ende des Konzepts.
-- Nächster Schritt nach Freigabe: Paket 1 Pillen-Baustein (`components/ui/Pille.tsx`), dann Paket 2 Alle Aktivitäten.
+- Freigegeben 25.11. mit Antworten (Logbuch): Tagebuch speichert sofort, Training Übersicht · Auswertung, Zeitraum im Kalender, Reihenfolge wie Tabelle. Karate als Paket 9 (A + B, Zielkarte C).
+- Fehler behoben: Verletzungshinweis nennt den Kyu der nächsten Prüfung (`kyuHinweis` in `lib/health.ts`), geprüft mit Ziel 4. Kyu.
+- Nächster Schritt: Paket 1 Pillen-Baustein (`components/ui/Pille.tsx`, `lib/ansicht.ts`), dann Paket 2 Alle Aktivitäten.
 
 ## Karate-Prüfungsprogramm (PR #143, 25.11.)
 - Konzept `docs/konzept-karate-pruefungen.md`, freigegeben 25.11. Training › Karate: Kyu-Chips 5.–1., Ring „x von y sitzen“ mit Satz, Gruppen Kihon/Kata/Kumite/Begriffe, Wiederholung eingeklappt, eigene Punkte je Kyu. Drei Stufen per Tipp, Kata und Kumite klappen in Teile auf. „X. Kyu bestanden“ ab Prüfungsdatum, dann rückt der nächste Kyu nach.
 - Programm in `lib/karate/programm.ts` nach **DKV Shotokan** (PO ab 01.01.2023, Stand 09.12.2025), von der Nutzerin freigegeben. Gruppen Kihon (Kennung je Grad `kihon.<kyu>.<nr>`), Kata (global `kata.<name>`, Teile), Anwendung, Kumite (je Grad, Teile = Angriffe), Begriffe (zählen nicht im Ring). Hinweise und Kürzel über dem Kihon. Einstellungen `karate.ziel`, `karate.pruefungen[kyu]`, `examDate` bleibt Datum der aktuellen Prüfung (Coach).
-- Offen: Hinweis bei Verletzung auf Gesundheit (`InjurySection`) nennt noch den 5. Kyu.
+- Erledigt 25.11.: Hinweis bei Verletzung nennt den aktuellen Kyu.
 - Gemergt 25.11., Migration grün. Nächster Schritt: Nutzerin prüft Training › Karate.
 
 

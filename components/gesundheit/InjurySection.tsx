@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { isoDay, shortDate } from "@/lib/dates";
-import { INJURY_CAUSES, INJURY_KINDS, SPOTS, type Injury } from "@/lib/health";
+import { INJURY_CAUSES, INJURY_KINDS, SPOTS, kyuHinweis, type Injury } from "@/lib/health";
+import { loadSettings } from "@/lib/training";
+import { karateZiel } from "@/components/training/KarateSection";
 import DayPick from "@/components/ui/DayPick";
 import EditSheet, { EditIcon } from "@/components/ui/EditSheet";
 
@@ -21,14 +23,17 @@ export default function InjurySection() {
   const [saving, setSaving] = useState(false);
   const [editPains, setEditPains] = useState<Record<string, number | null>>({}); // Schmerzwerte im Bogen, null = löschen
   const [addDay, setAddDay] = useState(isoDay());
+  const [kyuZiel, setKyuZiel] = useState(5); // Kyu der nächsten Karate-Prüfung für den Hinweis
 
   const load = useCallback(async () => {
     const sb = supabase();
     if (!sb) return;
-    const [i, p] = await Promise.all([
+    const [i, p, s] = await Promise.all([
       sb.from("injuries").select("*").order("started_on", { ascending: false }).limit(30),
       sb.from("injury_pain").select("injury_id, day, pain").order("day"),
+      loadSettings(sb),
     ]);
+    setKyuZiel(karateZiel(s).ziel);
     if (i.error) setError("Verletzungen konnten nicht geladen werden: " + i.error.message);
     const rows = (i.data ?? []) as Injury[];
     setList(rows);
@@ -213,7 +218,7 @@ export default function InjurySection() {
                 <span className="meta">Stattdessen: {instead}</span>
               </div>
             ))}
-            <p className="kyu">{spotInfo.kyu}</p>
+            <p className="kyu">{kyuHinweis(current.spot, kyuZiel)}</p>
           </section>
 
           <button type="button" className="btn btn-quiet" onClick={() => openEdit(current)}>
