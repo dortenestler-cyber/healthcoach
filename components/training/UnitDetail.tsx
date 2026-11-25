@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import KarateUeben from "@/components/training/KarateUeben";
+import AbschnitteCard from "@/components/training/AbschnitteCard";
 import { useCallback, useEffect, useState } from "react";
 import ExplainCard from "@/components/ui/ExplainCard";
 import SportIcon from "@/components/ui/SportIcon";
@@ -93,6 +94,7 @@ export default function UnitDetail({ id }: { id: string }) {
       {unit && data && <ResultCard unit={unit} data={data} />}
       {unit && <RpeCard unit={unit} onSaved={(rpe) => setUnit({ ...unit, rpe })} />}
       {unit && sport === "karate" && unit.start_local && <KarateUeben tag={unit.start_local.slice(0, 10)} art="nachher" />}
+      {unit && <AbschnitteCard unit={unit} data={data} onSaved={(n) => setUnit({ ...unit, segment_count: n })} />}
       {unit && <ZonesCard unit={unit} />}
       {unit && <TimelineCard t={timeline(unit, data)} />}
       {unit && data && <AfterCard unit={unit} data={data} today={today} />}

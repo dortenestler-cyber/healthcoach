@@ -96,3 +96,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-25 · OF · Nutzerin: Garmins Schlafwert (sleep_score) ganz aus der App entfernen; Uhr-Readiness, Abruf und Spalte folgen nach Freigabe (Daten)
 2026-11-25 · DA · Nutzerin: Garmin-Schlafwert auch aus Uhr, Abruf und Datenbank entfernen; Uhr-Readiness nutzt den eigenen Schlafwert
 2026-11-25 · DA · Nutzerin: Funktion coach angepasst (Ziele aktuell, Form der Frage folgen, nichts erklären, Tagesempfehlung/Rückblick ohne Verlauf und außerhalb des Limits); Funktion watch schickt keine Uhrzeiten mehr
+2026-11-25 · DA/OF · Nutzerin: Abschnitte (Versuche, Sätze, Runden, Intervalle) nachträglich aus dem Puls erkennen und in der Einheit bestätigen · Konzept im Chat freigegeben

@@ -12,6 +12,7 @@ import { computeTarget, FULL_DAY_LOAD, type Data, type Pattern } from "@/lib/ins
 import { cycleToday, groupOf, PHASES, PHASE_GROUP_LABEL, readinessFrom, type PhaseGroup } from "@/lib/cycle";
 import { shiftDay } from "@/lib/dates";
 import { SPORTS, sportOf, type Sport } from "@/lib/training";
+import { countWord, SEGMENT_RULES } from "@/lib/abschnitte";
 
 // Einheit mit den Spalten aus Migration 20261127090000_training_insights (fehlen sie, bleiben sie leer)
 export type Unit = Activity & {
@@ -19,7 +20,16 @@ export type Unit = Activity & {
   hr_zones?: number[] | null; // Minuten je Zone 0–5
   hr_series?: (number | null)[] | null; // Puls je 5 Minuten ab Beginn
   rpe?: number | null; // eigene Anstrengung 1–10
+  hr_fine?: (number | null)[] | null; // Puls je 5 Sekunden ab Beginn (Migration 20261130090000_abschnitte)
+  garmin_sets?: { s: number | null; d: number | null; r: number | null }[] | null; // Garmins Satzerkennung
+  segment_count?: number | null; // bestätigte Zahl der Abschnitte
 };
+
+// Ruhe- und Maximalpuls am Tag der Einheit, wie für die Pulszonen
+export function unitPulse(u: Unit, data: Data | null): { rest: number; max: number } {
+  const ld = data ? readLoadDay(data.daily.find((d) => d.day === unitDay(u))?.load_daily_min) : null;
+  return { rest: ld?.puls_ruhe ?? HR_REST_START, max: ld?.puls_max ?? Math.max(HR_MAX_START, u.max_hr ?? 0) };
+}
 
 export const MIN_UNITS = 5; // so viele Einheiten braucht ein Muster je Gruppe (Nutzerin 23.11.)
 export const COMPARE_UNITS = 5; // Vergleich mit den letzten 5 Einheiten derselben Sportart
@@ -141,9 +151,7 @@ export type Timeline = { segs: Seg[]; total: number; usesGarmin: boolean; peak: 
 export function timeline(u: Unit, data: Data | null): Timeline | null {
   const s = u.hr_series;
   if (!Array.isArray(s) || nums(s).length < 3) return null;
-  const ld = data ? readLoadDay(data.daily.find((d) => d.day === unitDay(u))?.load_daily_min) : null;
-  const rest = ld?.puls_ruhe ?? HR_REST_START;
-  const max = ld?.puls_max ?? Math.max(HR_MAX_START, u.max_hr ?? 0);
+  const { rest, max } = unitPulse(u, data);
   const start = startMinute(u) ?? 0;
   const pts = s.map((hr) => (typeof hr === "number" ? zoneOf(hr, rest, max) * SERIES_STEP : 0));
   const sum = pts.reduce((a, b) => a + b, 0);
@@ -450,6 +458,7 @@ export function coachUnitLine(acts: Unit[], data: Data): string | null {
     last.training_load ? `Belastung ${Math.round(last.training_load)}` : "",
     c.verdict ? `Vergleich mit den letzten ${c.n}: ${c.verdict}` : "",
     last.rpe ? `gefühlte Anstrengung ${last.rpe}/10` : "",
+    last.segment_count && SEGMENT_RULES[sportOf(last)] ? countWord(SEGMENT_RULES[sportOf(last)]!, last.segment_count) : "",
   ].filter(Boolean);
   return "Letzte Einheit: " + parts.join(", ") + ".";
 }

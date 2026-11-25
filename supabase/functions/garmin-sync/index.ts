@@ -15,6 +15,7 @@
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { applyAuto, autoFor, AUTO_KEYS, type Row as HabitRow } from "./habits.ts";
+import { fetchDetail, wantsSets, type DetailState } from "./details.ts";
 import { actDetailRow, type ActDetail, activityIntervals, computeDay, mergeActDetail, conversionFactor, FACTOR_START, HR_MAX_START, HR_REST_START, LOAD_VERSION, type LoadDay, MIN_COVERAGE, pointsFromSteps, type Sample } from "./alltag.ts";
 
 const GARMIN = "https://personal.connectapi.garmin.com";
@@ -169,6 +170,7 @@ Deno.serve(async (req) => {
       return daily.get(day)!;
     };
     const activities: Record<string, unknown>[] = [];
+    const startGmt = new Map<number, number>(); // Beginn je Aktivität in UTC, für die Satzerkennung
     let bbCurveDays = 0;
     let bbNote = "";
     let stressCurveDays = 0;
@@ -312,6 +314,8 @@ Deno.serve(async (req) => {
         const items = (Array.isArray(list) ? list : []) as Any[];
         for (const a of items) {
           if (!a?.activityId) continue;
+          const g = typeof a?.startTimeGMT === "string" ? Date.parse(a.startTimeGMT.replace(" ", "T") + "Z") : NaN;
+          if (Number.isFinite(g)) startGmt.set(a.activityId, g);
           activities.push({
             user_id: userId,
             activity_id: a.activityId,
@@ -386,6 +390,19 @@ Deno.serve(async (req) => {
       if (error) throw new Error("Speichern der Aktivitäten: " + error.message);
     }
 
+    // Puls in Sekunden und Satzerkennung je Aktivität (Abschnitte). Fehler brechen den Abruf nicht ab.
+    let detailUnits = 0;
+    let detailNote = "";
+    if (activities.length) {
+      try {
+        const res = await syncDetails(sb, token, userId, activities.map((a) => a.activity_id as number), startGmt);
+        detailUnits = res.units;
+        detailNote = res.note;
+      } catch (e) {
+        detailNote = "Puls in Sekunden nicht abgerufen: " + (e instanceof Error ? e.message : String(e));
+      }
+    }
+
     // Belastung aus dem Alltag: Tagespuls in Zonen, getrennt nach Training und Alltag.
     // Fehler brechen den Abruf nicht ab.
     let alltagDays = 0;
@@ -450,6 +467,8 @@ Deno.serve(async (req) => {
       energyNote: energyMissing ? "Die Datenbank-Spalten für die Energie über den Tag fehlen noch." : bbNote,
       stressCurveDays: stressMissing ? 0 : stressCurveDays,
       stressNote: stressMissing ? "Die Datenbank-Spalten für Atemfrequenz und Stress fehlen noch." : stressNote,
+      detailUnits,
+      detailNote,
       alltagDays,
       alltagNote: alltagMissing ? "Die Datenbank-Spalten für die Belastung aus dem Alltag fehlen noch." : alltagNote,
       syncedAt: new Date().toISOString(),
@@ -460,6 +479,36 @@ Deno.serve(async (req) => {
     return json(500, { error: msg });
   }
 });
+
+// Puls in Sekunden je Aktivität: nur Einheiten ohne hr_fine, neueste zuerst, höchstens DETAIL_LIMIT je Abruf.
+// Ältere Einheiten folgen bei späteren Abrufen („Ein Jahr laden“).
+const DETAIL_LIMIT = 8;
+async function syncDetails(sb: Any, token: string, userId: string, ids: number[], startGmt: Map<number, number>): Promise<{ units: number; note: string }> {
+  const { data, error } = await sb
+    .from("garmin_activities")
+    .select("activity_id, type_key, sport_override, start_local")
+    .eq("user_id", userId)
+    .in("activity_id", ids)
+    .is("hr_fine", null)
+    .order("start_local", { ascending: false })
+    .limit(DETAIL_LIMIT);
+  if (error) {
+    if (/hr_fine/.test(error.message)) return { units: 0, note: "Die Datenbank-Spalten für den Puls in Sekunden fehlen noch." };
+    throw new Error(error.message);
+  }
+  const st: DetailState = { path: null, failed: false, setsFailed: false };
+  let units = 0;
+  for (const a of (data ?? []) as Any[]) {
+    if (a.sport_override === "ignorieren") continue;
+    const d = await fetchDetail((p) => garminGet(token, p), a.activity_id, wantsSets(a.type_key, a.sport_override), startGmt.get(a.activity_id) ?? null, st);
+    if (st.failed) return { units, note: "Der Puls in Sekunden ist bei Garmin nicht abrufbar." };
+    if (!d) continue;
+    const { error: e } = await sb.from("garmin_activities").update(d).eq("user_id", userId).eq("activity_id", a.activity_id);
+    if (e) throw new Error(e.message);
+    units++;
+  }
+  return { units, note: "" };
+}
 
 // Zyklusbeginne aus Garmin: Tagesansicht von heute holen, dann jeweils den Tag vor dem
 // Zyklusbeginn, bis der Zeitraum abgedeckt ist. So reichen wenige Abfragen pro Zyklus.
