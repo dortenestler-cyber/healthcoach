@@ -103,6 +103,14 @@ function actRow(a: Any, userId: string): Record<string, unknown> {
   };
 }
 
+// Intensitätsminuten aus der Tageszusammenfassung: moderat + 2 × intensiv (wie Garmin)
+function intensityMinutes(d: Any): number | null {
+  const im = d?.intensityMinutes ?? {};
+  const mod = num(im?.moderate?.value ?? im?.moderateValue ?? im?.moderate) ?? 0;
+  const vig = num(im?.vigorous?.value ?? im?.vigorousValue ?? im?.vigorous) ?? 0;
+  return mod || vig ? Math.round(mod + 2 * vig) : null;
+}
+
 async function saveActivities(sb: Any, rows: Record<string, unknown>[]): Promise<boolean> {
   let { error } = await sb.from("garmin_activities").upsert(rows, { onConflict: "user_id,activity_id" });
   let stepsMissing = false;
@@ -197,8 +205,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Kurzer Abruf tagsüber (Zeitplan alle 15 Minuten): nur die Aktivitäten von gestern und heute,
-    // dazu Puls in Sekunden, danach die Mitteilung nach dem Training. Kein Eintrag im Protokoll.
+    // Kurzer Abruf tagsüber (Zeitplan alle 15 Minuten, zur Minute 37 läuft stattdessen der volle): Aktivitäten und
+    // Tageswerte von gestern und heute, dazu Puls in Sekunden, danach die Mitteilung nach dem Training. Kein Eintrag im Protokoll.
     if (body?.quick) {
       logRun = async () => {};
       const token = await garminToken(apiKey);
@@ -212,6 +220,31 @@ Deno.serve(async (req) => {
         if (Number.isFinite(g)) startGmt.set(a.activityId, g);
       }
       const rows = items.map((a) => actRow(a, userId));
+      // Intensitätsminuten, Schritte, Stress und Body Battery (Tageswerte) von gestern und heute nachführen,
+      // sonst bleiben sie bis zum nächsten vollen Abruf stehen. synced_at bleibt stehen, damit die App den vollen Abruf weiter selbst auslöst.
+      let summaryNote = "";
+      try {
+        const sums = await garminGet(token, `/usersummary-service/v2/dailysummaries?startDate=${s}&endDate=${e}`);
+        const sumRows = ((sums?.data ?? sums ?? []) as Any[])
+          .filter((d) => typeof d?.calendarDate === "string")
+          .map((d) => ({
+            user_id: userId,
+            day: d.calendarDate,
+            steps: int(d?.movement?.steps?.value),
+            intensity_minutes: intensityMinutes(d),
+            stress_avg: int(d?.stress?.avgLevel),
+            bb_max: int(d?.bodyBattery?.maxValue),
+            bb_min: int(d?.bodyBattery?.minValue),
+            bb_charged: int(d?.bodyBattery?.chargedValue),
+            bb_drained: int(d?.bodyBattery?.drainedValue),
+          }));
+        if (sumRows.length) {
+          const { error: sumError } = await sb.from("garmin_daily").upsert(sumRows, { onConflict: "user_id,day" });
+          if (sumError) summaryNote = sumError.message;
+        }
+      } catch (err) {
+        summaryNote = err instanceof Error ? err.message : String(err);
+      }
       let detail = { units: 0, note: "" };
       if (rows.length) {
         await saveActivities(sb, rows);
@@ -222,7 +255,7 @@ Deno.serve(async (req) => {
         }
       }
       const pushNote = cronKey && rows.length ? await notifyTraining() : "";
-      return json(200, { ok: true, quick: true, activities: rows.length, detailUnits: detail.units, detailNote: detail.note, pushNote });
+      return json(200, { ok: true, quick: true, activities: rows.length, detailUnits: detail.units, detailNote: detail.note, summaryNote, pushNote });
     }
 
     const days = Math.min(MAX_DAYS, Math.max(1, Number(body?.days) || 7));
@@ -273,10 +306,7 @@ Deno.serve(async (req) => {
         r.active_kcal = int(typeof kcal === "object" && kcal ? kcal.value : kcal);
         r.active_s = int(d?.movement?.activeSeconds ?? d?.movement?.active?.value ?? d?.activeSeconds);
         r.highly_active_s = int(d?.movement?.highlyActiveSeconds ?? d?.movement?.highlyActive?.value ?? d?.highlyActiveSeconds);
-        const im = d?.intensityMinutes ?? {};
-        const mod = num(im?.moderate?.value ?? im?.moderateValue ?? im?.moderate) ?? 0;
-        const vig = num(im?.vigorous?.value ?? im?.vigorousValue ?? im?.vigorous) ?? 0;
-        r.intensity_minutes = mod || vig ? Math.round(mod + 2 * vig) : null;
+        r.intensity_minutes = intensityMinutes(d);
         // Stress-Aufteilung in Sekunden (Ruhe, niedrig, mittel, hoch) und Atemfrequenz im Schlaf.
         // Garmin benennt die Felder je nach Schnittstelle unterschiedlich; fehlt ein Feld, bleibt es leer.
         const st = d?.stress ?? {};

@@ -85,7 +85,7 @@ export default function HeuteView() {
       {gsync.error && <p className="alert" role="alert">{gsync.error}</p>}
       {isToday && gsync.morningFailed && gsync.morning && (
         <p className="alert">
-          Der Abruf heute Morgen um {clock(new Date(gsync.morning.at))} hat nicht geklappt. Zieh die Seite nach unten, um es jetzt zu versuchen. ({gsync.morning.message ?? "unbekannter Fehler"})
+          Der automatische Abruf um {clock(new Date(gsync.morning.at))} hat nicht geklappt. Zieh die Seite nach unten, um es jetzt zu versuchen. ({gsync.morning.message ?? "unbekannter Fehler"})
         </p>
       )}
 

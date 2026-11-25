@@ -101,3 +101,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-25 · DA/OF · Nutzerin: Tagesabschluss am Abend umsetzen (Mitteilung und Karte im Tagebuch) · im Chat freigegeben
 2026-11-25 · OF · Nutzerin: Gruß locker nach Uhrzeit („Morgen!“ 5–11, „Hallo!“ 11–17, „Schönen Abend!“ 17–22, „Noch wach?“ 22–5) · im Chat freigegeben
 2026-11-25 · DA · Nutzerin: Vercel Hobby statt Pro; nur `main` deployt, Vorschau nur über `vorschau/…`, Änderungen bündeln · im Chat freigegeben
+2026-11-25 · DA · Nutzerin: Kurzer Garmin-Abruf alle 15 Min holt auch Intensitätsminuten, Schritte, Stress, Body Battery; voller Abruf stündlich (6–22 Uhr) statt nur abends · im Chat freigegeben
