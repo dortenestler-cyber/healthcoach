@@ -87,3 +87,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-25 · OF · Nutzerin: Reihenfolge Pillen → Alle Aktivitäten → Kalender → übrige Pakete
 2026-11-25 · OF · Nutzerin: Karate: eigene ruhige Seite (A) und Üben im Alltag (B), Zielkarte für alle Sportarten als Rahmen (C)
 2026-11-25 · OF · Nutzerin: Fehler Verletzungshinweis mit festem 5. Kyu sofort beheben
+2026-11-25 · OF · Nutzerin: Tagesblatt unter dem Trainingskalender ohne Kacheln „Auf einen Blick“ (stehen schon auf Heute)
