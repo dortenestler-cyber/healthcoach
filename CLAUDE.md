@@ -6,6 +6,7 @@ Health Coach bringt Training, Erholung, Zyklus, Perimenopause-Symptome, Krankhei
 - Änderungswünsche erst sammeln und erst nach Freigabe umsetzen. Bugs sofort beheben.
 - Vor einem Umbau kurz beschreiben, wie du es lösen würdest.
 - Änderungen immer über einen eigenen Zweig und einen Pull Request, nie direkt auf `main`.
+- Vercel läuft im kostenlosen Hobby-Tarif (höchstens 100 Deployments am Tag, Vorschauen zählen mit). Nur `main` geht online, andere Zweige bauen nicht (`vercel.json`). Eine Vorschau gibt es nur auf Wunsch der Nutzerin über einen Zweig `vorschau/…`. Änderungen bündeln: wenige Pushes, ein Pull Request, ein Merge. Zeitpläne laufen in Supabase (pg_cron), nicht als Vercel-Cron.
 - Eigene Pull Requests selbst mergen, wenn `tsc` und `npm run build` fehlerfrei sind und es keine Konflikte gibt. Bei Änderungen an der Datenbank (Migrationen) oder an Supabase-Funktionen auf Freigabe warten.
 - Antworten und Texte in der App auf Deutsch, klar und knapp, ohne Fachjargon.
 - Keine Hinweis- und Erklärtexte in der App: keine Untertitel unter Seitentiteln, keine Bedienhinweise, Rechenwege, Legenden-Sätze oder „keine Diagnose“-Sätze. Die Nutzerin hat die App gebaut und kennt sie. Erlaubt bleiben Leerzustände, Warnzeichen mit Verweis auf ärztliche Abklärung, Quellen bei Medikamenten und die Kennzeichnung von Beispieldaten.
