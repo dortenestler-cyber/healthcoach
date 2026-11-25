@@ -9,6 +9,7 @@ import { cycleInfo, HARD_DAY_PCT, loadPercent, type Data } from "@/lib/insights"
 import { load7 } from "@/lib/today";
 import { sportOf } from "@/lib/training";
 import { sleepScores } from "@/lib/schlaf";
+import { afternoonStress, dayCurve, TENSE_STRESS, type Snapshot } from "@/lib/tagesverlauf";
 
 export const MIN_EVENT_DAYS = 8; // so viele Tage mit Ereignis braucht die Auswertung
 export const MIN_GROUP_DAYS = 4; // so viele Tage braucht jede Seite eines Vergleichs
@@ -31,6 +32,7 @@ export type MusterExtra = {
   muscle: MuscleDay[];
   intakes: MedIntake[]; // regelmäßige Einnahmen mit Namen des Mittels
   illnesses: Illness[]; // auch abgeschlossene
+  snapshots?: Snapshot[]; // Zwischenstände der Abrufe für den Tagesverlauf (ab Migration 20261130140000)
 };
 
 // ---------- Bedingungen
@@ -82,6 +84,17 @@ export function conditions(data: Data, extra: MusterExtra): Condition[] {
         return l.value !== null && l.range !== null && l.value > l.range.hi;
       },
     });
+  }
+
+  // Tagesverlauf: angespannter Nachmittag (14–20 Uhr im Schnitt mindestens mittlerer Stress), erst ab dem ersten Zwischenstand
+  const snaps = extra.snapshots ?? [];
+  if (snaps.length) {
+    const tense = new Set<string>();
+    for (const day of new Set(snaps.map((x) => x.day))) {
+      const a = afternoonStress(dayCurve(day, snaps, []));
+      if (a !== null && a >= TENSE_STRESS) tense.add(day);
+    }
+    out.push({ key: "nachmittag_angespannt", group: "erholung", label: "Tage mit angespanntem Nachmittag", has: (d) => tense.has(d), from: [...snaps.map((x) => x.day)].sort()[0] });
   }
 
   // Erholung: Werte der Nacht davor gegen den eigenen Bereich (unteres oder oberes Viertel)
