@@ -1,6 +1,6 @@
 # Konzept: Karate-Prüfungen mit Prüfungsprogramm zum Abhaken
 
-Stand: 25.11.2026 · Status: **Freigegeben (25.11.), umgesetzt in PR #143 · Prüfungsordnung steht noch aus**
+Stand: 25.11.2026 · Status: **Freigegeben (25.11.), umgesetzt in PR #143 mit Vorlage · DKV-Programm als Entwurf zur Durchsicht**
 
 ## Ziel
 1. Für jede Prüfung ab dem 5. Kyu bis zum 1. Kyu steht das Prüfungsprogramm schon in der App: Kihon, Kata, Kumite.
@@ -14,82 +14,105 @@ Heute gibt es auf Training › Karate eine leere Liste „Meine Prüfungsliste�
 
 ## 1. Entscheidungen (25.11.)
 
-1. **Verband**: Du schickst die Prüfungsordnung deines Dojos. Bis dahin bleibt Abschnitt 2 eine Vorlage.
+1. **Verband**: Deutscher Karate Verband (DKV), Stilrichtung Shotokan. Entwurf in Abschnitt 2, wird erst nach deiner Durchsicht in die App übernommen.
 2. **Drei Stufen** pro Punkt: *offen · übe ich · sitzt*. „Abhaken“ heißt *sitzt*.
 3. **Kata in Teilen**: Jede Kata lässt sich aufklappen in Abfolge, Kiai-Stellen, Rhythmus und Stände, jeder Teil mit eigener Stufe. Die Kata gilt als *sitzt*, wenn alle Teile sitzen, sie lässt sich aber auch direkt setzen.
 4. **Begriffe und Theorie** kommen als eigene Gruppe dazu (z. B. Zählen, Namen der Techniken und Stände, Dojo-Kun), Inhalt nach deiner Prüfungsordnung.
 
 ---
 
-## 2. Prüfungsprogramm (Vorlage)
+## 2. Prüfungsprogramm nach DKV Shotokan (Entwurf zur Durchsicht)
 
-> **Beispielinhalt, nicht verbindlich.** Die Liste unten folgt dem verbreiteten Programm nach JKA/DJKB. Sie wird erst übernommen, wenn du den Verband bestätigt oder deine Prüfungsordnung geschickt hast. In der App steht über jeder Liste, nach welcher Ordnung sie gilt, mit Stand.
+> **Entwurf, wartet auf deine Durchsicht.** Grundlage: Prüfungsordnung Shotokan im Deutschen Karate Verband, in Kraft seit 01.01.2023, redaktionell geändert am 20.03.2024 und 09.12.2025 (karate.de › Service › Downloads › Prüfungswesen). In eigenen, kurzen Worten zusammengefasst; maßgeblich ist die Prüfungsordnung selbst.
 
-Kihon wird jeweils mehrmals vorwärts bzw. rückwärts gelaufen. Tritte meist beidseitig.
+**Was für alle Grade gilt (steht in der App über Kihon)**
+- Tritte Jodan, Armtechniken Chudan, jede Technik oder Kombination 5-mal, wenn nichts anderes dasteht.
+- Alle bisher gelernten Kata gehören zum Prüfungsstoff (Gruppe „Wiederholung“).
+- Zu jeder Prüfung gehören Kihon, Kata, Kumite und Anwendung (Bunkai).
+- Im Kumite zählt Zanshin, die Aufmerksamkeit nach der Technik.
 
-### 5. Kyu
+Kürzel: ZK Zenkutsu-dachi · KK Kokutsu-dachi · KB Kiba-dachi · NA Neko-ashi-dachi · SD Sochin-dachi · YA Yori-ashi (Gleitschritt) · „/“ ohne Schritt · „v“ mit Schritt vor · „r“ mit Schritt zurück. Ohne Angabe: ZK.
+
+**Neu gegenüber dem ersten Entwurf**: eigene Gruppe **Anwendung** (Verteidigung aus dem Kihon und Bunkai aus der Kata), weil der DKV sie in jeder Prüfung verlangt. Kihon-Punkte gelten je Grad, weil sich die Kombinationen von Grad zu Grad ändern. Kata behalten ihren Haken über alle Grade.
+
+### 5. Kyu · blauer Gürtel
 **Kihon**
-- Sanbon-zuki, vorwärts (Zenkutsu-dachi) · dreifacher Fauststoß
-- Age-uke, Gyaku-zuki, rückwärts · Abwehr nach oben, Gegenstoß
-- Soto-uke, Yoko-empi-uchi (Kiba-dachi), Uraken, Gyaku-zuki (Zenkutsu-dachi), vorwärts
-- Uchi-uke, Kizami-zuki, Gyaku-zuki, rückwärts
-- Shuto-uke (Kokutsu-dachi), Kizami-mae-geri, Nukite, vorwärts
-- Mae-geri Ren-geri (Chudan, Jodan)
-- Mawashi-geri
-- Yoko-geri Keage und Yoko-geri Kekomi (Kiba-dachi)
+1. Kizami-zuki (YA) v Oi-zuki, aus Kamae, mit Wendung
+2. Gyaku-zuki im Stand v Gyaku-zuki mit Schritt
+3. Age-uke / Gyaku-age-empi, mit Wendung · Abwehr oben, Ellbogen nach oben
+4. Gedan-barai / Gyaku-mawashi-empi, mit Wendung · Abwehr unten, Ellbogen im Bogen
+5. KK Morote-uchi-ude-uke / ZK Gyaku-zuki · verstärkte Abwehr von innen
+6. KK Shuto-uke / ZK Gyaku-shuto-uchi Jodan, mit Wendung · Handkante
+7. Mae-ashi-geri v Mawashi-geri, aus Kamae · Tritt mit dem vorderen Bein, dann Halbkreistritt
+8. Ushiro-geri rückwärts gehend, ohne Drehung
 
-**Kata**
-- Heian Godan
-- Wiederholung auf Zuruf: Heian Shodan bis Yondan
+**Kata**: Heian Yondan · Wiederholung: Heian Shodan, Nidan, Sandan
+**Anwendung**: 2 Verteidigungen mit Partner aus dem Kihon · 2 Bunkai aus Heian Yondan
+**Kumite**: Kaeshi-Kumite aus Kamae, Teile: Jodan-zuki (Age-uke, Gyaku-zuki) · Chudan-zuki (Soto-ude-uke, Gyaku-zuki) · Mae-geri (Gedan-nagashi-uke, Gyaku-zuki) · seitliches Ausweichen zeigen
 
-**Kumite**
-- Kihon Ippon Kumite: Jodan Oi-zuki, Chudan Oi-zuki, Mae-geri, Yoko-geri Kekomi, jeweils rechts und links
+### 4. Kyu · blauer Gürtel
+**Kihon**
+1. Oi-zuki / Gyaku-zuki
+2. KK Uchi-ude-uke / ZK Gyaku-zuki, mit Wendung
+3. Age-uke / Soto-ude-uke mit demselben Arm / Gyaku-zuki
+4. Shuto-uchi / Gyaku-haito-uchi, mit Wendung · Handkante, Innenhandkante
+5. Uraken / Yoko-geri kekomi (vorderes Bein, Beistellschritt) / Gyaku-zuki, mit Wendung
+6. Ushiro-geri, mit Wendung
+7. KB Ura-mawashi-geri übersetzend (oder Ashi-barai aus ZK), 3-mal rechts, 3-mal links
 
-### 4. Kyu
-**Kihon** wie 5. Kyu, dazu:
-- Ushiro-geri
-- Kombination: Mae-geri, Oi-zuki, Gyaku-zuki
+**Kata**: Heian Godan · Wiederholung: Heian Shodan bis Yondan
+**Anwendung**: 2 Verteidigungen aus dem Kihon · 2 Bunkai aus Heian Godan
+**Kumite**: Kaeshi-Kumite mit Tai-sabaki (seitlich ausweichen), Konter frei, Teile: Jodan-zuki · Chudan-zuki · Mae-geri · Mawashi-geri
 
-**Kata**
-- Tekki Shodan
-- Wiederholung: Heian Shodan bis Godan
+### 3. Kyu · brauner Gürtel
+**Kihon**
+1. Oi-zuki r Gedan-barai v Oi-zuki, mit Wendung
+2. Gyaku-zuki / Kizami-zuki im Stand v Gyaku-zuki aus Kamae
+3. KK Age-uke / Mae-ashi-geri / ZK Gyaku-zuki, mit Wendung
+4. Uchi-ude-uke / Gyaku-zuki / Kizami-zuki
+5. Mae-mawashi-geri / Ushiro-geri, mit Wendung
+6. KB 2-mal Yoko-geri keage (Beistellschritt) / Kekomi, nach der Wendung zweimal zurück
+7. Ura-mawashi-geri / Gyaku-zuki (oder Ashi-barai mit dem hinteren Bein / Gyaku-zuki), mit Wendung
 
-**Kumite**
-- Kihon Ippon Kumite, alle Angriffe, mit sauberem Abstand und Kime
+**Kata**: Tekki Shodan · Wiederholung: Heian Shodan bis Godan
+**Anwendung**: 2 Verteidigungen aus dem Kihon · 2 Bunkai aus Tekki Shodan
+**Kumite**: Jiyu-Ippon-Kumite mit Yori-ashi, je rechts und links, Teile: Kizami-zuki Jodan · Gyaku-zuki Chudan · Mae-geri Chudan · Mawashi-geri · Ushiro-geri Chudan · dazu Jiyu-Kumite
 
-### 3. Kyu
-**Kihon** wie 4. Kyu, dazu:
-- Kombinationen mit Tritten, z. B. Mae-geri, Mawashi-geri, Gyaku-zuki
-- Tritt-Kombination auf einem Bein (z. B. Yoko-geri Keage, Yoko-geri Kekomi)
+### 2. Kyu · brauner Gürtel
+**Kihon**
+1. Uraken-uchi / Gyaku-zuki
+2. NA Shuto-uke / Mae-ashi-geri / ZK Gyaku-tate-nukite, mit Wendung
+3. Soto-ude-uke / KB Yoko-empi / Yoko-uraken-uchi / ZK Gyaku-zuki, mit Wendung
+4. SD Uchi-ude-uke / ZK Gyaku-zuki
+5. aus Chudan-Kamae: Ashi-barai (vorderes Bein) / Uraken-uchi v Mawashi-geri / Gyaku-zuki, mit Wendung
+6. aus Chudan-Kamae: Kizami-zuki YA / Gyaku-zuki v Ura-mawashi-geri (oder v Ashi-barai / Gyaku-zuki), mit Wendung
+7. aus Chudan-Kamae: Kizami-zuki YA / Ushiro-geri / Gyaku-zuki, mit Wendung
 
-**Kata**
-- Bassai Dai
-- Wiederholung: Heian und Tekki Shodan
+**Kata**: Bassai Dai · Wiederholung: Heian Shodan bis Godan, Tekki Shodan
+**Anwendung**: 2 Verteidigungen aus dem Kihon · 2 Bunkai aus Bassai Dai
+**Kumite**: Jiyu-Ippon-Kumite mit Yori-ashi vor, je rechts und links, Teile: Kizami-zuki Jodan / Gyaku-zuki Chudan · Gyaku-zuki / Gyaku-zuki Jodan · Ura-mawashi-geri (oder Ushiro-geri) · Kizami-zuki Jodan / Mawashi-geri mit dem vorderen Bein · dazu Jiyu-Kumite
 
-**Kumite**
-- Jiyu Ippon Kumite: Jodan, Chudan, Mae-geri, Yoko-geri Kekomi, Mawashi-geri
+### 1. Kyu · brauner Gürtel
+**Kihon** (alles aus Kamae)
+1. Kizami-zuki (YA) / Gyaku-zuki v Oi-zuki
+2. KK Gedan-barai / Uraken mit demselben Arm / ZK Gyaku-zuki, mit Wendung
+3. Abwehr-Reihe rückwärts in SD, jeweils mit ZK Gyaku-zuki: Age-uke, Soto-uke, Uchi-ude-uke, Tate-shuto-uke, Gedan-barai, mit Wendung
+4. KK Shuto-uke / ZK Shuto-uchi mit demselben Arm / Mae-geri, hinten absetzen / ZK Gyaku-haito-uchi
+5. Oi-zuki r (YA) NA Jodan Te-nagashi-uke / Mae-mawashi-geri / Gyaku-zuki, mit Wendung
+6. Kizami-zuki (YA) / Ushiro-geri / Uraken / Gyaku-zuki, mit Wendung
+7. Ura-mawashi-geri (oder Yoko-geri kekomi) mit dem hinteren Bein, mit Wendung
 
-### 2. Kyu
-**Kihon** wie 3. Kyu, Kombinationen schneller und mit Richtungswechsel
+**Kata**: Wahlkata aus Jion, Kanku Dai, Empi, Hangetsu · Wiederholung: Heian Shodan bis Godan, Tekki Shodan, Bassai Dai
+**Anwendung**: 2 Verteidigungen aus dem Kihon · 3 Bunkai aus der Wahlkata
+**Kumite**: Jiyu-Ippon-Kumite, je rechts und links, Teile: Oi-zuki Jodan · Kizami-zuki · Uraken / Gyaku-zuki Chudan · Mawashi-geri (vorderes oder hinteres Bein) · Ushiro-geri oder Ushiro-ura-mawashi-geri · dazu Jiyu-Kumite
 
-**Kata**
-- Wahlkata: Kanku Dai, Enpi oder Jion
-- Wiederholung: Bassai Dai, Heian, Tekki Shodan
-
-**Kumite**
-- Jiyu Ippon Kumite, alle Angriffe
-
-### 1. Kyu
-**Kihon** wie 2. Kyu, freie Kombinationen nach Ansage
-
-**Kata**
-- Wahlkata (Tokui-Kata): Bassai Dai, Kanku Dai, Enpi oder Jion
-- Eine weitere Kata nach Wahl des Prüfers
-
-**Kumite**
-- Jiyu Kumite (freier Kampf)
-
----
+### Begriffe
+Der DKV fragt keine Theorie ab, die Prüfungsordnung hat aber ein Verzeichnis der Begriffe. Vorschlag: eine Gruppe „Begriffe“ zum Lernen, nicht zur Prüfung, verteilt auf die Grade:
+- 5. Kyu: Kommandos (Yoi, Hajime, Yame, Mawate, Rei) · Angriffsstufen (Jodan, Chudan, Gedan) · Stellungen
+- 4. Kyu: Namen der Techniken (Abwehr, Stöße, Schläge, Tritte)
+- 3. Kyu: Trainings- und Kampfformen (Gohon-, Kihon-Ippon-, Kaeshi-, Jiyu-Ippon-, Jiyu-Kumite)
+- 2. Kyu: Kiai, Kime, Hikite, Zanshin, Tai-sabaki
+- 1. Kyu: Schritte und Gleitschritte (Suri-ashi, Yori-ashi, Kai-ashi)
 
 ## 3. So sieht es in der App aus
 
