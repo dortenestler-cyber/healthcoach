@@ -34,10 +34,14 @@ export function clock(d: Date): string {
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
-// Gruß nach Tageszeit (Heute und Sperrbildschirm)
+// Gruß nach Tageszeit (Heute und Sperrbildschirm), locker statt förmlich.
+// Abend ab 17 Uhr, nachts ab 22 Uhr.
 export function greeting(d: Date = new Date()): string {
   const h = d.getHours();
-  return h < 11 ? "Guten Morgen" : h < 18 ? "Guten Tag" : "Guten Abend";
+  if (h >= 5 && h < 11) return "Morgen!";
+  if (h >= 11 && h < 17) return "Hallo!";
+  if (h >= 17 && h < 22) return "Schönen Abend!";
+  return "Noch wach?";
 }
 
 // Tag um n Tage verschieben (ISO-Datum, Ortszeit)

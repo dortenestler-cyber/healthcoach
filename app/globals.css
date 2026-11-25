@@ -724,10 +724,15 @@ button {
 }
 
 .pills.scroll {
+  /* Nur waagerecht wischen: overflow-x allein macht overflow-y automatisch zu „auto“,
+     und die unsichtbare Tap-Fläche (.pill::after) ragt oben/unten hinaus → die Zeile ließ sich hoch/runter schieben. */
   overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   gap: 6px;
-  padding-bottom: 2px;
+  padding: 4px 0;
 }
 
 .pills.scroll::-webkit-scrollbar { display: none; }
