@@ -14,6 +14,19 @@ const addDays = (iso: string, n: number) => {
 };
 const clamp = (v: number) => Math.max(0, Math.min(100, v));
 const lin = (v: number, zero: number, full: number) => clamp(((v - zero) / (full - zero)) * 100);
+// Punkte nach Lage im eigenen Bereich: typische Nacht (Mitte) 80, untere Grenze 60, obere 95, deutlich besser 100.
+// Unter dem Bereich fällt es bis 0 bei anderthalb Bereichsbreiten darunter. lower: weniger ist besser (Ruhepuls, Atem).
+function rangePoints(v: number, r: Range, lower = false): number {
+  const w = Math.max(r.hi - r.lo, Math.abs(r.median) * 0.05, 0.01);
+  const x = lower ? 2 * r.median - v : v; // gespiegelt, damit weniger besser zählt
+  const lo = lower ? 2 * r.median - r.hi : r.lo;
+  const hi = lower ? 2 * r.median - r.lo : r.hi;
+  if (x < lo) return lin(x, lo - 1.5 * w, lo) * 0.6;
+  if (x < r.median) return 60 + ((x - lo) / Math.max(r.median - lo, 0.01)) * 20;
+  if (x <= hi) return 80 + ((x - r.median) / Math.max(hi - r.median, 0.01)) * 15;
+  return Math.min(100, 95 + ((x - hi) / (0.5 * w)) * 5);
+}
+
 const fixed = (lo: number, hi: number): Range => ({ lo, hi, median: (lo + hi) / 2, n: 30, stable: true });
 const plain = (r: Range): Baseline => ({ range: r, phase: null, phaseKey: null, active: r });
 
@@ -78,47 +91,47 @@ function bodyParts(day: string, data: Data) {
     const b = metricBaseline(k.key, data.daily, { diary: data.diary, sick: data.sick }, day);
     const r = b.active?.stable ? b.active : null;
     const bad = v === null || !r ? null : k.higher ? v < r.lo : v > r.hi;
-    return { ...k, bad };
+    const points = v === null || !r ? null : rangePoints(v, r, !k.higher);
+    return { ...k, bad, points };
   });
 }
 
 export function sleepScore(day: string, data: Data): SleepScore {
   const slept = sleepAchieved(day, data);
   const pct = slept.ratio === null ? null : Math.round(slept.ratio * 100);
-  const amount = pct === null ? null : Math.min(100, pct);
+  // Menge: Bedarf gedeckt 85 (der Bedarf ist dein üblicher Schlaf), 10 % mehr 100; darunter 2 Punkte je Prozentpunkt (94 % → 73)
+  const amount = pct === null ? null : pct >= 100 ? Math.min(100, 85 + (pct - 100) * 1.5) : clamp(85 - (100 - pct) * 2);
   const d = night(data, day);
   const parts: Part[] = [];
 
-  // Durchschlafen: bis 2× wach und 20 min frei, dann Abzug
+  // Durchschlafen: je Aufwachen 10 Punkte, je Minute wach über 10 min 1,5 Punkte
   const cnt = d?.awake_count ?? null;
   const aw = awakeMin(d);
   if (cnt !== null || aw !== null) {
-    const p = clamp(100 - (cnt !== null ? Math.max(0, cnt - 2) * 15 : 0) - (aw !== null ? Math.max(0, aw - 20) : 0));
-    parts.push({ key: "durch", label: "Durchschlafen", weight: 30, points: p, weak: cnt !== null && cnt > 2 ? `${cnt}× wach` : `${hmFmt(aw ?? 0)} wach` });
+    const p = clamp(100 - (cnt !== null ? cnt * 10 : 0) - (aw !== null ? Math.max(0, aw - 10) * 1.5 : 0));
+    parts.push({ key: "durch", label: "Durchschlafen", weight: 30, points: p, weak: cnt !== null && cnt >= 2 ? `${cnt}× wach` : `${hmFmt(aw ?? 0)} wach` });
   }
 
-  // Effizienz: ab 90 % volle Punkte, bei 75 % keine
+  // Effizienz: ab 98 % volle Punkte, bei 85 % keine
   const eff = efficiency(d);
-  if (eff !== null) parts.push({ key: "effizienz", label: "Effizienz", weight: 20, points: lin(eff, 75, 90), weak: "viel wach gelegen" });
+  if (eff !== null) parts.push({ key: "effizienz", label: "Effizienz", weight: 20, points: lin(eff, 85, 98), weak: "viel wach gelegen" });
 
   // Tief- und REM-Schlaf als Anteil, gegen deinen Bereich (je Zyklusphase), sonst Startwerte
   const ph: { p: number; weak: string }[] = [];
   const ds = share(d?.sleep_deep_s, d);
   const rs = share(d?.sleep_rem_s, d);
   if (ds !== null) {
-    const lo = rangeOf((x) => share(x.sleep_deep_s, x), day, data, fixed(13, 23), true).active!.lo;
-    ph.push({ p: ds >= lo ? 100 : lin(ds, lo / 2, lo), weak: "wenig Tiefschlaf" });
+    ph.push({ p: rangePoints(ds, rangeOf((x) => share(x.sleep_deep_s, x), day, data, fixed(13, 23), true).active!), weak: "wenig Tiefschlaf" });
   }
   if (rs !== null) {
-    const lo = rangeOf((x) => share(x.sleep_rem_s, x), day, data, fixed(18, 25), true).active!.lo;
-    ph.push({ p: rs >= lo ? 100 : lin(rs, lo / 2, lo), weak: "wenig REM-Schlaf" });
+    ph.push({ p: rangePoints(rs, rangeOf((x) => share(x.sleep_rem_s, x), day, data, fixed(18, 25), true).active!), weak: "wenig REM-Schlaf" });
   }
   if (ph.length) {
     const worst = ph.reduce((a, b) => (b.p < a.p ? b : a));
     parts.push({ key: "phasen", label: "Tief- und REM-Schlaf", weight: 25, points: ph.reduce((a, b) => a + b.p, 0) / ph.length, weak: worst.weak });
   }
 
-  // Regelmäßigkeit: bis 30 min Abstand volle Punkte, ab 2 h keine
+  // Regelmäßigkeit: bis 10 min Abstand volle Punkte, ab 75 min keine
   const t = timing(day, data);
   const devs = [t.start, t.end].filter((x): x is number => x !== null);
   if (devs.length) {
@@ -126,14 +139,14 @@ export function sleepScore(day: string, data: Data): SleepScore {
     const s = t.start !== null && Math.abs(t.start) === dev;
     const v = s ? t.start! : t.end!;
     const weak = `${hmFmt(v)} ${v > 0 ? "später" : "früher"} ${s ? "eingeschlafen" : "aufgewacht"} als sonst`;
-    parts.push({ key: "regel", label: "Regelmäßigkeit", weight: 10, points: lin(dev, 120, 30), weak });
+    parts.push({ key: "regel", label: "Regelmäßigkeit", weight: 10, points: lin(dev, 75, 10), weak });
   }
 
-  // Erholung des Körpers: Ruhepuls, HRV, Atem im eigenen Bereich
-  const body = bodyParts(day, data).filter((b) => b.bad !== null);
+  // Erholung des Körpers: Ruhepuls, HRV, Atem nach Lage im eigenen Bereich
+  const body = bodyParts(day, data).filter((b) => b.points !== null);
   if (body.length) {
     const bad = body.filter((b) => b.bad);
-    parts.push({ key: "koerper", label: "Erholung des Körpers", weight: 15, points: clamp(100 - (bad.length * 100) / 3), weak: bad.map((b) => b.weak).join(", ") || "Körper erholt" });
+    parts.push({ key: "koerper", label: "Erholung des Körpers", weight: 15, points: body.reduce((a, b) => a + (b.points as number), 0) / body.length, weak: bad.map((b) => b.weak).join(", ") || "Körper erholt" });
   }
 
   const w = parts.reduce((a, p) => a + p.weight, 0);

@@ -50,6 +50,14 @@ Reihenfolge von oben:
 ## 5. Was der Coach daraus macht
 Die Erklärkarte „Wie kann ich meinen Schlaf verbessern?“ bekommt die Bausteine mit (nur Zahlen, keine Tagebuchtexte). So kann der Coach gezielt auf den schwächsten Baustein eingehen, z. B. Regelmäßigkeit statt allgemeiner Tipps. Gewohnheiten mit Wirkung auf Erholsam (Alkohol, Sauna, Bildschirm, spätes Training) kommen aus der vorhandenen Muster-Auswertung.
 
+## 5a. Nachkalibrierung (25.11.2026)
+Erste Fassung war zu großzügig: „im eigenen Bereich“ gab volle Punkte, eine gewöhnliche Nacht lag bei 95–100. Neu:
+- **Menge:** Bedarf gedeckt = 85 (der Bedarf ist dein üblicher Schlaf), 10 % mehr = 100, darunter 2 Punkte je Prozentpunkt.
+- **Lage im eigenen Bereich** (Tief-/REM-Anteil, Ruhepuls, HRV, Atem): Mitte 80, untere Grenze 60, obere 95, deutlich besser 100.
+- **Durchschlafen:** je Aufwachen −10, je Minute wach über 10 min −1,5.
+- **Effizienz:** voll ab 98 %, null bei 85 %. **Regelmäßigkeit:** voll bis 10 min, null ab 75 min.
+- Ergebnis mit Testnächten: typisch 82 (mittel), sehr gut 97, unruhig 67, kurz 62, schlecht 22.
+
 ## 6. Umsetzung
 - **Keine Migration nötig.** Alle Werte liegen schon in `garmin_daily`; die Rechnung läuft in der App (`lib/today.ts`: neue Funktion `sleepQuality`, `sleepAchieved` liefert zusätzlich Gesamtwert).
 - Oberfläche `[OF]`: `HeuteDetail.tsx` (Schlafseite), `RingRow.tsx` (Ring auf Heute), Readiness-Faktor.
