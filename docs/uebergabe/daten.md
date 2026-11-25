@@ -1,5 +1,5 @@
 # Übergabe · Daten (DA)
-Belegt: frei
+Belegt: Sitzung https://claude.ai/code/session_017zWr1WS7sTKnh1NfXui9YD (Intensität mit Training, seit 25.11. 20:50)
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1VwL1U1ue6ALkkaL4z
 
 ## Bug: Intensitätsminuten bleiben nach dem Training stehen (PR #184, 25.11.)
