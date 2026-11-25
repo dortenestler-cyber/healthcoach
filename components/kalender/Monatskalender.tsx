@@ -4,7 +4,7 @@
 // Monat mit Phasenbändern wie Vorlage 02, Ebenen zum Zuschalten: Zyklus, Training, Symptome.
 // Jeder Bereich gibt seine Voreinstellung mit. Tippen auf einen Tag ruft onPick (in der Regel: Tagesblatt öffnen).
 
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Pille, PillenZeile, useAuswahl } from "@/components/ui/Pille";
 import { projectedPhase } from "@/lib/cycle";
 import type { Diary } from "@/lib/insights";
@@ -49,14 +49,31 @@ type Props = {
   zeichen?: Partial<Record<ZeichenEbene, (day: string) => string | null>>; // Text für den Tag oder null
   selected?: string | null;
   onPick?: (day: string) => void;
+  bereich?: { von: string; bis: string } | null; // gewählter Zeitraum (Paket 6), wird hervorgehoben
+  onLangDruck?: (day: string) => void; // langes Drücken auf einen Tag startet den Zeitraum
   onMonth?: (first: string, last: string) => void; // für Bereiche, die je Monat nachladen
   maxForward?: number; // Monate nach vorn
   head?: ReactNode; // z. B. Vorhersage der nächsten Periode
   footer?: ReactNode; // z. B. „Periode eintragen +“
 };
 
-export default function Monatskalender({ today, diary, ebenen = ["zyklus", "training", "symptome"], start, merken = "allgemein", punkte, zeichen, selected, onPick, onMonth, maxForward = 3, head, footer }: Props) {
+export default function Monatskalender({ today, diary, ebenen = ["zyklus", "training", "symptome"], start, merken = "allgemein", punkte, zeichen, bereich, onLangDruck, selected, onPick, onMonth, maxForward = 3, head, footer }: Props) {
   const [offset, setOffset] = useState(0);
+  // Langes Drücken (0,45 s): startet den Zeitraum; der folgende Klick zählt dann nicht als Tipp
+  const druck = useRef<{ t: ReturnType<typeof setTimeout> | null; lang: boolean }>({ t: null, lang: false });
+  const druckStart = (day: string) => {
+    if (!onLangDruck) return;
+    druck.current.lang = false;
+    druck.current.t = setTimeout(() => {
+      druck.current.lang = true;
+      onLangDruck(day);
+      navigator.vibrate?.(15);
+    }, 450);
+  };
+  const druckEnde = () => {
+    if (druck.current.t) clearTimeout(druck.current.t);
+    druck.current.t = null;
+  };
   const [on, toggle] = useAuswahl<Ebene>(`kalender.${merken}`, start ?? ebenen);
   const base = new Date(today + "T12:00:00");
   const first = new Date(base.getFullYear(), base.getMonth() + offset, 1, 12);
@@ -140,10 +157,21 @@ export default function Monatskalender({ today, diary, ebenen = ["zyklus", "trai
             <button
               key={c.day}
               type="button"
-              onClick={() => onPick?.(c.day)}
+              onClick={() => {
+                if (druck.current.lang) {
+                  druck.current.lang = false;
+                  return;
+                }
+                onPick?.(c.day);
+              }}
+              onPointerDown={() => druckStart(c.day)}
+              onPointerUp={druckEnde}
+              onPointerLeave={druckEnde}
+              onPointerCancel={druckEnde}
+              onContextMenu={onLangDruck ? (e) => e.preventDefault() : undefined}
               aria-label={label}
               aria-pressed={selected ? selected === c.day : undefined}
-              className={`cal-cell${c.phase ? ` cal-${c.phase}` : ""}${c.future ? " cal-future" : ""}${segment(i)}${selected === c.day ? " mk-sel" : ""}${!c.phase ? " mk-plain" : ""}`}
+              className={`cal-cell${c.phase ? ` cal-${c.phase}` : ""}${c.future ? " cal-future" : ""}${segment(i)}${selected === c.day ? " mk-sel" : ""}${bereich && c.day >= bereich.von && c.day <= bereich.bis ? " mk-bereich" : ""}${!c.phase ? " mk-plain" : ""}`}
             >
               <span className="cal-band" aria-hidden="true" />
               <span className={`cal-num${c.today ? " cal-today" : ""}`} aria-hidden="true">{c.n}</span>
