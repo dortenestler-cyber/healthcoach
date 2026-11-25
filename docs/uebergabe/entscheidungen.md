@@ -73,3 +73,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-24 · OF/DA · Nutzerin: von der Vorlage schon geplante offene Einheiten werden gelöscht · kein „jede Woche“, Termine plant sie einzeln
 2026-11-24 · DA · Nutzerin: Migration für Dauer und Anstrengung in planned_sessions freigegeben
 2026-11-24 · OF · Nutzerin: Konzept Bündeln: Wert-Seite unter neuer Adresse `/wert/…`, Reihenfolge der Bausteine wie im Konzept
+2026-11-25 · OF · Nutzerin: „Gewohnheiten im Monat“ (Gesundheit › Überblick) und Monatsrückblick (Training › Auswertung) entfallen, „Dein Monat“ ersetzt beide
