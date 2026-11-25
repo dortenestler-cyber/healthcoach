@@ -31,7 +31,7 @@ Jeder Baustein gibt 0–100 Punkte. Maßstab ist, wo möglich, dein eigener Bere
 - Anteile statt Minuten bei Tief- und REM-Schlaf, damit eine lange Nacht nicht automatisch gut aussieht.
 - Fehlt ein Baustein (z. B. keine Phasen), werden die übrigen neu gewichtet. Unter drei Bausteinen gibt es keinen Wert „Erholsam“, nur die Menge.
 - Eigener Bereich erst ab 14 Nächten, vorher feste Startwerte (Tiefschlaf 13–23 %, REM 18–25 %).
-- Garmins eigener Schlafwert (`sleep_score`) fließt nicht ein. Er dient nur zur Kontrolle beim Einführen: Weicht unsere Zahl in mehr als jeder vierten Nacht um über 20 Punkte ab, Gewichte prüfen.
+- Garmins eigener Schlafwert (`sleep_score`) wird in der App nicht mehr verwendet (Nutzerin 25.11.: ganz entfernen; Uhr, Abruf und Spalte siehe Übergabe Daten).
 
 ## 3. Zyklus und Perimenopause
 - **Lutealphase:** Ruhepuls höher, Tiefschlaf oft weniger. Sobald zwei Zyklen Daten da sind, gilt für „Erholung des Körpers“ und „Tief- und REM-Schlaf“ der Bereich derselben Phase, nicht der letzten 30 Nächte. Sonst wird jede Lutealphase als schlecht bewertet.
