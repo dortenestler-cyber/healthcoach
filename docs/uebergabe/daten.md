@@ -8,7 +8,7 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017z
 - Erweiterung nach Freigabe: `quick` schreibt zusätzlich `stress_avg` und `bb_*` (gleiche Antwort, keine weitere Anfrage). Migration `20261130120000_abruf_stuendlich`: `garmin_day_tick` macht zwischen 6 und 22 Uhr jede Stunde zur Minute 37 den vollen Abruf `{days: 1}`, sonst den kurzen (vorher nur 19:37–21:37). Etwa 16 volle Abrufe am Tag; wegen Garmin-Limits und Laufzeit bewusst nicht alle 15 Minuten.
 - `HeuteView`: Fehlermeldung „Der automatische Abruf um …“ statt „heute Morgen“, weil `garmin_sync_runs` jetzt stündlich Einträge bekommt.
 - Geprüft: Syntax der Funktion (TypeScript-Transpile), `tsc`, `npm run build`. `deno check` nicht möglich (Deno fehlt in der Sitzung).
-- Wartet auf: Freigabe der Nutzerin zum Merge (Migration und Supabase-Funktion). Danach: Läufe „Supabase-Migrationen ausführen“ und „Supabase-Funktionen hochladen“ prüfen; in `garmin_sync_runs` sollten stündlich Einträge erscheinen.
+- Merge freigegeben 25.11. Nächster Schritt: Läufe „Supabase-Migrationen ausführen“ und „Supabase-Funktionen hochladen“ prüfen; in `garmin_sync_runs` sollten stündlich Einträge erscheinen.
 
 ## Vercel Hobby (PR #183, 25.11., Freigabe der Nutzerin)
 - Pro-Tarif gekündigt, jetzt Hobby: 100 Deployments am Tag inkl. Vorschauen, Vercel-Cron nur einmal täglich (±59 Min).
