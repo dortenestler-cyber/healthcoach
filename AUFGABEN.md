@@ -9,7 +9,7 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ### Tagesabschluss am Abend (PR #180, 25.11.)
 Enthält die Migration `supabase/migrations/20261130110000_tagesabschluss.sql` (Schalter und Uhrzeit für den Abend, voller Garmin-Abruf um 19:37, 20:37 und 21:37 Uhr). Dein Merge ist die Freigabe.
-- [ ] PR #180 mergen
+- [x] PR #180 gemergt (25. Nov.), Migration und Hochladen grün (geprüft von Claude)
 - [ ] Heute oder morgen Abend: kommt der Tagesabschluss um 21 Uhr, und öffnet er die Karte im Tagebuch?
 
 ### Tagesstart und Mitteilung nach dem Training (PR #179, 25.11.)
