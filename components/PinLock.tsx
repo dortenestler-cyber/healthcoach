@@ -128,7 +128,6 @@ export default function PinLock({ children }: { children: ReactNode }) {
 
   const hello = greeting();
   const letters = ["", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ"];
-  const minutes = Math.round(LOCK_AFTER_MS / 60000);
 
   // Sperrbildschirm (Konzept dunkel 2): App-Symbol, Gruß, PIN-Punkte, Ziffernfeld wie beim iPhone.
   // Hier steht nie ein Gesundheitswert.
@@ -173,7 +172,6 @@ export default function PinLock({ children }: { children: ReactNode }) {
       {mode === "eingeben" && (
         <button type="button" className="btn btn-link" onClick={signOut}>PIN vergessen? Mit Passwort anmelden</button>
       )}
-      <span className="pin-foot">Gesperrt nach {minutes} Minuten im Hintergrund. Hier steht nie ein Gesundheitswert.</span>
     </div>
   );
 }

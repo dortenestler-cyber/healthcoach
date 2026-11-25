@@ -2439,7 +2439,6 @@ body { overflow-x: clip; }
 .pin .pin-key-ghost { border: 0; background: transparent; }
 .pin-num { font-size: 30px; font-weight: 500; line-height: 1; }
 .pin-letters { height: 11px; font-size: 9px; font-weight: 600; letter-spacing: 0.18em; color: var(--muted); }
-.pin-foot { margin-top: 8px; max-width: 300px; font-size: 12px; color: var(--muted); }
 
 /* Gesundheit › Überblick und Gewohnheiten (Konzept dunkel 2) */
 .glance-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
