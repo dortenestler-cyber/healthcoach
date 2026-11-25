@@ -1,6 +1,12 @@
 # Übergabe · Daten (DA)
 Belegt: frei
-Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU
+Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WTBNyc3ZjZhsy1RJj
+
+## Vercel Hobby (PR #NR, 25.11., Freigabe der Nutzerin)
+- Pro-Tarif gekündigt, jetzt Hobby: 100 Deployments am Tag inkl. Vorschauen, Vercel-Cron nur einmal täglich (±59 Min).
+- `vercel.json`: `ignoreCommand` ersetzt durch `git.deploymentEnabled` (`**` aus, `main` und `vorschau/**` an). Der alte Ignored Build Step legte für jeden Push auf einen Arbeitszweig trotzdem ein abgebrochenes Deployment an.
+- Geprüft: Alle Zeitpläne (`garmin-morgen`, `garmin-tagsueber`, `health-coach-push`) laufen über pg_cron in Supabase, keine Vercel-Crons. Vom Tarifwechsel nicht betroffen.
+- Regel in `CLAUDE.md` › Arbeitsweise ergänzt. Wartet auf: nichts.
 
 ## Tagesabschluss am Abend (PR #180, 25.11., Freigabe der Nutzerin)
 - Migration `20261130110000_tagesabschluss`: `push_subscriptions.evening_push` (an), `evening_at` ('21:00'), `evening_sent_on`. `garmin_day_tick` macht um 19:37, 20:37, 21:37 einen vollen Abruf `{days: 1}` (Belastung aus dem Alltag), sonst den kurzen.
