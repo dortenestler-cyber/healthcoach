@@ -53,7 +53,6 @@ export default function FlashCounter({ day }: { day: string }) {
         </div>
       </div>
       {error && <p className="alert alert-inline">{error}</p>}
-      <span className="meta">Speichert sofort, unabhängig vom Knopf unten.</span>
     </section>
   );
 }

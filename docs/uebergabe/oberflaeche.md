@@ -1,5 +1,5 @@
 # Übergabe · Oberfläche (OF)
-Belegt: frei
+Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWcpKAVS1T6prb5SPNt · seit 2026-11-25
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWcpKAVS1T6prb5SPNt
 
 ## Konzept Einfach bedienen (PR #146, Entwurf, 25.11.)
@@ -17,7 +17,8 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014p
 - Gemessen mit Beispieldaten: Übersicht 4,7 Bildschirme (davon gut 2 Aktivitätenliste), Auswertung 7,1 mit allen Abschnitten an, Karate 2,6.
 - Paket 5 Zyklus (PR #153): `components/zyklus/ZyklusWoche.tsx` (Wochenstreifen mit Phasenfarbe, Wort und Satz, „Kalender ›“) statt `CycleCalendar` (gelöscht). `useAbschnitte("zyklus")` in `ZyklusPage`: Werte · Symptome an, Gewohnheiten · Perioden zuerst aus. `CycleHistory teil="perioden"|"symptome"`. Gewohnheiten-Balken hinter `Details id="zyklus.gewohnheiten"`. `#perioden` schaltet den Abschnitt ein und scrollt hin (`einschalten` in `useAbschnitte`). Länge mit Beispieldaten 6,7 → 3,4 Bildschirme.
 - Paket 6 Zeitraum (PR #155): `components/kalender/Zeitraum.tsx` (`ZeitraumLeiste`). Im zentralen Kalender (`CalendarSection zeitraum`): langes Drücken 0,45 s (`onLangDruck` in `Monatskalender`) oder „Mehrere Tage wählen“ setzt den Anfang, Tipp setzt das Ende. Aktionen: Periode (nur `bleeding` je Tag bis heute, andere Felder bleiben), Krank (`illnesses` insert, bis heute = offen), Gewohnheit (`influences` ergänzen), Vergleichen (Schnitt gegen 30 Tage davor, ±5 % = „etwa wie sonst“). `PeriodBackfill` bleibt für Ändern/Entfernen, mit Link zum Kalender.
-- Nächster Schritt: Paket 7 Tagebuch ruhiger: alles speichert sofort (Knopf „Speichern“ entfällt), Datum öffnet Monat als Blatt, Hinweise und Verlauf 4 Wochen raus.
+- Paket 7 Tagebuch (PR #156): speichert 0,6 s nach dem letzten Tipp (`dirty` + Timer, `saveRef`), Status „Speichert …“/„✓ Gespeichert“ oben rechts; nach dem Speichern wird nur `history` nachgeführt, nicht neu geladen (sonst gehen schnelle Tipps verloren). Tageswechsel speichert vorher, keine Rückfrage mehr. Datum ist ein Knopf und öffnet `Monatskalender` im `EditSheet` (Verlauf 120 Tage geladen, „oben genutzt“ weiter aus 28 Tagen). Raster „Verlauf, 4 Wochen“ und Hinweise entfernt, Link „Verlauf im Kalender“.
+- Nächster Schritt: Paket 8 Details einklappen (Grundlage-Sätze in Musterkarten auf Gesundheit › Überblick, „Was das Ziel bestimmt“ und „Empfehlung je Sportart“ in Auswertung, Abschnitts-Pillen auf `/heute/schlaf` und `/heute/stress`).
 
 ## Karate-Prüfungsprogramm (PR #143, 25.11.)
 - Konzept `docs/konzept-karate-pruefungen.md`, freigegeben 25.11. Training › Karate: Kyu-Chips 5.–1., Ring „x von y sitzen“ mit Satz, Gruppen Kihon/Kata/Kumite/Begriffe, Wiederholung eingeklappt, eigene Punkte je Kyu. Drei Stufen per Tipp, Kata und Kumite klappen in Teile auf. „X. Kyu bestanden“ ab Prüfungsdatum, dann rückt der nächste Kyu nach.

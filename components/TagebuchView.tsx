@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import TwoCol from "@/components/ui/TwoCol";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { daysAgo, isoDay, longDate, shortDate } from "@/lib/dates";
-import { BLEEDING, GRID_ROWS, LEVELS, SIGNS, splitFrequent, SYMPTOMS } from "@/lib/catalog";
+import { daysAgo, isoDay, longDate } from "@/lib/dates";
+import { BLEEDING, LEVELS, SIGNS, splitFrequent, SYMPTOMS } from "@/lib/catalog";
 import { OVULATION_SIGNS } from "@/lib/ovulation";
 import { DEFAULT_HABITS, loadHabits, SAUNA_GAENGE, SAUNA_WANN, WANN_LABEL, type Habit, type HabitDetails, type SaunaDetails } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
@@ -14,12 +14,12 @@ import DayIntakes from "@/components/tagebuch/DayIntakes";
 import FlashCounter from "@/components/tagebuch/FlashCounter";
 import MuscleSection from "@/components/tagebuch/MuscleSection";
 import { useFeatures } from "@/lib/prefs";
+import EditSheet from "@/components/ui/EditSheet";
+import Monatskalender from "@/components/kalender/Monatskalender";
 
 type Entry = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[] };
 
-const DAYS = 28;
-// Symptom-Stärke 0 bis 3 in Amber
-const heat = ["var(--line-soft)", "var(--warn-bg)", "var(--warn-mid)", "var(--warn)"];
+const DAYS = 28; // letzte 4 Wochen: welche Symptome und Gewohnheiten oben stehen
 
 const shift = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");
@@ -28,6 +28,7 @@ const shift = (iso: string, n: number) => {
 };
 
 // Tagebuch für heute oder einen vergangenen Tag: Check-in, Blutung, Symptome mit Hitzewallungen, Gewohnheiten, Einnahmen.
+// Speichert jeden Tipp von selbst (Konzept docs/konzept-einfach.md, Paket 7, Logbuch 25.11.), ohne Knopf.
 // Hier wird alles eingetragen; Heute zeigt nur, was offen ist. Vergangene Perioden trägst du auf der Seite Zyklus nach.
 // Dazu vergangene Perioden schnell nachtragen.
 export default function TagebuchView({ initial }: { initial?: string }) {
@@ -41,9 +42,9 @@ export default function TagebuchView({ initial }: { initial?: string }) {
   const [details, setDetails] = useState<HabitDetails>({});
   const [detailsNote, setDetailsNote] = useState("");
   const [history, setHistory] = useState<Entry[]>([]);
-  const [muscle, setMuscle] = useState<Map<string, number>>(new Map());
-  const [saved, setSaved] = useState(false);
+  const [status, setStatus] = useState<"" | "speichert" | "gespeichert">("");
   const [dirty, setDirty] = useState(false);
+  const [blatt, setBlatt] = useState(false); // Monat als Blatt zum Tag wählen
   const [error, setError] = useState("");
   const [moreSym, setMoreSym] = useState(false);
   const [moreSign, setMoreSign] = useState(false);
@@ -59,7 +60,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     const sb = supabase();
     if (!sb) return;
     const [h, d] = await Promise.all([
-      sb.from("diary_entries").select("day, bleeding, symptoms, influences").gte("day", isoDay(daysAgo(DAYS - 1))).order("day"),
+      sb.from("diary_entries").select("day, bleeding, symptoms, influences").gte("day", isoDay(daysAgo(120))).order("day"), // 4 Monate für die Phasen im Blatt
       sb.from("diary_entries").select("day, bleeding, symptoms, influences").eq("day", day).maybeSingle(),
     ]);
     if (h.error || d.error) {
@@ -84,7 +85,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     setAutoReady(!au.error);
     setAutoSet(ad?.auto_set ?? []);
     setAutoOff(ad?.auto_off ?? []);
-    setSaved(!!t);
+    setStatus("");
     setDirty(false);
   }, [day]);
 
@@ -92,44 +93,32 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     load();
   }, [load]);
 
-  // Wadenkrämpfe der letzten 4 Wochen für das Raster: stärkste Intensität je Tag
-  const loadMuscle = useCallback(async () => {
-    const sb = supabase();
-    if (!sb || !feat.muskeln) return;
-    const { data } = await sb.from("muscle_events").select("day, intensity").gte("day", isoDay(daysAgo(DAYS - 1)));
-    const m = new Map<string, number>();
-    for (const r of (data ?? []) as { day: string; intensity: number }[]) m.set(r.day, Math.max(m.get(r.day) ?? 0, r.intensity));
-    setMuscle(m);
-  }, [feat.muskeln]);
-
-  useEffect(() => {
-    loadMuscle();
-  }, [loadMuscle]);
-
-  const changed = () => {
-    setSaved(false);
-    setDirty(true);
-  };
+  const changed = () => setDirty(true);
   const setSauna = (patch: Partial<SaunaDetails>) => {
     setDetails((d) => ({ ...d, sauna: { ...(d.sauna ?? {}), ...patch } }));
     changed();
   };
-  // Tag wechseln: ungespeicherte Änderungen nicht still verwerfen
-  const go = (d: string) => {
+  // Tag wechseln: Offenes vorher speichern
+  const go = async (d: string) => {
     if (d === day || d > today) return;
-    if (dirty && !window.confirm("Deine Änderungen für diesen Tag sind noch nicht gespeichert. Trotzdem wechseln?")) return;
+    if (dirty) await save();
     setDay(d);
   };
 
   const save = async () => {
     const sb = supabase();
     if (!sb) return;
+    if (timer.current) clearTimeout(timer.current);
+    setDirty(false);
+    setStatus("speichert");
     const clean = Object.fromEntries(Object.entries(symptoms).filter(([, v]) => v > 0));
     const { error: e } = await sb
       .from("diary_entries")
       .upsert({ day, bleeding, symptoms: clean, influences, updated_at: new Date().toISOString() }, { onConflict: "user_id,day" });
     if (e) {
       setError("Eintrag konnte nicht gespeichert werden: " + e.message);
+      setStatus("");
+      setDirty(true);
       return;
     }
     // Details nur für eingetragene Gewohnheiten speichern. Fehlt die Spalte noch, bleibt der Eintrag trotzdem gespeichert.
@@ -146,26 +135,31 @@ export default function TagebuchView({ initial }: { initial?: string }) {
       if (o2.error) setError("Eisprung-Zeichen konnten nicht gespeichert werden: " + o2.error.message);
     }
     setDetailsNote(d2.error ? "Die Sauna-Details werden gespeichert, sobald die Datenbank aktualisiert ist (PR mit Migration)." : "");
-    setSaved(true);
-    setDirty(false);
-    load();
+    setStatus("gespeichert");
+    // Nur die Liste der letzten Wochen nachführen, die Auswahl bleibt, wie sie ist (weitere Tipps laufen weiter)
+    setHistory((h) => [...h.filter((x) => x.day !== day), { day, bleeding, symptoms: clean, influences }]);
   };
 
-  const byDay = new Map(history.map((h) => [h.day, h]));
-  const days = Array.from({ length: DAYS }, (_, i) => isoDay(daysAgo(DAYS - 1 - i)));
-  const cellColor = (rowKey: string, d: string) => {
-    if (rowKey === "wade") return heat[muscle.get(d) ?? 0];
-    const e = d === day ? { day: d, bleeding, symptoms, influences } : byDay.get(d);
-    if (!e) return "var(--line-soft)";
-    if (rowKey === "blut") return e.bleeding > 0 ? "var(--menses-fg)" : "var(--line-soft)";
-    return heat[e.symptoms?.[rowKey] ?? 0];
-  };
+  // Von selbst speichern: kurz nach dem letzten Tipp
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveRef = useRef(save);
+  saveRef.current = save;
+  useEffect(() => {
+    if (!dirty) return;
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => saveRef.current(), 600);
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, [dirty, bleeding, symptoms, influences, details, ovSigns, autoSet, autoOff]);
 
-  // Oben die genutzten, Rest unter „Weitere anzeigen“ (Sammelliste 5e)
-  const usedSym = new Set<string>([...Object.keys(symptoms).filter((k) => symptoms[k] > 0), ...history.flatMap((e) => Object.keys(e.symptoms ?? {}).filter((k) => (e.symptoms[k] ?? 0) > 0))]);
+  // Oben die genutzten (letzte 4 Wochen)
+  const seit = isoDay(daysAgo(DAYS - 1));
+  const recent = history.filter((e) => e.day >= seit); // Rest unter „Weitere anzeigen“ (Sammelliste 5e)
+  const usedSym = new Set<string>([...Object.keys(symptoms).filter((k) => symptoms[k] > 0), ...recent.flatMap((e) => Object.keys(e.symptoms ?? {}).filter((k) => (e.symptoms[k] ?? 0) > 0))]);
   const symSplit = splitFrequent(SYMPTOMS, usedSym);
   const signSplit = splitFrequent(SIGNS, usedSym);
-  const usedHab = new Set<string>([...influences, ...history.flatMap((e) => e.influences ?? [])]);
+  const usedHab = new Set<string>([...influences, ...recent.flatMap((e) => e.influences ?? [])]);
   const habSplit = splitFrequent(habits.filter((h) => h.on || influences.includes(h.key)), usedHab);
 
   return (
@@ -175,12 +169,34 @@ export default function TagebuchView({ initial }: { initial?: string }) {
 
       <div className="day-nav">
         <button type="button" className="btn btn-soft btn-44" aria-label="Vorheriger Tag" onClick={() => go(shift(day, -1))}>‹</button>
-        <input type="date" className="input" aria-label="Tag wählen" max={today} value={day} onChange={(e) => e.target.value && go(e.target.value)} />
+        <button type="button" className="input tb-datum" aria-label={`${longDate(new Date(day + "T12:00:00"))}, anderen Tag wählen`} onClick={() => setBlatt(true)}>
+          {longDate(new Date(day + "T12:00:00"))}
+        </button>
         <button type="button" className="btn btn-soft btn-44" aria-label="Nächster Tag" disabled={day >= today} onClick={() => go(shift(day, 1))}>›</button>
       </div>
-      {day !== today && (
-        <button type="button" className="btn btn-link btn-44" onClick={() => go(today)}>Zurück zu heute</button>
-      )}
+      <div className="tb-status-zeile">
+        {day !== today ? (
+          <button type="button" className="btn btn-link btn-44" onClick={() => go(today)}>Zurück zu heute</button>
+        ) : <span />}
+        <span className="meta tb-status" role="status" aria-live="polite">
+          {status === "speichert" || dirty ? "Speichert …" : status === "gespeichert" ? "✓ Gespeichert" : ""}
+        </span>
+      </div>
+      <EditSheet title="Tag wählen" open={blatt} onClose={() => setBlatt(false)} instant>
+        <Monatskalender
+          today={today}
+          diary={history}
+          ebenen={["zyklus", "symptome"]}
+          merken="tagebuch-blatt"
+          selected={day}
+          maxForward={0}
+          onPick={(d) => {
+            if (d > today) return;
+            setBlatt(false);
+            go(d);
+          }}
+        />
+      </EditSheet>
 
       <TwoCol
         left={
@@ -299,7 +315,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
               );
             })}
         </div>
-        {autoReady && <span className="meta">Sport (ab 20 Minuten Garmin-Aktivität) und Stress (über deinem Bereich) setzt die App aus Garmin. Abwählen und speichern gilt für diesen Tag.</span>}
+        {autoReady && influences.some((k) => autoSet.includes(k)) && <span className="meta">„aus Garmin“ setzt die App selbst. Abwählen gilt für diesen Tag.</span>}
         {habSplit.rest.length > 0 && (
           <button type="button" className="btn btn-link more-link" onClick={() => setMoreHab(!moreHab)} aria-expanded={moreHab}>
             {moreHab ? "Weniger anzeigen" : `Weitere anzeigen (${habSplit.rest.length})`}
@@ -330,12 +346,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
           </div>
         )}
         {detailsNote && <span className="meta">{detailsNote}</span>}
-        <span className="meta">Ein Tipp genügt. Die Auswertung findest du unter Gesundheit.</span>
       </section>
-
-      <button type="button" className="btn btn-primary" onClick={save} disabled={saved}>
-        {saved ? "Gespeichert" : day === today ? "Eintrag speichern" : "Nachtrag speichern"}
-      </button>
 
           </>
         }
@@ -343,31 +354,15 @@ export default function TagebuchView({ initial }: { initial?: string }) {
           <>
       <DayIntakes key={"i" + day} day={day} />
 
-      {feat.muskeln && <MuscleSection key={"m" + day} day={day} onChanged={loadMuscle} />}
+      {feat.muskeln && <MuscleSection key={"m" + day} day={day} />}
 
-      <section className="card">
-        <details className="derive">
-        <summary>Verlauf, 4 Wochen · {shortDate(daysAgo(DAYS - 1))} bis heute</summary>
-          {[...GRID_ROWS, ...(feat.muskeln ? [{ key: "wade", label: "Wade" }] : [])].map((r) => (
-            <div key={r.key} className="grid-row">
-              <span className="grid-label">{r.label}</span>
-              <div className="grid-28" aria-label={r.label + " der letzten 4 Wochen"}>
-                {days.map((d) => (
-                  <span key={d} className="grid-cell" data-selected={d === day} style={{ background: cellColor(r.key, d) }} />
-                ))}
-              </div>
-            </div>
-          ))}
-          <div className="legend">
-            <span><i style={{ background: heat[1] }} />leicht</span>
-            <span><i style={{ background: heat[2] }} />mittel</span>
-            <span><i style={{ background: heat[3] }} />stark</span>
-            <span><i style={{ background: "var(--menses-fg)" }} />Periode</span>
-          </div>
-          {feat.muskeln && <span className="meta">Wade: leicht Zucken, mittel Krampf, stark starker Krampf</span>}
-          {history.length === 0 && <p>Sobald du Einträge machst, füllt sich das Raster.</p>}
-        </details>
-      </section>
+      <Link href="/kalender?von=tagebuch" className="card card-link-row">
+        <span className="stack">
+          <span className="row-strong">Verlauf im Kalender</span>
+          <span className="meta">Symptome und Gewohnheiten Tag für Tag</span>
+        </span>
+        <span aria-hidden="true">›</span>
+      </Link>
           </>
         }
       />

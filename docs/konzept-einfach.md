@@ -221,7 +221,7 @@ Jedes Paket ist ein eigener PR mit Fotos vorher/nachher. Alle Pakete gehören zu
 | 4 | Training zwei Reiter ✓ (PR #152) | hoch | Übersicht/Auswertung, Sportarten-Seiten, Kalender-Reiter raus, Insights in Auswertung |
 | 5 | Zyklus kürzen ✓ (PR #153) | hoch | Kalender und Nachtragen raus, Wochenstreifen, Abschnitts-Pillen |
 | 6 | Zeitraum im Kalender ✓ (PR #155) | mittel | Mehrere Tage wählen: Periode, krank, Gewohnheit, vergleichen |
-| 7 | Tagebuch ruhiger | mittel | Datum als Kalender-Blatt, Hinweise raus, Verlauf raus, ein Speicherweg (siehe Frage 1) |
+| 7 | Tagebuch ruhiger ✓ (PR #156) | mittel | Datum als Kalender-Blatt, Hinweise raus, Verlauf raus, ein Speicherweg (siehe Frage 1) |
 | 8 | Details einklappen | mittel | Einblende-Pillen in Musterkarten, Auswertung, Detailseiten |
 | 9 | Karate | mittel | Zielkarte für alle Sportarten, ruhige Karate-Seite, „Heute üben“ und „Was saß heute?“ (Abschnitt H) |
 

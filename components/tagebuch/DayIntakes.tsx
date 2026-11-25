@@ -63,7 +63,6 @@ export default function DayIntakes({ day }: { day: string }) {
           </div>
         );
       })}
-      <span className="meta">Speichert sofort, unabhängig vom Knopf unten.</span>
     </section>
   );
 }
