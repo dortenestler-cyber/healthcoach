@@ -6,7 +6,7 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017z
 - Migration `20261130090000_abschnitte`: `garmin_activities.hr_fine` (Puls je 5 s ab Beginn, `[]` = Garmin liefert keinen), `garmin_sets` (aktive Sätze aus `/exerciseSets`: `{s, d, r}`), `segment_count` (0–200, nur App).
 - `garmin-sync/details.ts`: `/activity-service/activity/{id}/details` (zwei Pfadvarianten), `fineSeries`, `activeSets`; `syncDetails` in `index.ts` holt je Abruf höchstens 8 Einheiten ohne `hr_fine`, neueste zuerst. Scheitert der Pfad, Hinweis `detailNote`, nichts wird gespeichert. Sätze nur bei Krafttraining/HIIT oder Zuordnung Kettlebell. Rückgabe `detailUnits`, `detailNote`.
 - Geprüft: `deno check`, Umrechnung an Beispieldaten. Ungeprüft: ob die Personal API den Detailpfad freigibt.
-- PR #176 gemergt 25.11., Lauf „Supabase-Migrationen ausführen“ grün. Nächster Schritt: Lauf prüfen, ob `hr_fine` ankommt (`detailNote` leer).
+- PR #176 gemergt 25.11., Lauf „Supabase-Migrationen ausführen“ grün. Lauf „Supabase-Funktionen hochladen“ grün. Nächster Schritt: nach dem nächsten Abruf prüfen, ob `hr_fine` ankommt (`detailNote` leer).
 
 ## Garmin-Schlafwert entfernt (25.11.)
 - Uhr: `supabase/functions/watch/schlaf.ts` (`sleepTotal`) rechnet den eigenen Schlafwert wie `lib/schlaf.ts` (geprüft: gleiche Werte an Testnächten). Readiness-Faktor SCHLAF mit festen Stufen (≥85 +3, ≥70 0, ≥55 −5, sonst −10), Feld `sleep` für das Zifferblatt liefert den eigenen Wert. `rangeFor` in `target.ts` exportiert und allgemein.
