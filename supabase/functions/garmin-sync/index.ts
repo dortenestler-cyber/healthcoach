@@ -114,6 +114,39 @@ function intensityMinutes(d: Any): number | null {
   return mod || vig ? Math.round(mod + 2 * vig) : null;
 }
 
+// Zwischenstand von heute für den Tagesverlauf (Migration 20261130140000_tagesverlauf).
+// Gespeichert wird nur, wenn sich etwas geändert hat. Fehler brechen den Abruf nicht ab.
+async function saveSnapshot(sb: Any, userId: string, sums: Any[]): Promise<string> {
+  const today = localDayMinute(Date.now()).day;
+  const d = sums.find((x) => x?.calendarDate === today);
+  if (!d) return "";
+  const st = d?.stress ?? {};
+  const row = {
+    user_id: userId,
+    day: today,
+    steps: int(d?.movement?.steps?.value),
+    intensity_minutes: intensityMinutes(d),
+    stress_avg: int(d?.stress?.avgLevel),
+    stress_rest_s: int(st?.restDuration ?? d?.restStressDuration),
+    stress_low_s: int(st?.lowDuration ?? d?.lowStressDuration),
+    stress_medium_s: int(st?.mediumDuration ?? d?.mediumStressDuration),
+    stress_high_s: int(st?.highDuration ?? d?.highStressDuration),
+  };
+  const { data: last, error: lastErr } = await sb
+    .from("garmin_snapshots")
+    .select("steps, intensity_minutes, stress_avg, stress_rest_s, stress_low_s, stress_medium_s, stress_high_s")
+    .eq("user_id", userId)
+    .eq("day", today)
+    .order("at", { ascending: false })
+    .limit(1);
+  if (lastErr) return lastErr.message;
+  const prev = (last ?? [])[0];
+  const keys = ["steps", "intensity_minutes", "stress_avg", "stress_rest_s", "stress_low_s", "stress_medium_s", "stress_high_s"] as const;
+  if (prev && keys.every((k) => (prev[k] ?? null) === (row[k] ?? null))) return "";
+  const { error } = await sb.from("garmin_snapshots").insert({ ...row, at: new Date().toISOString() });
+  return error ? error.message : "";
+}
+
 async function saveActivities(sb: Any, rows: Record<string, unknown>[]): Promise<boolean> {
   let { error } = await sb.from("garmin_activities").upsert(rows, { onConflict: "user_id,activity_id" });
   if (error && /im_moderate|im_vigorous/.test(error.message)) {
@@ -231,6 +264,7 @@ Deno.serve(async (req) => {
       // Intensitätsminuten, Schritte, Stress und Body Battery (Tageswerte) von gestern und heute nachführen,
       // sonst bleiben sie bis zum nächsten vollen Abruf stehen. synced_at bleibt stehen, damit die App den vollen Abruf weiter selbst auslöst.
       let summaryNote = "";
+      let snapshotNote = "";
       try {
         const sums = await garminGet(token, `/usersummary-service/v2/dailysummaries?startDate=${s}&endDate=${e}`);
         const sumRows = ((sums?.data ?? sums ?? []) as Any[])
@@ -250,6 +284,7 @@ Deno.serve(async (req) => {
           const { error: sumError } = await sb.from("garmin_daily").upsert(sumRows, { onConflict: "user_id,day" });
           if (sumError) summaryNote = sumError.message;
         }
+        snapshotNote = await saveSnapshot(sb, userId, (sums?.data ?? sums ?? []) as Any[]);
       } catch (err) {
         summaryNote = err instanceof Error ? err.message : String(err);
       }
@@ -263,7 +298,7 @@ Deno.serve(async (req) => {
         }
       }
       const pushNote = cronKey && rows.length ? await notifyTraining() : "";
-      return json(200, { ok: true, quick: true, activities: rows.length, detailUnits: detail.units, detailNote: detail.note, summaryNote, pushNote });
+      return json(200, { ok: true, quick: true, activities: rows.length, detailUnits: detail.units, detailNote: detail.note, summaryNote, snapshotNote, pushNote });
     }
 
     const days = Math.min(MAX_DAYS, Math.max(1, Number(body?.days) || 7));
@@ -292,6 +327,7 @@ Deno.serve(async (req) => {
     let bbNote = "";
     let stressCurveDays = 0;
     let stressNote = "";
+    let snapshotNote = "";
     const stress: StressCache = { known: { path: null, failed: false }, days: new Map() };
 
     for (const w of windows) {
@@ -324,6 +360,13 @@ Deno.serve(async (req) => {
         r.stress_high_s = int(st?.highDuration ?? d?.highStressDuration);
         const resp = num(d?.respiration?.avgSleepValue ?? d?.avgSleepRespirationValue ?? d?.respiration?.avgValue);
         if (resp !== null && resp >= 5 && resp <= 40) r.respiration_avg = Math.round(resp * 10) / 10;
+      }
+      if (offset === 0) {
+        try {
+          snapshotNote = await saveSnapshot(sb, userId, (sums?.data ?? sums ?? []) as Any[]);
+        } catch (err) {
+          snapshotNote = err instanceof Error ? err.message : String(err);
+        }
       }
 
       // Schlaf
@@ -573,6 +616,7 @@ Deno.serve(async (req) => {
       detailNote,
       alltagDays,
       alltagNote: alltagMissing ? "Die Datenbank-Spalten für die Belastung aus dem Alltag fehlen noch." : alltagNote,
+      snapshotNote,
       syncedAt: new Date().toISOString(),
     });
   } catch (e) {

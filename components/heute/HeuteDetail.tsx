@@ -7,6 +7,7 @@ import { DayBars, HalfGauge, ValueRing } from "@/components/charts";
 import DaySentence from "@/components/heute/DaySentence";
 import FactorList from "@/components/heute/FactorList";
 import ExplainCard from "@/components/ui/ExplainCard";
+import DayCurveCard from "@/components/heute/DayCurveCard";
 import LoadCard from "@/components/heute/LoadCard";
 import SleepCard from "@/components/heute/SleepCard";
 import EnergyCard from "@/components/heute/EnergyCard";
@@ -79,6 +80,7 @@ export default function HeuteDetail({ k, day: dayParam }: { k: DetailKey; day?: 
       {data && k === "schlaf" && <SleepDetail day={day} data={data} />}
 
       {data && rule && k === "belastung" && <LoadCard day={day} data={data} target={rule.target} />}
+      {data && rule && k === "belastung" && <DayCurveCard kind="steps" day={day} data={data} />}
 
       {data && k === "stress" && <StressDetail day={day} data={data} />}
 
@@ -229,7 +231,7 @@ function SleepDetail({ day, data }: { day: string; data: Data }) {
 }
 
 // Stress (nach Whoop „Stress-Monitor“): Halbbogen 0–100 in Türkis, Satz, Aufteilung, Tag gegen üblichen Wochentag.
-// Den Verlauf über den Tag liefert Garmin nicht.
+// Verlauf über den Tag aus den Zwischenständen der Abrufe (DayCurveCard).
 function StressDetail({ day, data }: { day: string; data: Data }) {
   const s = stressDay(day, data.daily);
   const synced = data.daily.find((d) => d.day === day)?.synced_at;
@@ -290,6 +292,8 @@ function StressDetail({ day, data }: { day: string; data: Data }) {
           </div>
         </section>
       )}
+
+      <DayCurveCard kind="stress" day={day} data={data} />
 
       <p className="meta"><a href="#verlauf">Stress über die Zeit ↓</a></p>
     </>
@@ -352,6 +356,8 @@ function IntensityDetail({ day, data, rule, isToday, nowMinute }: { day: string;
       <p className="gauge-meta detail-center">Montag bis {isToday ? "heute" : shortDay(day)} · Empfehlung der WHO</p>
 
       <DaySentence focus="intensitaet" day={day} data={data} rule={rule} nowMinute={nowMinute} isToday={isToday} showLoad={false} />
+
+      <DayCurveCard kind="intensity" day={day} data={data} />
 
       <section className="card">
         <span className="eyebrow">Diese Woche</span>

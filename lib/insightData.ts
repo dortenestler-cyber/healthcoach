@@ -10,6 +10,7 @@ import { shortName } from "@/lib/intakes";
 import { sickDays } from "@/lib/baseline";
 import { loadOvulation, withOvulation } from "@/lib/ovulation";
 import type { MedIntake, MuscleDay, MusterExtra } from "@/lib/muster";
+import { loadSnapshots } from "@/lib/tagesverlauf";
 
 // Lädt alles, was Tagesziel und Muster brauchen (letzte 180 Tage)
 export async function loadInsightData(days = 180): Promise<Data | null> {
@@ -50,11 +51,12 @@ export async function loadMusterExtra(days = 180): Promise<MusterExtra | null> {
   const sb = supabase();
   if (!sb) return null;
   const from = isoDay(daysAgo(days - 1));
-  const [m, i, meds, il] = await Promise.all([
+  const [m, i, meds, il, snapshots] = await Promise.all([
     sb.from("muscle_events").select("day, intensity, situation, swelling, numbness").gte("day", from),
     sb.from("medication_intakes").select("day, medication_id").eq("as_needed", false).gte("day", from),
     sb.from("medications").select("id, name"),
     sb.from("illnesses").select("*").or(`ended_on.is.null,ended_on.gte.${from}`),
+    loadSnapshots(sb, from),
   ]);
   const names = new Map(((meds.data ?? []) as { id: string; name: string }[]).map((x) => [x.id, x.name]));
   const intakes: MedIntake[] = [];
@@ -71,5 +73,6 @@ export async function loadMusterExtra(days = 180): Promise<MusterExtra | null> {
     muscle: (m.data ?? []) as MuscleDay[],
     intakes,
     illnesses: (il.data ?? []) as Illness[],
+    snapshots,
   };
 }

@@ -104,3 +104,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-25 · DA · Nutzerin: Kurzer Garmin-Abruf alle 15 Min holt auch Intensitätsminuten, Schritte, Stress, Body Battery; voller Abruf stündlich (6–22 Uhr) statt nur abends · im Chat freigegeben
 2026-11-25 · OF · Nutzerin: Seite Intensität zeigt Belastung aus Training je Tag und Krafttage nach WHO (2 pro Woche: Kettlebell, Bouldern, Karate) · im Chat freigegeben
 2026-11-25 · DA · Nutzerin: Ring „Intensität“ zählt jede Trainingsminute mindestens moderat, Garmins Minuten bleiben (intensive doppelt); Gehen nur mit Garmins Minuten, Wandern voll, „ignorieren“ zählt nicht · Bouldern brachte kaum Intensitätsminuten, ist aber Training
+2026-11-25 · DA · Nutzerin: Tagesverläufe aus Zwischenständen je Abruf (Stress, Schritte, Intensität je Stunde) und Muster „angespannter Nachmittag“, im selben PR wie die Intensität · Garmin gibt keinen Stressverlauf heraus
