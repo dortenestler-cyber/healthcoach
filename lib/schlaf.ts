@@ -196,3 +196,17 @@ export function spo2Warning(day: string, data: Data): boolean {
   const low = Array.from({ length: 7 }, (_, i) => night(data, addDays(day, -i))?.spo2_low).filter((v) => typeof v === "number" && v < 88);
   return low.length >= 3;
 }
+
+// Schlafwert je Nacht (Aufwachtag) für Muster und Vergleiche, einmal je Datenstand gerechnet
+const scoreCache = new WeakMap<object, Map<string, number>>();
+export function sleepScores(data: Data): Map<string, number> {
+  const hit = scoreCache.get(data.daily);
+  if (hit) return hit;
+  const m = new Map<string, number>();
+  for (const d of data.daily) {
+    const t = sleepScore(d.day, data).total;
+    if (t !== null) m.set(d.day, t);
+  }
+  scoreCache.set(data.daily, m);
+  return m;
+}

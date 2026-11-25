@@ -8,6 +8,7 @@ import { sportOf, type Sport } from "@/lib/training";
 import { alltagMinutes, FULL_DAY_LOAD, loadToPct, readLoadDay } from "@/lib/alltagslast";
 import { baselineFor, RANGE_PHASE_NAMES, type Baseline, type Range } from "@/lib/baseline";
 import { sleepScore } from "@/lib/schlaf";
+import { sleepScores } from "@/lib/schlaf";
 
 export type Diary = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[]; fromGarmin?: boolean; garminOnly?: boolean; ovulation?: string[]; symptoms_checked?: boolean };
 // fromGarmin: Blutung an diesem Tag stammt aus Garmin · garminOnly: kein eigener Tagebucheintrag an diesem Tag
@@ -344,7 +345,8 @@ export function patterns(data: Data): Pattern[] {
     const l = loadPercent(r.day, data.daily, data.acts);
     (l >= HARD_DAY_PCT ? hardDays : otherDays).push(r.day);
   }
-  const nextScore = (days: string[]) => days.map((d) => dm.get(addDays(d, 1))?.sleep_score ?? null).filter((v): v is number => v !== null);
+  const ss = sleepScores(data);
+  const nextScore = (days: string[]) => days.map((d) => ss.get(addDays(d, 1)) ?? null).filter((v): v is number => v !== null);
   const nextHrv = (days: string[]) => days.map((d) => dm.get(addDays(d, 1))?.hrv_last_night ?? null).filter((v): v is number => v !== null);
   const hs = mean(nextScore(hardDays));
   const os = mean(nextScore(otherDays));
@@ -409,7 +411,7 @@ export function patterns(data: Data): Pattern[] {
   for (const k of infl) {
     const withD = data.diary.filter((d) => d.influences?.includes(k)).map((d) => d.day);
     const withoutD = data.diary.filter((d) => !d.garminOnly && !d.influences?.includes(k)).map((d) => d.day);
-    const sleep = (days: string[]) => days.map((d) => dm.get(addDays(d, 1))?.sleep_score ?? null).filter((v): v is number => v !== null);
+    const sleep = (days: string[]) => days.map((d) => ss.get(addDays(d, 1)) ?? null).filter((v): v is number => v !== null);
     const a = mean(sleep(withD));
     const b = mean(sleep(withoutD));
     if (withD.length >= 4 && withoutD.length >= 4 && a !== null && b !== null) rows.push({ label: labels[k], with: a, without: b, n: withD.length });

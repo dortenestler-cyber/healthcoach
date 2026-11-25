@@ -5,6 +5,7 @@
 import { cycleToday, groupOf, type PhaseGroup } from "@/lib/cycle";
 import type { Daily } from "@/lib/garmin";
 import type { Data, Diary } from "@/lib/insights";
+import { sleepScores } from "@/lib/schlaf";
 
 export const MIN_NIGHTS = 5;
 
@@ -43,7 +44,7 @@ const hm = (h: number) => {
   return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, "0")} h`;
 };
 
-// Die Nacht danach: HRV, Ruhepuls, Tiefschlaf, Nachtschweiß
+// Die Nacht danach: Schlafwert, HRV, Ruhepuls, Tiefschlaf, Nachtschweiß
 export function nightAfter(data: Data, key: string, from?: string): NightRow[] {
   const { withD, withoutD } = splitDays(data.diary, key, from);
   const byDay = new Map<string, Daily>(data.daily.map((d) => [d.day, d]));
@@ -53,7 +54,9 @@ export function nightAfter(data: Data, key: string, from?: string): NightRow[] {
     const v = r ? f(r) : null;
     return typeof v === "number" && Number.isFinite(v) ? v : null;
   };
+  const ss = sleepScores(data);
   return [
+    { key: "schlafwert", label: "Schlafwert", c: compare(withD, withoutD, (day) => ss.get(day) ?? null), fmt: (v) => de(v), unit: "", higherIsBetter: true },
     { key: "hrv", label: "HRV", c: compare(withD, withoutD, get((d) => d.hrv_last_night)), fmt: (v) => `${de(v)} ms`, unit: "ms", higherIsBetter: true },
     { key: "ruhepuls", label: "Ruhepuls", c: compare(withD, withoutD, get((d) => d.resting_hr)), fmt: (v) => de(v), unit: "", higherIsBetter: false },
     { key: "tief", label: "Tiefschlaf", c: compare(withD, withoutD, get((d) => (d.sleep_deep_s ? d.sleep_deep_s / 3600 : null))), fmt: hm, unit: "h", higherIsBetter: true },
