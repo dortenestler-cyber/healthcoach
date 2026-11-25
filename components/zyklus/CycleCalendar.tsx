@@ -32,6 +32,7 @@ export default function CycleCalendar({ today, diary, data }: { today: string; d
         today={today}
         diary={diary}
         ebenen={["zyklus", "symptome", "training"]}
+        merken="zyklus"
         start={["zyklus", "symptome"]}
         punkte={data ? punkte : undefined}
         onPick={setPicked}

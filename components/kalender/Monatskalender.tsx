@@ -5,16 +5,17 @@
 // Jeder Bereich gibt seine Voreinstellung mit. Tippen auf einen Tag ruft onPick (in der Regel: Tagesblatt öffnen).
 
 import { useState, type ReactNode } from "react";
+import { Pille, PillenZeile, useAuswahl } from "@/components/ui/Pille";
 import { projectedPhase } from "@/lib/cycle";
 import type { Diary } from "@/lib/insights";
 import { PHASE4, PHASE4_LABEL, phase4Of, type Phase4 } from "@/components/zyklus/CycleRing";
 import { SPORTS, type Sport } from "@/lib/training";
 
 export type Ebene = "zyklus" | "training" | "symptome";
-const EBENEN: { key: Ebene; label: string }[] = [
-  { key: "zyklus", label: "Zyklus" },
-  { key: "training", label: "Training" },
-  { key: "symptome", label: "Symptome" },
+const EBENEN: { key: Ebene; label: string; farbe: string }[] = [
+  { key: "zyklus", label: "Zyklus", farbe: "var(--cycle)" },
+  { key: "training", label: "Training", farbe: "var(--training)" },
+  { key: "symptome", label: "Symptome", farbe: "var(--warn)" },
 ];
 export type Punkt = { key: string; sport: Sport; filled: boolean }; // Training: voll = erledigt, hohl = geplant
 
@@ -30,6 +31,7 @@ type Props = {
   diary: Diary[];
   ebenen?: Ebene[]; // welche Ebenen es hier gibt
   start?: Ebene[]; // welche zu Beginn an sind
+  merken?: string; // Ort, unter dem die gewählten Ebenen gemerkt werden, z. B. "training"
   punkte?: (day: string) => Punkt[]; // Training je Tag
   selected?: string | null;
   onPick?: (day: string) => void;
@@ -39,9 +41,9 @@ type Props = {
   footer?: ReactNode; // z. B. „Periode eintragen +“
 };
 
-export default function Monatskalender({ today, diary, ebenen = ["zyklus", "training", "symptome"], start, punkte, selected, onPick, onMonth, maxForward = 3, head, footer }: Props) {
+export default function Monatskalender({ today, diary, ebenen = ["zyklus", "training", "symptome"], start, merken = "allgemein", punkte, selected, onPick, onMonth, maxForward = 3, head, footer }: Props) {
   const [offset, setOffset] = useState(0);
-  const [on, setOn] = useState<Set<Ebene>>(new Set(start ?? ebenen));
+  const [on, toggle] = useAuswahl<Ebene>(`kalender.${merken}`, start ?? ebenen);
   const base = new Date(today + "T12:00:00");
   const first = new Date(base.getFullYear(), base.getMonth() + offset, 1, 12);
   const y = first.getFullYear();
@@ -58,12 +60,6 @@ export default function Monatskalender({ today, diary, ebenen = ["zyklus", "trai
     setOffset(next);
     const f = new Date(base.getFullYear(), base.getMonth() + next, 1, 12);
     onMonth?.(iso(f.getFullYear(), f.getMonth(), 1), iso(f.getFullYear(), f.getMonth(), new Date(f.getFullYear(), f.getMonth() + 1, 0).getDate()));
-  };
-  const toggle = (e: Ebene) => {
-    const next = new Set(on);
-    if (next.has(e)) next.delete(e);
-    else next.add(e);
-    setOn(next);
   };
 
   const cells: Cell[] = Array(lead).fill(null);
@@ -104,13 +100,13 @@ export default function Monatskalender({ today, diary, ebenen = ["zyklus", "trai
         <button type="button" className="icon-btn" aria-label="Nächster Monat" disabled={offset >= maxForward} onClick={() => shift(1)}>›</button>
       </div>
       {ebenen.length > 1 && (
-        <div className="pills wrap mk-ebenen" role="group" aria-label="Ebenen im Kalender">
+        <PillenZeile label="Ebenen im Kalender" className="mk-ebenen">
           {EBENEN.filter((e) => ebenen.includes(e.key)).map((e) => (
-            <button key={e.key} type="button" className="pill pill-sm" aria-pressed={on.has(e.key)} onClick={() => toggle(e.key)}>
+            <Pille key={e.key} an={on.has(e.key)} farbe={e.farbe} onClick={() => toggle(e.key)}>
               {e.label}
-            </button>
+            </Pille>
           ))}
-        </div>
+        </PillenZeile>
       )}
       <div className="cal-grid cal-head" aria-hidden="true">
         {WD.map((w) => <span key={w}>{w}</span>)}

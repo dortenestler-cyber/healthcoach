@@ -1,5 +1,5 @@
 # Übergabe · Oberfläche (OF)
-Belegt: frei
+Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWcpKAVS1T6prb5SPNt · seit 2026-11-25
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWcpKAVS1T6prb5SPNt
 
 ## Konzept Einfach bedienen (PR #146, Entwurf, 25.11.)
@@ -8,7 +8,8 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014p
 - Vorschlag: `/kalender` mit Ebenen-Pillen und Zeitraum-Auswahl, Training nur noch Übersicht · Auswertung (Sportarten als eigene Seiten, Alle Aktivitäten am Ende), Pillen-Baustein mit drei Arten, gemerkt in `settings.data.ansicht` (keine Migration). Acht Pakete, alle OF.
 - Freigegeben 25.11. mit Antworten (Logbuch): Tagebuch speichert sofort, Training Übersicht · Auswertung, Zeitraum im Kalender, Reihenfolge wie Tabelle. Karate als Paket 9 (A + B, Zielkarte C).
 - Fehler behoben: Verletzungshinweis nennt den Kyu der nächsten Prüfung (`kyuHinweis` in `lib/health.ts`), geprüft mit Ziel 4. Kyu.
-- Nächster Schritt: Paket 1 Pillen-Baustein (`components/ui/Pille.tsx`, `lib/ansicht.ts`), dann Paket 2 Alle Aktivitäten.
+- Paket 1 Pillen (PR #147): `components/ui/Pille.tsx` und `lib/ansicht.ts`. Gemerkt wird sofort im Gerät (localStorage `hc-ansicht`) und gesammelt nach 0,8 s in `settings.data.ansicht` (frisch laden, nur geänderte Schlüssel zusammenführen). Kalender-Ebenen merken sich die Wahl je Ort (`kalender.training`, `kalender.zyklus`). Alle `.pill` haben jetzt eine Tap-Fläche von 44 px (`::after`). Geprüft: Wahl bleibt nach Neuladen und auf einem zweiten Gerät.
+- Nächster Schritt: Paket 2 Alle Aktivitäten (Liste am Ende von Training, Filter nach Sportart, Suche, „Alle ›“ auf Heute).
 
 ## Karate-Prüfungsprogramm (PR #143, 25.11.)
 - Konzept `docs/konzept-karate-pruefungen.md`, freigegeben 25.11. Training › Karate: Kyu-Chips 5.–1., Ring „x von y sitzen“ mit Satz, Gruppen Kihon/Kata/Kumite/Begriffe, Wiederholung eingeklappt, eigene Punkte je Kyu. Drei Stufen per Tipp, Kata und Kumite klappen in Teile auf. „X. Kyu bestanden“ ab Prüfungsdatum, dann rückt der nächste Kyu nach.
