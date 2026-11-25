@@ -1,6 +1,10 @@
 # Übergabe · Daten (DA)
-Belegt: frei
+Belegt: Konto A · Sitzung https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU · seit 2026-11-25
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU
+
+## In Arbeit: Tagesstart und Mitteilung nach dem Training (25.11., Freigabe der Nutzerin)
+- Zweig `claude/training-detection-heart-rate-ypzut9`. Lösung A: Abruf tagsüber alle 15 Min, Mitteilung nach neuer Einheit; Tagesstart ersetzt die Check-in-Erinnerung.
+- Nächster Schritt: Migration `20261130100000_tagesstart_training`, dann `push` und `garmin-sync`.
 
 ## Abschnitte aus dem Puls (PR #176, 25.11., Freigabe der Nutzerin)
 - Migration `20261130090000_abschnitte`: `garmin_activities.hr_fine` (Puls je 5 s ab Beginn, `[]` = Garmin liefert keinen), `garmin_sets` (aktive Sätze aus `/exerciseSets`: `{s, d, r}`), `segment_count` (0–200, nur App).

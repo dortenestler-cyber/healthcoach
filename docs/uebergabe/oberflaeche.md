@@ -1,6 +1,10 @@
 # Übergabe · Oberfläche (OF)
-Belegt: frei
+Belegt: Konto A · Sitzung https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU · seit 2026-11-25
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU
+
+## In Arbeit: Tagesstart und Mitteilung nach dem Training (25.11., Freigabe der Nutzerin)
+- Zweig `claude/training-detection-heart-rate-ypzut9`. Lösung A: Abruf tagsüber alle 15 Min, Mitteilung nach neuer Einheit; Tagesstart ersetzt die Check-in-Erinnerung.
+- Nächster Schritt: Migration `20261130100000_tagesstart_training`, dann `push` und `garmin-sync`.
 
 ## Abschnitte aus dem Puls (PR #176, 25.11., Freigabe der Nutzerin)
 - `lib/abschnitte.ts`: `detect` (Spitzen nach Prominenz in Anteil der Pulsreserve, Mindestpause je Sportart, Glättung 15 s), `learnScale` (Faktor 0,6–2,0 aus bis zu 20 bestätigten Einheiten derselben Sportart, ab 2), Regeln `SEGMENT_RULES` für Klettern, Kettlebell, Karate, Ausdauer.
