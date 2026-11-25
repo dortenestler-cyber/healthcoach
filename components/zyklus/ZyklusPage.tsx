@@ -5,7 +5,8 @@ import { useRefresh } from "@/lib/refresh";
 import { useCallback, useEffect, useState } from "react";
 import { loadOvulation, withOvulation } from "@/lib/ovulation";
 import PageHead from "@/components/PageHead";
-import ZyklusView from "@/components/zyklus/ZyklusView";
+import ZyklusView, { type ZyklusAbschnitt } from "@/components/zyklus/ZyklusView";
+import { useAbschnitte } from "@/components/ui/Pille";
 import PeriodBackfill from "@/components/zyklus/PeriodBackfill";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay } from "@/lib/dates";
@@ -51,18 +52,42 @@ export default function ZyklusPage() {
     load();
   }, [load]);
 
-  // Link aus dem Tagebuch (/zyklus#perioden): erst nach dem Laden hinscrollen, sonst verschiebt der Ring die Stelle
+  // Abschnitte ein- und ausblenden (Konzept Einfach, Paket 5); Perioden und Gewohnheiten zuerst aus
+  const abschnitte = useAbschnitte<ZyklusAbschnitt>(
+    "zyklus",
+    [
+      ["werte", "Werte"],
+      ["symptome", "Symptome"],
+      ["gewohnheiten", "Gewohnheiten"],
+      ["perioden", "Perioden"],
+    ],
+    ["werte", "symptome"],
+  );
+
+  // Link auf #perioden (Tagebuch, „Perioden nachtragen“): Abschnitt einschalten, nach dem Laden hinscrollen
+  const [ziel, setZiel] = useState(false);
   useEffect(() => {
-    if (data && longDiary && window.location.hash === "#perioden") document.getElementById("perioden")?.scrollIntoView();
-  }, [data, longDiary]);
+    const pruefen = () => {
+      if (window.location.hash === "#perioden") setZiel(true);
+    };
+    pruefen();
+    window.addEventListener("hashchange", pruefen);
+    return () => window.removeEventListener("hashchange", pruefen);
+  }, []);
+  useEffect(() => {
+    if (!ziel || !data || !longDiary) return;
+    abschnitte.einschalten("perioden");
+    setTimeout(() => document.getElementById("perioden")?.scrollIntoView(), 50);
+    setZiel(false);
+  }, [ziel, data, longDiary, abschnitte]);
 
   return (
     <>
       <PageHead title="Zyklus" sub="Dein Zyklus und was sich darin wiederholt" tone="zyklus" kalender="zyklus" />
       {error && <p className="alert" role="alert">{error}</p>}
       {!error && (!data || !longDiary) && <p className="hint">Lädt …</p>}
-      {data && longDiary && <ZyklusView today={isoDay()} data={data} longDiary={longDiary} flashes={flashes} showFlashes={feat.perimenopause} extra={feat.muskeln ? extra : null} />}
-      {feat.zyklus && <PeriodBackfill onChanged={load} />}
+      {data && longDiary && <ZyklusView today={isoDay()} data={data} longDiary={longDiary} flashes={flashes} showFlashes={feat.perimenopause} extra={feat.muskeln ? extra : null} zeile={abschnitte.zeile} zeigt={abschnitte.zeigt} />}
+      {feat.zyklus && abschnitte.zeigt("perioden") && <PeriodBackfill onChanged={load} />}
     </>
   );
 }

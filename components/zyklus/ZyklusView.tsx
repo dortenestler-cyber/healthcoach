@@ -5,7 +5,8 @@ import TwoCol from "@/components/ui/TwoCol";
 import Link from "next/link";
 import { DivergingBars } from "@/components/charts";
 import CycleRing, { arcs4, PHASE4, PHASE4_LABEL, PhaseIcon, phase4Of } from "@/components/zyklus/CycleRing";
-import CycleCalendar from "@/components/zyklus/CycleCalendar";
+import ZyklusWoche from "@/components/zyklus/ZyklusWoche";
+import { Details } from "@/components/ui/Pille";
 import ExplainCard from "@/components/ui/ExplainCard";
 import CycleDayChart from "@/components/zyklus/CycleDayChart";
 import CycleHistory from "@/components/zyklus/CycleHistory";
@@ -27,10 +28,13 @@ const addDays = (iso: string, n: number) => {
 };
 const isNew = (n: number) => n >= MIN_DAYS && n <= MIN_DAYS + 1; // Schwelle gerade erreicht
 
-type Props = { today: string; data: Data; longDiary: Diary[]; flashes: string[]; showFlashes: boolean; extra?: MusterExtra | null };
+export type ZyklusAbschnitt = "werte" | "symptome" | "gewohnheiten" | "perioden";
+type Props = { today: string; data: Data; longDiary: Diary[]; flashes: string[]; showFlashes: boolean; extra?: MusterExtra | null; zeile?: React.ReactNode; zeigt?: (k: ZyklusAbschnitt) => boolean };
 
 // Seite Zyklus: dein Zyklus im Mittelpunkt, Muster innerhalb des Zyklus. Ohne Netzwerk, die Daten kommen von ZyklusPage.
-export default function ZyklusView({ today, data, longDiary, flashes, showFlashes, extra }: Props) {
+// Konzept Einfach, Paket 5: Monatskalender ersetzt durch den Wochenstreifen (Kalender › öffnet den zentralen Kalender),
+// Abschnitte Werte · Symptome · Gewohnheiten · Perioden per Pillen ein- und ausblendbar (zeile, zeigt aus ZyklusPage).
+export default function ZyklusView({ today, data, longDiary, flashes, showFlashes, extra, zeile, zeigt = () => true }: Props) {
   const [metric, setMetric] = useState<MetricKey>("hrv");
   const ct = cycleToday(today, longDiary);
   const cycleStart = (t: string, cd: number) => {
@@ -116,7 +120,7 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
           {phase ? (ct.fromGarmin ? "Geschätzt · Beginn aus Garmin" : "Geschätzt") : "Trag deine Periode im Tagebuch ein, dann schätzt die App die Phase."}
           {ct.window ? ` · ${windowText(ct.window, today)} (${ct.window.earliest === ct.window.latest ? date(ct.window.earliest) : `${date(ct.window.earliest)}–${date(ct.window.latest)}`})` : ct.cycleDay !== null ? " · Periodenfenster ab 2 Zyklen" : ""}
         </span>
-        {(!phase || !ct.window) && <Link href="/tagebuch#perioden" className="settings-link">Perioden nachtragen ›</Link>}
+        {(!phase || !ct.window) && <Link href="#perioden" className="settings-link">Perioden nachtragen ›</Link>}
       </div>
 
       <TwoCol
@@ -148,14 +152,14 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         <span className="meta">Phasen sind aus deinem Tagebuch geschätzt, Lücken füllt Garmin. Dein Tagebuch hat Vorrang. Vorschlag, keine Diagnose.</span>
       </section>
 
-      <CycleCalendar today={today} diary={longDiary} data={data} />
+      <ZyklusWoche today={today} diary={longDiary} />
           </>
         }
         right={
           <>
+      {zeile}
 
-
-      {phase && (
+      {zeigt("werte") && phase && (
         <section className="card">
           <span className="meta">Heute in deinem Zyklus · {phase.label}</span>
           <h2>
@@ -181,6 +185,7 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         </section>
       )}
 
+      {zeigt("werte") && (
       <section className="card">
         <span className="meta">{m.label} nach Zyklustag · dieser Zyklus und frühere</span>
         <h2>{curSentence}</h2>
@@ -202,10 +207,11 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         </div>
         <Link href={`/wert/${metric}`} className="settings-link">{m.label} im Verlauf ›</Link>
       </section>
+      )}
 
-      <CycleHistory today={today} diary={longDiary} flashes={flashes} showFlashes={showFlashes} muscle={extra ? muscle : undefined} />
+      {zeigt("symptome") && <CycleHistory teil="symptome" today={today} diary={longDiary} flashes={flashes} showFlashes={showFlashes} muscle={extra ? muscle : undefined} />}
 
-      {extra && muscleTotal > 0 && (
+      {zeigt("symptome") && extra && muscleTotal > 0 && (
         <section className="card">
           <span className="meta">Wadenzucken und Krämpfe · je Phase</span>
           <h2>{muscleSentence}</h2>
@@ -223,16 +229,22 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         </section>
       )}
 
+      {zeigt("gewohnheiten") && (
       <section className="card">
         <span className="eyebrow">Täglich aktualisiert · was dir guttut je Phase</span>
         <h2 className="card-title-lg">{effectSentence}</h2>
+        <Details id="zyklus.gewohnheiten" label="Balken je Phase und Grundlage">
         <p>HRV in der Nacht danach, Tage mit Einfluss gegen Tage ohne, jeweils in derselben Phase. Ein Zusammenhang, keine Ursache. Erst ab je {MIN_DAYS} Nächten.</p>
         {effectRows.length > 0 && (
           <DivergingBars fmt={ms} scaleMin={8} neg="HRV niedriger" pos="HRV höher" label={`HRV in der Nacht danach je Phase: ${effectRows.map((r) => `${r.label} ${r.note} ${r.value! > 0 ? "plus" : "minus"} ${ms(Math.abs(r.value!))}`).join(", ")}`} rows={effectRows} />
         )}
         {waiting.length > 0 && <span className="meta">Noch zu wenige Nächte: {waiting.join(", ")}.</span>}
         {lutStrongest && <ExplainCard tone="cycle" question={`Was bedeutet es, dass „${lutStrongest.label}“ in meiner Lutealphase mit meiner HRV zusammenhängt?`}>Ein Zusammenhang aus deinen eigenen Einträgen, keine Empfehlung.</ExplainCard>}
+        </Details>
       </section>
+      )}
+
+      {zeigt("perioden") && <CycleHistory teil="perioden" today={today} diary={longDiary} flashes={flashes} showFlashes={showFlashes} />}
 
       <Link href="/gesundheit" className="card card-link-row">
         <span className="stack">
