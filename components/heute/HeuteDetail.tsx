@@ -15,7 +15,7 @@ import { energyDay } from "@/lib/energie";
 import { duration, stressDay, stressSentence } from "@/lib/stress";
 import { dayRule, PHASES, STAGES, windowText, type DayRule, type Stage } from "@/lib/cycle";
 import { clock, isoDay, longDate, shiftDay } from "@/lib/dates";
-import { weekIntensity, WHO_MINUTES, WHO_STRENGTH_DAYS } from "@/lib/trainingLoad";
+import { dayIntensity, weekIntensity, WHO_MINUTES, WHO_STRENGTH_DAYS } from "@/lib/trainingLoad";
 import { activityLabel } from "@/lib/garmin";
 import { sportOf, type Sport } from "@/lib/training";
 import type { Data } from "@/lib/insights";
@@ -319,7 +319,7 @@ const mondayOf = (iso: string) => shiftDay(iso, -((new Date(iso + "T12:00:00").g
 function IntensityDetail({ day, data, rule, isToday, nowMinute }: { day: string; data: Data; rule: DayRule; isToday: boolean; nowMinute: number }) {
   const im = weekIntensity(day, data);
   const mon = mondayOf(day);
-  const byDay = new Map(data.daily.map((d) => [d.day, d.intensity_minutes]));
+  const byDay = new Map(Array.from({ length: 7 }, (_, i) => shiftDay(mon, i)).map((d) => [d, dayIntensity(d, data)]));
   const week = Array.from({ length: 7 }, (_, i) => shiftDay(mon, i));
   const weeks = Array.from({ length: 4 }, (_, i) => shiftDay(mon, -7 * (3 - i))).map((m) => ({ m, sum: weekIntensity(m === mon ? day : shiftDay(m, 6), data) }));
   const reached = weeks.filter((w) => w.sum >= WHO_MINUTES).length;

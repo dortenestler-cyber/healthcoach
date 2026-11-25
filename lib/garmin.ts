@@ -59,6 +59,9 @@ export type Activity = {
   training_load: number | null;
   sport_override?: string | null; // eigene Zuordnung (Sammelliste Punkt 6), „ignorieren“ = nicht zuordnen
   sport_label?: string | null; // eigener Name bei „Anderes“
+  im_moderate?: number | null; // Garmins Intensitätsminuten der Einheit (ab Migration 20261130130000)
+  im_vigorous?: number | null;
+  hr_zones?: number[] | null; // Minuten je Pulszone 0–5
 };
 
 // Eigene Zuordnungen laden. Fehlt die Spalte noch (Migration nicht gelaufen), kommt null zurück.
@@ -67,6 +70,15 @@ export async function loadActivityOverrides(sb: any, from: string): Promise<Map<
   const { data, error } = await sb.from("garmin_activities").select("activity_id, sport_override, sport_label").gte("start_local", from).not("sport_override", "is", null);
   if (error) return null;
   return new Map(((data ?? []) as { activity_id: number; sport_override: string; sport_label: string | null }[]).map((r) => [r.activity_id, { sport: r.sport_override, label: r.sport_label }]));
+}
+
+// Intensitätsminuten und Pulszonen je Einheit laden. Fehlen die Spalten noch (Migration nicht gelaufen), nur die Pulszonen.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function loadActivityIntensity(sb: any, from: string): Promise<Map<number, Pick<Activity, "im_moderate" | "im_vigorous" | "hr_zones">>> {
+  let res = await sb.from("garmin_activities").select("activity_id, im_moderate, im_vigorous, hr_zones").gte("start_local", from);
+  if (res.error) res = await sb.from("garmin_activities").select("activity_id, hr_zones").gte("start_local", from);
+  if (res.error) return new Map();
+  return new Map(((res.data ?? []) as (Pick<Activity, "activity_id" | "im_moderate" | "im_vigorous" | "hr_zones">)[]).map(({ activity_id, ...r }) => [activity_id, r]));
 }
 
 export function withOverrides(acts: Activity[], ov: Map<number, { sport: string; label: string | null }> | null): Activity[] {
