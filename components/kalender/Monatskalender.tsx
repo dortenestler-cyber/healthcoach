@@ -11,12 +11,25 @@ import type { Diary } from "@/lib/insights";
 import { PHASE4, PHASE4_LABEL, phase4Of, type Phase4 } from "@/components/zyklus/CycleRing";
 import { SPORTS, type Sport } from "@/lib/training";
 
-export type Ebene = "zyklus" | "training" | "symptome";
-const EBENEN: { key: Ebene; label: string; farbe: string }[] = [
+export type Ebene = "zyklus" | "training" | "symptome" | ZeichenEbene;
+// Ebenen mit einem Zeichen je Tag (zentraler Kalender, Konzept docs/konzept-einfach.md, Paket 3)
+export type ZeichenEbene = "gewohnheiten" | "krank" | "medikamente" | "schlaf";
+export const EBENEN: { key: Ebene; label: string; farbe: string }[] = [
   { key: "zyklus", label: "Zyklus", farbe: "var(--cycle)" },
   { key: "training", label: "Training", farbe: "var(--training)" },
   { key: "symptome", label: "Symptome", farbe: "var(--warn)" },
+  { key: "gewohnheiten", label: "Gewohnheiten", farbe: "var(--recovery)" },
+  { key: "krank", label: "Krank & verletzt", farbe: "var(--warn)" },
+  { key: "medikamente", label: "Medikamente", farbe: "var(--mobility)" },
+  { key: "schlaf", label: "Schlaf", farbe: "var(--sleep)" },
 ];
+// Form und Wort je Zeichen-Ebene: Farbe steht nie allein (Legende und Vorlesetext)
+const ZEICHEN: Record<ZeichenEbene, { cls: string; legende: string }> = {
+  gewohnheiten: { cls: "mk-hab", legende: "Gewohnheit" },
+  krank: { cls: "mk-krank", legende: "krank oder verletzt" },
+  medikamente: { cls: "mk-med", legende: "Bedarfs-Medikament" },
+  schlaf: { cls: "mk-schlaf", legende: "Schlaf unter deinem Bereich" },
+};
 export type Punkt = { key: string; sport: Sport; filled: boolean }; // Training: voll = erledigt, hohl = geplant
 
 const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
@@ -33,6 +46,7 @@ type Props = {
   start?: Ebene[]; // welche zu Beginn an sind
   merken?: string; // Ort, unter dem die gewählten Ebenen gemerkt werden, z. B. "training"
   punkte?: (day: string) => Punkt[]; // Training je Tag
+  zeichen?: Partial<Record<ZeichenEbene, (day: string) => string | null>>; // Text für den Tag oder null
   selected?: string | null;
   onPick?: (day: string) => void;
   onMonth?: (first: string, last: string) => void; // für Bereiche, die je Monat nachladen
@@ -41,7 +55,7 @@ type Props = {
   footer?: ReactNode; // z. B. „Periode eintragen +“
 };
 
-export default function Monatskalender({ today, diary, ebenen = ["zyklus", "training", "symptome"], start, merken = "allgemein", punkte, selected, onPick, onMonth, maxForward = 3, head, footer }: Props) {
+export default function Monatskalender({ today, diary, ebenen = ["zyklus", "training", "symptome"], start, merken = "allgemein", punkte, zeichen, selected, onPick, onMonth, maxForward = 3, head, footer }: Props) {
   const [offset, setOffset] = useState(0);
   const [on, toggle] = useAuswahl<Ebene>(`kalender.${merken}`, start ?? ebenen);
   const base = new Date(today + "T12:00:00");
@@ -90,6 +104,11 @@ export default function Monatskalender({ today, diary, ebenen = ["zyklus", "trai
   };
   const shown = cells.filter((c): c is NonNullable<Cell> => !!c);
   const anyPunkte = training && shown.some((c) => punkte!(c.day).length);
+  // Vorgewählte Ebenen zuerst, damit sie in der Zeile zum Wischen sichtbar sind; die Reihenfolge bleibt beim Umschalten gleich
+  const verfuegbar = EBENEN.filter((e) => ebenen.includes(e.key));
+  const reihe = [...verfuegbar.filter((e) => (start ?? ebenen).includes(e.key)), ...verfuegbar.filter((e) => !(start ?? ebenen).includes(e.key))];
+  const zEbenen = (Object.keys(ZEICHEN) as ZeichenEbene[]).filter((z) => on.has(z) && ebenen.includes(z) && zeichen?.[z]);
+  const zeichenAm = (day: string) => zEbenen.map((z) => ({ z, text: zeichen![z]!(day) })).filter((x): x is { z: ZeichenEbene; text: string } => !!x.text);
 
   return (
     <section className="card mk">
@@ -100,8 +119,8 @@ export default function Monatskalender({ today, diary, ebenen = ["zyklus", "trai
         <button type="button" className="icon-btn" aria-label="Nächster Monat" disabled={offset >= maxForward} onClick={() => shift(1)}>›</button>
       </div>
       {ebenen.length > 1 && (
-        <PillenZeile label="Ebenen im Kalender" className="mk-ebenen">
-          {EBENEN.filter((e) => ebenen.includes(e.key)).map((e) => (
+        <PillenZeile label="Ebenen im Kalender" className="mk-ebenen" scroll={ebenen.length > 3}>
+          {reihe.map((e) => (
             <Pille key={e.key} an={on.has(e.key)} farbe={e.farbe} onClick={() => toggle(e.key)}>
               {e.label}
             </Pille>
@@ -115,7 +134,8 @@ export default function Monatskalender({ today, diary, ebenen = ["zyklus", "trai
         {cells.map((c, i) => {
           if (!c) return <div key={"x" + i} className="cal-cell" aria-hidden="true" />;
           const p = training ? punkte!(c.day) : [];
-          const label = `${c.n}. ${MONTHS[m]}${c.phase ? ", " + PHASE4_LABEL[c.phase] : ""}${c.future && c.phase ? ", geschätzt" : ""}${c.today ? ", heute" : ""}${p.length ? ", " + p.map((x) => SPORTS[x.sport].label + (x.filled ? "" : " geplant")).join(", ") : ""}${symptome && c.symptom ? ", Symptome eingetragen" : ""}${zyklus && c.ov ? ", Eisprung-Zeichen eingetragen" : ""}`;
+          const zs = zeichenAm(c.day);
+          const label = `${c.n}. ${MONTHS[m]}${c.phase ? ", " + PHASE4_LABEL[c.phase] : ""}${c.future && c.phase ? ", geschätzt" : ""}${c.today ? ", heute" : ""}${p.length ? ", " + p.map((x) => SPORTS[x.sport].label + (x.filled ? "" : " geplant")).join(", ") : ""}${symptome && c.symptom ? ", Symptome eingetragen" : ""}${zyklus && c.ov ? ", Eisprung-Zeichen eingetragen" : ""}${zs.map((x) => ", " + x.text).join("")}`;
           return (
             <button
               key={c.day}
@@ -127,10 +147,11 @@ export default function Monatskalender({ today, diary, ebenen = ["zyklus", "trai
             >
               <span className="cal-band" aria-hidden="true" />
               <span className={`cal-num${c.today ? " cal-today" : ""}`} aria-hidden="true">{c.n}</span>
-              {(p.length > 0 || (symptome && c.symptom)) && (
+              {(p.length > 0 || (symptome && c.symptom) || zs.length > 0) && (
                 <span className="mk-dots" aria-hidden="true">
                   {p.slice(0, 3).map((x) => <i key={x.key} style={{ borderColor: SPORTS[x.sport].color, background: x.filled ? SPORTS[x.sport].color : "transparent" }} />)}
                   {symptome && c.symptom && <i className="mk-sym" />}
+                  {zs.map((x) => <i key={x.z} className={ZEICHEN[x.z].cls} />)}
                 </span>
               )}
               {zyklus && c.ov && <span className="cal-ov" aria-hidden="true">✦</span>}
@@ -144,6 +165,7 @@ export default function Monatskalender({ today, diary, ebenen = ["zyklus", "trai
         {anyPunkte && ADDABLE.map((s) => <span key={s}><i style={{ background: SPORTS[s].color }} />{SPORTS[s].label}</span>)}
         {anyPunkte && <span><i style={{ background: "transparent", border: "1.5px solid var(--muted)" }} />geplant</span>}
         {symptome && <span><i className="mk-key-sym" />Symptome</span>}
+        {zEbenen.map((z) => <span key={z}><span className="mk-dots mk-key" aria-hidden="true"><i className={ZEICHEN[z].cls} /></span>{ZEICHEN[z].legende}</span>)}
         {zyklus && shown.some((c) => c.ov) && <span><span className="cal-ov-key" aria-hidden="true">✦</span>Eisprung-Zeichen</span>}
       </div>
       {footer}

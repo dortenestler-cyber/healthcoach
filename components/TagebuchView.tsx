@@ -170,7 +170,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
 
   return (
     <>
-      <PageHead title="Tagebuch" sub={(day === today ? "Eintrag für " : "Nachtrag für ") + longDate(new Date(day + "T12:00:00"))} />
+      <PageHead title="Tagebuch" sub={(day === today ? "Eintrag für " : "Nachtrag für ") + longDate(new Date(day + "T12:00:00"))} kalender="tagebuch" />
       {error && <p className="alert" role="alert">{error}</p>}
 
       <div className="day-nav">

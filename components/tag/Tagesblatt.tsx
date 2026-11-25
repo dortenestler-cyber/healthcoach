@@ -45,7 +45,8 @@ const covers = (s: Span, day: string) => s.started_on <= day && (s.ended_on === 
 
 type Tile = { key: string; label: string; value: string; word: string; href: string };
 
-export default function Tagesblatt({ day, data, onChanged, intro, bare = false }: { day: string; data: Data | null; onChanged?: () => void; intro?: ReactNode; bare?: boolean }) {
+// kompakt: ohne Kacheln „Auf einen Blick“ (zentraler Kalender, Konzept docs/konzept-einfach.md)
+export default function Tagesblatt({ day, data, onChanged, intro, bare = false, kompakt = false }: { day: string; data: Data | null; onChanged?: () => void; intro?: ReactNode; bare?: boolean; kompakt?: boolean }) {
   const [extra, setExtra] = useState<DayExtra | null>(null);
 
   const load = useCallback(async () => {
@@ -144,7 +145,7 @@ export default function Tagesblatt({ day, data, onChanged, intro, bare = false }
         )}
       </div>
 
-      {tiles.length > 0 && (
+      {!kompakt && tiles.length > 0 && (
         <div className="tag-sec">
           <span className="eyebrow">Auf einen Blick</span>
           <div className="today-glance">

@@ -76,7 +76,7 @@ export default function TrainingView({ initial }: { initial: string }) {
 
   return (
     <>
-      <PageHead title="Training" sub="Karate, Bouldern, Kettlebell und Ausdauer" tone="training" />
+      <PageHead title="Training" sub="Karate, Bouldern, Kettlebell und Ausdauer" tone="training" kalender="training" />
       {error && <p className="alert" role="alert">{error}</p>}
       {hasAlltag && (
         <div className="segmented" role="group" aria-label="Welche Belastung zählt">

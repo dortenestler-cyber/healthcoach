@@ -52,7 +52,9 @@ export default function DayHead({ day, today, lastSync, failed = false, onDay, o
             <button type="button" className="today-date-btn" aria-label="Tag davor" onClick={() => onDay(shiftDay(day, -1))}>
               <Chevron dir="l" />
             </button>
-            <span className="today-date-text">{longDate(date)}</span>
+            <Link href={`/kalender?von=heute&tag=${day}`} className="today-date-text today-date-link" aria-label={`${longDate(date)}, Kalender öffnen`}>
+              {longDate(date)}
+            </Link>
             <button type="button" className="today-date-btn" aria-label="Tag danach" disabled={isToday} onClick={() => onDay(shiftDay(day, 1))}>
               <Chevron dir="r" />
             </button>
