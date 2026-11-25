@@ -3,6 +3,7 @@
 // Training › Kalender: gemeinsamer Monatskalender (Ebenen Training, Zyklus, Symptome) und daneben das Tagesblatt.
 // Konzept docs/konzept-buendeln.md, Bausteine 1 (Tagesblatt) und 2 (Kalender mit Ebenen).
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { isoDay } from "@/lib/dates";
@@ -17,6 +18,11 @@ import TwoCol from "@/components/ui/TwoCol";
 import { sportOf, SPORTS, type Session, type Sport } from "@/lib/training";
 
 const monthBounds = (d: Date) => [isoDay(new Date(d.getFullYear(), d.getMonth(), 1)), isoDay(new Date(d.getFullYear(), d.getMonth() + 1, 0))] as const;
+const weekBounds = (d: Date) => {
+  const mo = new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 6) % 7), 12);
+  return [isoDay(mo), isoDay(new Date(mo.getFullYear(), mo.getMonth(), mo.getDate() + 6, 12))] as const;
+};
+const WT = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
 type Span = { started_on: string; ended_on: string | null };
 
@@ -29,6 +35,7 @@ export default function CalendarSection({
   merken = "training",
   tag,
   kompakt = false,
+  woche = false,
 }: {
   data: Data | null;
   ebenen?: Ebene[];
@@ -36,9 +43,10 @@ export default function CalendarSection({
   merken?: string;
   tag?: string;
   kompakt?: boolean;
+  woche?: boolean; // Wochenstreifen statt Monat (Training › Übersicht), mit Link zum zentralen Kalender
 }) {
   const today = isoDay();
-  const [[first, last], setRange] = useState<readonly [string, string]>(() => monthBounds(new Date()));
+  const [[first, last], setRange] = useState<readonly [string, string]>(() => (woche ? weekBounds(new Date()) : monthBounds(new Date())));
   const [selected, setSelected] = useState(tag && /^\d{4}-\d{2}-\d{2}$/.test(tag) ? tag : today);
   const [spans, setSpans] = useState<{ krank: (Span & { label: string })[]; verletzt: (Span & { spot: string })[] }>({ krank: [], verletzt: [] });
   const mitZeichen = ebenen.some((e) => ["gewohnheiten", "krank", "medikamente", "schlaf"].includes(e));
@@ -133,6 +141,20 @@ export default function CalendarSection({
       {/* Am Computer Kalender und Tagesblatt nebeneinander (TwoCol), auf dem iPhone untereinander */}
       <TwoCol
         left={
+          woche ? (
+            <WochenStreifen
+              first={first}
+              today={today}
+              selected={selected}
+              punkte={punkte}
+              onPick={setSelected}
+              onShift={(n) => {
+                const mo = new Date(first + "T12:00:00");
+                mo.setDate(mo.getDate() + 7 * n);
+                setRange(weekBounds(mo));
+              }}
+            />
+          ) : (
           <Monatskalender
             today={today}
             diary={data?.diary ?? []}
@@ -146,6 +168,7 @@ export default function CalendarSection({
             onMonth={(f, l) => setRange([f, l])}
             maxForward={12}
           />
+          )
         }
         right={
           <Tagesblatt
@@ -167,5 +190,51 @@ export default function CalendarSection({
         }
       />
     </>
+  );
+}
+
+// Training › Übersicht: eine Woche mit Punkten je Einheit (voll erledigt, hohl geplant), Tipp wählt den Tag
+function WochenStreifen({ first, today, selected, punkte, onPick, onShift }: { first: string; today: string; selected: string; punkte: (day: string) => Punkt[]; onPick: (d: string) => void; onShift: (n: number) => void }) {
+  const tage = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(first + "T12:00:00");
+    d.setDate(d.getDate() + i);
+    return isoDay(d);
+  });
+  const diese = tage.includes(today);
+  const titel = diese ? "Diese Woche" : `${new Date(tage[0] + "T12:00:00").toLocaleDateString("de-DE", { day: "numeric", month: "short" })} – ${new Date(tage[6] + "T12:00:00").toLocaleDateString("de-DE", { day: "numeric", month: "short" })}`;
+  const alle = tage.flatMap((d) => punkte(d));
+  const erledigt = alle.filter((p) => p.filled).length;
+  const geplant = alle.length - erledigt;
+  return (
+    <section className="card woche">
+      <div className="woche-kopf">
+        <button type="button" className="icon-btn" aria-label="Woche davor" onClick={() => onShift(-1)}>‹</button>
+        <h2>{titel}</h2>
+        <button type="button" className="icon-btn" aria-label="Woche danach" onClick={() => onShift(1)}>›</button>
+        <Link href="/kalender?von=training" className="sec-link woche-kal">Kalender ›</Link>
+      </div>
+      <div className="woche-tage">
+        {tage.map((d, i) => {
+          const p = punkte(d);
+          return (
+            <button
+              key={d}
+              type="button"
+              className={`woche-tag${d === today ? " is-heute" : ""}`}
+              aria-pressed={d === selected}
+              aria-label={`${WT[i]} ${Number(d.slice(8))}.${d === today ? ", heute" : ""}${p.length ? ", " + p.map((x) => SPORTS[x.sport].label + (x.filled ? "" : " geplant")).join(", ") : ", nichts"}`}
+              onClick={() => onPick(d)}
+            >
+              <span className="woche-wt">{WT[i]}</span>
+              <span className="woche-n">{Number(d.slice(8))}</span>
+              <span className="mk-dots woche-dots" aria-hidden="true">
+                {p.slice(0, 3).map((x) => <i key={x.key} style={{ borderColor: SPORTS[x.sport].color, background: x.filled ? SPORTS[x.sport].color : "transparent" }} />)}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="meta">{erledigt} erledigt{geplant ? ` · ${geplant} geplant` : ""} · voller Punkt erledigt, leerer geplant</p>
+    </section>
   );
 }

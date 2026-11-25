@@ -63,7 +63,7 @@ export default function TodayPlan({ children }: { children?: ReactNode }) {
     <div className="agenda-part">
       <div className="card-row">
         <h3>Training</h3>
-        <Link href="/training" className="link-small">Kalender ›</Link>
+        <Link href="/kalender?von=training" className="link-small">Kalender ›</Link>
       </div>
       {!open.length && !acts.length && <p>Heute ist frei. Gehen oder Mobilität tun trotzdem gut.</p>}
       {open.map((s) => {
@@ -83,7 +83,7 @@ export default function TodayPlan({ children }: { children?: ReactNode }) {
             </div>
             {eff && <span className="meta meta-warn">{eff.text}</span>}
             {!done && s.sport === "kettlebell" && !eff && (
-              <Link href="/training?t=kettlebell" className="link-small">Einheit starten ›</Link>
+              <Link href="/training/kettlebell" className="link-small">Einheit starten ›</Link>
             )}
           </div>
         );
