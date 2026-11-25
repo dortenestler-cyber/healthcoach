@@ -1,10 +1,12 @@
 # Übergabe · Oberfläche (OF)
-Belegt: Konto A · Sitzung https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU · seit 2026-11-25
+Belegt: frei
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU
 
-## In Arbeit: Tagesstart und Mitteilung nach dem Training (25.11., Freigabe der Nutzerin)
-- Zweig `claude/training-detection-heart-rate-ypzut9`. Lösung A: Abruf tagsüber alle 15 Min, Mitteilung nach neuer Einheit; Tagesstart ersetzt die Check-in-Erinnerung.
-- Nächster Schritt: Migration `20261130100000_tagesstart_training`, dann `push` und `garmin-sync`.
+## Tagesstart und Mitteilung nach dem Training (PR #179, 25.11., Freigabe der Nutzerin)
+- `components/settings/PushRows.tsx`: Schalter Mitteilungen (Gerät), Tagesstart (`checkin_reminder`) mit Uhrzeit, Nach dem Training (`training_push`), Werte in Mitteilungen zeigen (`show_values`). `lib/push.ts` lädt `*`.
+- `lib/abschnitte.ts` reicht nur noch `supabase/functions/_shared/abschnitte.ts` weiter.
+- Idee für später (nur Konzept, nicht freigegeben): Checkout am Abend, siehe Chat 25.11. und `BACKLOG.md`.
+- Wartet auf: Merge.
 
 ## Abschnitte aus dem Puls (PR #176, 25.11., Freigabe der Nutzerin)
 - `lib/abschnitte.ts`: `detect` (Spitzen nach Prominenz in Anteil der Pulsreserve, Mindestpause je Sportart, Glättung 15 s), `learnScale` (Faktor 0,6–2,0 aus bis zu 20 bestätigten Einheiten derselben Sportart, ab 2), Regeln `SEGMENT_RULES` für Klettern, Kettlebell, Karate, Ausdauer.

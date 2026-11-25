@@ -1,10 +1,14 @@
 # Übergabe · Daten (DA)
-Belegt: Konto A · Sitzung https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU · seit 2026-11-25
+Belegt: frei
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU
 
-## In Arbeit: Tagesstart und Mitteilung nach dem Training (25.11., Freigabe der Nutzerin)
-- Zweig `claude/training-detection-heart-rate-ypzut9`. Lösung A: Abruf tagsüber alle 15 Min, Mitteilung nach neuer Einheit; Tagesstart ersetzt die Check-in-Erinnerung.
-- Nächster Schritt: Migration `20261130100000_tagesstart_training`, dann `push` und `garmin-sync`.
+## Tagesstart und Mitteilung nach dem Training (PR #179, 25.11., Freigabe der Nutzerin)
+- Migration `20261130100000_tagesstart_training`: `push_subscriptions.training_push`, `show_values` (beide Standard an), `garmin_activities.notified_at` (alle bisherigen gesetzt), Funktion `garmin_day_tick` und Zeitplan `garmin-tagsueber` (Minute 7, 22, 37, 52; nur 6–22 Uhr Berlin) ruft `garmin-sync` mit `{quick: true}`.
+- `garmin-sync`: `quick` holt nur die Aktivitäten von gestern und heute (eine Anfrage), dazu `syncDetails`, kein Eintrag in `garmin_sync_runs`. Nach Zeitplan-Läufen `notifyTraining()` → `push` `{action: "training"}` mit `PUSH_CRON_SECRET`. Abruf aus der App setzt `notified_at` neuer Einheiten (keine Mitteilung). `actRow`, `saveActivities` ausgelagert.
+- `push`: `due` schickt den Tagesstart ab `remind_at` (wartet bis 2 Std auf Garmin-Werte der Nacht), auch wenn der Check-in schon da ist. `training` meldet Einheiten ohne `notified_at`, die vor höchstens 6 Std endeten. Texte in `push/nachrichten.ts`, `show_values = false` → neutraler Satz.
+- `watch/today.ts`: Tagesrechnung aus `watch/index.ts` ausgelagert, nutzen Uhr und Tagesstart. `_shared/abschnitte.ts`: Erkennung für App und `push`; Lauf „Supabase-Funktionen hochladen“ überspringt Ordner mit `_`.
+- Geprüft: `deno check` für garmin-sync, watch, push; Texte an Beispieldaten. Ungeprüft: Hochladen mit `_shared` und `../watch` (erster Lauf nach dem Merge zeigt es).
+- Wartet auf: Merge durch die Nutzerin (Migration). Danach Läufe prüfen und am nächsten Morgen den Tagesstart.
 
 ## Abschnitte aus dem Puls (PR #176, 25.11., Freigabe der Nutzerin)
 - Migration `20261130090000_abschnitte`: `garmin_activities.hr_fine` (Puls je 5 s ab Beginn, `[]` = Garmin liefert keinen), `garmin_sets` (aktive Sätze aus `/exerciseSets`: `{s, d, r}`), `segment_count` (0–200, nur App).
