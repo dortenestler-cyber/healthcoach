@@ -254,6 +254,6 @@ Freigegeben: A und B, mit C als Rahmen.
 - Nach einer Karate-Einheit (Garmin oder erfasst) fragt die Einheit-Seite: „Was saß heute?“ mit denselben Punkten, ein Tipp je Punkt setzt die Stufe.
 - Merkt sich, wann ein Punkt zuletzt dran war, in `settings.data.karate.zuletzt` (keine Migration).
 
-Umgesetzt (PR #159): Zielkarte (`components/training/Zielkarte.tsx`) auf der Karate-Seite und als Karate-Kachel („12/31 sitzen · 4. Kyu“). Bouldern und Kettlebell zeigen in der Kachel noch Trainingstage, ihre Zielkarte folgt.
+Umgesetzt (PR #159): Zielkarte (`components/training/Zielkarte.tsx`) auf der Karate-Seite und als Karate-Kachel („12/31 sitzen · 4. Kyu“). Bouldern (Tops ab 6A von allen Versuchen ab 6A, 8 Wochen) und Kettlebell (Einheiten des Plans von allen geplanten, „im Plan“ = mindestens so viele wie bis zur laufenden Woche vorgesehen) folgen in PR #160, `lib/ziele.ts`.
 
 Behoben am 25.11. (vorab): Der Hinweis bei Verletzung nennt den Kyu der nächsten Prüfung statt fest den 5. Kyu (`kyuHinweis` in `lib/health.ts`, genutzt auf Gesundheit › Krank & verletzt und Training › Karate).
