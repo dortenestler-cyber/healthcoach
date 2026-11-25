@@ -226,7 +226,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
           {feat.zyklus && <Link href="/zyklus#perioden" className="settings-link">Frühere nachtragen ›</Link>}
         </div>
         {feat.zyklus && ct?.phase && ct.cycleDay !== null && (
-          <span className="meta tb-phase">Zyklustag {ct.cycleDay} · {PHASES[ct.phase].label} (geschätzt)</span>
+          <span className="meta tb-phase">Zyklustag {ct.cycleDay} · {PHASES[ct.phase].label}{ct.phase === "menstruation" && bleeding > 0 ? "" : " (geschätzt)"}</span>
         )}
         <div className="grid-5 tb-blutung">
           {BLEEDING.map((l, i) => (
@@ -264,13 +264,13 @@ export default function TagebuchView({ initial }: { initial?: string }) {
         </div>
         {jetzt.length > 0 && (
           <>
-            <span className="meta tb-jetzt">Passt zu jetzt{ct?.phase ? ` · ${PHASES[ct.phase].label}` : ""}</span>
+            <span className="meta tb-jetzt">Passt zu jetzt{ct?.phase ? ` · ${PHASES[ct.phase].label}` : ""}{eigeneJetzt.length ? " · „oft“ = trägst du um diesen Zyklustag oft ein" : ""}</span>
             <div className="pills wrap">
               {jetzt.map((s) => {
                 const v = symptoms[s.key] ?? 0;
                 return (
                   <button key={s.key} type="button" className={"pill level-" + v} onClick={() => { setSymptoms({ ...symptoms, [s.key]: (v + 1) % 4 }); changed(); }}>
-                    {s.label}{v ? " · " + LEVELS[v] : eigeneJetzt.includes(s.key) ? " · oft um diesen Tag" : ""}
+                    {s.label}{v ? " · " + LEVELS[v] : eigeneJetzt.includes(s.key) ? " · oft" : ""}
                   </button>
                 );
               })}

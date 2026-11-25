@@ -89,3 +89,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-25 · OF · Nutzerin: Fehler Verletzungshinweis mit festem 5. Kyu sofort beheben
 2026-11-25 · OF · Nutzerin: Tagesblatt unter dem Trainingskalender ohne Kacheln „Auf einen Blick“ (stehen schon auf Heute)
 2026-11-25 · OF · Nutzerin: Uhrzeiten geplanter Einheiten entfallen in der App (Anzeige und Vorgabe beim Planen)
+2026-11-25 · OF · Nutzerin: Tagebuch zeigt passend zur Zyklusphase Symptome (eigene Muster zuerst, dann typische) und Eisprung-Zeichen im Fenster; Blutung bleibt sichtbar, kompakter

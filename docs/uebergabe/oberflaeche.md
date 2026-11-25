@@ -2,6 +2,10 @@
 Belegt: frei
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWcpKAVS1T6prb5SPNt
 
+## Tagebuch passend zur Zyklusphase (25.11.)
+- Wunsch der Nutzerin. Phase wie auf Zyklus (`zDiary`: Tagebuch 200 Tage + Garmin-Zyklen + Eisprung-Zeichen, `cycleToday`). Blutung kompakt (`pill-sm`) mit „Zyklustag x · Phase (geschätzt)“ darüber. Eisprung-Zeichen offen im Eisprung-Fenster oder wenn eines eingetragen ist, sonst Pille „+ Eisprung-Zeichen“.
+- Symptome: Reihe „Passt zu jetzt“ = eigene Muster (`symptomeUmTag` in `lib/zyklusAuswertung.ts`: in mindestens der Hälfte der letzten bis zu 4 Zyklen am Zyklustag ±1, Zusatz „· oft“), dann typische der Phase (`PHASE_SYMPTOME` in `lib/catalog.ts`), höchstens 6. Darunter „Sonst oft“ wie bisher.
+
 ## Uhrzeiten im Plan entfernt (25.11.)
 - Wunsch der Nutzerin: keine Uhrzeiten bei geplanten Einheiten. Anzeige in `TodayPlan` und `TagTraining` entfernt, neue Einheiten ohne Zeit (`DEFAULT_TIMES` gelöscht). Spalte `time` bleibt in der Datenbank.
 - Offen für Daten: `supabase/functions/watch/index.ts` gibt `time` noch an die Uhr; neue Einheiten liefern dort eine leere Zeit. Ändern nur mit Freigabe.
