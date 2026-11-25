@@ -5,8 +5,10 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017z
 ## Bug: Intensitätsminuten bleiben nach dem Training stehen (PR #184, 25.11.)
 - Ursache: Der kurze Abruf alle 15 Minuten (`quick`) holte nur Aktivitäten, die Tageszusammenfassung nur der volle Abruf (Morgen, 19:37–21:37, App nach 60 Min, Ziehen auf Heute). Die Training-Einheit erschien, die Intensitätsminuten blieben auf dem Stand vom Morgen.
 - `garmin-sync`: `quick` holt jetzt auch `dailysummaries` für gestern und heute und schreibt nur `steps` und `intensity_minutes` (ohne `synced_at`, damit die App den vollen Abruf weiter auslöst). Fehler landen in `summaryNote`, brechen nicht ab. Rechnung in `intensityMinutes()` ausgelagert.
-- Geprüft: Syntax (TypeScript-Transpile). `deno check` nicht möglich (Deno fehlt in der Sitzung).
-- Wartet auf: Freigabe der Nutzerin zum Merge (Änderung an einer Supabase-Funktion).
+- Erweiterung nach Freigabe: `quick` schreibt zusätzlich `stress_avg` und `bb_*` (gleiche Antwort, keine weitere Anfrage). Migration `20261130120000_abruf_stuendlich`: `garmin_day_tick` macht zwischen 6 und 22 Uhr jede Stunde zur Minute 37 den vollen Abruf `{days: 1}`, sonst den kurzen (vorher nur 19:37–21:37). Etwa 16 volle Abrufe am Tag; wegen Garmin-Limits und Laufzeit bewusst nicht alle 15 Minuten.
+- `HeuteView`: Fehlermeldung „Der automatische Abruf um …“ statt „heute Morgen“, weil `garmin_sync_runs` jetzt stündlich Einträge bekommt.
+- Geprüft: Syntax der Funktion (TypeScript-Transpile), `tsc`, `npm run build`. `deno check` nicht möglich (Deno fehlt in der Sitzung).
+- Wartet auf: Freigabe der Nutzerin zum Merge (Migration und Supabase-Funktion). Danach: Läufe „Supabase-Migrationen ausführen“ und „Supabase-Funktionen hochladen“ prüfen; in `garmin_sync_runs` sollten stündlich Einträge erscheinen.
 
 ## Vercel Hobby (PR #183, 25.11., Freigabe der Nutzerin)
 - Pro-Tarif gekündigt, jetzt Hobby: 100 Deployments am Tag inkl. Vorschauen, Vercel-Cron nur einmal täglich (±59 Min).

@@ -205,8 +205,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Kurzer Abruf tagsüber (Zeitplan alle 15 Minuten): nur die Aktivitäten von gestern und heute,
-    // dazu Puls in Sekunden, danach die Mitteilung nach dem Training. Kein Eintrag im Protokoll.
+    // Kurzer Abruf tagsüber (Zeitplan alle 15 Minuten, zur Minute 37 läuft stattdessen der volle): Aktivitäten und
+    // Tageswerte von gestern und heute, dazu Puls in Sekunden, danach die Mitteilung nach dem Training. Kein Eintrag im Protokoll.
     if (body?.quick) {
       logRun = async () => {};
       const token = await garminToken(apiKey);
@@ -220,14 +220,24 @@ Deno.serve(async (req) => {
         if (Number.isFinite(g)) startGmt.set(a.activityId, g);
       }
       const rows = items.map((a) => actRow(a, userId));
-      // Intensitätsminuten und Schritte von gestern und heute nachführen, sonst bleiben sie bis zum nächsten vollen
-      // Abruf auf dem Stand vom Morgen. synced_at bleibt stehen, damit die App den vollen Abruf weiter selbst auslöst.
+      // Intensitätsminuten, Schritte, Stress und Body Battery (Tageswerte) von gestern und heute nachführen,
+      // sonst bleiben sie bis zum nächsten vollen Abruf stehen. synced_at bleibt stehen, damit die App den vollen Abruf weiter selbst auslöst.
       let summaryNote = "";
       try {
         const sums = await garminGet(token, `/usersummary-service/v2/dailysummaries?startDate=${s}&endDate=${e}`);
         const sumRows = ((sums?.data ?? sums ?? []) as Any[])
           .filter((d) => typeof d?.calendarDate === "string")
-          .map((d) => ({ user_id: userId, day: d.calendarDate, steps: int(d?.movement?.steps?.value), intensity_minutes: intensityMinutes(d) }));
+          .map((d) => ({
+            user_id: userId,
+            day: d.calendarDate,
+            steps: int(d?.movement?.steps?.value),
+            intensity_minutes: intensityMinutes(d),
+            stress_avg: int(d?.stress?.avgLevel),
+            bb_max: int(d?.bodyBattery?.maxValue),
+            bb_min: int(d?.bodyBattery?.minValue),
+            bb_charged: int(d?.bodyBattery?.chargedValue),
+            bb_drained: int(d?.bodyBattery?.drainedValue),
+          }));
         if (sumRows.length) {
           const { error: sumError } = await sb.from("garmin_daily").upsert(sumRows, { onConflict: "user_id,day" });
           if (sumError) summaryNote = sumError.message;
