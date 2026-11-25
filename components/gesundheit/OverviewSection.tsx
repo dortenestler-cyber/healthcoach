@@ -1,5 +1,7 @@
 "use client";
 
+import { Details } from "@/components/ui/Pille";
+
 import { trainingPatterns } from "@/lib/trainingInsights";
 import { useRefresh } from "@/lib/refresh";
 import Link from "next/link";
@@ -175,7 +177,9 @@ export default function OverviewSection() {
             <div key={p.key} className="pattern-block">
               <span className="eyebrow pattern-title">{p.title}</span>
               <span className={p.ready ? "pattern-text" : "meta"}>{p.ready ? p.text : p.need}</span>
-              {p.ready && p.bars.length > 0 && (
+              {p.ready && (
+                <Details id={`muster.${p.key}`} label="Balken und Grundlage">
+              {p.bars.length > 0 && (
                 <div className="pattern-bars">
                   {(() => {
                     const max = Math.max(...p.bars.map((b) => Math.abs(b.value)), 1);
@@ -189,7 +193,9 @@ export default function OverviewSection() {
                   })()}
                 </div>
               )}
-              {p.ready && <span className="meta">Grundlage: {p.basis}. Ein Zusammenhang, kein Beweis.</span>}
+              {<span className="meta">Grundlage: {p.basis}. Ein Zusammenhang, kein Beweis.</span>}
+                </Details>
+              )}
             </div>
           ))}
           <span className="meta">Muster mit Zyklusbezug stehen auf der Seite Zyklus.</span>

@@ -3,6 +3,7 @@
 // darunter die Grundlage und „Ein Zusammenhang, kein Beweis“. Nie eine Ursache, nie eine Diagnose.
 
 import type { Analysis, Finding } from "@/lib/muster";
+import { Details } from "@/components/ui/Pille";
 import { MIN_EVENT_DAYS } from "@/lib/muster";
 
 export function Zusammenhang({ titel, satz, sicherheit, heute }: { titel?: string; satz: string; sicherheit?: Finding["sicherheit"]; heute?: boolean }) {
@@ -30,9 +31,11 @@ export function ZusammenhangListe({ a, mit, start, max = 3, leer }: { a: Analysi
       ) : (
         <span className="meta">{leer}</span>
       )}
+      <Details id={`zusammenhang.${mit}`} label="Grundlage">
       <span className="meta">
         Grundlage: {a.eventDays} {a.eventDays === 1 ? "Tag" : "Tage"} {mit} in {a.windowDays} Tagen, {a.checked} Vergleiche. Gezeigt wird nur, was mindestens doppelt oder halb so oft vorkommt. Ein Zusammenhang, kein Beweis.
       </span>
+      </Details>
     </div>
   );
 }
