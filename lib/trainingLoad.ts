@@ -8,6 +8,7 @@ import { loadByDay } from "@/lib/today";
 export const RATIO_LO = 0.8; // darunter baust du ab
 export const RATIO_HI = 1.3; // darüber steigt die Last schnell
 export const WHO_MINUTES = 150; // WHO: mindestens 150 Minuten mäßige Bewegung pro Woche
+export const WHO_STRENGTH_DAYS = 2; // WHO: zusätzlich an mindestens 2 Tagen Muskeltraining
 
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");

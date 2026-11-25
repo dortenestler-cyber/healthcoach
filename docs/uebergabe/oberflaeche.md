@@ -1,6 +1,11 @@
 # Übergabe · Oberfläche (OF)
 Belegt: frei
-Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU
+Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1VwL1U1ue6ALkkaL4z
+
+## Intensität: Belastung und Krafttage (PR #185, 25.11., Freigabe der Nutzerin)
+- Anlass: Bouldern bringt kaum Intensitätsminuten (Garmin zählt gleich wenig), aber deutlich Belastung.
+- `/heute/intensitaet` (`IntensityDetail` in `HeuteDetail.tsx`): neue Karte „Belastung aus Training“ (Satz „Heute 58 aus Bouldern, diese Woche 210.“, Säulen je Tag, nur Training wie Garmin, `loadByDay(data.acts)`), Karte „Kraft · Empfehlung der WHO“ (Tage mit Kettlebell, Bouldern, Karate nach `sportOf`, Ziel `WHO_STRENGTH_DAYS = 2` in `lib/trainingLoad.ts`, Liste der Tage).
+- Geprüft: `tsc`, `npm run build`. Nicht im Browser angesehen (Login nötig). Nächster Schritt: Nutzerin schaut auf dem iPhone.
 
 ## Tagesabschluss am Abend (PR #180, 25.11., Freigabe der Nutzerin)
 - `components/tagebuch/AbschlussCard.tsx`: Satz Belastung gegen Ziel, Kacheln Schlafbedarf und Ins Bett bis, „Ein Wort zum Tag“ in `diary_entries.note` (max. 40 Zeichen, speichert von selbst). Im Tagebuch oben, heute ab 18 Uhr oder mit `?abschluss=1` (scrollt hin).
