@@ -1,5 +1,5 @@
 # Übergabe · Oberfläche (OF)
-Belegt: frei
+Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWd9mT296ny9kidDGro · seit 2026-11-25 · Karate-Prüfungen
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWdNvxckjvEm2fZmoT8
 
 

@@ -1,5 +1,5 @@
 # Übergabe · Daten (DA)
-Belegt: frei
+Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWd9mT296ny9kidDGro · seit 2026-11-25 · Karate-Prüfungen
 Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ
 
 Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`, `.github/`. Regeln: `docs/konzept-zwei-instanzen.md`.
