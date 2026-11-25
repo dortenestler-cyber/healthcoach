@@ -222,7 +222,7 @@ Jedes Paket ist ein eigener PR mit Fotos vorher/nachher. Alle Pakete gehören zu
 | 5 | Zyklus kürzen ✓ (PR #153) | hoch | Kalender und Nachtragen raus, Wochenstreifen, Abschnitts-Pillen |
 | 6 | Zeitraum im Kalender ✓ (PR #155) | mittel | Mehrere Tage wählen: Periode, krank, Gewohnheit, vergleichen |
 | 7 | Tagebuch ruhiger ✓ (PR #156) | mittel | Datum als Kalender-Blatt, Hinweise raus, Verlauf raus, ein Speicherweg (siehe Frage 1) |
-| 8 | Details einklappen | mittel | Einblende-Pillen in Musterkarten, Auswertung, Detailseiten |
+| 8 | Details einklappen ✓ (PR #157) | mittel | Einblende-Pillen in Musterkarten, Auswertung, Detailseiten |
 | 9 | Karate | mittel | Zielkarte für alle Sportarten, ruhige Karate-Seite, „Heute üben“ und „Was saß heute?“ (Abschnitt H) |
 
 ### Entscheidungen der Nutzerin (25.11.)

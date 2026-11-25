@@ -1,6 +1,6 @@
 "use client";
 
-import { Details } from "@/components/ui/Pille";
+import { Details, useAbschnitte } from "@/components/ui/Pille";
 
 import { trainingPatterns } from "@/lib/trainingInsights";
 import { useRefresh } from "@/lib/refresh";
@@ -37,6 +37,12 @@ export default function OverviewSection() {
   const [error, setError] = useState("");
   const today = isoDay();
 
+  // Abschnitte ein- und ausblenden (Konzept Einfach, Paket 8)
+  const abschnitte = useAbschnitte("gesundheit.ueberblick", [
+    ["guttut", "Was dir guttut"],
+    ["monat", "Dein Monat"],
+    ["muster", "Muster"],
+  ]);
   const [tick, setTick] = useState(0); // Neu laden (Konzept Datenaktualisierung)
   useRefresh(() => setTick((t) => t + 1));
   useEffect(() => {
@@ -108,6 +114,9 @@ export default function OverviewSection() {
         </div>
       </section>
 
+      {abschnitte.zeile}
+
+      {abschnitte.zeigt("guttut") && (
       <section className="card">
         <span className="eyebrow">Täglich aktualisiert · letzte 90 Tage</span>
         <h2 className="card-title-lg">
@@ -144,8 +153,9 @@ export default function OverviewSection() {
           </ExplainCard>
         )}
       </section>
+      )}
 
-      {data && (() => {
+      {abschnitte.zeigt("monat") && data && (() => {
         // Dein Monat (Konzept Bündeln, Baustein 6): nur was sich deutlich verändert hat, je ein Satz mit Link
         const dm = deinMonat(data, today, (k) => habits.find((h) => h.key === k)?.label ?? k);
         const n = dm.zeilen.length;
@@ -164,7 +174,7 @@ export default function OverviewSection() {
         );
       })()}
 
-      {(more.length > 0 || signsShown) && (
+      {abschnitte.zeigt("muster") && (more.length > 0 || signsShown) && (
         <section className="card">
           <span className="eyebrow">Weitere Muster</span>
           {signsShown && (
