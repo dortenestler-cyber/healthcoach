@@ -126,7 +126,6 @@ export default function OverviewSection() {
               ? "Bisher hängt keine Gewohnheit deutlich mit deiner HRV zusammen."
               : `Was dir guttut, erscheint ab je ${MIN_NIGHTS} Nächten mit und ohne eine Gewohnheit.`}
         </h2>
-        <p>HRV der Nacht danach mit und ohne Gewohnheit. Ein Zusammenhang, keine Ursache. Je Zyklusphase: Seite Zyklus.</p>
         {ready.length > 0 && (
           <DivergingBars
             fmt={ms}
@@ -139,7 +138,6 @@ export default function OverviewSection() {
         )}
         {waiting.length > 0 && <span className="meta">Noch zu wenige Nächte: {waiting.map((x) => `${x.h.label} (${x.c.nWith} von ${MIN_NIGHTS})`).join(", ")}.</span>}
         {/* Jede Gewohnheit hat ihre Seite (CLAUDE.md); „Gewohnheiten im Monat“ ist entfallen (Nutzerin 25.11.), die Wege stehen hier */}
-        <span className="meta">Jede Gewohnheit im Einzelnen:</span>
         <div className="pills wrap">
           {habits.filter((h) => h.on).map((h) => (
             <Link key={h.key} href={`/wert/gewohnheit-${encodeURIComponent(h.key)}`} className="pill pill-sm habit-link">
@@ -169,7 +167,6 @@ export default function OverviewSection() {
                 <span className="row-chev" aria-hidden="true">›</span>
               </Link>
             ))}
-            <span className="meta">Werte: Schnitt bis heute gegen den Vormonat. Training und Gewohnheiten: bis heute gegen dieselben Tage im Vormonat. Gezeigt wird nur, was sich deutlich verändert hat.</span>
           </section>
         );
       })()}
@@ -208,7 +205,6 @@ export default function OverviewSection() {
               )}
             </div>
           ))}
-          <span className="meta">Muster mit Zyklusbezug stehen auf der Seite Zyklus.</span>
         </section>
       )}
 

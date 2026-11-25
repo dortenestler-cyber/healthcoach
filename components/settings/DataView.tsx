@@ -62,7 +62,7 @@ export default function DataView() {
 
   return (
     <>
-      <PageHead title="Export & Backup" sub="Einstellungen" />
+      <PageHead title="Export & Backup" />
       <Group title="Sicherung">
         <Row label="Sicherung herunterladen" note="Alle deine Daten als eine JSON-Datei" onClick={busy ? undefined : backup} />
         <Row label="Sicherung wiederherstellen" note="JSON-Datei auswählen" onClick={busy ? undefined : () => file.current?.click()} />

@@ -88,7 +88,6 @@ export default function KettlebellSection() {
             </div>
           ))}
           <button type="button" className="btn btn-dark" onClick={createPlan}>Plan anlegen</button>
-          <span className="meta">Gewichte und Wiederholungen kannst du danach anpassen.</span>
         </section>
       </>
     );
@@ -271,7 +270,6 @@ export default function KettlebellSection() {
             </div>
           ))}
         </div>
-        <span className="meta">Wiederholungen mal Gewicht, ohne Übungen mit Körpergewicht. Die letzte Säule ist diese Woche.</span>
       </section>
 
       <button type="button" className="btn btn-link center-link" onClick={() => sb.from("kb_plans").update({ active: false }).eq("id", plan.id).then(() => load())}>

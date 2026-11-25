@@ -8,9 +8,9 @@ import ClimbSection from "@/components/training/ClimbSection";
 
 // Eigene Seite je Sportart (Konzept docs/konzept-einfach.md, Paket 4). Inhalt wie der frühere Reiter.
 const SEITEN = {
-  karate: { titel: "Karate", sub: "Training · Prüfungsprogramm", inhalt: <KarateSection /> },
-  kettlebell: { titel: "Kettlebell", sub: "Training · Plan und Sätze", inhalt: <KettlebellSection /> },
-  bouldern: { titel: "Bouldern", sub: "Training · Grade und Ziel", inhalt: <ClimbSection /> },
+  karate: { titel: "Karate", inhalt: <KarateSection /> },
+  kettlebell: { titel: "Kettlebell", inhalt: <KettlebellSection /> },
+  bouldern: { titel: "Bouldern", inhalt: <ClimbSection /> },
 };
 
 export default function SportSeite({ slug }: { slug: keyof typeof SEITEN }) {
@@ -18,7 +18,7 @@ export default function SportSeite({ slug }: { slug: keyof typeof SEITEN }) {
   return (
     <>
       <Link href="/training" className="back-link kal-zurueck">‹ Training</Link>
-      <PageHead title={s.titel} sub={s.sub} tone="training" kalender="training" />
+      <PageHead title={s.titel} tone="training" kalender="training" />
       {s.inhalt}
     </>
   );

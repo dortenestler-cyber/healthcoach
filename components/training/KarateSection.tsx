@@ -278,7 +278,6 @@ export default function KarateSection() {
 
         {aktiv === "Eigene" && (
         <div className="stack">
-          {!eigene.length && <span className="meta">Was dein Trainer dir mitgibt oder was noch wackelt, trägst du hier ein.</span>}
           {eigene.filter((i) => filter === "alles" || i.status !== "sitzt").map((i) => (
             <Zeile
               key={i.id}
@@ -326,7 +325,6 @@ export default function KarateSection() {
               </div>
             ))}
           </div>
-          <span className="meta">Erledigte Einheiten aus dem Kalender und Karate aus Garmin.</span>
           {injuries.map((inj) =>
             SPOTS[inj.spot] ? (
               <p key={inj.id} className="kyu">

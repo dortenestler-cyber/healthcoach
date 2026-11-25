@@ -116,7 +116,6 @@ function ReadinessDetail({ day, data, rule, showGarmin }: { day: string; data: D
       <div className="ring-hero detail-hero">
         <ValueRing tone="recovery" size={208} value={value / 10} center={de1(value)} caption={label} label={`Readiness ${de1(value)} von 10, ${label}`} />
       </div>
-      {!rule.target.enoughData && <p className="meta detail-center">Wird genauer, sobald 14 Tage Garmin-Daten da sind.</p>}
       <div className="stage-bar" aria-label={`Stufe: ${label}`}>
         {STAGE_ORDER.map((st) => (
           <div key={st} className="stage" data-on={st === stage}>
@@ -150,7 +149,6 @@ function ReadinessDetail({ day, data, rule, showGarmin }: { day: string; data: D
         {rule.cycle.cycleDay !== null ? `Zyklustag ${rule.cycle.cycleDay}${phase ? " · " + phase + " (geschätzt)" : ""}` : "Zyklus: noch keine Periode im Tagebuch"}
         {rule.cycle.window ? ` · ${windowText(rule.cycle.window, isoDay())} (${rule.cycle.window.earliest === rule.cycle.window.latest ? shortDay(rule.cycle.window.earliest) : `${shortDay(rule.cycle.window.earliest)}–${shortDay(rule.cycle.window.latest)}`})` : ""}
       </p>
-      <p className="meta">Vorschlag, keine Diagnose. Du entscheidest.</p>
     </>
   );
 }
@@ -196,7 +194,6 @@ function SleepDetail({ day, data }: { day: string; data: Data }) {
             {night.awake_count != null && night.sleep_awake_s ? <li>Wachzeit zusammen {duration(night.sleep_awake_s)}</li> : null}
             {night.spo2_avg != null && <li>Sauerstoff im Schlaf im Schnitt {Math.round(night.spo2_avg)} %{night.spo2_low != null ? `, niedrigster Wert ${Math.round(night.spo2_low)} %` : ""}</li>}
           </ul>
-          <span className="meta">Bei Auffälligkeiten sprich mit deiner Ärztin oder deinem Arzt, die App stellt keine Diagnose.</span>
         </section>
       )}
 
@@ -215,7 +212,6 @@ function SleepDetail({ day, data }: { day: string; data: Data }) {
           </li>
           <li>{need.loadAddMin ? `${need.loadAddMin} min dazu nach deiner Belastung` : "Kein Zuschlag für Belastung"}</li>
         </ul>
-        <span className="meta">Richtwerte aus deinen Daten, keine Diagnose.</span>
       </section>
 
       <section className="card">
@@ -352,7 +348,6 @@ function IntensityDetail({ day, data, rule, isToday, nowMinute }: { day: string;
         />
       </section>
 
-      <p className="meta">Garmin zählt intensive Minuten doppelt. <Link href="/training">Training ›</Link></p>
     </>
   );
 }

@@ -149,7 +149,6 @@ export default function IllnessSection() {
       {!active && !draft && (
         <section className="card">
           <h2>Was hast du?</h2>
-          <span className="meta">Auch zum Nachtragen: Beginn und Ende wählst du im nächsten Schritt.</span>
           <div className="pills wrap">
             {ILLNESSES.map((i) => (
               <button key={i.key} type="button" className="pill" onClick={() => pick(i.key, i.label, i.fever, i.below)}>

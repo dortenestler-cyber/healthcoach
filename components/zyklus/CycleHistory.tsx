@@ -61,7 +61,6 @@ export default function CycleHistory({ today, diary, flashes, showFlashes, muscl
             />
           )}
         </ValueHeader>
-        {y && <span className="meta">Band: mittlere Hälfte der Zykluslängen von vor einem Jahr ({cl.yearAgoN} Zyklen). Kürzere oder unregelmäßige Zyklen sind in der Perimenopause häufig. Sehr starke oder lange Blutungen bitte ärztlich abklären lassen.</span>}
         <Link href="#perioden" className="settings-link">Vergangene Perioden nachtragen ›</Link>
       </section>
       )}
@@ -87,7 +86,6 @@ export default function CycleHistory({ today, diary, flashes, showFlashes, muscl
         <span className="meta">Symptome nach Zyklustag · letzte {heat.n || 4} Zyklen</span>
         <h2>{heatSentence}</h2>
         {heat.rows.length > 0 && <Heatmap rows={heat.rows} columns={heat.columns} label={`Symptome nach Zyklustag über ${heat.n} Zyklen`} />}
-        <span className="meta">Anteil der Zyklen, in denen du das Symptom an diesem Tag eingetragen hast. Ein Zusammenhang, keine Diagnose.</span>
       </section>
       )}
     </>

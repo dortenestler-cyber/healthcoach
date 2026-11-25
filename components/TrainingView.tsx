@@ -98,7 +98,7 @@ export default function TrainingView({ initial }: { initial: string }) {
 
   return (
     <>
-      <PageHead title="Training" sub="Karate, Bouldern, Kettlebell und Ausdauer" tone="training" kalender="training" />
+      <PageHead title="Training" tone="training" kalender="training" />
       {error && <p className="alert" role="alert">{error}</p>}
       <div className="segmented segmented-tabs" role="group" aria-label="Bereich">
         {TABS.map(([k, l]) => (

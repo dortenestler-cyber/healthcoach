@@ -80,7 +80,6 @@ export default function KarateUeben({ tag, art, onChanged }: { tag: string; art:
         <p className="meta">Für den {kyu}. Kyu sitzt alles. Wiederhole, was du magst.</p>
       ) : (
         <>
-          <span className="meta">{art === "nachher" ? "Tipp setzt die Stufe weiter: offen → übe ich → sitzt." : "Zuerst, was du gerade übst, dann was lange nicht dran war."}</span>
           {punkte.map((p) => {
             const st = stand(p, progress);
             return (

@@ -66,7 +66,7 @@ export default function TodayPlan({ children }: { children?: ReactNode }) {
         <h3>Training</h3>
         <Link href="/kalender?von=training" className="link-small">Kalender ›</Link>
       </div>
-      {!open.length && !acts.length && <p>Heute ist frei. Gehen oder Mobilität tun trotzdem gut.</p>}
+      {!open.length && !acts.length && <p>Heute ist frei.</p>}
       {open.map((s) => {
         const done = isDone(s);
         const eff = done ? null : healthEffect(s.sport, s.day, illness, injuries);

@@ -111,7 +111,7 @@ export default function VerlaufView({ initial, mode = "uebersicht" }: { initial:
         {mode === "wert" ? (
           <>
             <Link href="/verlauf" className="back-link">‹ Alle Werte</Link>
-            <PageHead title={METRICS[metric].label} sub="Dein Wert über die Zeit" />
+            <PageHead title={METRICS[metric].label} />
           </>
         ) : (
           <h2 className="sec-title" id="verlauf">{METRICS[metric].label} über die Zeit</h2>
@@ -137,7 +137,7 @@ export default function VerlaufView({ initial, mode = "uebersicht" }: { initial:
   return (
     <>
       <Link href="/" className="back-link">‹ Heute</Link>
-      <PageHead title="Verlauf" sub="Deine Werte über die Zeit" />
+      <PageHead title="Verlauf" />
       {error && <p className="alert" role="alert">{error}</p>}
 
       <div className="segmented" role="group" aria-label="Gruppe">

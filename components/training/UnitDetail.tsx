@@ -176,7 +176,6 @@ function ResultCard({ unit, data }: { unit: Unit; data: Data }) {
         <Tile label="Puls max" value={unit.max_hr ? `${unit.max_hr}` : "–"} unit="bpm" note={diffNote(unit.max_hr, c.maxHr, "", undefined, 3)} />
         <Tile label="Belastung" value={unit.training_load ? `${Math.round(loadToPct(unit.training_load))} %` : "–"} note={unit.training_load ? `Garmin-Last ${Math.round(unit.training_load)}${c.load ? ` · üblich ${Math.round(loadToPct(c.load))} %` : ""}` : ""} />
       </div>
-      {c.n > 0 && <span className="meta">Vergleich mit deinen letzten {c.n} Einheiten dieser Sportart. Belastung wie bei Garmin.</span>}
       {unit.rpe && unit.training_load && c.verdict && (
         <ExplainCard tone={tone}>
           Gefühlt <strong>{unit.rpe} von 10</strong>, laut Garmin <strong>{c.verdict === "üblich" ? "eine übliche Belastung" : c.verdict === "härter" ? "mehr Belastung als üblich" : "weniger Belastung als üblich"}</strong>.
@@ -257,7 +256,6 @@ function ZonesCard({ unit }: { unit: Unit }) {
           </span>
         ))}
       </div>
-      <span className="meta">Zonen zwischen deinem Ruhepuls und Maximalpuls, wie bei der Belastung. Mehr ist heller.</span>
     </section>
   );
 }
@@ -378,7 +376,6 @@ function AfterCard({ unit, data, today }: { unit: Unit; data: Data; today: strin
           <span className="chip-sm chip-cycle">{cyc}</span>
         </div>
       )}
-      {!a.pending && <span className="meta">Werte vom Morgen nach der Einheit, gegen deinen Bereich (zyklusabhängige Werte gegen dieselbe Phase).</span>}
     </section>
   );
 }

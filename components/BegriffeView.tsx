@@ -43,7 +43,7 @@ const TERMS: { term: string; text: string; tip: string }[] = [
 export default function BegriffeView() {
   return (
     <>
-      <PageHead title="Begriffe" sub="Kurz erklärt" />
+      <PageHead title="Begriffe" />
       {TERMS.map((t) => (
         <section key={t.term} className="card">
           <h2>{t.term}</h2>

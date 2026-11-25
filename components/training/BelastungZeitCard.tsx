@@ -171,7 +171,6 @@ export default function BelastungZeitCard({ today, data, alltag = true }: { toda
         <span><i className="cb-key-zone" />Optimaler Bereich aus den 4 Wochen davor</span>
       </div>
 
-      {kind === "cardio" && <p className="meta">Schnitt deiner Tagesbelastung{alltag ? " mit Alltag" : ", nur Training"}. Müde heißt: HRV unter oder Ruhepuls über deinem Bereich, seit 2 Tagen.</p>}
       {kind === "muskeln" && muscle && (
         <p className="meta">
           {[lastUnitText(muscle.last, today), "Aus Kettlebell-Sätzen, Bouldern und Karate (halb), auch aus Einheiten, die du im Kalender erfasst.", muscle.estimated ? "Einheiten ohne eingetragene Anstrengung zählen mit 5 von 10, ohne Dauer mit 60 Minuten." : null].filter(Boolean).join(" ")}

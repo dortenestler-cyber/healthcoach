@@ -111,7 +111,7 @@ export default function HabitDetail({ habitKey }: { habitKey: string }) {
   return (
     <>
       <Link href="/gesundheit" className="back-link">‹ Gesundheit</Link>
-      <PageHead title={label} sub="Gewohnheit · aus deinem Tagebuch, letzte 90 Tage" tone="gesundheit" />
+      <PageHead title={label} tone="gesundheit" />
       {error && <p className="alert" role="alert">{error}</p>}
       {!data && !error && <p className="hint">Lädt …</p>}
 
@@ -151,7 +151,7 @@ export default function HabitDetail({ habitKey }: { habitKey: string }) {
               })}
             </div>
             <span className="meta">
-              {rows[0] ? `${rows[0].c.nWith} Nächte nach „${label}“ gegen ${rows[0].c.nWithout} ohne. ` : ""}Ein Zusammenhang, keine Ursache.
+              {rows[0] ? `${rows[0].c.nWith} Nächte nach „${label}“ gegen ${rows[0].c.nWithout} ohne.` : ""}
             </span>
           </section>
 
@@ -190,7 +190,6 @@ export default function HabitDetail({ habitKey }: { habitKey: string }) {
                       ))}
                     </div>
                   )}
-                  <span className="meta">Schnitt pro Tag aus deinen Einträgen auf Heute.</span>
                 </div>
               )}
             </section>

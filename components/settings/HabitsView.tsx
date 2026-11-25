@@ -62,7 +62,7 @@ export default function HabitsView() {
   return (
     <>
       <Link href="/tagebuch" className="back-link">‹ Tagebuch</Link>
-      <PageHead title="Gewohnheiten" sub="Einstellungen" />
+      <PageHead title="Gewohnheiten" />
       {error && <p className="alert" role="alert">{error}</p>}
       <Group title="Im Tagebuch">
         {habits.map((h, i) => (

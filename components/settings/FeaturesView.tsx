@@ -10,7 +10,7 @@ export default function FeaturesView() {
   const profile = currentProfile(f);
   return (
     <>
-      <PageHead title="Funktionen" sub="Einstellungen" />
+      <PageHead title="Funktionen" />
       <Group title="Profil">
         {PROFILES.map((p) => (
           <Row key={p.key} label={p.label + (profile === p.key ? " ✓" : "")} note={p.note} onClick={() => applyProfile(p.key)} />

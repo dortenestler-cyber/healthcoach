@@ -39,8 +39,7 @@ export default function KalenderView({ von, tag }: { von: Von; tag?: string }) {
   return (
     <>
       <Link href={href} className="back-link kal-zurueck">‹ {wort}</Link>
-      <PageHead title="Kalender" sub="Alles an einem Ort, Tag für Tag" />
-      <p className="meta kal-tipp">Lange auf einen Tag drücken wählt mehrere Tage.</p>
+      <PageHead title="Kalender" />
       {error && <p className="alert" role="alert">{error}</p>}
       <CalendarSection
         key={von}

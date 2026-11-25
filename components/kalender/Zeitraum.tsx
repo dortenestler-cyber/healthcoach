@@ -142,7 +142,6 @@ export default function ZeitraumLeiste({ von, bis, today, data, onDone, onCancel
             Fertig
           </button>
         </div>
-        <span className="meta">Tipp auf einen anderen Tag ändert das Ende des Zeitraums.</span>
         {msg && <p className="meta zeitraum-ok" role="status">✓ {msg}</p>}
         <div className="zeitraum-aktionen">
           <button type="button" className="pill" onClick={() => setAktion("periode")}>Periode eintragen</button>
@@ -153,7 +152,6 @@ export default function ZeitraumLeiste({ von, bis, today, data, onDone, onCancel
       </section>
 
       <EditSheet title={`Periode · ${zeitraumText(von, bis)}`} open={aktion === "periode"} onClose={schliessen} onSave={speichern} saving={busy} error={error} saveLabel="Eintragen">
-        <p className="meta">{bisHeute.length < tage.length ? `Eingetragen werden die ${bisHeute.length} Tage bis heute. ` : ""}Symptome und Gewohnheiten dieser Tage bleiben, wie sie sind.</p>
         <span className="row-strong">Stärke</span>
         <div className="pills wrap">
           {STAERKE.map(([v, l]) => (
@@ -163,7 +161,6 @@ export default function ZeitraumLeiste({ von, bis, today, data, onDone, onCancel
       </EditSheet>
 
       <EditSheet title={`Krank · ${bis < today ? zeitraumText(von, bis) : `seit ${kurz(von)}`}`} open={aktion === "krank"} onClose={schliessen} onSave={speichern} saving={busy} error={error} saveLabel="Eintragen" canSave={!!krank}>
-        <p className="meta">{bis < today ? "Beginn und Ende aus dem Zeitraum." : "Der Zeitraum reicht bis heute, die Krankheit gilt deshalb als noch nicht vorbei."} Stärke und Details änderst du unter Gesundheit › Krank &amp; verletzt.</p>
         <div className="pills wrap">
           {ILLNESSES.map((i) => (
             <button key={i.key} type="button" className="pill" aria-pressed={krank === i.key} onClick={() => setKrank(i.key)}>{i.label}</button>
@@ -172,7 +169,6 @@ export default function ZeitraumLeiste({ von, bis, today, data, onDone, onCancel
       </EditSheet>
 
       <EditSheet title={`Gewohnheit · ${zeitraumText(von, bis)}`} open={aktion === "gewohnheit"} onClose={schliessen} onSave={speichern} saving={busy} error={error} saveLabel="Eintragen" canSave={!!habit}>
-        <p className="meta">Wird an jedem Tag bis heute ergänzt. Was an den Tagen schon steht, bleibt.</p>
         <div className="pills wrap">
           {habits.map((h) => (
             <button key={h.key} type="button" className="pill" aria-pressed={habit === h.key} onClick={() => setHabit(h.key)}>{h.label}</button>
@@ -181,7 +177,6 @@ export default function ZeitraumLeiste({ von, bis, today, data, onDone, onCancel
       </EditSheet>
 
       <EditSheet title={`Vergleichen · ${zeitraumText(von, bis)}`} open={aktion === "vergleich"} onClose={schliessen} instant>
-        <p className="meta">Schnitt dieser Tage gegen die 30 Tage davor. Ein Vergleich, keine Diagnose.</p>
         {vergleich.length === 0 && <p>Für diese Tage gibt es noch keine Werte von Garmin.</p>}
         {vergleich.map((r) => (
           <div key={r.key} className="card-row list-line">
