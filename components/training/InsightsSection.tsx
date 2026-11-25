@@ -1,5 +1,7 @@
 "use client";
 
+import { Details } from "@/components/ui/Pille";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -164,7 +166,9 @@ function PatternsCard({ patterns }: { patterns: Pattern[] }) {
         <div key={p.key} className="pattern-block">
           <span className="eyebrow pattern-title">{p.title}</span>
           <span className={p.ready ? "pattern-text" : "meta"}>{p.ready ? p.text : p.need}</span>
-          {p.ready && p.bars.length > 0 && (
+          {p.ready && (
+            <Details id={`insights.${p.key}`} label="Balken und Grundlage">
+          {p.bars.length > 0 && (
             <div className="pattern-bars">
               {(() => {
                 const max = Math.max(...p.bars.map((b) => Math.abs(b.value)), 1);
@@ -178,7 +182,9 @@ function PatternsCard({ patterns }: { patterns: Pattern[] }) {
               })()}
             </div>
           )}
-          {p.ready && <span className="meta">Grundlage: {p.basis}. Ein Zusammenhang, kein Beweis.</span>}
+          {<span className="meta">Grundlage: {p.basis}. Ein Zusammenhang, kein Beweis.</span>}
+            </Details>
+          )}
         </div>
       ))}
     </section>

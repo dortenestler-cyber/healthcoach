@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Details } from "@/components/ui/Pille";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, shortDate } from "@/lib/dates";
 import { computeTarget, loadPercent, sportAdvice, type Data, type Target } from "@/lib/insights";
@@ -39,6 +40,8 @@ export default function TargetSection({ data }: { data: Data }) {
           <h2>Was das Ziel bestimmt</h2>
           <span className="meta">Punkte {t.score} von 100</span>
         </div>
+        <p className="ziel-kurz">{t.pause ? "Heute Pause." : `Stufe heute: ${t.label}, ${t.lo}–${t.hi} %.`}</p>
+        <Details id="ziel.gruende" label="Gründe und Rechenweg">
         {t.factors.map((f) => (
           <div key={f.name} className="factor-row list-line">
             <div className="stack">
@@ -51,16 +54,19 @@ export default function TargetSection({ data }: { data: Data }) {
         {!t.factors.length && <p>Noch keine Daten für heute. Synchronisiere Garmin auf der Seite Heute (Karte „Deine Werte“).</p>}
         <span className="meta">{t.pause ? "Heute Pause." : `Stufe heute: ${t.label}, ${t.lo}–${t.hi} %.`} 100 % entsprechen etwa einem harten Trainingstag (60 Intensitätsminuten).</span>
         <span className="meta">Ausgangswert 80 Punkte. Ab 85 hart möglich, ab 65 moderat, ab 45 leicht, darunter Erholung.</span>
+        </Details>
       </section>
 
       <section className="card">
         <h2>Empfehlung je Sportart</h2>
+        <Details id="ziel.sportarten" label="Je Sportart anzeigen">
         {sportAdvice(t, injured).map((a) => (
           <div key={a.sport} className="card-row list-line">
             <span className="row-strong">{a.sport}</span>
             <span className="meta">{a.tip}</span>
           </div>
         ))}
+        </Details>
       </section>
 
       <section className="card">

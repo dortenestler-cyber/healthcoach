@@ -11,6 +11,8 @@ import { sickDays } from "@/lib/baseline";
 import { DEFAULT_HABITS, loadHabits, type Habit } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
 import DieserMonat from "@/components/wert/DieserMonat";
+import { useAbschnitte } from "@/components/ui/Pille";
+import type { VerlaufAbschnitt } from "@/components/verlauf/VerlaufDetail";
 import { useRouter } from "next/navigation";
 import VerlaufDetail, { HISTORY } from "@/components/verlauf/VerlaufDetail";
 import VerlaufGroup, { GROUPS, groupOfMetric, type GroupKey } from "@/components/verlauf/VerlaufGroup";
@@ -26,6 +28,18 @@ import { loadGarminCycles, mergeGarminCycles } from "@/lib/garminZyklus";
 // mode „uebersicht“: Gruppen, Tippen öffnet /wert/<Wert>. „wert“: ein Wert als eigene Seite (Wert-Seite, Konzept Bündeln Baustein 3).
 // „eingebettet“: unter einer Detailseite mit Ring (Schlaf, Stress, Belastung), ohne Seitenkopf.
 export default function VerlaufView({ initial, mode = "uebersicht" }: { initial: string | null; mode?: "uebersicht" | "wert" | "eingebettet" }) {
+  // Unter einer Detailseite (Schlaf, Stress, Belastung): Abschnitte per Pillen, Kurve und Bereich zuerst an (Konzept Einfach, Paket 8)
+  const abschnitte = useAbschnitte<VerlaufAbschnitt>(
+    `wert.${initial ?? "x"}`,
+    [
+      ["kurve", "Kurve"],
+      ["bereich", "Bereich"],
+      ["phasen", "Phasen"],
+      ["monat", "Monat"],
+    ],
+    mode === "eingebettet" ? ["kurve", "bereich"] : ["kurve", "bereich", "phasen", "monat"],
+  );
+  const zeigt = mode === "eingebettet" ? abschnitte.zeigt : () => true;
   const router = useRouter();
   const start = initial && initial in METRICS ? (initial as MetricKey) : null;
   const [metric, setMetric] = useState<MetricKey | null>(start);
@@ -103,9 +117,10 @@ export default function VerlaufView({ initial, mode = "uebersicht" }: { initial:
           <h2 className="sec-title" id="verlauf">{METRICS[metric].label} über die Zeit</h2>
         )}
         {error && <p className="alert" role="alert">{error}</p>}
-        <SpanSwitch value={span} onChange={setSpan} options={["heute", ...STANDARD]} />
-        <VerlaufDetail metric={metric} span={span} rows={rows} diary={diary} acts={acts} sick={sick} habits={habits} />
-        <DieserMonat metric={metric} rows={rows} ctx={ctx} today={isoDay()} />
+        {mode === "eingebettet" && abschnitte.zeile}
+        {zeigt("kurve") && <SpanSwitch value={span} onChange={setSpan} options={["heute", ...STANDARD]} />}
+        <VerlaufDetail metric={metric} span={span} rows={rows} diary={diary} acts={acts} sick={sick} habits={habits} zeigt={zeigt} />
+        {zeigt("monat") && <DieserMonat metric={metric} rows={rows} ctx={ctx} today={isoDay()} />}
         {missingHistory && (
           <section className="card">
             <h2>Ältere Daten fehlen</h2>

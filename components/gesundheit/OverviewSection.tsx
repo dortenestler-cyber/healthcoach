@@ -1,5 +1,7 @@
 "use client";
 
+import { Details, useAbschnitte } from "@/components/ui/Pille";
+
 import { trainingPatterns } from "@/lib/trainingInsights";
 import { useRefresh } from "@/lib/refresh";
 import Link from "next/link";
@@ -35,6 +37,12 @@ export default function OverviewSection() {
   const [error, setError] = useState("");
   const today = isoDay();
 
+  // Abschnitte ein- und ausblenden (Konzept Einfach, Paket 8)
+  const abschnitte = useAbschnitte("gesundheit.ueberblick", [
+    ["guttut", "Was dir guttut"],
+    ["monat", "Dein Monat"],
+    ["muster", "Muster"],
+  ]);
   const [tick, setTick] = useState(0); // Neu laden (Konzept Datenaktualisierung)
   useRefresh(() => setTick((t) => t + 1));
   useEffect(() => {
@@ -106,6 +114,9 @@ export default function OverviewSection() {
         </div>
       </section>
 
+      {abschnitte.zeile}
+
+      {abschnitte.zeigt("guttut") && (
       <section className="card">
         <span className="eyebrow">Täglich aktualisiert · letzte 90 Tage</span>
         <h2 className="card-title-lg">
@@ -142,8 +153,9 @@ export default function OverviewSection() {
           </ExplainCard>
         )}
       </section>
+      )}
 
-      {data && (() => {
+      {abschnitte.zeigt("monat") && data && (() => {
         // Dein Monat (Konzept Bündeln, Baustein 6): nur was sich deutlich verändert hat, je ein Satz mit Link
         const dm = deinMonat(data, today, (k) => habits.find((h) => h.key === k)?.label ?? k);
         const n = dm.zeilen.length;
@@ -162,7 +174,7 @@ export default function OverviewSection() {
         );
       })()}
 
-      {(more.length > 0 || signsShown) && (
+      {abschnitte.zeigt("muster") && (more.length > 0 || signsShown) && (
         <section className="card">
           <span className="eyebrow">Weitere Muster</span>
           {signsShown && (
@@ -175,7 +187,9 @@ export default function OverviewSection() {
             <div key={p.key} className="pattern-block">
               <span className="eyebrow pattern-title">{p.title}</span>
               <span className={p.ready ? "pattern-text" : "meta"}>{p.ready ? p.text : p.need}</span>
-              {p.ready && p.bars.length > 0 && (
+              {p.ready && (
+                <Details id={`muster.${p.key}`} label="Balken und Grundlage">
+              {p.bars.length > 0 && (
                 <div className="pattern-bars">
                   {(() => {
                     const max = Math.max(...p.bars.map((b) => Math.abs(b.value)), 1);
@@ -189,7 +203,9 @@ export default function OverviewSection() {
                   })()}
                 </div>
               )}
-              {p.ready && <span className="meta">Grundlage: {p.basis}. Ein Zusammenhang, kein Beweis.</span>}
+              {<span className="meta">Grundlage: {p.basis}. Ein Zusammenhang, kein Beweis.</span>}
+                </Details>
+              )}
             </div>
           ))}
           <span className="meta">Muster mit Zyklusbezug stehen auf der Seite Zyklus.</span>

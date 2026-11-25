@@ -28,11 +28,12 @@ const addDays = (iso: string, n: number) => {
 const avgRange = (rs: Range[]): Range | null =>
   rs.length ? { lo: rs.reduce((a, r) => a + r.lo, 0) / rs.length, hi: rs.reduce((a, r) => a + r.hi, 0) / rs.length, median: rs.reduce((a, r) => a + r.median, 0) / rs.length, n: rs.length, stable: rs.every((r) => r.stable) } : null;
 
-type Props = { metric: MetricKey; span: Span; rows: Daily[]; diary: Diary[]; acts: Activity[]; sick: Set<string>; habits: Habit[] };
+export type VerlaufAbschnitt = "kurve" | "bereich" | "phasen" | "monat";
+type Props = { metric: MetricKey; span: Span; rows: Daily[]; diary: Diary[]; acts: Activity[]; sick: Set<string>; habits: Habit[]; zeigt?: (k: VerlaufAbschnitt) => boolean };
 
 // Karten der Detailansicht: Satz, Zahl, Bereich, Grafik · Dein Bereich · Highlights · Vergleich nach Zyklusphase. Ohne Netzwerk.
 // Der Bereich wandert im Diagramm mit: je Tag der Bereich, der damals galt (je Zyklusphase, ohne Krankheitstage).
-export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, habits }: Props) {
+export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, habits, zeigt = () => true }: Props) {
   const today = isoDay();
   const [bandMode, setBandMode] = useState<"zeit" | "heute">("zeit");
   const ctx = useMemo(() => ({ diary, sick }), [diary, sick]);
@@ -105,6 +106,7 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
 
   return (
     <>
+      {zeigt("kurve") && (
       <section className="card">
         <ValueHeader
           meta={`${m.label} · ${span === "heute" ? "heute" : weekly ? `${spanOf(span).name}, Wochenmittel` : spanOf(span).last}`}
@@ -164,7 +166,9 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
           </div>
         )}
       </section>
+      )}
 
+      {zeigt("bereich") && (
       <section className="card">
         <span className="meta">Dein Bereich · {m.label}</span>
         {lines.length ? (
@@ -186,8 +190,9 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
           {base.active && !base.active.stable ? " Noch vorläufig, stabil ab 14 Tagen." : ""}
         </span>
       </section>
+      )}
 
-      {sum.highlights.length > 0 && (
+      {zeigt("kurve") && sum.highlights.length > 0 && (
         <section className="card">
           <span className="meta">Highlights · {spanOf(span).name}</span>
           <div className="highlight-grid">
@@ -201,6 +206,7 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
         </section>
       )}
 
+      {zeigt("phasen") && (
       <section className="card">
         <span className="meta">{m.label} nach Zyklusphase · letzte 6 Monate</span>
         {cycles >= 2 ? (
@@ -215,6 +221,7 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
           <p>Der Vergleich erscheint, sobald zwei ganze Zyklen im Tagebuch stehen.</p>
         )}
       </section>
+      )}
 
     </>
   );
