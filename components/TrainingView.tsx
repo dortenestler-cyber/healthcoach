@@ -17,6 +17,7 @@ import CalendarSection from "@/components/training/CalendarSection";
 import KettlebellSection from "@/components/training/KettlebellSection";
 import ClimbSection from "@/components/training/ClimbSection";
 import KarateSection from "@/components/training/KarateSection";
+import AlleAktivitaeten from "@/components/training/AlleAktivitaeten";
 import InsightsSection from "@/components/training/InsightsSection";
 
 const TABS: [string, string][] = [
@@ -95,7 +96,12 @@ export default function TrainingView({ initial }: { initial: string }) {
           </button>
         ))}
       </div>
-      {shown === "kalender" && <CalendarSection data={data} />}
+      {shown === "kalender" && (
+        <>
+          <CalendarSection data={data} />
+          <AlleAktivitaeten />
+        </>
+      )}
       {shown === "auswertung" && (
         <TwoCol
           left={
