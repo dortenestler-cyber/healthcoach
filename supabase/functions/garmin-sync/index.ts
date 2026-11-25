@@ -99,6 +99,9 @@ function actRow(a: Any, userId: string): Record<string, unknown> {
     max_hr: int(a?.maxHR),
     training_load: num(a?.activityTrainingLoad),
     steps: int(a?.steps),
+    // Garmins Intensitätsminuten der Einheit (Migration 20261130130000_intensitaet_einheiten)
+    im_moderate: int(a?.moderateIntensityMinutes),
+    im_vigorous: int(a?.vigorousIntensityMinutes),
     synced_at: new Date().toISOString(),
   };
 }
@@ -113,6 +116,11 @@ function intensityMinutes(d: Any): number | null {
 
 async function saveActivities(sb: Any, rows: Record<string, unknown>[]): Promise<boolean> {
   let { error } = await sb.from("garmin_activities").upsert(rows, { onConflict: "user_id,activity_id" });
+  if (error && /im_moderate|im_vigorous/.test(error.message)) {
+    // Migration 20261130130000_intensitaet_einheiten fehlt noch: ohne Intensitätsminuten der Einheit speichern
+    rows = rows.map(({ im_moderate: _m, im_vigorous: _v, ...a }) => a);
+    ({ error } = await sb.from("garmin_activities").upsert(rows, { onConflict: "user_id,activity_id" }));
+  }
   let stepsMissing = false;
   if (error && /steps/.test(error.message)) {
     // Migration 20261124090000_alltagslast fehlt noch: ohne Schritte speichern

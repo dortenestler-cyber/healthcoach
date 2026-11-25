@@ -2,6 +2,7 @@
 // Standard: Last aus Training und Alltag. alltag = false: nur Training, wie bei Garmin.
 // Reine Berechnungen ohne Netzwerk. Grenzen sind Startwerte, keine Aussage zum Verletzungsrisiko.
 
+import type { Activity } from "@/lib/garmin";
 import type { Data } from "@/lib/insights";
 import { loadByDay } from "@/lib/today";
 
@@ -59,8 +60,35 @@ export function ratioText(r: number): string {
   return "Deine Belastung steigt gleichmäßig.";
 }
 
-// Intensitätsminuten dieser Woche (Montag bis heute), Garmin zählt intensive Minuten doppelt
+// Intensitätsminuten (Nutzerin 25.11.): Garmins Tageswert, dazu zählt jede Trainingsminute mindestens moderat.
+// Minuten, die Garmin in der Einheit schon gezählt hat, bleiben (intensive doppelt), der Rest der Einheit kommt einfach dazu.
+// Gehen zählt nur mit Garmins Minuten, außer die Einheit ist in der App einer Sportart zugeordnet. „Ignorieren“ zählt nicht.
+const WALK = /^(walking|casual_walking)$/;
+const GARMIN_ZONE_FROM = 2; // ohne Garmins Werte je Einheit: Minuten ab Zone 2 gelten als von Garmin gezählt
+
+export function extraIntensity(a: Activity): number {
+  if (a.sport_override === "ignorieren") return 0;
+  if (!a.sport_override && WALK.test(a.type_key ?? "")) return 0;
+  const dur = (a.duration_s ?? 0) / 60;
+  if (dur <= 0) return 0;
+  const counted =
+    a.im_moderate != null || a.im_vigorous != null
+      ? (a.im_moderate ?? 0) + (a.im_vigorous ?? 0)
+      : Array.isArray(a.hr_zones)
+        ? a.hr_zones.slice(GARMIN_ZONE_FROM).reduce((s, v) => s + (Number(v) || 0), 0)
+        : 0;
+  return Math.max(0, Math.round(dur - counted));
+}
+
+export function dayIntensity(day: string, data: Data): number {
+  const garmin = data.daily.find((d) => d.day === day)?.intensity_minutes ?? 0;
+  return garmin + data.acts.filter((a) => (a.start_local ?? "").slice(0, 10) === day).reduce((s, a) => s + extraIntensity(a), 0);
+}
+
+// Intensitätsminuten dieser Woche (Montag bis heute)
 export function weekIntensity(today: string, data: Data): number {
   const mon = mondayOf(today);
-  return data.daily.filter((d) => d.day >= mon && d.day <= today).reduce((a, d) => a + (d.intensity_minutes ?? 0), 0);
+  let sum = 0;
+  for (let d = mon; d <= today; d = addDays(d, 1)) sum += dayIntensity(d, data);
+  return sum;
 }

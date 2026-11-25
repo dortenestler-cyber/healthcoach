@@ -5,6 +5,7 @@ import { clock } from "@/lib/dates";
 import { gross, zielWort } from "@/lib/einordnung";
 import { dayLoad, firstAlltagDay, loadLabel, ringSplit, type Data, type Target } from "@/lib/insights";
 import { LOAD_CURVE_TEXT, targetBasisText, targetText } from "@/lib/today";
+import { dayIntensity } from "@/lib/trainingLoad";
 
 // Belastung heute als Halbbogen mit Zielbereich, Kacheln und Erklärkarte (Konzept dunkel 2, Muster 2 und 3).
 // Training kräftig, Alltag hell (Konzept Korridore und Alltagslast, Teil B).
@@ -65,7 +66,7 @@ export default function LoadCard({ day, data, target: t }: { day: string; data: 
         ) : (
           <div className="stat-tile">
             <span className="meta">Intensitätsminuten</span>
-            <span className="stat-tile-value">{today?.intensity_minutes ?? "–"} <small>min</small></span>
+            <span className="stat-tile-value">{today || data.acts.length ? dayIntensity(day, data) : "–"} <small>min</small></span>
           </div>
         )}
       </div>

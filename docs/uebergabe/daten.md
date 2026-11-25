@@ -1,6 +1,15 @@
 # Übergabe · Daten (DA)
 Belegt: frei
-Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1VwL1U1ue6ALkkaL4z
+Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WS7sTKnh1NfXui9YD
+
+
+## Intensität: jedes Training zählt mit (PR #186, 25.11., Freigabe der Nutzerin)
+- Anlass: Bouldern (1 Std) brachte kaum Garmin-Intensitätsminuten, der Ring übernahm Garmins Tageswert 1:1.
+- Migration `20261130130000_intensitaet_einheiten`: `garmin_activities.im_moderate`, `im_vigorous` (Garmins Minuten je Einheit). `actRow` füllt sie aus `moderateIntensityMinutes`/`vigorousIntensityMinutes`, `saveActivities` speichert ohne sie, solange die Migration fehlt.
+- App (`lib/trainingLoad.ts`): `dayIntensity` = Garmins Tageswert + je Einheit `extraIntensity` = Dauer minus von Garmin gezählte Minuten (ohne Werte je Einheit: Minuten ab Zone 2 aus `hr_zones`). Gehen (`walking`, `casual_walking`) nur mit Garmins Minuten, außer in der App einer Sportart zugeordnet; „ignorieren“ zählt nicht. `weekIntensity` summiert `dayIntensity`. Genutzt von Ring, Detailseite (Tagesbalken), Kachel in `LoadCard`, `DaySentence`, `RatioCard`.
+- `loadActivityIntensity` (`lib/garmin.ts`) lädt die Spalten getrennt, fehlen sie, nur `hr_zones`.
+- Ungeprüft: ob die Personal API `moderateIntensityMinutes` in der Aktivitätenliste liefert. Sonst greift die Schätzung aus den Pulszonen.
+- Wartet auf: Merge-Freigabe der Nutzerin, danach Läufe „Supabase-Migrationen ausführen“ und „Supabase-Funktionen hochladen“.
 
 ## Bug: Intensitätsminuten bleiben nach dem Training stehen (PR #184, 25.11.)
 - Ursache: Der kurze Abruf alle 15 Minuten (`quick`) holte nur Aktivitäten, die Tageszusammenfassung nur der volle Abruf (Morgen, 19:37–21:37, App nach 60 Min, Ziehen auf Heute). Die Training-Einheit erschien, die Intensitätsminuten blieben auf dem Stand vom Morgen.
