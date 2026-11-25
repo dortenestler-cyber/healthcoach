@@ -3133,3 +3133,8 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .zeitraum-leiste .zeitraum-aktionen { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .zeitraum-ok { color: var(--recovery-fg); }
 .kal-tipp { margin: -4px 0 10px; }
+
+/* Tagebuch speichert von selbst (Konzept Einfach, Paket 7) */
+.tb-datum { flex: 1; text-align: center; font: inherit; font-weight: 600; color: var(--text); cursor: pointer; }
+.tb-status-zeile { display: flex; justify-content: space-between; align-items: center; min-height: 28px; margin: -4px 0 6px; }
+.tb-status { font-variant-numeric: tabular-nums; }
