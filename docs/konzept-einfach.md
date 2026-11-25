@@ -216,7 +216,7 @@ Jedes Paket ist ein eigener PR mit Fotos vorher/nachher. Alle Pakete gehören zu
 | # | Paket | Nutzen | Inhalt |
 |---|---|---|---|
 | 1 | Pillen-Baustein ✓ (PR #147) | Grundlage | `Pille.tsx` (`Pille`, `PillenZeile`, `useAuswahl`, `useAbschnitte`, `Details`), Merken über `lib/ansicht.ts` in `settings.data.ansicht`, Tap-Fläche 44 px für alle `.pill`, Kalender-Ebenen umgestellt. Weitere Stellen ziehen mit ihren Paketen um |
-| 2 | Alle Aktivitäten | hoch, klein | Liste am Ende von Training, Filter, Suche, Heute „Alle ›“ |
+| 2 | Alle Aktivitäten ✓ (PR #148) | hoch, klein | Liste am Ende von Training, Filter, Suche, Heute „Alle ›“ |
 | 3 | Zentraler Kalender | hoch | `/kalender`, neue Ebenen, Einstiege über Heute-Datum und `PageHead`, Tagesblatt kurz |
 | 4 | Training zwei Reiter | hoch | Übersicht/Auswertung, Sportarten-Seiten, Kalender-Reiter raus, Insights in Auswertung |
 | 5 | Zyklus kürzen | hoch | Kalender und Nachtragen raus, Wochenstreifen, Abschnitts-Pillen |

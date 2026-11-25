@@ -86,7 +86,7 @@ export default function AlleAktivitaeten() {
       const garminTage = new Set(acts.map((x) => `${(x.start_local as string).slice(0, 10)}|${sportOf(x)}`));
       const rows: Zeile[] = acts.map((x) => {
         const sport = sportOf(x);
-        const titel = x.sport_label || (sport === "sonstiges" && x.name ? x.name : SPORTS[sport].label);
+        const titel = x.sport_label || ((sport === "sonstiges" || sport === "ausdauer") && x.name ? x.name : SPORTS[sport].label);
         return {
           key: `g${x.activity_id}`,
           day: (x.start_local as string).slice(0, 10),
