@@ -7,7 +7,6 @@ import { DivergingBars } from "@/components/charts";
 import CycleRing, { arcs4, PHASE4, PHASE4_LABEL, PhaseIcon, phase4Of } from "@/components/zyklus/CycleRing";
 import ZyklusWoche from "@/components/zyklus/ZyklusWoche";
 import { Details } from "@/components/ui/Pille";
-import ExplainCard from "@/components/ui/ExplainCard";
 import CycleDayChart from "@/components/zyklus/CycleDayChart";
 import CycleHistory from "@/components/zyklus/CycleHistory";
 import { cycleToday, PHASES, windowText } from "@/lib/cycle";
@@ -234,7 +233,6 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
           <DivergingBars fmt={ms} scaleMin={8} neg="HRV niedriger" pos="HRV höher" label={`HRV in der Nacht danach je Phase: ${effectRows.map((r) => `${r.label} ${r.note} ${r.value! > 0 ? "plus" : "minus"} ${ms(Math.abs(r.value!))}`).join(", ")}`} rows={effectRows} />
         )}
         {waiting.length > 0 && <span className="meta">Noch zu wenige Nächte: {waiting.join(", ")}.</span>}
-        {lutStrongest && <ExplainCard tone="cycle" question={`Was bedeutet es, dass „${lutStrongest.label}“ in meiner Lutealphase mit meiner HRV zusammenhängt?`}>Ein Zusammenhang aus deinen eigenen Einträgen, keine Empfehlung.</ExplainCard>}
         </Details>
       </section>
       )}

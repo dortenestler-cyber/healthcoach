@@ -14,7 +14,7 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017z
 - Variante A freigegeben. `lib/briefing.ts` (`useBriefing`): ruft die bestehende Funktion `coach` mit fester Frage und `buildCoachContext()` auf, speichert in `settings.data.briefing.{tag,monat}` mit Schlüssel (Tag; Monat: Tag + Anzahl Veränderungen), ↻ schreibt neu. Rendering `components/ui/CoachText.tsx` (erste Zeile Lage, „- “ Liste, **fett**).
 - Heute: `components/heute/Tagesempfehlung.tsx` „Für heute“ statt `DaySentence` (nur heute, nicht bei Warnzeichen; Coach aus oder Fehler → `DaySentence`). Gesundheit: `components/gesundheit/DeinMonatKarte.tsx`, Liste hinter `Details id="monat.liste"`, ohne Veränderungen keine Anfrage.
 - Mit `briefing: true` (PR Coach-Funktion): kein Chat-Verlauf, kein Tageslimit.
-- Nächster Schritt: Erklärkarten (`ExplainCard`, 25 Stellen) prüfen: nur behalten, wo sie etwas Eigenes sagen, auf eigene Zahlen zuschneiden.
+- Erklärkarten geprüft (9 Stellen): Training-Status (wiederholte „Was das heißt“) und Zyklus-Gewohnheiten (reiner Hinweis) entfernt; die übrigen sieben nennen eigene Zahlen und bleiben.
 
 ## Hinweistexte entfernt (25.11.)
 - Wunsch der Nutzerin, dauerhaft als Regel in `CLAUDE.md` (Arbeitsweise). `PageHead.sub` ist optional, alle festen Untertitel entfernt (bleiben: Coach „Ausgeschaltet“, Nutzung, neue Hinweise, Konto). Rund 55 Bedienhinweise, Rechenwege, Legenden-Sätze und „keine Diagnose“-Sätze entfernt, ebenso die Karte „So geht die App mit deinen Werten um“ (Körper).
