@@ -92,3 +92,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-25 · OF · Nutzerin: Tagebuch zeigt passend zur Zyklusphase Symptome (eigene Muster zuerst, dann typische) und Eisprung-Zeichen im Fenster; Blutung bleibt sichtbar, kompakter
 2026-11-25 · OF · Nutzerin: keine Hinweis- und Erklärtexte mehr in der App (Untertitel, Bedienhinweise, Rechenwege, Disclaimer), dauerhaft in CLAUDE.md
 2026-11-25 · OF · Nutzerin: Variante A – der Coach (Claude) schreibt Tagesempfehlung auf Heute und Monatsrückblick, einmal am Tag gespeichert
+2026-11-25 · OF · Nutzerin: Schlaf mit Gesamtwert aus Menge und Erholsam (50 : 50) im Ring, Readiness nutzt ihn (docs/konzept-schlafqualitaet.md)

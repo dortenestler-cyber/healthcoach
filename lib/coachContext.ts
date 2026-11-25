@@ -12,6 +12,7 @@ import { SPOTS, type Injury, type Medication } from "@/lib/health";
 import { SPORTS, type Session } from "@/lib/training";
 import { ALL_SYMPTOMS } from "@/lib/catalog";
 import { cardioPerDay, musclePerDay, series, tiredCheck, ZUSTAND_NAMEN, type KbSet, type ZeitPunkt } from "@/lib/belastungZeit";
+import { sleepScore } from "@/lib/schlaf";
 
 // Kompakte Zusammenfassung für den Coach: Kennzahlen und Hinweise, keine Rohdaten
 export async function buildCoachContext(): Promise<string> {
@@ -31,7 +32,8 @@ export async function buildCoachContext(): Promise<string> {
     const vals = (["schlaf", "hrv", "ruhepuls", "bb", "stress"] as const)
       .map((k) => { const v = METRICS[k].value(todayRow); return v === null ? null : `${METRICS[k].label} ${METRICS[k].fmt(v)}`; })
       .filter(Boolean);
-    if (todayRow.sleep_score !== null) vals.unshift(`Schlafwert ${todayRow.sleep_score} von 100`);
+    const sl = sleepScore(day, data);
+    if (sl.total !== null) vals.unshift(`Schlafwert ${sl.total} von 100 (Menge ${sl.pct} % vom Bedarf, erholsam ${sl.rest ?? "–"}; Bausteine: ${sl.parts.map((p) => `${p.label} ${Math.round(p.points)}`).join(", ")})`);
     lines.push(vals.length ? `Heute (Garmin): ${vals.join(", ")}.` : "Heute: noch keine Garmin-Werte.");
   } else lines.push("Heute: noch keine Garmin-Werte synchronisiert.");
 
