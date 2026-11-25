@@ -114,21 +114,26 @@ export function windowText(w: PeriodWindow, day: string): string {
 
 export type CycleToday = { cycleDay: number | null; length: number; phase: Phase | null; window: PeriodWindow | null; cycles: number; fromGarmin: boolean; ovDay: number | null };
 
-// Erstes eingetragenes Eisprung-Zeichen im Zyklus, der am Tag `start` begann (als Zyklustag), sonst null.
+// Eisprung aus den eingetragenen Zeichen im Zyklus, der am Tag `start` begann (als Zyklustag), sonst null.
 // Gesucht wird ab Zyklustag 6 bis zum nächsten Periodenbeginn.
-export function ovulationDay(start: string, diary: Diary[]): number | null {
+// Ein Temperaturanstieg zeigt sich erst nach dem Eisprung, er zählt deshalb für den Vortag.
+// Ein Zeichen zählt nur, wenn danach noch mindestens 10 Tage bis zur üblichen Zykluslänge bleiben
+// (die Lutealphase dauert meist 10–16 Tage). Spätere Zeichen passen nicht zum Zyklus, dann gilt die Schätzung.
+export const LUTEAL_MIN = 10;
+export function ovulationDay(start: string, diary: Diary[], length?: number): number | null {
   const next = periodStarts(diary).find((s) => s > start);
   const from = addDays(start, 5);
-  const hit = diary
+  const days = diary
     .filter((d) => d.ovulation?.length && d.day >= from && (!next || d.day < next))
-    .map((d) => d.day)
-    .sort()[0];
-  return hit ? daysBetween(start, hit) + 1 : null;
+    .sort((a, b) => (a.day < b.day ? -1 : 1))
+    .map((d) => daysBetween(start, d.day) + 1 - (d.ovulation!.every((k) => k === "temperatur") ? 1 : 0));
+  const ok = days.filter((cd) => cd >= 6 && (!length || cd <= length - LUTEAL_MIN));
+  return ok.length ? ok[0] : null;
 }
 
 export function cycleToday(day: string, diary: Diary[]): CycleToday {
   const ci = cycleInfo(day, diary);
-  const ovDay = ci.cycleDay !== null ? ovulationDay(addDays(day, -(ci.cycleDay - 1)), diary) : null;
+  const ovDay = ci.cycleDay !== null ? ovulationDay(addDays(day, -(ci.cycleDay - 1)), diary, ci.length) : null;
   return {
     cycleDay: ci.cycleDay,
     length: ci.length,
