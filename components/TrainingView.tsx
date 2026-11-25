@@ -98,7 +98,7 @@ export default function TrainingView({ initial }: { initial: string }) {
       </div>
       {shown === "kalender" && (
         <>
-          <CalendarSection data={data} />
+          <CalendarSection data={data} kompakt />
           <AlleAktivitaeten />
         </>
       )}
