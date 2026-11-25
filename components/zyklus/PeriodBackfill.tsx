@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay } from "@/lib/dates";
@@ -113,6 +114,11 @@ export default function PeriodBackfill({ onChanged }: { onChanged: () => void })
     <section className="card" id="perioden">
       <h2>{editing ? `Periode ab ${fmt(editing.start)} ändern` : "Vergangene Perioden nachtragen"}</h2>
       <p>Für den Zyklus zählt der erste Tag mit mindestens leichter Blutung. Je mehr Perioden eingetragen sind, desto genauer werden Phasen, Zykluslänge und Vergleiche.</p>
+      {!editing && (
+        <Link href="/kalender?von=zyklus" className="settings-link">
+          Schneller im Kalender: lange auf den ersten Tag drücken, letzten Tag tippen ›
+        </Link>
+      )}
       <label className="field">
         <span className="meta">Erster Tag</span>
         <input type="date" className="input" max={today} value={start} onChange={(e) => setStart(e.target.value)} />
