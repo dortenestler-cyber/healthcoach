@@ -8,6 +8,7 @@ import type { Illness } from "@/lib/health";
 import { cycleInfo, HARD_DAY_PCT, loadPercent, type Data } from "@/lib/insights";
 import { load7 } from "@/lib/today";
 import { sportOf } from "@/lib/training";
+import { sleepScores } from "@/lib/schlaf";
 
 export const MIN_EVENT_DAYS = 8; // so viele Tage mit Ereignis braucht die Auswertung
 export const MIN_GROUP_DAYS = 4; // so viele Tage braucht jede Seite eines Vergleichs
@@ -85,10 +86,11 @@ export function conditions(data: Data, extra: MusterExtra): Condition[] {
 
   // Erholung: Werte der Nacht davor gegen den eigenen Bereich (unteres oder oberes Viertel)
   const vals = (f: (r: (typeof data.daily)[number]) => number | null) => data.daily.map(f).filter((v): v is number => v !== null);
-  const sleepLo = quantile(vals((r) => r.sleep_score), 0.25);
+  const ss = sleepScores(data);
+  const sleepLo = quantile([...ss.values()], 0.25);
   const hrvLo = quantile(vals((r) => r.hrv_last_night), 0.25);
   const rhrHi = quantile(vals((r) => r.resting_hr), 0.75);
-  if (sleepLo !== null) out.push({ key: "schlaf_schlecht", group: "erholung", label: "Tage nach einer schlechten Nacht", has: (d) => (dm.get(d)?.sleep_score ?? Infinity) < sleepLo });
+  if (sleepLo !== null) out.push({ key: "schlaf_schlecht", group: "erholung", label: "Tage nach einer schlechten Nacht", has: (d) => (ss.get(d) ?? Infinity) < sleepLo });
   if (hrvLo !== null) out.push({ key: "hrv_niedrig", group: "erholung", label: "Tage mit niedriger HRV", has: (d) => (dm.get(d)?.hrv_last_night ?? Infinity) < hrvLo });
   if (rhrHi !== null) out.push({ key: "ruhepuls_hoch", group: "erholung", label: "Tage mit erhöhtem Ruhepuls", has: (d) => (dm.get(d)?.resting_hr ?? -Infinity) > rhrHi });
 
