@@ -1,6 +1,12 @@
 # Übergabe · Oberfläche (OF)
-Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWd9mT296ny9kidDGro · seit 2026-11-25 · Karate-Prüfungen
-Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWdNvxckjvEm2fZmoT8
+Belegt: frei
+Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWd9mT296ny9kidDGro
+
+## Karate-Prüfungsprogramm (PR #143, 25.11.)
+- Konzept `docs/konzept-karate-pruefungen.md`, freigegeben 25.11. Training › Karate: Kyu-Chips 5.–1., Ring „x von y sitzen“ mit Satz, Gruppen Kihon/Kata/Kumite/Begriffe, Wiederholung eingeklappt, eigene Punkte je Kyu. Drei Stufen per Tipp, Kata und Kumite klappen in Teile auf. „X. Kyu bestanden“ ab Prüfungsdatum, dann rückt der nächste Kyu nach.
+- Programm in `lib/karate/programm.ts`, Kennungen über alle Grade gleich. Noch **Vorlage** (JKA/DJKB), `QUELLE.beispiel = true`. Einstellungen `karate.ziel`, `karate.pruefungen[kyu]`, `examDate` bleibt Datum der aktuellen Prüfung (Coach).
+- Offen: Hinweis bei Verletzung auf Gesundheit (`InjurySection`) nennt noch den 5. Kyu.
+- Nächster Schritt: Nutzerin merged PR #143 (Migration), schickt Prüfungsordnung; dann `lib/karate/programm.ts` ersetzen und `beispiel` auf false.
 
 
 

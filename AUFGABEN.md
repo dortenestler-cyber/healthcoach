@@ -7,6 +7,11 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Karate-Prüfungsprogramm (PR #143, 25.11.)
+Enthält die Migration `supabase/migrations/20261129090000_karate_pruefungen.sql` (neue Tabelle `karate_progress`, bei deinen eigenen Punkten Kyu und drei Stufen). Dein Merge ist die Freigabe.
+- [ ] PR #143 ansehen und mergen
+- [ ] Prüfungsordnung deines Dojos schicken (PDF oder Fotos, 5. bis 1. Kyu, mit Begriffen/Theorie). Bis dahin zeigt die App eine gekennzeichnete Vorlage
+
 ### Mehrere Claude-Konten (Regeln, 24.11.)
 - [ ] Im zweiten Konto unter claude.ai › Einstellungen › Connectors GitHub verbinden, mit Zugriff auf healthcoach und cashflow-app.
 - [ ] Ist es ein anderes GitHub-Konto: in beiden Repos als Collaborator mit Schreibrecht einladen.

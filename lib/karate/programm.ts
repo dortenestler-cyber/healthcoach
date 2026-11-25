@@ -94,13 +94,14 @@ export const PROGRAMM: Grad[] = [
 
 export const grad = (kyu: number) => PROGRAMM.find((g) => g.kyu === kyu) ?? PROGRAMM[0];
 
-// Stand eines Punktes: eigener Stand, sonst aus den Teilen (alle sitzen → sitzt, einer begonnen → übe ich)
+// Stand eines Punktes: das Höhere aus eigenem Stand und Teilen (alle Teile sitzen → sitzt, einer begonnen → übe ich)
+const RANG: Record<Status, number> = { offen: 0, uebe: 1, sitzt: 2 };
 export function stand(p: Punkt, m: Map<string, Status>): Status {
   const own = m.get(p.key) ?? "offen";
-  if (own !== "offen" || !p.teile?.length) return own;
+  if (!p.teile?.length) return own;
   const t = p.teile.map((x) => m.get(x.key) ?? "offen");
-  if (t.every((s) => s === "sitzt")) return "sitzt";
-  return t.some((s) => s !== "offen") ? "uebe" : "offen";
+  const aus: Status = t.every((s) => s === "sitzt") ? "sitzt" : t.some((s) => s !== "offen") ? "uebe" : "offen";
+  return RANG[aus] > RANG[own] ? aus : own;
 }
 
 const liste = (w: string[]) => (w.length < 2 ? w[0] : w.slice(0, -1).join(", ") + " und " + w[w.length - 1]);

@@ -104,8 +104,9 @@ export async function buildCoachContext(): Promise<string> {
     const tops = cl.filter((c) => c.result !== "versuch");
     lines.push(`Bouldern letzte 8 Wochen: ${tops.length} Tops von ${cl.length} Versuchen, höchster Top ${tops.map((c) => c.grade).sort().pop() ?? "–"}.`);
   }
-  const exam = (settings.data as { data?: { examDate?: string } } | null)?.data?.examDate;
-  lines.push(`Prüfung 5. Kyu: ${exam ?? "Frühjahr 2027, Datum noch offen"}.`);
+  const sd = (settings.data as { data?: { examDate?: string; karate?: { ziel?: number } } } | null)?.data;
+  const ziel = sd?.karate?.ziel ?? 5;
+  if (ziel >= 1) lines.push(`Nächste Karate-Prüfung ${ziel}. Kyu: ${sd?.examDate ?? "Datum noch offen"}.`);
 
   for (const pat of patterns(data).filter((x) => x.ready)) lines.push(`Muster „${pat.title}“: ${pat.text}`);
   return lines.join("\n");

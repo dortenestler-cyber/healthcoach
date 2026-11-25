@@ -1,6 +1,6 @@
 # Konzept: Karate-Prüfungen mit Prüfungsprogramm zum Abhaken
 
-Stand: 25.11.2026 · Status: **Fragen beantwortet (25.11.), wartet auf die Prüfungsordnung und Freigabe**
+Stand: 25.11.2026 · Status: **Freigegeben (25.11.), umgesetzt in PR #143 · Prüfungsordnung steht noch aus**
 
 ## Ziel
 1. Für jede Prüfung ab dem 5. Kyu bis zum 1. Kyu steht das Prüfungsprogramm schon in der App: Kihon, Kata, Kumite.
@@ -150,4 +150,4 @@ Row Level Security wie bei allen Tabellen. Aktueller Grad und Prüfungen (Datum,
 ## 6. Nächste Schritte
 1. ☑ Fragen beantwortet. Offen: Du schickst die Prüfungsordnung.
 2. Ich passe das Programm in Abschnitt 2 an und markiere es als bestätigt.
-3. Nach deiner Freigabe: Migration (Daten), dann Oberfläche, je ein Pull Request.
+3. ☑ Freigegeben am 25.11., Migration und Oberfläche zusammen in PR #143.
