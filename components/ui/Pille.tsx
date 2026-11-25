@@ -62,7 +62,8 @@ export function useAbschnitte<K extends string>(key: string, abschnitte: [K, str
       ))}
     </PillenZeile>
   );
-  return { zeile, zeigt: (k: K) => an.has(k) };
+  // einschalten: z. B. wenn ein Link (#perioden) auf einen ausgeblendeten Abschnitt zeigt
+  return { zeile, zeigt: (k: K) => an.has(k), einschalten: (k: K) => !an.has(k) && umschalten(k) };
 }
 
 // „Details“ unter einer Karte: zuerst zu, die Wahl bleibt gemerkt.

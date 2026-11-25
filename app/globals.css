@@ -3119,3 +3119,8 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .sport-kachel .today-act-icon { width: 32px; height: 32px; margin-bottom: 4px; }
 .sport-kachel-name { font-size: 13px; color: var(--muted); }
 .sport-kachel-wert { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.zw-tag { cursor: default; background: var(--band, var(--fill)); padding-bottom: 6px; }
+.zw-tag .woche-n { color: var(--num, var(--text)); }
+.zw-tag.zw-future { background: transparent; box-shadow: inset 0 0 0 1.5px var(--band, var(--line)); }
+.zw-tag.is-heute { outline: 2px solid var(--text); outline-offset: -2px; }
+.zw-wort { font-size: 9.5px; color: var(--muted); letter-spacing: -0.01em; }

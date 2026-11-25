@@ -10,7 +10,8 @@ const de1 = (v: number) => v.toLocaleString("de-DE", { maximumFractionDigits: 1 
 
 // Seite Zyklus, unterer Teil: Zykluslängen mit Bereich von vor einem Jahr, Hitzewallungen pro Woche, Symptome nach Zyklustag.
 // Ohne Netzwerk. Zusammenhänge, keine Diagnose.
-export default function CycleHistory({ today, diary, flashes, showFlashes, muscle }: { today: string; diary: Diary[]; flashes: string[]; showFlashes: boolean; muscle?: Map<string, number> }) {
+// teil: nur die Perioden (Zykluslänge) oder nur die Symptome (Hitzewallungen, Raster); Konzept Einfach, Paket 5
+export default function CycleHistory({ today, diary, flashes, showFlashes, muscle, teil = "alle" }: { today: string; diary: Diary[]; flashes: string[]; showFlashes: boolean; muscle?: Map<string, number>; teil?: "alle" | "perioden" | "symptome" }) {
   const cl = cycleLengthView(diary, today);
   const last = cl.recent[cl.recent.length - 1];
   const y = cl.yearAgo;
@@ -43,6 +44,7 @@ export default function CycleHistory({ today, diary, flashes, showFlashes, muscl
 
   return (
     <>
+      {teil !== "symptome" && (
       <section className="card">
         <ValueHeader meta="Zykluslänge · letzte 12 Zyklen" sentence={sentence} value={last ? `${last.length} Tage` : null}>
           <p className="value-range">{y ? `Bereich vor einem Jahr ${y.lo === y.hi ? y.lo : `${de1(y.lo)}–${de1(y.hi)}`} Tage` : "Bereich vor einem Jahr ab 3 Zyklen von damals"}</p>
@@ -60,10 +62,11 @@ export default function CycleHistory({ today, diary, flashes, showFlashes, muscl
           )}
         </ValueHeader>
         {y && <span className="meta">Band: mittlere Hälfte der Zykluslängen von vor einem Jahr ({cl.yearAgoN} Zyklen). Kürzere oder unregelmäßige Zyklen sind in der Perimenopause häufig. Sehr starke oder lange Blutungen bitte ärztlich abklären lassen.</span>}
-        <Link href="/tagebuch#perioden" className="settings-link">Vergangene Perioden nachtragen ›</Link>
+        <Link href="#perioden" className="settings-link">Vergangene Perioden nachtragen ›</Link>
       </section>
+      )}
 
-      {showFlashes && (
+      {teil !== "perioden" && showFlashes && (
         <section className="card">
           <ValueHeader meta="Hitzewallungen · pro Woche" sentence={flashSentence} value={String(now)}>
             <span className="value-range">diese Woche{avg !== null ? ` · Schnitt davor ${de1(avg)}` : ""}</span>
@@ -79,12 +82,14 @@ export default function CycleHistory({ today, diary, flashes, showFlashes, muscl
         </section>
       )}
 
+      {teil !== "perioden" && (
       <section className="card">
         <span className="meta">Symptome nach Zyklustag · letzte {heat.n || 4} Zyklen</span>
         <h2>{heatSentence}</h2>
         {heat.rows.length > 0 && <Heatmap rows={heat.rows} columns={heat.columns} label={`Symptome nach Zyklustag über ${heat.n} Zyklen`} />}
         <span className="meta">Anteil der Zyklen, in denen du das Symptom an diesem Tag eingetragen hast. Ein Zusammenhang, keine Diagnose.</span>
       </section>
+      )}
     </>
   );
 }
