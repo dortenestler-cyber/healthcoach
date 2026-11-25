@@ -389,6 +389,24 @@ button {
   color: var(--on-primary);
 }
 
+/* Tap-Fläche mindestens 44 px, auch wenn die Pille kleiner aussieht */
+.pill { position: relative; }
+.pill::after { content: ""; position: absolute; inset: -4px 0; }
+.pill-sm::after { inset: -6px 0; }
+
+/* Baustein Pille (components/ui/Pille.tsx, Konzept Einfach Paket 1) */
+.pille { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+.pille:not([aria-pressed="true"]) { background: transparent; color: var(--muted); }
+.pille-punkt { width: 8px; height: 8px; border-radius: 999px; flex: none; }
+.pillen-zeile { margin: 4px 0 12px; }
+.pillen-abschnitte { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 8px 0; margin: 0 0 8px; }
+.pille-details { margin-top: 8px; }
+.pille-einblenden { display: flex; width: 100%; min-height: 44px; align-items: center; justify-content: space-between; gap: 8px; background: none; border: 0; padding: 0; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; }
+.pille-einblenden:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 8px; }
+.pille-pfeil { transition: transform 0.15s; }
+.pille-einblenden[aria-expanded="true"] .pille-pfeil { transform: rotate(180deg); }
+.pille-inhalt { padding-top: 4px; }
+
 /* Symptom-Stärke: leicht, mittel, stark (Amber) */
 .pill.level-1 { background: var(--warn-bg); border-color: var(--warn-bg); color: var(--warn-fg); }
 .pill.level-2 { background: var(--warn-mid); border-color: var(--warn-mid); color: var(--warn-fg); }

@@ -87,6 +87,7 @@ export default function CalendarSection({ data }: { data: Data | null }) {
             today={today}
             diary={data?.diary ?? []}
             ebenen={["training", "zyklus", "symptome"]}
+            merken="training"
             punkte={punkte}
             selected={selected}
             onPick={setSelected}

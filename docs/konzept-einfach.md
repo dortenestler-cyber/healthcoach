@@ -141,7 +141,7 @@ Ein Baustein, drei Arten, gleiche Größe und Bedienung.
 
 - Sichtbar 32 px hoch, Tap-Fläche 44 px, Radius rund, Schrift 14, Farben nur aus `globals.css`.
 - Zustand wird gemerkt in `settings.data.ansicht` (synchron zwischen iPhone und Computer, Feld ist schon `jsonb`, **keine Migration**). Schlüssel je Ort, z. B. `ansicht.zyklus.abschnitte`, `ansicht.kalender.training`.
-- Ersetzt: `chip`, `chip-sm`, `pill`, `pill-sm`, `kp-chip`, `card-toggle`, `habit-manage-toggle`, `unit-sport-pills`, `right-pills`. Bleiben: `segmented` für Reiter und `SpanSwitch` für Zeiträume. Tagebuch-Auswahl (Symptome, Gewohnheiten) nutzt die Art Filter.
+- Ersetzt nach und nach `pill`-Varianten, `kp-chip` und `card-toggle`, jeweils mit dem Paket, das die Seite umbaut. `chip` und `chip-sm` sind keine Knöpfe, sondern Etiketten, und bleiben. Bleiben: `segmented` für Reiter und `SpanSwitch` für Zeiträume. Tagebuch-Auswahl (Symptome, Gewohnheiten) nutzt die Art Filter.
 
 **Abschnitts-Pillen** kommen auf diese Seiten:
 - Zyklus: Heute · Werte · Symptome · Gewohnheiten · Perioden
@@ -215,7 +215,7 @@ Jedes Paket ist ein eigener PR mit Fotos vorher/nachher. Alle Pakete gehören zu
 
 | # | Paket | Nutzen | Inhalt |
 |---|---|---|---|
-| 1 | Pillen-Baustein | Grundlage | `Pille.tsx` mit drei Arten, Merken in `settings.data.ansicht`, alte Klassen ersetzen |
+| 1 | Pillen-Baustein ✓ (PR #147) | Grundlage | `Pille.tsx` (`Pille`, `PillenZeile`, `useAuswahl`, `useAbschnitte`, `Details`), Merken über `lib/ansicht.ts` in `settings.data.ansicht`, Tap-Fläche 44 px für alle `.pill`, Kalender-Ebenen umgestellt. Weitere Stellen ziehen mit ihren Paketen um |
 | 2 | Alle Aktivitäten | hoch, klein | Liste am Ende von Training, Filter, Suche, Heute „Alle ›“ |
 | 3 | Zentraler Kalender | hoch | `/kalender`, neue Ebenen, Einstiege über Heute-Datum und `PageHead`, Tagesblatt kurz |
 | 4 | Training zwei Reiter | hoch | Übersicht/Auswertung, Sportarten-Seiten, Kalender-Reiter raus, Insights in Auswertung |
