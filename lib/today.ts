@@ -7,6 +7,7 @@ import { badStreak } from "@/lib/korridor";
 import { METRICS, type Activity, type Daily, type MetricKey } from "@/lib/garmin";
 import { HARD_DAY_PCT, loadPercent, MID_DAY_PCT, type Data } from "@/lib/insights";
 import { readLoadDay } from "@/lib/alltagslast";
+import { sleepScore } from "@/lib/schlaf";
 
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");
@@ -112,13 +113,18 @@ export function metricRow(key: MetricKey, day: string, data: Data, label = METRI
 
 const plain = (range: Range | null): Baseline => ({ range, phase: null, phaseKey: null, active: range });
 
+// Schlaf als Gesamtwert (lib/schlaf.ts): ab 70 im Bereich, ab 85 darüber
+function sleepRow(day: string, data: Data): Row {
+  return { key: "schlaf", label: "Schlaf", value: sleepScore(day, data).total, fmt: (v) => String(Math.round(v)), base: plain({ lo: 70, hi: 84.5, median: 78, n: 30, stable: true }), href: "/wert/schlaf" };
+}
+
 // HRV, Ruhepuls, Schlaf und Last: was in die Readiness einfließt
 export function readinessFactors(day: string, data: Data): Row[] {
   const l = load7(day, data);
   return [
     metricRow("hrv", day, data),
     metricRow("ruhepuls", day, data),
-    metricRow("schlaf", day, data),
+    sleepRow(day, data),
     { key: "last", label: "Belastung 7 Tage", value: l.value, fmt: (v) => String(Math.round(v)), base: plain(l.range) },
   ];
 }

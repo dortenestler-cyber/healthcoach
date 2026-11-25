@@ -21,6 +21,7 @@ import { cycleToday, PHASES, readinessFrom } from "@/lib/cycle";
 import { positionIn } from "@/lib/baseline";
 import { bereichWort, zielWort } from "@/lib/einordnung";
 import { vitalRows } from "@/lib/today";
+import { sleepScore } from "@/lib/schlaf";
 import type { Session } from "@/lib/training";
 
 const de1 = (v: number) => v.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -105,7 +106,8 @@ export default function Tagesblatt({ day, data, onChanged, intro, bare = false, 
       const r = readinessFrom(t);
       tiles.push({ key: "readiness", label: "Readiness", value: de1(r.value), word: r.label, href: `/wert/readiness${q}` });
     }
-    if (d?.sleep_score != null) tiles.push({ key: "schlaf", label: "Schlaf", value: String(d.sleep_score), word: d.sleep_seconds ? `${Math.floor(d.sleep_seconds / 3600)} h ${String(Math.round((d.sleep_seconds % 3600) / 60)).padStart(2, "0")}` : "Punkte", href: `/wert/schlaf${q}` });
+    const sl = sleepScore(day, data);
+    if (sl.total !== null) tiles.push({ key: "schlaf", label: "Schlaf", value: String(sl.total), word: d?.sleep_seconds ? `${Math.floor(d.sleep_seconds / 3600)} h ${String(Math.round((d.sleep_seconds % 3600) / 60)).padStart(2, "0")}` : "Punkte", href: `/wert/schlaf${q}` });
     const dl = dayLoad(day, data.daily, data.acts);
     if (d || dl.training) tiles.push({ key: "belastung", label: "Belastung", value: `${dl.pct} %`, word: zielWort(dl.pct, t), href: `/wert/belastung${q}` });
     for (const r of vitalRows(day, data).filter((x) => x.key === "hrv" || x.key === "ruhepuls" || x.key === "stress")) {

@@ -20,7 +20,8 @@ import type { Data } from "@/lib/insights";
 import { loadInsightData } from "@/lib/insightData";
 import { useFeatures } from "@/lib/prefs";
 import { DETAILS, type DetailKey } from "@/lib/heuteDetails";
-import { hm, metricRow, readinessFactors, readinessWhy, sleepAchieved, sleepNeed, vitalRows } from "@/lib/today";
+import { hm, metricRow, readinessFactors, readinessWhy, sleepNeed, vitalRows } from "@/lib/today";
+import { sleepRows, sleepScore, sleepSentence, sleepWord, spo2Warning } from "@/lib/schlaf";
 
 
 const GLOW: Record<DetailKey, string> = { readiness: "heute", schlaf: "gesundheit", belastung: "training", stress: "stress", energie: "heute", intensitaet: "training" };
@@ -153,47 +154,50 @@ function ReadinessDetail({ day, data, rule, showGarmin }: { day: string; data: D
   );
 }
 
-// Schlaf (nach Whoop „Schlafleistung“): großer Ring in % vom Bedarf, Faktoren mit drei Stufen, Satz, Schlafbedarf mit Herleitung, Phasen und 7 Nächte
+// Schlaf: Ring mit Gesamtwert aus Menge und Erholsam (lib/schlaf.ts), Faktoren mit drei Stufen, Satz, Schlafbedarf, Phasen und 7 Nächte
 function SleepDetail({ day, data }: { day: string; data: Data }) {
-  const slept = sleepAchieved(day, data);
+  const score = sleepScore(day, data);
   const need = sleepNeed(day, data.daily, data.acts);
-  const pct = slept.ratio === null ? null : Math.round(slept.ratio * 100);
-  const night = data.daily.find((d) => d.day === day);
-  const rows = [metricRow("schlaf", day, data, "Dauer"), metricRow("tiefschlaf", day, data), metricRow("rem", day, data)].filter((r, i) => i === 0 || r.value !== null);
-  const count = countInRange(rows.map((r) => ({ value: r.value, range: r.base.active })));
-  const deep = rows.find((r) => r.key === "tiefschlaf");
-  const deepPos = deep && deep.value !== null && deep.base.active ? positionIn(deep.value, deep.base.active) : null;
-
-  let sentence = "Für diese Nacht gibt es noch keinen Schlafwert.";
-  if (pct !== null && slept.hours !== null) {
-    sentence = pct >= 100 ? `Du hast ${hm(slept.hours)} geschlafen, so viel wie du brauchst.` : pct >= 90 ? `Du hast ${hm(slept.hours)} geschlafen, knapp unter deinem Bedarf.` : `Du hast ${hm(slept.hours)} geschlafen, deutlich unter deinem Bedarf.`;
-    if (deepPos) sentence += deepPos === "im" ? " Tiefschlaf im Bereich." : ` Tiefschlaf ${deepPos} deinem Bereich.`;
-  }
+  const rows = sleepRows(day, data);
+  const warn = spo2Warning(day, data);
 
   return (
     <>
       <div className="ring-hero detail-hero">
-        <ValueRing tone="sleep" size={208} value={slept.ratio ?? 0} center={pct === null ? "–" : `${pct} %`} caption="vom Bedarf" label={pct === null ? "Schlaf: noch kein Wert" : `Schlaf ${pct} Prozent vom Bedarf`} />
+        <ValueRing tone="sleep" size={208} value={(score.total ?? 0) / 100} center={score.total === null ? "–" : String(score.total)} caption={score.word ?? "kein Wert"} label={score.total === null ? "Schlaf: noch kein Wert" : `Schlaf ${score.total} von 100, ${score.word}`} />
       </div>
 
-      <section className="card detail-card">
-        <FactorList rows={rows} mode="stufen" tone="sleep" legend="unter · im · über deinem Bereich (letzte 30 Nächte)" />
-      </section>
+      {score.total !== null && (
+        <div className="today-glance">
+          <div className="today-tile">
+            <div className="today-tile-text">
+              <span className="today-tile-label">Menge</span>
+              <span className="today-tile-value">{score.pct} %</span>
+              <span className="today-tile-word">vom Bedarf</span>
+            </div>
+          </div>
+          <div className="today-tile">
+            <div className="today-tile-text">
+              <span className="today-tile-label">Erholsam</span>
+              <span className="today-tile-value">{score.rest ?? "–"}</span>
+              <span className="today-tile-word">{score.rest === null ? "zu wenig Werte" : sleepWord(score.rest)}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ExplainCard tone="sleep" question="Wie kann ich meinen Schlaf verbessern?">
-        {sentence} {count.total ? `${count.inRange} von ${count.total} Werten in deinem Bereich.` : ""}
+        {sleepSentence(day, data, score)}
       </ExplainCard>
 
-      {night && (night.awake_count != null || night.sleep_awake_s || night.spo2_avg != null) && (
+      <section className="card detail-card">
+        <FactorList rows={rows} mode="stufen" tone="sleep" />
+      </section>
+
+      {warn && (
         <section className="card">
-          <span className="eyebrow">Wach und Sauerstoff in der Nacht</span>
-          <p className="value-big">
-            {night.awake_count != null ? (night.awake_count === 0 ? "Nicht aufgewacht" : `${night.awake_count}× wach`) : night.sleep_awake_s ? duration(night.sleep_awake_s) : "–"}
-          </p>
-          <ul className="derive-list">
-            {night.awake_count != null && night.sleep_awake_s ? <li>Wachzeit zusammen {duration(night.sleep_awake_s)}</li> : null}
-            {night.spo2_avg != null && <li>Sauerstoff im Schlaf im Schnitt {Math.round(night.spo2_avg)} %{night.spo2_low != null ? `, niedrigster Wert ${Math.round(night.spo2_low)} %` : ""}</li>}
-          </ul>
+          <span className="eyebrow">Sauerstoff in der Nacht</span>
+          <p>In mehreren Nächten fiel der Sauerstoff im Schlaf unter 88 %. Lass das ärztlich abklären.</p>
         </section>
       )}
 

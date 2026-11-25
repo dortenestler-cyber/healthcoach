@@ -9,7 +9,7 @@ import { energyDay } from "@/lib/energie";
 import { zielWort } from "@/lib/einordnung";
 import { dayLoad, loadLabel, ringSplit, type Data } from "@/lib/insights";
 import { stressDay } from "@/lib/stress";
-import { sleepAchieved } from "@/lib/today";
+import { sleepScore } from "@/lib/schlaf";
 import { weekIntensity, WHO_MINUTES } from "@/lib/trainingLoad";
 
 const de1 = (v: number) => v.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -61,9 +61,8 @@ export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarm
     items.push({ key: "energie", href: `/wert/energie${q}`, label: "Energie", tone: "energy", value: (last ?? 0) / 100, center: last === null ? "–" : String(Math.round(last)), word: last === null ? "kein Wert" : "Body Battery", aria: last === null ? "Energie: noch kein Wert" : `Energie, Body Battery ${Math.round(last)} von 100` });
   }
 
-  const slept = sleepAchieved(day, data);
-  const sleepPct = slept.ratio === null ? null : Math.round(slept.ratio * 100);
-  items.push({ key: "schlaf", href: `/wert/schlaf${q}`, label: "Schlaf", tone: "sleep", value: slept.ratio ?? 0, center: sleepPct === null ? "–" : `${sleepPct} %`, word: sleepPct === null ? "kein Wert" : "vom Bedarf", aria: sleepPct === null ? "Schlaf: noch kein Wert für letzte Nacht" : `Schlaf ${sleepPct} Prozent vom Bedarf` });
+  const sl = sleepScore(day, data);
+  items.push({ key: "schlaf", href: `/wert/schlaf${q}`, label: "Schlaf", tone: "sleep", value: (sl.total ?? 0) / 100, center: sl.total === null ? "–" : String(sl.total), word: sl.word ?? "kein Wert", aria: sl.total === null ? "Schlaf: noch kein Wert für letzte Nacht" : `Schlaf ${sl.total} von 100, ${sl.word}` });
 
   const r = rule.readiness;
   const warn = rule.level === "warnzeichen";

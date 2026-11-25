@@ -1,6 +1,6 @@
 # Konzept: Schlaf auch nach Qualität bewerten
 
-Stand: 25.11.2026 · Status: **Entwurf, wartet auf Freigabe**
+Stand: 25.11.2026 · Status: **Freigegeben (25.11.)** · umgesetzt in `lib/schlaf.ts`
 
 Anlass: Die Schlafseite bewertet nur die Menge („94 % vom Bedarf“). Tiefschlaf und REM stehen als Minuten daneben, fließen aber nicht ein. Eine Nacht mit 8:35 h, aber fünfmal wach und Nachtschweiß sieht genauso gut aus wie eine ruhige Nacht.
 
@@ -56,7 +56,7 @@ Die Erklärkarte „Wie kann ich meinen Schlaf verbessern?“ bekommt die Bauste
 - Daten `[DA]`: nichts, außer der Abruf liefert `awake_count` noch nicht zuverlässig (vor Umsetzung prüfen, wie viele der letzten 30 Nächte gefüllt sind).
 - Eins rein, eins raus: Der Satz „x von 3 Werten in deinem Bereich“ und die Legenden-Zeile fallen weg.
 
-## Offene Fragen
-1. Gesamtzahl im Ring (Vorschlag) oder weiter Menge im Ring und Erholsam nur als Kachel?
-2. Gewichtung Menge zu Erholsam 50 : 50 passend?
-3. Soll Readiness die Gesamtzahl übernehmen?
+## Entscheidungen (25.11.2026)
+1. Ring zeigt die Gesamtzahl.
+2. Gewichtung Menge zu Erholsam 50 : 50.
+3. Readiness nutzt die Gesamtzahl (ab 85 +3, ab 70 ±0, ab 55 −5, darunter −10) statt Garmins Schlafwert.
