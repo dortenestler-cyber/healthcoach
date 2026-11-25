@@ -219,7 +219,7 @@ Jedes Paket ist ein eigener PR mit Fotos vorher/nachher. Alle Pakete gehören zu
 | 2 | Alle Aktivitäten ✓ (PR #148) | hoch, klein | Liste am Ende von Training, Filter, Suche, Heute „Alle ›“ |
 | 3 | Zentraler Kalender ✓ (PR #149) | hoch | `/kalender`, neue Ebenen, Einstiege über Heute-Datum und `PageHead`, Tagesblatt kurz |
 | 4 | Training zwei Reiter ✓ (PR #152) | hoch | Übersicht/Auswertung, Sportarten-Seiten, Kalender-Reiter raus, Insights in Auswertung |
-| 5 | Zyklus kürzen | hoch | Kalender und Nachtragen raus, Wochenstreifen, Abschnitts-Pillen |
+| 5 | Zyklus kürzen ✓ (PR #153) | hoch | Kalender und Nachtragen raus, Wochenstreifen, Abschnitts-Pillen |
 | 6 | Zeitraum im Kalender | mittel | Mehrere Tage wählen: Periode, krank, Gewohnheit, vergleichen |
 | 7 | Tagebuch ruhiger | mittel | Datum als Kalender-Blatt, Hinweise raus, Verlauf raus, ein Speicherweg (siehe Frage 1) |
 | 8 | Details einklappen | mittel | Einblende-Pillen in Musterkarten, Auswertung, Detailseiten |
