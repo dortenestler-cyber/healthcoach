@@ -5,10 +5,10 @@ import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, longDate } from "@/lib/dates";
 import { SPOTS, weekStart, type Injury } from "@/lib/health";
 import { fromIso, loadSettings, saveSettings, sportOf, type Settings } from "@/lib/training";
-import { GRUPPEN, NEXT, QUELLE, STATUS_WORT, grad, satz, stand, type Punkt, type Status } from "@/lib/karate/programm";
+import { GRUPPEN, HINWEISE, KUERZEL, NEXT, QUELLE, STATUS_WORT, grad, satz, stand, type Punkt, type Status } from "@/lib/karate/programm";
 
 type Item = { id: string; label: string; category: string; status: Status; kyu: number };
-const CATEGORIES = ["Kihon", "Kata", "Kumite", "Begriffe", "Sonstiges"];
+const CATEGORIES = ["Kihon", "Kata", "Anwendung", "Kumite", "Begriffe", "Sonstiges"];
 const KYUS = [5, 4, 3, 2, 1];
 type Pruefung = { datum?: string; bestanden?: string };
 type KarateSettings = { ziel?: number; pruefungen?: Record<string, Pruefung> };
@@ -134,12 +134,11 @@ export default function KarateSection() {
   const rep = punkte.filter((p) => p.wiederholung);
   const eigene = items.filter((i) => (i.kyu ?? 5) === kyu);
   const zaehl = (list: Status[]) => ({ sitzt: list.filter((s) => s === "sitzt").length, total: list.length });
-  const gruppen = [
-    ...GRUPPEN.map((g) => ({ gruppe: g, ...zaehl(haupt.filter((p) => p.gruppe === g).map((p) => stand(p, progress))) })),
-    { gruppe: "eigenen Punkten", ...zaehl(eigene.map((i) => i.status)) },
-  ];
-  const sitzt = gruppen.reduce((a, g) => a + g.sitzt, 0);
-  const total = gruppen.reduce((a, g) => a + g.total, 0);
+  // Begriffe prüft der DKV nicht, sie zählen deshalb nicht im Ring
+  const gruppen = GRUPPEN.filter((g) => g !== "Begriffe").map((g) => ({ gruppe: g, ...zaehl(haupt.filter((p) => p.gruppe === g).map((p) => stand(p, progress))) }));
+  const eigenStand = zaehl(eigene.map((i) => i.status));
+  const sitzt = gruppen.reduce((a, g) => a + g.sitzt, 0) + eigenStand.sitzt;
+  const total = gruppen.reduce((a, g) => a + g.total, 0) + eigenStand.total;
   const pct = total ? Math.round((sitzt / total) * 100) : 0;
   const repStand = zaehl(rep.map((p) => stand(p, progress)));
   const r = 23;
@@ -186,7 +185,7 @@ export default function KarateSection() {
       <section className="card">
         <div className="card-row">
           <div className="stack">
-            <span className="meta">Prüfung zum {kyu}. Kyu</span>
+            <span className="meta">Prüfung zum {kyu}. Kyu · {grad(kyu).guertel}</span>
             {bestanden ? (
               <span className="big-number">bestanden</span>
             ) : (
@@ -267,13 +266,22 @@ export default function KarateSection() {
         {GRUPPEN.map((g) => {
           const list = haupt.filter((p) => p.gruppe === g);
           if (!list.length) return null;
-          const z = gruppen.find((x) => x.gruppe === g)!;
+          const z = gruppen.find((x) => x.gruppe === g) ?? { gruppe: g, ...zaehl(list.map((p) => stand(p, progress))) };
           return (
             <div key={g} className="stack">
               <div className="card-row">
                 <span className="eyebrow">{g}</span>
                 <span className="meta">{z.sitzt} von {z.total}</span>
               </div>
+              {g === "Kihon" && (
+                <div className="kp-note">
+                  {HINWEISE.map((h) => <span key={h} className="meta">{h}</span>)}
+                  <details>
+                    <summary className="meta">Kürzel</summary>
+                    <span className="meta">{KUERZEL}</span>
+                  </details>
+                </div>
+              )}
               {list.map(renderPunkt)}
             </div>
           );
@@ -328,7 +336,7 @@ export default function KarateSection() {
           </div>
         </div>
 
-        <span className="meta">{QUELLE.beispiel ? `Beispielinhalt: ${QUELLE.text}.` : QUELLE.text}</span>
+        <span className="meta">{QUELLE.beispiel ? `Beispielinhalt: ${QUELLE.text}` : QUELLE.text}</span>
       </section>
     </>
   );

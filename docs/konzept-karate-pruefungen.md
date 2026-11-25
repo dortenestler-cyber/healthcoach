@@ -1,6 +1,6 @@
 # Konzept: Karate-Prüfungen mit Prüfungsprogramm zum Abhaken
 
-Stand: 25.11.2026 · Status: **Freigegeben (25.11.), umgesetzt in PR #143 mit Vorlage · DKV-Programm als Entwurf zur Durchsicht**
+Stand: 25.11.2026 · Status: **Freigegeben (25.11.), umgesetzt in PR #143 mit dem Programm nach DKV Shotokan**
 
 ## Ziel
 1. Für jede Prüfung ab dem 5. Kyu bis zum 1. Kyu steht das Prüfungsprogramm schon in der App: Kihon, Kata, Kumite.
@@ -21,9 +21,9 @@ Heute gibt es auf Training › Karate eine leere Liste „Meine Prüfungsliste�
 
 ---
 
-## 2. Prüfungsprogramm nach DKV Shotokan (Entwurf zur Durchsicht)
+## 2. Prüfungsprogramm nach DKV Shotokan
 
-> **Entwurf, wartet auf deine Durchsicht.** Grundlage: Prüfungsordnung Shotokan im Deutschen Karate Verband, in Kraft seit 01.01.2023, redaktionell geändert am 20.03.2024 und 09.12.2025 (karate.de › Service › Downloads › Prüfungswesen). In eigenen, kurzen Worten zusammengefasst; maßgeblich ist die Prüfungsordnung selbst.
+> **Von der Nutzerin am 25.11. freigegeben.** Grundlage: Prüfungsordnung Shotokan im Deutschen Karate Verband, in Kraft seit 01.01.2023, redaktionell geändert am 20.03.2024 und 09.12.2025 (karate.de › Service › Downloads › Prüfungswesen). In eigenen, kurzen Worten zusammengefasst; maßgeblich ist die Prüfungsordnung selbst.
 
 **Was für alle Grade gilt (steht in der App über Kihon)**
 - Tritte Jodan, Armtechniken Chudan, jede Technik oder Kombination 5-mal, wenn nichts anderes dasteht.
@@ -107,7 +107,7 @@ Kürzel: ZK Zenkutsu-dachi · KK Kokutsu-dachi · KB Kiba-dachi · NA Neko-ashi-
 **Kumite**: Jiyu-Ippon-Kumite, je rechts und links, Teile: Oi-zuki Jodan · Kizami-zuki · Uraken / Gyaku-zuki Chudan · Mawashi-geri (vorderes oder hinteres Bein) · Ushiro-geri oder Ushiro-ura-mawashi-geri · dazu Jiyu-Kumite
 
 ### Begriffe
-Der DKV fragt keine Theorie ab, die Prüfungsordnung hat aber ein Verzeichnis der Begriffe. Vorschlag: eine Gruppe „Begriffe“ zum Lernen, nicht zur Prüfung, verteilt auf die Grade:
+Der DKV fragt keine Theorie ab, die Prüfungsordnung hat aber ein Verzeichnis der Begriffe. Deshalb eine Gruppe „Begriffe“ zum Lernen, nicht zur Prüfung, verteilt auf die Grade. Sie zählt nicht im Ring „x von y sitzen“:
 - 5. Kyu: Kommandos (Yoi, Hajime, Yame, Mawate, Rei) · Angriffsstufen (Jodan, Chudan, Gedan) · Stellungen
 - 4. Kyu: Namen der Techniken (Abwehr, Stöße, Schläge, Tritte)
 - 3. Kyu: Trainings- und Kampfformen (Gohon-, Kihon-Ippon-, Kaeshi-, Jiyu-Ippon-, Jiyu-Kumite)

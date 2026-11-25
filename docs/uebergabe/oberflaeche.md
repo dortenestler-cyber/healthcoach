@@ -4,9 +4,9 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014p
 
 ## Karate-Prüfungsprogramm (PR #143, 25.11.)
 - Konzept `docs/konzept-karate-pruefungen.md`, freigegeben 25.11. Training › Karate: Kyu-Chips 5.–1., Ring „x von y sitzen“ mit Satz, Gruppen Kihon/Kata/Kumite/Begriffe, Wiederholung eingeklappt, eigene Punkte je Kyu. Drei Stufen per Tipp, Kata und Kumite klappen in Teile auf. „X. Kyu bestanden“ ab Prüfungsdatum, dann rückt der nächste Kyu nach.
-- Programm in `lib/karate/programm.ts`, Kennungen über alle Grade gleich. Noch **Vorlage** (JKA/DJKB), `QUELLE.beispiel = true`. Einstellungen `karate.ziel`, `karate.pruefungen[kyu]`, `examDate` bleibt Datum der aktuellen Prüfung (Coach).
+- Programm in `lib/karate/programm.ts` nach **DKV Shotokan** (PO ab 01.01.2023, Stand 09.12.2025), von der Nutzerin freigegeben. Gruppen Kihon (Kennung je Grad `kihon.<kyu>.<nr>`), Kata (global `kata.<name>`, Teile), Anwendung, Kumite (je Grad, Teile = Angriffe), Begriffe (zählen nicht im Ring). Hinweise und Kürzel über dem Kihon. Einstellungen `karate.ziel`, `karate.pruefungen[kyu]`, `examDate` bleibt Datum der aktuellen Prüfung (Coach).
 - Offen: Hinweis bei Verletzung auf Gesundheit (`InjurySection`) nennt noch den 5. Kyu.
-- Nächster Schritt: Nutzerin merged PR #143 (Migration), schickt Prüfungsordnung; dann `lib/karate/programm.ts` ersetzen und `beispiel` auf false.
+- Nächster Schritt: Nutzerin merged PR #143 (Migration) und prüft Training › Karate.
 
 
 

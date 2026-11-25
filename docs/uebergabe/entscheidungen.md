@@ -77,3 +77,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-25 · OF · Nutzerin: Karate-Prüfungen: drei Stufen (offen · übe ich · sitzt), Kata in Teile aufklappbar, Begriffe und Theorie kommen dazu, Prüfungsordnung liefert die Nutzerin
 2026-11-25 · OF/DA · Nutzerin: Umsetzung Karate-Prüfungsprogramm freigegeben, vorerst mit gekennzeichneter Vorlage bis zur Prüfungsordnung
 2026-11-25 · OF · Nutzerin: Prüfungsprogramm nach der Prüfungsordnung Shotokan des DKV; Entwurf erst ansehen, dann übernehmen
+2026-11-25 · OF · Nutzerin: Entwurf DKV-Programm freigegeben, in die App übernommen

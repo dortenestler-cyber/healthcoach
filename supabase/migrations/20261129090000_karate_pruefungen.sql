@@ -1,6 +1,6 @@
 -- Health Coach · Karate-Prüfungen 5. bis 1. Kyu (freigegeben am 25.11., docs/konzept-karate-pruefungen.md)
 -- 1. Neue Tabelle karate_progress: Stand je Punkt des Prüfungsprogramms (Kennung aus lib/karate/programm.ts)
--- 2. karate_items (eigene Punkte): Kyu, drei Stufen statt Haken, Gruppe „Begriffe“
+-- 2. karate_items (eigene Punkte): Kyu, drei Stufen statt Haken, Gruppen „Anwendung“ und „Begriffe“
 -- Mehrfaches Ausführen schadet nicht.
 
 create table if not exists public.karate_progress (
@@ -17,7 +17,7 @@ update public.karate_items set status = 'sitzt' where done and status = 'offen';
 
 alter table public.karate_items drop constraint if exists karate_items_category_check;
 alter table public.karate_items add constraint karate_items_category_check
-  check (category in ('Kihon', 'Kata', 'Kumite', 'Begriffe', 'Sonstiges'));
+  check (category in ('Kihon', 'Kata', 'Anwendung', 'Kumite', 'Begriffe', 'Sonstiges'));
 
 alter table public.karate_progress enable row level security;
 drop policy if exists "nur eigene Daten" on public.karate_progress;
