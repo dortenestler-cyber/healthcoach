@@ -2951,6 +2951,13 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .unit-timeline .tl-hit { fill: transparent; cursor: pointer; }
 .unit-timeline .tl-picked { stroke: var(--text); stroke-width: 1.5; }
 .tl-readout { min-height: 2.6em; }
+.seg-chart .seg-line { fill: none; stroke: var(--training); stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.seg-chart .seg-dot { fill: var(--text); }
+.seg-chart .seg-num { fill: var(--text-2); font-size: 9.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.seg-chart .seg-mark { cursor: pointer; }
+.seg-confirm { display: flex; align-items: center; gap: 10px; margin: 4px 0 8px; }
+.seg-step { width: 44px; padding: 0; font-size: 20px; }
+.seg-count { min-width: 2.2em; text-align: center; font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .unit-after-value { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; text-align: right; }
 .chip-sm { display: inline-block; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .chip-ok { background: var(--recovery-bg); color: var(--recovery-fg); }

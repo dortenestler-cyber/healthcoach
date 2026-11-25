@@ -7,6 +7,12 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Abschnitte aus dem Puls (PR #176, 25.11.)
+Enthält die Migration `supabase/migrations/20261130090000_abschnitte.sql` (Spalten `hr_fine`, `garmin_sets`, `segment_count` an den Garmin-Aktivitäten) und eine Änderung an `garmin-sync`. Dein Merge ist die Freigabe.
+- [ ] PR #176 mergen
+- [ ] Danach einmal synchronisieren, eine Boulder- oder Kettlebell-Einheit öffnen und die Zahl bestätigen oder korrigieren
+- [ ] Kommt dort „Der Puls in Sekunden kommt mit dem nächsten Abruf“ auch nach dem Abruf, Claude Bescheid sagen (dann liefert Garmin den Detailpfad nicht)
+
 ### Karate-Prüfungsprogramm (PR #143, 25.11.)
 Enthält die Migration `supabase/migrations/20261129090000_karate_pruefungen.sql` (neue Tabelle `karate_progress`, bei deinen eigenen Punkten Kyu, drei Stufen und die Gruppen Anwendung und Begriffe). Prüfungsprogramm nach DKV Shotokan. Dein Merge ist die Freigabe.
 - [x] PR #143 gemergt (25. Nov.), Migration grün (geprüft von Claude)

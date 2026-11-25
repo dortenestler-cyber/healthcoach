@@ -1,10 +1,12 @@
 # Übergabe · Daten (DA)
-Belegt: Konto A · Sitzung https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU · seit 2026-11-25
-Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WGKktjg5sG2bBmQXp
+Belegt: frei
+Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU
 
-## In Arbeit: Abschnitte aus dem Puls (25.11., Freigabe der Nutzerin)
-- Zweig `claude/training-detection-heart-rate-ypzut9`. Versuche (Bouldern), Sätze (Kettlebell), Runden (Karate), Intervalle (Ausdauer) aus dem Puls in Sekunden erkennen, in der Einheit bestätigen.
-- Nächster Schritt: Migration `20261130090000_abschnitte`, Abruf in `garmin-sync/details.ts`.
+## Abschnitte aus dem Puls (PR #176, 25.11., Freigabe der Nutzerin)
+- Migration `20261130090000_abschnitte`: `garmin_activities.hr_fine` (Puls je 5 s ab Beginn, `[]` = Garmin liefert keinen), `garmin_sets` (aktive Sätze aus `/exerciseSets`: `{s, d, r}`), `segment_count` (0–200, nur App).
+- `garmin-sync/details.ts`: `/activity-service/activity/{id}/details` (zwei Pfadvarianten), `fineSeries`, `activeSets`; `syncDetails` in `index.ts` holt je Abruf höchstens 8 Einheiten ohne `hr_fine`, neueste zuerst. Scheitert der Pfad, Hinweis `detailNote`, nichts wird gespeichert. Sätze nur bei Krafttraining/HIIT oder Zuordnung Kettlebell. Rückgabe `detailUnits`, `detailNote`.
+- Geprüft: `deno check`, Umrechnung an Beispieldaten. Ungeprüft: ob die Personal API den Detailpfad freigibt.
+- Wartet auf: Merge durch die Nutzerin (Migration). Danach Lauf prüfen, ob `hr_fine` ankommt (`detailNote` leer).
 
 ## Garmin-Schlafwert entfernt (25.11.)
 - Uhr: `supabase/functions/watch/schlaf.ts` (`sleepTotal`) rechnet den eigenen Schlafwert wie `lib/schlaf.ts` (geprüft: gleiche Werte an Testnächten). Readiness-Faktor SCHLAF mit festen Stufen (≥85 +3, ≥70 0, ≥55 −5, sonst −10), Feld `sleep` für das Zifferblatt liefert den eigenen Wert. `rangeFor` in `target.ts` exportiert und allgemein.
