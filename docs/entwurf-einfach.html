@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entwurf Einfach bedienen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0D10;--card:#15181D;--tile:#1C2026;--fill:#262B33;--line:#3A414B;--text:#F2F4F7;--muted:#9AA3AE;
+--rec:#52B788;--cyc:#E8845A;--cyc-bg:#3A2318;--men:#F28B8B;--men-bg:#3B1E22;--tr:#7C9AE0;--tr-bg:#1B2438;--warn:#F0A24A;--mob:#A98BE0;--sleep:#E5E7EB;--brand:#A3234F}
+*{box-sizing:border-box;margin:0}
+body{background:#05070A;color:var(--text);font:14px/1.4 Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;padding:24px 16px}
+h1{font-size:22px;margin-bottom:4px}.note{color:var(--muted);margin-bottom:20px;max-width:900px}
+.row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.phone{width:390px;max-width:100%;background:var(--bg);border-radius:32px;border:1px solid var(--fill);padding:20px 16px 24px;overflow:hidden}
+.cap{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 8px 4px}
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.head h2{font-size:28px;font-weight:700}
+.icons{display:flex;gap:8px}.ic{width:44px;height:44px;border-radius:22px;background:var(--card);display:grid;place-items:center;color:var(--text);font-size:18px}
+.ic.on{outline:2px solid var(--text)}
+.pills{display:flex;gap:8px;overflow:hidden;margin:8px 0 12px;flex-wrap:nowrap}
+.pill{flex:none;height:32px;padding:0 12px;border-radius:16px;border:1px solid var(--line);color:var(--muted);display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500}
+.pill.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.dot{width:8px;height:8px;border-radius:4px;display:inline-block}
+.card{background:var(--card);border-radius:24px;padding:16px;margin-bottom:12px}
+.card h3{font-size:16px;margin-bottom:4px}.sub{color:var(--muted);font-size:13px}
+.mon{display:flex;justify-content:space-between;align-items:center;font-weight:600;margin-bottom:8px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.wd{font-size:11px;color:var(--muted)}
+.d{height:44px;border-radius:12px;font-size:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.d .mk{display:flex;gap:2px;height:7px;align-items:center}
+.men{background:var(--men-bg);color:var(--men)}.lut{background:var(--cyc-bg)}.ov{background:#4a2c1e}
+.sel{outline:2px solid var(--text)}
+.m{width:6px;height:6px;border-radius:3px}.m.tr{background:var(--tr)}.m.trh{border:1.5px solid var(--tr)}.m.sy{background:var(--warn);transform:rotate(45deg);border-radius:1px;width:5px;height:5px}.m.ha{background:var(--rec);height:2px;width:7px;border-radius:1px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);margin-top:10px}
+.line{display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--fill);font-size:14px}
+.line:first-of-type{border-top:0}
+.btn{height:44px;border-radius:22px;background:var(--text);color:var(--bg);display:flex;align-items:center;justify-content:center;font-weight:600;margin-top:12px}
+.bar{position:relative;background:var(--tile);border-radius:18px;padding:12px;display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:4px}
+.ring{width:64px;height:64px;border-radius:50%;border:5px solid var(--fill);border-top-color:var(--tr);border-right-color:var(--tr);display:grid;place-items:center;font-weight:700;font-size:16px;flex:none}
+.tabs{display:flex;background:var(--card);border-radius:14px;padding:4px;margin:4px 0 12px}
+.tab{flex:1;height:36px;display:grid;place-items:center;border-radius:10px;color:var(--muted);font-weight:500}.tab.on{background:var(--fill);color:var(--text)}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;margin-top:10px}
+.wk{background:var(--tile);border-radius:12px;padding:6px 0;font-size:12px;color:var(--muted)}.wk b{display:block;color:var(--text);font-size:14px}
+.wk.today{outline:2px solid var(--text)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{background:var(--tile);border-radius:18px;padding:12px 10px}.tile b{display:block;font-size:15px;margin:2px 0}.tile span{font-size:12px;color:var(--muted)}
+.grp{font-size:12px;color:var(--muted);margin:12px 0 4px;display:flex;justify-content:space-between}
+.act{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--fill)}
+.ai{width:36px;height:36px;border-radius:12px;background:var(--tr-bg);color:var(--tr);display:grid;place-items:center;font-size:15px;flex:none}
+.act .t{flex:1}.act .t b{display:block;font-size:14px;font-weight:600}.act .t span{font-size:12px;color:var(--muted)}
+.search{height:40px;border-radius:20px;background:var(--tile);color:var(--muted);display:flex;align-items:center;padding:0 14px;font-size:13px;margin-bottom:4px}
+.cring{width:150px;height:150px;border-radius:50%;margin:4px auto 10px;background:conic-gradient(var(--men) 0 18%,#2b3340 18% 45%,var(--cyc) 45% 55%,#5a3624 55% 100%);display:grid;place-items:center}
+.cring div{width:126px;height:126px;border-radius:50%;background:var(--bg);display:grid;place-items:center;text-align:center}
+.cring b{font-size:28px;display:block}
+.fold{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px;margin-top:8px}
+.tag{font-size:11px;background:var(--fill);color:var(--muted);padding:2px 8px;border-radius:10px}
+.example{display:inline-block;font-size:12px;color:var(--warn);border:1px solid var(--warn);border-radius:10px;padding:2px 8px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<h1>Einfach bedienen · Skizze</h1>
+<p class="note">Entwurf zu <code>docs/konzept-einfach.md</code>. Drei Bildschirme auf 390 px: zentraler Kalender, Training mit „Alle Aktivitäten“ und Zyklus mit Abschnitts-Pillen. <span class="example">Beispieldaten</span></p>
+<div class="row">
+
+<!-- 1 Kalender -->
+<div>
+<p class="cap">1 · Kalender, geöffnet von Zyklus</p>
+<div class="phone">
+ <div class="head"><h2>Kalender</h2><div class="icons"><div class="ic">✕</div></div></div>
+ <div class="pills">
+  <div class="pill on"><span class="dot" style="background:var(--cyc)"></span>Zyklus</div>
+  <div class="pill on"><span class="dot" style="background:var(--warn)"></span>Symptome</div>
+  <div class="pill"><span class="dot" style="background:var(--tr)"></span>Training</div>
+  <div class="pill"><span class="dot" style="background:var(--rec)"></span>Gewohnheiten</div>
+  <div class="pill">Krank &amp; …</div>
+ </div>
+ <div class="card">
+  <div class="mon"><span>‹</span><span>November 2026</span><span style="display:flex;gap:12px"><span class="tag">Heute</span>›</span></div>
+  <div class="grid">
+   <div class="wd">Mo</div><div class="wd">Di</div><div class="wd">Mi</div><div class="wd">Do</div><div class="wd">Fr</div><div class="wd">Sa</div><div class="wd">So</div>
+   <div></div><div></div><div></div><div></div><div></div><div></div><div class="d lut">1<span class="mk"><i class="m sy"></i></span></div>
+   <div class="d lut">2<span class="mk"><i class="m sy"></i></span></div><div class="d lut">3<span class="mk"></span></div><div class="d lut">4<span class="mk"><i class="m sy"></i></span></div><div class="d lut">5<span class="mk"></span></div><div class="d lut">6<span class="mk"><i class="m sy"></i></span></div><div class="d lut">7<span class="mk"></span></div><div class="d lut">8<span class="mk"><i class="m sy"></i></span></div>
+   <div class="d lut">9<span class="mk"></span></div><div class="d lut">10<span class="mk"><i class="m sy"></i></span></div><div class="d lut">11<span class="mk"></span></div><div class="d lut">12<span class="mk"></span></div><div class="d men">13<span class="mk"><i class="m sy"></i></span></div><div class="d men">14<span class="mk"><i class="m sy"></i></span></div><div class="d men">15<span class="mk"></span></div>
+   <div class="d men">16<span class="mk"></span></div><div class="d men">17<span class="mk"><i class="m sy"></i></span></div><div class="d">18<span class="mk"></span></div><div class="d">19<span class="mk"></span></div><div class="d">20<span class="mk"><i class="m sy"></i></span></div><div class="d">21<span class="mk"></span></div><div class="d">22<span class="mk"></span></div>
+   <div class="d">23<span class="mk"></span></div><div class="d ov">24<span class="mk"><i class="m sy"></i></span></div><div class="d ov sel">25<span class="mk"><i class="m sy"></i></span></div><div class="d ov">26</div><div class="d lut">27</div><div class="d lut">28</div><div class="d lut">29</div>
+  </div>
+  <div class="legend"><span><i class="dot" style="background:var(--men)"></i> Periode</span><span><i class="dot" style="background:var(--cyc)"></i> Eisprung</span><span><i class="dot" style="background:#5a3624"></i> Luteal</span><span>◆ Symptom</span></div>
+ </div>
+ <div class="card">
+  <h3>Mittwoch, 25. November</h3>
+  <p class="sub">Zyklustag 13 · Eisprung-Fenster</p>
+  <div class="line"><span>Symptome</span><span class="sub">Hitzewallungen leicht</span></div>
+  <div class="line"><span>Training</span><span class="sub">Kettlebell 18:00 geplant</span></div>
+  <div class="line"><span>Schlaf</span><span class="sub">7 h 05 · im Bereich</span></div>
+  <div class="btn">Im Tagebuch bearbeiten ›</div>
+ </div>
+ <p class="sub">Lange drücken und ziehen wählt mehrere Tage: Periode eintragen · Krank von–bis · Gewohnheit · Vergleichen</p>
+</div>
+</div>
+
+<!-- 2 Training -->
+<div>
+<p class="cap">2 · Training › Übersicht, unten Alle Aktivitäten</p>
+<div class="phone">
+ <div class="head"><h2>Training</h2><div class="icons"><div class="ic">▦</div><div class="ic">⚙</div></div></div>
+ <div class="tabs"><div class="tab on">Übersicht</div><div class="tab">Auswertung</div></div>
+ <div class="card">
+  <div style="display:flex;gap:14px;align-items:center"><div class="ring">536</div><div><h3>Aufbau</h3><p class="sub">Deine Belastung steigt gleichmäßig, im Korridor 379–616.</p></div></div>
+  <div class="fold"><span>Details</span><span>⌄</span></div>
+ </div>
+ <div class="card">
+  <div class="mon"><span>Diese Woche</span><span class="sub">Kalender ›</span></div>
+  <div class="week">
+   <div class="wk">Mo<b>●</b></div><div class="wk">Di<b>●</b></div><div class="wk today">Mi<b>○</b></div><div class="wk">Do<b>○</b></div><div class="wk">Fr<b>·</b></div><div class="wk">Sa<b>○</b></div><div class="wk">So<b>·</b></div>
+  </div>
+  <p class="sub" style="margin-top:8px">● erledigt · ○ geplant</p>
+ </div>
+ <div class="card">
+  <h3 style="margin-bottom:10px">Deine Sportarten</h3>
+  <div class="tiles"><div class="tile"><span>Karate</span><b>18 von 31</b><span>sitzen</span></div><div class="tile"><span>Kettlebell</span><b>Woche 3</b><span>im Plan</span></div><div class="tile"><span>Bouldern</span><b>Ziel 6A</b><span>2 fehlen</span></div></div>
+ </div>
+ <div class="card">
+  <h3>Alle Aktivitäten</h3>
+  <div class="pills"><div class="pill on">Alle</div><div class="pill"><span class="dot" style="background:#A9BDF0"></span>Karate</div><div class="pill"><span class="dot" style="background:var(--tr)"></span>Kettlebell</div><div class="pill">Bouldern</div></div>
+  <div class="search">⌕ Suchen</div>
+  <div class="grp"><span>Diese Woche</span><span>3 Einheiten · 3 h 25</span></div>
+  <div class="act"><div class="ai">🚶</div><div class="t"><b>Gehen</b><span>heute · 40 min · Belastung 95 %</span></div>›</div>
+  <div class="act"><div class="ai">🥋</div><div class="t"><b>Karate</b><span>Di 24.11. · 1 h 30 · Belastung 84 %</span></div>›</div>
+  <div class="act"><div class="ai">🏋</div><div class="t"><b>Kettlebell</b><span>Mo 23.11. · 45 min · Belastung 62 %</span></div>›</div>
+  <div class="grp"><span>KW 47</span><span>4 Einheiten · 5 h 10</span></div>
+  <div class="act"><div class="ai">🧗</div><div class="t"><b>Bouldern</b><span>Sa 21.11. · 1 h 40</span></div>›</div>
+  <div class="act"><div class="ai">🥋</div><div class="t"><b>Karate</b><span>Do 19.11. · 1 h 30</span></div>›</div>
+  <p class="sub" style="text-align:center;margin-top:8px">Weitere laden</p>
+ </div>
+</div>
+</div>
+
+<!-- 3 Zyklus -->
+<div>
+<p class="cap">3 · Zyklus mit Abschnitts-Pillen</p>
+<div class="phone">
+ <div class="head"><h2>Zyklus</h2><div class="icons"><div class="ic">▦</div><div class="ic">⚙</div></div></div>
+ <div class="cring"><div><span><b>Tag 13</b><span class="sub">Eisprung-Fenster</span></span></div></div>
+ <div class="card">
+  <h3>Eisprung-Fenster · 25.–27. Nov.</h3>
+  <p class="sub">Hohe Leistung ist möglich, Sehnen und Gelenke sind etwas lockerer.</p>
+  <div class="fold"><span>Details</span><span>⌄</span></div>
+ </div>
+ <div class="card" style="padding:12px 16px">
+  <div class="mon" style="margin:0"><span>Diese Woche</span><span class="sub">Kalender ›</span></div>
+  <div class="week"><div class="wk">Mo<b>11</b></div><div class="wk">Di<b>12</b></div><div class="wk today" style="background:#4a2c1e">Mi<b>13</b></div><div class="wk" style="background:#4a2c1e">Do<b>14</b></div><div class="wk" style="background:#4a2c1e">Fr<b>15</b></div><div class="wk" style="background:var(--cyc-bg)">Sa<b>16</b></div><div class="wk" style="background:var(--cyc-bg)">So<b>17</b></div></div>
+ </div>
+ <div class="pills"><div class="pill on">Werte</div><div class="pill on">Symptome</div><div class="pill">Gewohnheiten</div><div class="pill">Perioden</div></div>
+ <div class="card">
+  <p class="cap" style="margin-left:0">Werte nach Zyklustag</p>
+  <h3>HRV verläuft wie in deinen früheren Zyklen.</h3>
+  <div class="line"><span>HRV</span><span>47 ms</span></div>
+  <div class="line"><span>Ruhepuls</span><span>57 bpm</span></div>
+  <div class="line"><span>Schlaf</span><span>7:14 h</span></div>
+  <div class="fold"><span>Kurve und Grundlage</span><span>⌄</span></div>
+ </div>
+ <div class="card">
+  <p class="cap" style="margin-left:0">Symptome nach Zyklustag</p>
+  <h3>Um Tag 13 trägst du oft Hitzewallungen ein.</h3>
+  <div class="fold"><span>Raster und Grundlage</span><span>⌄</span></div>
+ </div>
+ <p class="sub">Gewohnheiten und Perioden sind ausgeblendet. Die Wahl bleibt beim nächsten Öffnen.</p>
+</div>
+</div>
+
+</div>
+</body>
+</html>

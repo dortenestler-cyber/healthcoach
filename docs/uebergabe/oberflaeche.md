@@ -1,6 +1,13 @@
 # Übergabe · Oberfläche (OF)
-Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWcpKAVS1T6prb5SPNt · seit 2026-11-25
-Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWd9mT296ny9kidDGro
+Belegt: frei
+Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWcpKAVS1T6prb5SPNt
+
+## Konzept Einfach bedienen (PR #146, Entwurf, 25.11.)
+- Dritte Runde nach Aufräumen und Bündeln. Prompt `docs/prompt-einfach.md`, Konzept `docs/konzept-einfach.md`, Skizze `docs/entwurf-einfach.html`, Fotos `docs/bilder/einfach/`.
+- Prüfung mit Beispieldaten über einen nachgebauten Supabase-Server (Playwright, 390 × 844). Größte Hürden: kein zentraler Kalender, keine Liste aller Aktivitäten („Alle ›“ auf Heute führt ins Leere), Status-Block über sechs Trainingsreitern, Zyklus 6,7 Bildschirme.
+- Vorschlag: `/kalender` mit Ebenen-Pillen und Zeitraum-Auswahl, Training nur noch Übersicht · Auswertung (Sportarten als eigene Seiten, Alle Aktivitäten am Ende), Pillen-Baustein mit drei Arten, gemerkt in `settings.data.ansicht` (keine Migration). Acht Pakete, alle OF.
+- Wartet auf: Freigabe der Nutzerin und Antworten auf die vier offenen Fragen am Ende des Konzepts.
+- Nächster Schritt nach Freigabe: Paket 1 Pillen-Baustein (`components/ui/Pille.tsx`), dann Paket 2 Alle Aktivitäten.
 
 ## Karate-Prüfungsprogramm (PR #143, 25.11.)
 - Konzept `docs/konzept-karate-pruefungen.md`, freigegeben 25.11. Training › Karate: Kyu-Chips 5.–1., Ring „x von y sitzen“ mit Satz, Gruppen Kihon/Kata/Kumite/Begriffe, Wiederholung eingeklappt, eigene Punkte je Kyu. Drei Stufen per Tipp, Kata und Kumite klappen in Teile auf. „X. Kyu bestanden“ ab Prüfungsdatum, dann rückt der nächste Kyu nach.
