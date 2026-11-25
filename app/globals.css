@@ -3146,3 +3146,9 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .karate-ueben .kp-row { margin-top: 4px; }
 .karate-ueben-zeile { display: block; margin-top: 2px; }
 .kp-filter { margin: 4px 0 8px; }
+
+/* Tagebuch: Blutung kompakt, passend zur Phase (Wunsch der Nutzerin 25.11.) */
+.tb-blutung .pill { min-height: 36px; padding: 0 4px; border-radius: 12px; }
+.tb-phase { display: block; margin: -2px 0 8px; color: var(--cycle-fg); }
+.tb-ov-auf { margin-top: 10px; align-self: flex-start; width: auto; }
+.tb-jetzt { display: block; margin: 2px 0 6px; }

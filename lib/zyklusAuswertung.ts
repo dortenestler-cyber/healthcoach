@@ -85,3 +85,21 @@ export function symptomHeat(diary: Diary[], muscle?: Map<string, number>): { row
     n: recent.length,
   };
 }
+
+// Tagebuch: Symptome, die du in mindestens der Hälfte deiner letzten (bis zu 4) Zyklen um diesen Zyklustag (±1) eingetragen hast.
+// Häufigste zuerst. Ab 2 ganzen Zyklen, sonst leer. Konzept Einfach, Wunsch der Nutzerin 25.11.
+export function symptomeUmTag(diary: Diary[], cycleDay: number): string[] {
+  const recent = cycles(diary).slice(-4);
+  if (recent.length < 2) return [];
+  const byDay = new Map(diary.map((d) => [d.day, d]));
+  const share = new Map<string, number>();
+  for (const c of recent) {
+    const hit = new Set<string>();
+    for (const i of [cycleDay - 2, cycleDay - 1, cycleDay]) {
+      if (i < 0 || i >= c.length) continue;
+      for (const [k, v] of Object.entries(byDay.get(addDays(c.start, i))?.symptoms ?? {})) if (v > 0) hit.add(k);
+    }
+    for (const k of hit) share.set(k, (share.get(k) ?? 0) + 1 / recent.length);
+  }
+  return [...share.entries()].filter(([, v]) => v >= 0.5).sort((a, b) => b[1] - a[1]).map(([k]) => k);
+}
