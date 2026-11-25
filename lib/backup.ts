@@ -26,6 +26,7 @@ export const TABLES: { name: string; label: string; key: string }[] = [
   { name: "kb_sets", label: "Kettlebell-Sätze", key: "id" },
   { name: "climbs", label: "Bouldern", key: "id" },
   { name: "karate_items", label: "Karate", key: "id" },
+  { name: "karate_progress", label: "Karate-Prüfungsprogramm", key: "user_id,item_key" },
   { name: "coach_chats", label: "Coach-Chats", key: "id" },
   { name: "coach_messages", label: "Coach-Verlauf", key: "id" },
 ];
