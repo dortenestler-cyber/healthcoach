@@ -1,6 +1,7 @@
 "use client";
 
 import { Details, useAbschnitte } from "@/components/ui/Pille";
+import DeinMonatKarte from "@/components/gesundheit/DeinMonatKarte";
 
 import { trainingPatterns } from "@/lib/trainingInsights";
 import { useRefresh } from "@/lib/refresh";
@@ -156,19 +157,7 @@ export default function OverviewSection() {
       {abschnitte.zeigt("monat") && data && (() => {
         // Dein Monat (Konzept Bündeln, Baustein 6): nur was sich deutlich verändert hat, je ein Satz mit Link
         const dm = deinMonat(data, today, (k) => habits.find((h) => h.key === k)?.label ?? k);
-        const n = dm.zeilen.length;
-        return (
-          <section className="card">
-            <span className="eyebrow">Dein Monat · {dm.monat}</span>
-            <h2>{n === 0 ? `Im ${dm.monat} ist alles etwa wie im ${dm.vormonat}.` : n === 1 ? `Eine Sache hat sich gegenüber ${dm.vormonat} verändert.` : `${n} Dinge haben sich gegenüber ${dm.vormonat} verändert.`}</h2>
-            {dm.zeilen.map((z) => (
-              <Link key={z.key} href={z.href} className="card-row list-line unit-link">
-                <span>{z.text}</span>
-                <span className="row-chev" aria-hidden="true">›</span>
-              </Link>
-            ))}
-          </section>
-        );
+        return <DeinMonatKarte today={today} monat={dm.monat} vormonat={dm.vormonat} zeilen={dm.zeilen} />;
       })()}
 
       {abschnitte.zeigt("muster") && (more.length > 0 || signsShown) && (
