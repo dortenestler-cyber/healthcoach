@@ -77,37 +77,37 @@ export const SPOTS: Record<string, { label: string; x: number; y: number; sports
   finger: {
     label: "Finger", x: 145, y: 133, sports: ["klettern"],
     rows: [["Klettern und Bouldern", "Pause, bis der Finger schmerzfrei belastbar ist"], ["Swing und Clean & Press", "Goblet Squat mit lockerem Griff oder Beine ohne Gewicht"], ["Karate: Fauststöße mit Kontakt", "Techniken in die Luft, Kata"]],
-    kyu: "Für den 5. Kyu üben: Stände, Tritte und die Kata-Abfolge. Fauststöße nur in die Luft.",
+    kyu: "Für die Prüfung üben: Stände, Tritte und die Kata-Abfolge. Fauststöße nur in die Luft.",
   },
   hand: {
     label: "Handgelenk", x: 29, y: 121, sports: ["klettern"],
     rows: [["Liegestütz", "Unterarmstütz"], ["Clean & Press", "Goblet Squat"], ["Klettern und Bouldern", "Pause"]],
-    kyu: "Für den 5. Kyu üben: Stände, Tritte und die Kata-Abfolge. Fauststöße nur locker in die Luft.",
+    kyu: "Für die Prüfung üben: Stände, Tritte und die Kata-Abfolge. Fauststöße nur locker in die Luft.",
   },
   schulter: {
     label: "Schulter", x: 117, y: 40, sports: ["klettern"],
     rows: [["Clean & Press und Halo", "Beinübungen wie Goblet Squat"], ["Klettern und Bouldern", "Pause"], ["Karate: Schläge mit voller Kraft", "Tritte und Stände"]],
-    kyu: "Für den 5. Kyu üben: Tritte, Stände und die Kata-Abfolge mit lockeren Armen.",
+    kyu: "Für die Prüfung üben: Tritte, Stände und die Kata-Abfolge mit lockeren Armen.",
   },
   ruecken: {
     label: "Rücken", x: 85, y: 78, sports: [],
     rows: [["Swing und schwere Kettlebell", "Gehen, Mobilität, leichte Kettlebell"], ["Kumite", "Kata langsam und im hohen Stand"]],
-    kyu: "Für den 5. Kyu üben: die Kata langsam und ohne tiefe Stände.",
+    kyu: "Für die Prüfung üben: die Kata langsam und ohne tiefe Stände.",
   },
   knie: {
     label: "Knie", x: 69, y: 175, sports: [],
     rows: [["Ausfallschritt und Goblet Squat", "Oberkörper-Übungen"], ["Karate: Tritte und tiefe Stände", "Arm-Techniken im hohen Stand"], ["Joggen", "Rad fahren nach Gefühl"]],
-    kyu: "Für den 5. Kyu üben: Arm-Techniken aus dem Kihon und die Kata-Abfolge im hohen Stand.",
+    kyu: "Für die Prüfung üben: Arm-Techniken aus dem Kihon und die Kata-Abfolge im hohen Stand.",
   },
   wade: {
     label: "Wade / Achillessehne", x: 102, y: 189, sports: ["klettern"],
     rows: [["Joggen, Springen und Sprints", "Rad fahren oder Rudern nach Gefühl"], ["Bouldern", "Pause, vor allem kein Abspringen"], ["Karate: Tritte und Sprünge", "Arm-Techniken im hohen Stand"], ["Ausfallschritt und tiefe Kniebeuge", "Oberkörper-Übungen, Swing nur wenn schmerzfrei"]],
-    kyu: "Für den 5. Kyu üben: Arm-Techniken aus dem Kihon und die Kata-Abfolge im hohen Stand, ohne Sprünge.",
+    kyu: "Für die Prüfung üben: Arm-Techniken aus dem Kihon und die Kata-Abfolge im hohen Stand, ohne Sprünge.",
   },
   fuss: {
     label: "Fuß", x: 103, y: 221, sports: ["klettern"],
     rows: [["Joggen und Springen", "Rad fahren nach Gefühl"], ["Bouldern", "Pause, vor allem kein Abspringen"], ["Karate-Tritte", "Arm-Techniken im Stand"]],
-    kyu: "Für den 5. Kyu üben: Arm-Techniken und die Kata-Abfolge im Kopf.",
+    kyu: "Für die Prüfung üben: Arm-Techniken und die Kata-Abfolge im Kopf.",
   },
 };
 
@@ -210,4 +210,12 @@ export function usualRange(previous: number[]): { lo: number; hi: number; own: b
   const withData = previous.filter((c) => c > 0);
   if (withData.length < 4) return { lo: 2, hi: 4, own: false };
   return { lo: Math.min(...previous), hi: Math.max(2, ...previous), own: true };
+}
+
+// Hinweis für die Karate-Prüfung bei einer Verletzung, mit dem Kyu, auf den die Nutzerin gerade hinarbeitet.
+// ziel 0 heißt: alle Kyu-Prüfungen bestanden, dann ohne Prüfungsbezug.
+export function kyuHinweis(spot: string, ziel: number): string {
+  const text = SPOTS[spot]?.kyu ?? "";
+  if (ziel < 1) return text.replace("Für die Prüfung üben: ", "Im Karate üben: ");
+  return text.replace("Für die Prüfung üben", `Für den ${ziel}. Kyu üben`);
 }

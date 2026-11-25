@@ -79,3 +79,11 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-25 · OF/DA · Nutzerin: Umsetzung Karate-Prüfungsprogramm freigegeben, vorerst mit gekennzeichneter Vorlage bis zur Prüfungsordnung
 2026-11-25 · OF · Nutzerin: Prüfungsprogramm nach der Prüfungsordnung Shotokan des DKV; Entwurf erst ansehen, dann übernehmen
 2026-11-25 · OF · Nutzerin: Entwurf DKV-Programm freigegeben, in die App übernommen
+2026-11-25 · OF · Nutzerin: dritte Runde „Einfach“: Prüfprompt freigegeben, zentraler Kalender öffnet sich über das Datum auf Heute und ein Kalender-Symbol im Kopf jedes Bereichs (mit passender Ebene vorgewählt), kein sechster Navigationspunkt
+2026-11-25 · OF · Nutzerin: Pillen zum Ein- und Ausblenden merken ihren Zustand
+2026-11-25 · OF · Nutzerin: Konzept Einfach: Tagebuch speichert alles sofort, Knopf „Speichern“ entfällt
+2026-11-25 · OF · Nutzerin: Training nur noch Übersicht · Auswertung, Sportarten als eigene Seiten
+2026-11-25 · OF · Nutzerin: Kalender mit Zeitraum-Auswahl (Periode, krank von–bis, Gewohnheit, Vergleichen)
+2026-11-25 · OF · Nutzerin: Reihenfolge Pillen → Alle Aktivitäten → Kalender → übrige Pakete
+2026-11-25 · OF · Nutzerin: Karate: eigene ruhige Seite (A) und Üben im Alltag (B), Zielkarte für alle Sportarten als Rahmen (C)
+2026-11-25 · OF · Nutzerin: Fehler Verletzungshinweis mit festem 5. Kyu sofort beheben
