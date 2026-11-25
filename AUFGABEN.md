@@ -9,7 +9,7 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ### Abschnitte aus dem Puls (PR #176, 25.11.)
 Enthält die Migration `supabase/migrations/20261130090000_abschnitte.sql` (Spalten `hr_fine`, `garmin_sets`, `segment_count` an den Garmin-Aktivitäten) und eine Änderung an `garmin-sync`. Dein Merge ist die Freigabe.
-- [ ] PR #176 mergen
+- [x] PR #176 gemergt (25. Nov.), Migration grün (geprüft von Claude)
 - [ ] Danach einmal synchronisieren, eine Boulder- oder Kettlebell-Einheit öffnen und die Zahl bestätigen oder korrigieren
 - [ ] Kommt dort „Der Puls in Sekunden kommt mit dem nächsten Abruf“ auch nach dem Abruf, Claude Bescheid sagen (dann liefert Garmin den Detailpfad nicht)
 

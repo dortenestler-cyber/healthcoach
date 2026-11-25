@@ -5,7 +5,7 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017z
 ## Abschnitte aus dem Puls (PR #176, 25.11., Freigabe der Nutzerin)
 - `lib/abschnitte.ts`: `detect` (Spitzen nach Prominenz in Anteil der Pulsreserve, Mindestpause je Sportart, Glättung 15 s), `learnScale` (Faktor 0,6–2,0 aus bis zu 20 bestätigten Einheiten derselben Sportart, ab 2), Regeln `SEGMENT_RULES` für Klettern, Kettlebell, Karate, Ausdauer.
 - `components/training/AbschnitteCard.tsx` in der Einheit nach der Anstrengung: Kurve mit nummerierten Spitzen, Kacheln, − / + und „Stimmt“ schreibt `segment_count`. Vorschlag in dieser Reihenfolge: bestätigt, Kettlebell-Erfassung (`kb_sets` des Tages), Garmins Satzerkennung, Puls.
-- `unitPulse` in `lib/trainingInsights.ts` (Ruhe- und Maximalpuls des Tages), `coachUnitLine` nennt die bestätigte Zahl, sobald `segment_count` in den Aktivitäten geladen wird (`lib/insightData.ts` lädt die Spalte noch nicht, erst nach der Migration ergänzen).
+- `unitPulse` in `lib/trainingInsights.ts` (Ruhe- und Maximalpuls des Tages), `coachUnitLine` nennt die bestätigte Zahl, sobald `segment_count` in den Aktivitäten geladen wird (`lib/insightData.ts` lädt `segment_count` und `rpe` seit PR #177).
 - Test an künstlichen Verläufen: 7 Boulder-Versuche, 12 kurze, 10 Kettlebell-Sätze richtig; 15 Sätze à 30 s / 30 s Pause nur 2 (Pause zu kurz, wird über Bestätigungen gelernt). Nicht im Browser angesehen.
 - Wartet auf: Merge, danach Karte an echten Einheiten ansehen.
 
