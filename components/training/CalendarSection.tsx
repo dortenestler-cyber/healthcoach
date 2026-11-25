@@ -100,6 +100,7 @@ export default function CalendarSection({
       return n ? `${n} ${n === 1 ? "Gewohnheit" : "Gewohnheiten"}` : null;
     },
     krank: (day) => {
+      if (day > today) return null;
       const k = spans.krank.find((x) => covers(x, day));
       const v = spans.verletzt.find((x) => covers(x, day));
       return [k && k.label, v && `${SPOTS[v.spot]?.label ?? "verletzt"} verletzt`].filter(Boolean).join(", ") || null;

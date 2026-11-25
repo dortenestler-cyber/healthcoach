@@ -104,6 +104,9 @@ export default function Monatskalender({ today, diary, ebenen = ["zyklus", "trai
   };
   const shown = cells.filter((c): c is NonNullable<Cell> => !!c);
   const anyPunkte = training && shown.some((c) => punkte!(c.day).length);
+  // Vorgewählte Ebenen zuerst, damit sie in der Zeile zum Wischen sichtbar sind; die Reihenfolge bleibt beim Umschalten gleich
+  const verfuegbar = EBENEN.filter((e) => ebenen.includes(e.key));
+  const reihe = [...verfuegbar.filter((e) => (start ?? ebenen).includes(e.key)), ...verfuegbar.filter((e) => !(start ?? ebenen).includes(e.key))];
   const zEbenen = (Object.keys(ZEICHEN) as ZeichenEbene[]).filter((z) => on.has(z) && ebenen.includes(z) && zeichen?.[z]);
   const zeichenAm = (day: string) => zEbenen.map((z) => ({ z, text: zeichen![z]!(day) })).filter((x): x is { z: ZeichenEbene; text: string } => !!x.text);
 
@@ -116,8 +119,8 @@ export default function Monatskalender({ today, diary, ebenen = ["zyklus", "trai
         <button type="button" className="icon-btn" aria-label="Nächster Monat" disabled={offset >= maxForward} onClick={() => shift(1)}>›</button>
       </div>
       {ebenen.length > 1 && (
-        <PillenZeile label="Ebenen im Kalender" className="mk-ebenen">
-          {EBENEN.filter((e) => ebenen.includes(e.key)).map((e) => (
+        <PillenZeile label="Ebenen im Kalender" className="mk-ebenen" scroll={ebenen.length > 3}>
+          {reihe.map((e) => (
             <Pille key={e.key} an={on.has(e.key)} farbe={e.farbe} onClick={() => toggle(e.key)}>
               {e.label}
             </Pille>

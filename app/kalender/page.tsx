@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import KalenderView, { istVon } from "@/components/kalender/KalenderView";
+import KalenderView from "@/components/kalender/KalenderView";
+import { istVon } from "@/lib/kalender";
 
 export const metadata: Metadata = { title: "Kalender · Health Coach" };
 

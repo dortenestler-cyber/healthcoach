@@ -8,12 +8,11 @@ import { EBENEN, type Ebene } from "@/components/kalender/Monatskalender";
 import { loadInsightData } from "@/lib/insightData";
 import { useRefresh } from "@/lib/refresh";
 import type { Data } from "@/lib/insights";
+import type { Von } from "@/lib/kalender";
 
 // Zentraler Kalender (Konzept docs/konzept-einfach.md, Paket 3). Kein eigener Navigationspunkt:
 // Er öffnet sich über das Datum auf Heute und über das Kalender-Symbol im Kopf jedes Bereichs.
 // Jeder Einstieg bringt seine Ebenen mit und merkt sich die Wahl für sich (Logbuch 25.11.).
-
-export type Von = "heute" | "tagebuch" | "training" | "zyklus" | "gesundheit";
 
 const VORWAHL: Record<Von, { start: Ebene[]; zurueck: [string, string] }> = {
   heute: { start: ["zyklus", "training", "symptome"], zurueck: ["/", "Heute"] },
@@ -22,8 +21,6 @@ const VORWAHL: Record<Von, { start: Ebene[]; zurueck: [string, string] }> = {
   zyklus: { start: ["zyklus", "symptome"], zurueck: ["/zyklus", "Zyklus"] },
   gesundheit: { start: ["krank", "medikamente"], zurueck: ["/gesundheit", "Gesundheit"] },
 };
-
-export const istVon = (v: string | undefined): v is Von => !!v && v in VORWAHL;
 
 export default function KalenderView({ von, tag }: { von: Von; tag?: string }) {
   const [data, setData] = useState<Data | null>(null);
