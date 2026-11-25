@@ -11,7 +11,7 @@ import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay } from "@/lib/dates";
 import { SPOTS, type Illness, type Injury, type Intake, type Medication } from "@/lib/health";
 import { DEFAULT_HABITS, loadHabits, type Habit } from "@/lib/habits";
-import { frequency, hrvEffect, MIN_NIGHTS } from "@/lib/habitStats";
+import { hrvEffect, MIN_NIGHTS } from "@/lib/habitStats";
 import { loadInsightData } from "@/lib/insightData";
 import { patterns, type Data } from "@/lib/insights";
 import { groupsFor } from "@/lib/intakes";
@@ -21,10 +21,9 @@ import { MIN_EVENT_DAYS } from "@/lib/muster";
 import { ZusammenhangListe } from "@/components/ui/Zusammenhang";
 import { deinMonat } from "@/lib/deinMonat";
 
-const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 const ms = (v: number) => `${Math.round(v)} ms`;
 
-// Gesundheit › Überblick (Konzept dunkel 2): heute auf einen Blick, was dir guttut, Gewohnheiten im Monat, weitere Muster.
+// Gesundheit › Überblick (Konzept dunkel 2): heute auf einen Blick, was dir guttut (mit Wegen zu jeder Gewohnheit), Dein Monat, weitere Muster.
 // Muster mit Zyklusbezug stehen auf der Seite Zyklus.
 export default function OverviewSection() {
   const [data, setData] = useState<Data | null>(null);
@@ -71,11 +70,9 @@ export default function OverviewSection() {
   // Anzeichen-Muster (Sammelliste Punkt 19): nur zeigen, wenn es schon Anzeichen gibt
   const signs = data ? signAnalysis(data, { muscle: [], intakes: [], illnesses: allIll }, today) : null;
   const signsShown = signs && signs.eventDays > 0 ? signs : null;
-  const freq = data ? habits.map((h) => ({ h, f: frequency(data.diary, h.key, today) })).filter((x) => x.f.month > 0 || x.f.prevMonth > 0) : [];
   // Training-Muster nur, wenn sie schon etwas zeigen; alle stehen unter Training › Insights
   const more = data ? [...patterns(data).filter((p) => p.key !== "zyklus"), ...trainingPatterns(data).filter((p) => p.ready)] : [];
   const injury = injuries[0];
-  const month = MONTHS[Number(today.slice(5, 7)) - 1];
 
   return (
     <>
@@ -130,6 +127,15 @@ export default function OverviewSection() {
           />
         )}
         {waiting.length > 0 && <span className="meta">Noch zu wenige Nächte: {waiting.map((x) => `${x.h.label} (${x.c.nWith} von ${MIN_NIGHTS})`).join(", ")}.</span>}
+        {/* Jede Gewohnheit hat ihre Seite (CLAUDE.md); „Gewohnheiten im Monat“ ist entfallen (Nutzerin 25.11.), die Wege stehen hier */}
+        <span className="meta">Jede Gewohnheit im Einzelnen:</span>
+        <div className="pills wrap">
+          {habits.filter((h) => h.on).map((h) => (
+            <Link key={h.key} href={`/wert/gewohnheit-${encodeURIComponent(h.key)}`} className="pill pill-sm habit-link">
+              {h.label} ›
+            </Link>
+          ))}
+        </div>
         {best && Math.abs(best.c.diff as number) >= 2 && (
           <ExplainCard tone="recovery">
             Nach <strong>{best.c.nWith} Tagen mit „{best.h.label}“</strong> lag deine HRV im Schnitt <strong>{ms(Math.abs(best.c.diff as number))} {(best.c.diff as number) >= 0 ? "höher" : "niedriger"}</strong> als in Nächten ohne.
@@ -155,28 +161,6 @@ export default function OverviewSection() {
           </section>
         );
       })()}
-
-      <section className="card">
-        <div className="card-row">
-          <span className="eyebrow">Gewohnheiten im {month}</span>
-          <Link href="/einstellungen/gewohnheiten" className="settings-link">Verwalten ›</Link>
-        </div>
-        {!freq.length && <p>Trag Gewohnheiten wie Sauna oder Alkohol im Tagebuch ein, dann erscheinen sie hier.</p>}
-        <div className="factor-list">
-          {freq.map(({ h, f }) => (
-            <Link key={h.key} href={`/wert/gewohnheit-${encodeURIComponent(h.key)}`} className="habit-month-row">
-              <span className="row-strong habit-month-name">{h.label}</span>
-              <span className="habit-weeks" role="img" aria-label={`Letzte 4 Wochen: ${f.weeks.join(", ")} Mal`}>
-                {f.weeks.map((n, i) => (
-                  <span key={i} className="habit-week"><span style={{ height: `${Math.min(100, (n / 4) * 100)}%` }} /></span>
-                ))}
-              </span>
-              <span className="habit-month-count">{f.month}×</span>
-              <span aria-hidden="true" className="meta">›</span>
-            </Link>
-          ))}
-        </div>
-      </section>
 
       {(more.length > 0 || signsShown) && (
         <section className="card">

@@ -167,7 +167,7 @@ Biologisches Alter und Alterungstempo (05), empfohlene Schlafens- und Aufstehzei
 - **Gesundheit** mit den Reitern Überblick · Medikamente · Krank & verletzt · Körper. Der Überblick zeigt:
   - heute auf einen Blick: Einnahmen als Ring, Krankheit, Verletzung
   - „Was dir guttut“: HRV der Nacht danach je Gewohnheit, über alle Tage
-  - Gewohnheiten im Monat mit den letzten 4 Wochen
+  - Gewohnheiten im Monat mit den letzten 4 Wochen (entfallen am 25.11., ersetzt durch „Dein Monat“, Konzept Bündeln)
   - „Weitere Muster“ (vorher auf der Seite Zyklus)
 - **Gewohnheiten** statt „Einflüsse“:
   - Erfassen im Tagebuch per Tipp. Sauna mit freiwilligen Details: Gänge, Wann, Kältebecken.

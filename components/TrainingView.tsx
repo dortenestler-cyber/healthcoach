@@ -10,7 +10,6 @@ import WeekLoadCard from "@/components/training/WeekLoadCard";
 import RatioCard from "@/components/training/RatioCard";
 import BelastungZeitCard from "@/components/training/BelastungZeitCard";
 import HabitCard from "@/components/training/HabitCard";
-import MonthReviewCard from "@/components/training/MonthReviewCard";
 import { isoDay } from "@/lib/dates";
 import { loadInsightData } from "@/lib/insightData";
 import { firstAlltagDay, type Data } from "@/lib/insights";
@@ -109,7 +108,6 @@ export default function TrainingView({ initial }: { initial: string }) {
             <>
               <WeekLoadCard data={data} alltag={withAlltag} />
               {data && <HabitCard today={isoDay()} data={data} />}
-              {data && <MonthReviewCard today={isoDay()} data={data} />}
             </>
           }
         />

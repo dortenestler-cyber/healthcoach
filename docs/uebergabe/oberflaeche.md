@@ -13,6 +13,11 @@ Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014p
 
 
 
+
+## Gewohnheiten im Monat und Monatsrückblick entfernt (PR #140, 25.11.)
+- Wunsch der Nutzerin: „Dein Monat“ ersetzt beide. `MonthReviewCard` gelöscht, Karte „Gewohnheiten im …“ aus `OverviewSection` entfernt, tote Stile (`review-*` außer count/number/unit, `habit-month-*`, `habit-week*`) entfernt.
+- Wege zu jeder Gewohnheit (CLAUDE.md: jede Gewohnheit hat eine Seite): Tasten unter „Was dir guttut“ (`.habit-link`). CLAUDE.md, `docs/design-konzept-dunkel.md`, `docs/konzept-buendeln.md` angepasst.
+
 ## Bündeln Baustein Raster und Rückblick (PR #139, 24.11.) · Konzept Bündeln fertig
 - `components/ui/Raster.tsx`: Kästchen-Raster (Wochen × 7, Monatsnamen, Legende), `tone` training/neutral. Genutzt in `HabitCard` (24 Wochen) und `HabitDetail` (13 Wochen). Tagebuch-Raster (Zeile je Symptom, Stärke) bleibt eigen.
 - `lib/deinMonat.ts` + Karte „Dein Monat“ auf Gesundheit › Überblick (vor „Gewohnheiten im …“): Werte mit deutlicher Änderung (`monatsBlick.deutlich`: halbe Bereichsbreite, sonst 10 %, nach Runden sichtbar), Training je Sportart und Gewohnheiten (bis heute gegen dieselben Tage im Vormonat, ab 2 bzw. 3 Unterschied). Sätze in `lib/monat.ts` ohne Verb („Schritte: im November im Schnitt …“).

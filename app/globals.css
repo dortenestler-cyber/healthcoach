@@ -2357,27 +2357,8 @@ body { overflow-x: clip; }
 .legend .habit-key-off { background: var(--fill); }
 .legend .habit-key-on { background: var(--training); }
 .review-count { display: flex; align-items: baseline; gap: 8px; }
-.review-arrow { font-size: 20px; color: var(--training); }
 .review-number { font-size: 44px; font-weight: 800; line-height: 1; letter-spacing: -0.02em; }
 .review-unit { font-size: 20px; font-weight: 600; }
-.review-grid { row-gap: 6px; padding-top: 2px; }
-.review-grid > span { height: 44px; display: flex; align-items: center; justify-content: center; }
-.review-day { font-size: 12px; color: var(--muted); }
-.review-future { color: var(--line-strong); }
-.review-today-plain { color: var(--text); font-weight: 700; }
-.review-bubble {
-  width: 40px;
-  height: 40px !important;
-  margin: 2px auto;
-  border-radius: 20px;
-  flex-direction: column;
-  line-height: 1.05;
-}
-.review-bubble b { font-size: 12px; font-weight: 800; }
-.review-bubble small { font-size: 9px; font-weight: 700; }
-.review-today { box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--text); }
-.review-key { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 11px; margin-right: 6px; vertical-align: middle; }
-.review-icon { display: inline-flex; align-items: center; gap: 1px; }
 
 /* Coach (Muster 17) */
 .coach-mark {
@@ -2441,7 +2422,6 @@ body { overflow-x: clip; }
 .pin-num { font-size: 30px; font-weight: 500; line-height: 1; }
 .pin-letters { height: 11px; font-size: 9px; font-weight: 600; letter-spacing: 0.18em; color: var(--muted); }
 .pin-foot { margin-top: 8px; max-width: 300px; font-size: 12px; color: var(--muted); }
-.review-filter .pill { display: inline-flex; flex-direction: row; align-items: center; gap: 2px; }
 
 /* Gesundheit › Überblick und Gewohnheiten (Konzept dunkel 2) */
 .glance-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
@@ -2464,12 +2444,6 @@ body { overflow-x: clip; }
 .glance-badge { width: 44px; height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; }
 .glance-ok { background: var(--recovery-bg); color: var(--recovery-fg); }
 .glance-warn { background: var(--warn-bg); color: var(--warn-fg); font-size: 12px; }
-.habit-month-row { display: flex; align-items: center; gap: 12px; min-height: 52px; color: var(--text); text-decoration: none; }
-.habit-month-name { flex: 1; min-width: 0; }
-.habit-weeks { display: flex; gap: 3px; }
-.habit-week { width: 8px; height: 22px; border-radius: 3px; background: var(--fill); display: flex; align-items: flex-end; overflow: hidden; }
-.habit-week span { display: block; width: 100%; background: var(--muted); border-radius: 3px; }
-.habit-month-count { width: 40px; text-align: right; font-size: 16px; font-weight: 700; }
 .pattern-block { display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
 .pattern-title { color: var(--text-2); }
 .pattern-text { font-size: 16px; font-weight: 600; line-height: 1.4; color: var(--text); }
@@ -3071,3 +3045,6 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .zh-satz { font-size: 15px; line-height: 1.45; color: var(--text); }
 .zh-deutlich { background: var(--card-2); color: var(--text); }
 .zh-vorlaeufig { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+
+/* Gesundheit › Überblick: Wege zu jeder Gewohnheit als Tasten */
+.habit-link { text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; }
