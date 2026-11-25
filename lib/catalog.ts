@@ -123,3 +123,12 @@ export const GRID_ROWS: { key: string; label: string }[] = [
   { key: "reiz", label: "Reizbarkeit" },
   { key: "erschoepf", label: "Erschöpfung" },
 ];
+
+// Häufig in dieser Zyklusphase (allgemein, keine Diagnose). Ergänzt im Tagebuch die eigenen Muster.
+export const PHASE_SYMPTOME: Record<"menstruation" | "follikel" | "eisprung" | "luteal-frueh" | "luteal-spaet", string[]> = {
+  menstruation: ["kraempfe", "ruecken", "erschoepf", "kopf"],
+  follikel: [],
+  eisprung: ["libido"],
+  "luteal-frueh": ["brust", "blaeh", "haut"],
+  "luteal-spaet": ["brust", "blaeh", "heisshunger", "reiz", "stimmung", "haut", "schlaf"],
+};

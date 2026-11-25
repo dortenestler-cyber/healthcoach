@@ -5,7 +5,12 @@ import TwoCol from "@/components/ui/TwoCol";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, longDate } from "@/lib/dates";
-import { BLEEDING, LEVELS, SIGNS, splitFrequent, SYMPTOMS } from "@/lib/catalog";
+import { BLEEDING, LEVELS, PHASE_SYMPTOME, SIGNS, splitFrequent, SYMPTOMS } from "@/lib/catalog";
+import { cycleToday, PHASES } from "@/lib/cycle";
+import { symptomeUmTag } from "@/lib/zyklusAuswertung";
+import { loadGarminCycles, mergeGarminCycles } from "@/lib/garminZyklus";
+import { loadOvulation, withOvulation } from "@/lib/ovulation";
+import { markAutoRows, type Diary } from "@/lib/insights";
 import { OVULATION_SIGNS } from "@/lib/ovulation";
 import { DEFAULT_HABITS, loadHabits, SAUNA_GAENGE, SAUNA_WANN, WANN_LABEL, type Habit, type HabitDetails, type SaunaDetails } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
@@ -45,6 +50,8 @@ export default function TagebuchView({ initial }: { initial?: string }) {
   const [status, setStatus] = useState<"" | "speichert" | "gespeichert">("");
   const [dirty, setDirty] = useState(false);
   const [blatt, setBlatt] = useState(false); // Monat als Blatt zum Tag wählen
+  const [zDiary, setZDiary] = useState<Diary[] | null>(null); // mit Garmin-Zyklen und Eisprung-Zeichen, für die Phase
+  const [ovOffen, setOvOffen] = useState(false);
   const [error, setError] = useState("");
   const [moreSym, setMoreSym] = useState(false);
   const [moreSign, setMoreSign] = useState(false);
@@ -60,7 +67,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
     const sb = supabase();
     if (!sb) return;
     const [h, d] = await Promise.all([
-      sb.from("diary_entries").select("day, bleeding, symptoms, influences").gte("day", isoDay(daysAgo(120))).order("day"), // 4 Monate für die Phasen im Blatt
+      sb.from("diary_entries").select("day, bleeding, symptoms, influences").gte("day", isoDay(daysAgo(200))).order("day"), // gut 6 Monate: Phasen im Blatt und „oft um diesen Zyklustag“
       sb.from("diary_entries").select("day, bleeding, symptoms, influences").eq("day", day).maybeSingle(),
     ]);
     if (h.error || d.error) {
@@ -68,6 +75,10 @@ export default function TagebuchView({ initial }: { initial?: string }) {
       return;
     }
     setHistory((h.data ?? []) as Entry[]);
+    // Phase wie auf der Seite Zyklus: Tagebuch, Lücken aus Garmin, Eisprung-Zeichen
+    Promise.all([loadGarminCycles(sb, isoDay(daysAgo(200))), loadOvulation(sb, isoDay(daysAgo(200)))])
+      .then(([gc, ov]) => setZDiary(withOvulation(mergeGarminCycles(markAutoRows(((h.data ?? []) as Entry[]).map((e) => ({ ...e, symptoms: e.symptoms ?? {}, influences: e.influences ?? [] })) as (Diary & { manual?: boolean })[]), gc), ov)))
+      .catch(() => setZDiary(null));
     const t = d.data as Entry | null;
     setBleeding(t?.bleeding ?? 0);
     setSymptoms(t?.symptoms ?? {});
@@ -157,7 +168,13 @@ export default function TagebuchView({ initial }: { initial?: string }) {
   const seit = isoDay(daysAgo(DAYS - 1));
   const recent = history.filter((e) => e.day >= seit); // Rest unter „Weitere anzeigen“ (Sammelliste 5e)
   const usedSym = new Set<string>([...Object.keys(symptoms).filter((k) => symptoms[k] > 0), ...recent.flatMap((e) => Object.keys(e.symptoms ?? {}).filter((k) => (e.symptoms[k] ?? 0) > 0))]);
-  const symSplit = splitFrequent(SYMPTOMS, usedSym);
+  // Passt zu jetzt (Wunsch der Nutzerin 25.11.): eigene Muster um diesen Zyklustag zuerst, dann typisch für die Phase
+  const ct = zDiary ? cycleToday(day, zDiary) : null;
+  const eigeneJetzt = ct?.cycleDay ? symptomeUmTag(zDiary!, ct.cycleDay) : [];
+  const jetztKeys = [...eigeneJetzt, ...(ct?.phase ? PHASE_SYMPTOME[ct.phase] : []).filter((k) => !eigeneJetzt.includes(k))].filter((k) => SYMPTOMS.some((x) => x.key === k)).slice(0, 6);
+  const jetzt = jetztKeys.map((k) => SYMPTOMS.find((x) => x.key === k)!);
+  const symSplit = splitFrequent(SYMPTOMS.filter((x) => !jetztKeys.includes(x.key)), usedSym);
+  const zeigeEisprung = ct?.phase === "eisprung" || ovSigns.length > 0 || ovOffen;
   const signSplit = splitFrequent(SIGNS, usedSym);
   const usedHab = new Set<string>([...influences, ...recent.flatMap((e) => e.influences ?? [])]);
   const habSplit = splitFrequent(habits.filter((h) => h.on || influences.includes(h.key)), usedHab);
@@ -208,16 +225,24 @@ export default function TagebuchView({ initial }: { initial?: string }) {
           <h2>Blutung</h2>
           {feat.zyklus && <Link href="/zyklus#perioden" className="settings-link">Frühere nachtragen ›</Link>}
         </div>
-        <div className="grid-5">
+        {feat.zyklus && ct?.phase && ct.cycleDay !== null && (
+          <span className="meta tb-phase">Zyklustag {ct.cycleDay} · {PHASES[ct.phase].label} (geschätzt)</span>
+        )}
+        <div className="grid-5 tb-blutung">
           {BLEEDING.map((l, i) => (
-            <button key={l} type="button" className="pill pill-box" aria-pressed={bleeding === i} onClick={() => { setBleeding(i); changed(); }}>
+            <button key={l} type="button" className="pill pill-sm" aria-pressed={bleeding === i} onClick={() => { setBleeding(i); changed(); }}>
               {l}
             </button>
           ))}
         </div>
-        {feat.zyklus && ovReady && (
+        {feat.zyklus && ovReady && !zeigeEisprung && (
+          <button type="button" className="pill pill-sm pill-quiet tb-ov-auf" onClick={() => setOvOffen(true)}>
+            + Eisprung-Zeichen
+          </button>
+        )}
+        {feat.zyklus && ovReady && zeigeEisprung && (
           <>
-            <span className="meta ov-label">Eisprung-Zeichen (wenn du eines bemerkst)</span>
+            <span className="meta ov-label">Eisprung-Zeichen{ct?.phase === "eisprung" ? " · du bist im Eisprung-Fenster (geschätzt)" : " (wenn du eines bemerkst)"}</span>
             <div className="pills wrap">
               {OVULATION_SIGNS.map((o) => {
                 const on = ovSigns.includes(o.key);
@@ -237,6 +262,22 @@ export default function TagebuchView({ initial }: { initial?: string }) {
           <h2>Symptome</h2>
           <span className="meta">Tippen: leicht, mittel, stark</span>
         </div>
+        {jetzt.length > 0 && (
+          <>
+            <span className="meta tb-jetzt">Passt zu jetzt{ct?.phase ? ` · ${PHASES[ct.phase].label}` : ""}</span>
+            <div className="pills wrap">
+              {jetzt.map((s) => {
+                const v = symptoms[s.key] ?? 0;
+                return (
+                  <button key={s.key} type="button" className={"pill level-" + v} onClick={() => { setSymptoms({ ...symptoms, [s.key]: (v + 1) % 4 }); changed(); }}>
+                    {s.label}{v ? " · " + LEVELS[v] : eigeneJetzt.includes(s.key) ? " · oft um diesen Tag" : ""}
+                  </button>
+                );
+              })}
+            </div>
+            <span className="meta tb-jetzt">Sonst oft</span>
+          </>
+        )}
         <div className="pills wrap">
           {[...symSplit.top, ...(moreSym ? symSplit.rest : [])].map((s) => {
             const v = symptoms[s.key] ?? 0;
