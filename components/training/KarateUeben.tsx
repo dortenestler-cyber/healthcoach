@@ -59,7 +59,8 @@ export function KarateUebenZeile({ tag }: { tag: string }) {
   if (!punkte?.length) return null;
   return (
     <Link href="/training/karate" className="link-small karate-ueben-zeile">
-      Heute üben: {punkte.map((p) => p.name.replace(/,.*$/, "")).join(" · ")} ›
+      Heute üben: {punkte.slice(0, 2).map((p) => p.name.replace(/^\d+\.\s*/, "").replace(/,.*$/, "")).join(", ")}
+      {punkte.length > 2 ? ` und ${punkte.length - 2} weitere` : ""} ›
     </Link>
   );
 }

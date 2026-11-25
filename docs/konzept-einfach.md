@@ -223,7 +223,7 @@ Jedes Paket ist ein eigener PR mit Fotos vorher/nachher. Alle Pakete gehören zu
 | 6 | Zeitraum im Kalender ✓ (PR #155) | mittel | Mehrere Tage wählen: Periode, krank, Gewohnheit, vergleichen |
 | 7 | Tagebuch ruhiger ✓ (PR #156) | mittel | Datum als Kalender-Blatt, Hinweise raus, Verlauf raus, ein Speicherweg (siehe Frage 1) |
 | 8 | Details einklappen ✓ (PR #157) | mittel | Einblende-Pillen in Musterkarten, Auswertung, Detailseiten |
-| 9 | Karate | mittel | Zielkarte für alle Sportarten, ruhige Karate-Seite, „Heute üben“ und „Was saß heute?“ (Abschnitt H) |
+| 9 | Karate ✓ (PR #159) | mittel | Zielkarte für alle Sportarten, ruhige Karate-Seite, „Heute üben“ und „Was saß heute?“ (Abschnitt H) |
 
 ### Entscheidungen der Nutzerin (25.11.)
 
@@ -253,5 +253,7 @@ Freigegeben: A und B, mit C als Rahmen.
 - An Karate-Tagen steht unter „Heute steht an“ und im Tagesblatt: „Heute üben“ mit 3–5 Punkten. Auswahl: zuerst „übe ich“, dann „offen“, Punkte, die lange nicht dran waren, zuerst. Bei Verletzung nur, was der Hinweis erlaubt.
 - Nach einer Karate-Einheit (Garmin oder erfasst) fragt die Einheit-Seite: „Was saß heute?“ mit denselben Punkten, ein Tipp je Punkt setzt die Stufe.
 - Merkt sich, wann ein Punkt zuletzt dran war, in `settings.data.karate.zuletzt` (keine Migration).
+
+Umgesetzt (PR #159): Zielkarte (`components/training/Zielkarte.tsx`) auf der Karate-Seite und als Karate-Kachel („12/31 sitzen · 4. Kyu“). Bouldern und Kettlebell zeigen in der Kachel noch Trainingstage, ihre Zielkarte folgt.
 
 Behoben am 25.11. (vorab): Der Hinweis bei Verletzung nennt den Kyu der nächsten Prüfung statt fest den 5. Kyu (`kyuHinweis` in `lib/health.ts`, genutzt auf Gesundheit › Krank & verletzt und Training › Karate).

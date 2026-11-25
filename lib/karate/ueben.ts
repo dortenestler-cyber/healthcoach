@@ -21,8 +21,15 @@ export function waehleUeben(kyu: number, progress: Map<string, Status>, zuletzt:
     .map((p) => ({ p, s: stand(p, progress) }))
     .filter((x) => x.s !== "sitzt")
     .sort((a, b) => rang(a.s) - rang(b.s) || (zuletzt[a.p.key] ?? "").localeCompare(zuletzt[b.p.key] ?? "") || Number(!!a.p.wiederholung) - Number(!!b.p.wiederholung))
-    .slice(0, ANZAHL)
     .map((x) => x.p);
+}
+
+// Gruppen mischen: zuerst je Gruppe der wichtigste Punkt, dann auffüllen
+function mischen(liste: Punkt[]): Punkt[] {
+  const erst: Punkt[] = [];
+  const gruppen = new Set<string>();
+  for (const p of liste) if (!gruppen.has(p.gruppe)) (gruppen.add(p.gruppe), erst.push(p));
+  return [...erst, ...liste.filter((p) => !erst.includes(p))].slice(0, ANZAHL);
 }
 
 // Auswahl für einen Tag: gespeicherte nehmen, sonst neu wählen (und zurückgeben, ob sie neu ist)
@@ -33,7 +40,7 @@ export function uebenFuer(tag: string, merk: KarateMerk, progress: Map<string, S
     const punkte = merk.ueben.keys.map((k) => alle.find((p) => p.key === k)).filter((p): p is Punkt => !!p);
     if (punkte.length) return { punkte, neu: false };
   }
-  return { punkte: waehleUeben(kyu, progress, merk.zuletzt ?? {}, verletzt), neu: true };
+  return { punkte: mischen(waehleUeben(kyu, progress, merk.zuletzt ?? {}, verletzt)), neu: true };
 }
 
 // Fortschritt für den Kyu: Punkte ohne Begriffe und ohne Wiederholung, dazu eigene Punkte (wie der Ring auf der Karate-Seite)
