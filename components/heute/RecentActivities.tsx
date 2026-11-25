@@ -27,7 +27,7 @@ export default function RecentActivities({ day, data }: { day: string; data: Dat
     <section aria-label="Letzte Aktivitäten">
       <div className="sec-head">
         <h2 className="sec-title">Letzte Aktivitäten</h2>
-        <Link href="/training?t=kalender#aktivitaeten" className="sec-link">
+        <Link href="/training#aktivitaeten" className="sec-link">
           Alle ›
         </Link>
       </div>

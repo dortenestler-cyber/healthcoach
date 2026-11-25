@@ -1,47 +1,44 @@
 "use client";
 
+import Link from "next/link";
 import { useRefresh } from "@/lib/refresh";
 import { useCallback, useEffect, useState } from "react";
 import TwoCol from "@/components/ui/TwoCol";
 import PageHead from "@/components/PageHead";
-import { useFeatures, type Feature } from "@/lib/prefs";
+import { useFeatures } from "@/lib/prefs";
 import TargetSection from "@/components/training/TargetSection";
 import WeekLoadCard from "@/components/training/WeekLoadCard";
 import RatioCard from "@/components/training/RatioCard";
 import BelastungZeitCard from "@/components/training/BelastungZeitCard";
 import HabitCard from "@/components/training/HabitCard";
-import { isoDay } from "@/lib/dates";
+import { daysAgo, isoDay } from "@/lib/dates";
 import { loadInsightData } from "@/lib/insightData";
 import { firstAlltagDay, type Data } from "@/lib/insights";
 import CalendarSection from "@/components/training/CalendarSection";
-import KettlebellSection from "@/components/training/KettlebellSection";
-import ClimbSection from "@/components/training/ClimbSection";
-import KarateSection from "@/components/training/KarateSection";
-import AlleAktivitaeten from "@/components/training/AlleAktivitaeten";
 import InsightsSection from "@/components/training/InsightsSection";
+import AlleAktivitaeten from "@/components/training/AlleAktivitaeten";
+import SportIcon from "@/components/ui/SportIcon";
+import { useAbschnitte } from "@/components/ui/Pille";
+import { sportOf, SPORTS, type Sport } from "@/lib/training";
+import { SPORT_SEITEN } from "@/lib/sportSeiten";
 
+// Training (Konzept docs/konzept-einfach.md, Paket 4): zwei Reiter statt sechs.
+// Übersicht: Status kompakt · Diese Woche (Streifen + Tagesblatt) · Deine Sportarten · Alle Aktivitäten.
+// Auswertung: Ziel · Verlauf · Woche · Insights, per Abschnitts-Pillen ein- und ausblendbar.
+// Karate, Kettlebell und Bouldern haben eigene Seiten (/training/karate usw.).
 const TABS: [string, string][] = [
-  ["kalender", "Kalender"],
+  ["uebersicht", "Übersicht"],
   ["auswertung", "Auswertung"],
-  ["insights", "Insights"],
-  ["kettlebell", "Kettlebell"],
-  ["klettern", "Bouldern"],
-  ["karate", "Karate"],
 ];
-
-// Training: Status oben, darunter Reiter Kalender · Auswertung · Insights · die drei Sportarten mit eigenen Zielen.
-// Auswertung bündelt Tagesziel, Lastkurve, Wochenlast, Trainingstage und Monatsrückblick.
-const TAB_FEATURE: Record<string, Feature> = {kettlebell: "kettlebell", klettern: "bouldern", karate: "karate"};
+// Alte Adressen (?t=kalender, ?t=insights) zeigen auf den passenden Reiter
+const ALT: Record<string, string> = { kalender: "uebersicht", insights: "auswertung", auswertung: "auswertung", uebersicht: "uebersicht" };
 
 export default function TrainingView({ initial }: { initial: string }) {
-  const [tab, setTab] = useState(TABS.some(([k]) => k === initial) ? initial : "kalender");
-  // Links auf einen Reiter (z. B. /training?t=auswertung von Heute) wechseln ihn auch, wenn die Seite schon offen ist
+  const [tab, setTab] = useState(ALT[initial] ?? "uebersicht");
   useEffect(() => {
-    if (TABS.some(([k]) => k === initial)) setTab(initial);
+    if (ALT[initial]) setTab(ALT[initial]);
   }, [initial]);
   const feat = useFeatures();
-  const tabs = TABS.filter(([k]) => !TAB_FEATURE[k] || feat[TAB_FEATURE[k]]);
-  const shown = tabs.some(([k]) => k === tab) ? tab : tabs[0][0];
   const [data, setData] = useState<Data | null>(null);
   const [error, setError] = useState("");
   // Last mit Alltag (Standard) oder nur Training wie bei Garmin; merkt sich die Wahl auf diesem Gerät
@@ -74,54 +71,90 @@ export default function TrainingView({ initial }: { initial: string }) {
   }, [loadData]);
   useRefresh(loadData);
 
+  const abschnitte = useAbschnitte("training.auswertung", [
+    ["ziel", "Ziel"],
+    ["verlauf", "Verlauf"],
+    ["woche", "Woche"],
+    ["insights", "Insights"],
+  ]);
+
+  const alltagSchalter = hasAlltag && (
+    <div className="segmented" role="group" aria-label="Welche Belastung zählt">
+      <button type="button" aria-pressed={alltag} onClick={() => setAlltag(true)}>
+        Mit Alltag
+      </button>
+      <button type="button" aria-pressed={!alltag} onClick={() => setAlltag(false)}>
+        Nur Training
+      </button>
+    </div>
+  );
+
+  // Sportarten mit eigener Seite, nur eingeschaltete Funktionen
+  const sportarten = SPORT_SEITEN.filter((s) => feat[s.feature]);
+  const seit = isoDay(daysAgo(27));
+  const anzahl = (sp: Sport) => (data ? new Set(data.acts.filter((a) => sportOf(a) === sp && (a.start_local ?? "") >= seit).map((a) => (a.start_local ?? "").slice(0, 10))).size + (data.done ?? []).filter((d) => d.sport === sp && d.day >= seit && !data.acts.some((a) => sportOf(a) === sp && (a.start_local ?? "").startsWith(d.day))).length : null);
+
   return (
     <>
       <PageHead title="Training" sub="Karate, Bouldern, Kettlebell und Ausdauer" tone="training" kalender="training" />
       {error && <p className="alert" role="alert">{error}</p>}
-      {hasAlltag && (
-        <div className="segmented" role="group" aria-label="Welche Belastung zählt">
-          <button type="button" aria-pressed={alltag} onClick={() => setAlltag(true)}>
-            Mit Alltag
-          </button>
-          <button type="button" aria-pressed={!alltag} onClick={() => setAlltag(false)}>
-            Nur Training
-          </button>
-        </div>
-      )}
-      {data && <RatioCard today={isoDay()} data={data} alltag={withAlltag} />}
-      <div className="segmented segmented-tabs training-tabs" role="group" aria-label="Bereich">
-        {tabs.map(([k, l]) => (
-          <button key={k} type="button" aria-pressed={shown === k} onClick={() => setTab(k)}>
+      <div className="segmented segmented-tabs" role="group" aria-label="Bereich">
+        {TABS.map(([k, l]) => (
+          <button key={k} type="button" aria-pressed={tab === k} onClick={() => setTab(k)}>
             {l}
           </button>
         ))}
       </div>
-      {shown === "kalender" && (
+
+      {tab === "uebersicht" && (
         <>
-          <CalendarSection data={data} kompakt />
+          {data && <RatioCard today={isoDay()} data={data} alltag={withAlltag} zusatz={alltagSchalter} />}
+          <CalendarSection data={data} kompakt woche />
+          {sportarten.length > 0 && (
+            <section className="card" aria-label="Deine Sportarten">
+              <h2>Deine Sportarten</h2>
+              <div className="sport-kacheln">
+                {sportarten.map((s) => {
+                  const n = anzahl(s.sport);
+                  return (
+                    <Link key={s.slug} href={`/training/${s.slug}`} className="sport-kachel">
+                      <span className="today-act-icon is-training" aria-hidden="true">
+                        <SportIcon sport={s.sport} size={20} />
+                      </span>
+                      <span className="sport-kachel-name">{SPORTS[s.sport].label}</span>
+                      <span className="sport-kachel-wert">{n === null ? "–" : `${n} ${n === 1 ? "Tag" : "Tage"}`}</span>
+                      <span className="meta">in 4 Wochen</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          )}
           <AlleAktivitaeten />
         </>
       )}
-      {shown === "auswertung" && (
-        <TwoCol
-          left={
-            <>
-              {feat.tagesziel && data && <TargetSection data={data} />}
-              {data && <BelastungZeitCard today={isoDay()} data={data} alltag={withAlltag} />}
-            </>
-          }
-          right={
-            <>
-              <WeekLoadCard data={data} alltag={withAlltag} />
-              {data && <HabitCard today={isoDay()} data={data} />}
-            </>
-          }
-        />
+
+      {tab === "auswertung" && (
+        <>
+          {alltagSchalter}
+          {abschnitte.zeile}
+          <TwoCol
+            left={
+              <>
+                {abschnitte.zeigt("ziel") && feat.tagesziel && data && <TargetSection data={data} />}
+                {abschnitte.zeigt("verlauf") && data && <BelastungZeitCard today={isoDay()} data={data} alltag={withAlltag} />}
+              </>
+            }
+            right={
+              <>
+                {abschnitte.zeigt("woche") && <WeekLoadCard data={data} alltag={withAlltag} />}
+                {abschnitte.zeigt("woche") && data && <HabitCard today={isoDay()} data={data} />}
+              </>
+            }
+          />
+          {abschnitte.zeigt("insights") && <InsightsSection data={data} />}
+        </>
       )}
-      {shown === "insights" && <InsightsSection data={data} />}
-      {shown === "kettlebell" && <KettlebellSection />}
-      {shown === "klettern" && <ClimbSection />}
-      {shown === "karate" && <KarateSection />}
     </>
   );
 }

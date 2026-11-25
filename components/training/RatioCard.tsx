@@ -1,5 +1,7 @@
 import { ValueRing, ZoneScale } from "@/components/charts";
 import ExplainCard from "@/components/ui/ExplainCard";
+import { Details } from "@/components/ui/Pille";
+import type { ReactNode } from "react";
 import type { Data } from "@/lib/insights";
 import { loadRatio, ratioText, RATIO_HI, RATIO_LO, weekIntensity, WHO_MINUTES } from "@/lib/trainingLoad";
 
@@ -14,8 +16,9 @@ export function statusWord(r: number): string {
 }
 
 // Status (Konzept dunkel 2, Muster 13): Statuswort, Ring mit der Last der letzten 7 Tage, „Was das heißt“.
-// Darunter Belastungsverhältnis (7 Tage ÷ Wochenschnitt 28 Tage) und Intensitätsminuten gegen 150 (WHO). Ohne Netzwerk.
-export default function RatioCard({ today, data, alltag = true }: { today: string; data: Data; alltag?: boolean }) {
+// Unter „Details“ (Konzept Einfach, Paket 4): Belastungsverhältnis (7 Tage ÷ Wochenschnitt 28 Tage),
+// Intensitätsminuten gegen 150 (WHO) und `zusatz` (z. B. Umschalter Mit Alltag · Nur Training). Ohne Netzwerk.
+export default function RatioCard({ today, data, alltag = true, zusatz }: { today: string; data: Data; alltag?: boolean; zusatz?: ReactNode }) {
   const r = loadRatio(today, data, alltag);
   const im = weekIntensity(today, data);
   const pct = Math.min(100, Math.round((im / WHO_MINUTES) * 100));
@@ -56,6 +59,12 @@ export default function RatioCard({ today, data, alltag = true }: { today: strin
               </span>
             </div>
           </div>
+        </>
+      )}
+
+      <Details id="training.status">
+        {zusatz}
+        {r.ratio !== null && (
           <div className="today-line">
             <span className="row-strong">Belastungsverhältnis {de2(r.ratio)}</span>
             <ZoneScale
@@ -68,12 +77,14 @@ export default function RatioCard({ today, data, alltag = true }: { today: strin
             />
             <span className="meta">Belastung 7 Tage {Math.round(r.acute)} ÷ Wochenschnitt der letzten 4 Wochen {Math.round(chronic)}{alltag ? ", mit Alltag" : ", nur Training"}</span>
           </div>
+        )}
+        {r.ratio !== null && (
+          <>
           <ExplainCard tone="training" question={`Mein Belastungsverhältnis ist ${de2(r.ratio)} (${statusWord(r.ratio)}). Wie plane ich die nächsten Tage?`}>
             Status <strong>{statusWord(r.ratio)}</strong>: {ratioText(r.ratio)}
           </ExplainCard>
-        </>
-      )}
-
+          </>
+        )}
       <div className="today-line">
         <span className="row-strong">
           Intensitätsminuten diese Woche: {im} von {WHO_MINUTES}
@@ -84,6 +95,7 @@ export default function RatioCard({ today, data, alltag = true }: { today: strin
         <span>{im >= WHO_MINUTES ? "Wochenziel erreicht." : `Noch ${WHO_MINUTES - im} Minuten bis 150.`} Garmin zählt intensive Minuten doppelt.</span>
         <span className="meta">Quelle: WHO-Empfehlung, mindestens 150 Minuten mäßige Bewegung pro Woche.</span>
       </div>
+      </Details>
     </section>
   );
 }

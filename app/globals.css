@@ -3101,3 +3101,21 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .page-head-actions { display: flex; gap: 8px; flex: none; }
 .today-date-link { color: inherit; text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; border-bottom: 1px dashed var(--line-strong); }
 .kal-zurueck { display: inline-flex; align-items: center; min-height: 44px; }
+
+/* Training › Übersicht: Wochenstreifen (Konzept Einfach, Paket 4) */
+.woche-kopf { display: flex; align-items: center; gap: 4px; margin-bottom: 10px; }
+.woche-kopf h2 { flex: 1; text-align: center; font-size: 16px; margin: 0; }
+.woche-kal { margin-left: 4px; }
+.woche-tage { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.woche-tag { position: relative; display: grid; justify-items: center; gap: 2px; min-height: 64px; padding: 6px 0 12px; border-radius: 14px; border: 0; background: var(--fill); color: var(--text); font: inherit; cursor: pointer; }
+.woche-tag[aria-pressed="true"] { outline: 2px solid var(--text); outline-offset: -2px; }
+.woche-tag.is-heute .woche-n { color: var(--text); font-weight: 700; }
+.woche-wt { font-size: 11px; color: var(--muted); }
+.woche-n { font-size: 15px; font-variant-numeric: tabular-nums; color: var(--text-2); }
+.woche-dots { bottom: 6px; }
+.woche .meta { margin-top: 8px; }
+.sport-kacheln { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; margin-top: 8px; }
+.sport-kachel { display: grid; gap: 2px; padding: 12px 10px; border-radius: 18px; background: var(--fill); color: inherit; text-decoration: none; min-height: 44px; }
+.sport-kachel .today-act-icon { width: 32px; height: 32px; margin-bottom: 4px; }
+.sport-kachel-name { font-size: 13px; color: var(--muted); }
+.sport-kachel-wert { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }

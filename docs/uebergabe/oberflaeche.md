@@ -1,5 +1,5 @@
 # Übergabe · Oberfläche (OF)
-Belegt: frei
+Belegt: Konto A · Sitzung https://claude.ai/code/session_014pVPWcpKAVS1T6prb5SPNt · seit 2026-11-25
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWcpKAVS1T6prb5SPNt
 
 ## Konzept Einfach bedienen (PR #146, Entwurf, 25.11.)
@@ -12,7 +12,10 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014p
 - Paket 2 Alle Aktivitäten (PR #148): `components/training/AlleAktivitaeten.tsx`, vorerst unter Training › Kalender (zieht mit Paket 4 ans Ende der Übersicht). Lädt alle Garmin-Einheiten (ohne „ignorieren“) und erledigte `planned_sessions` ohne Garmin-Einheit derselben Sportart am Tag. Filter gemerkt unter `training.aktivitaeten`, Suche über Name und Sportart, 20 je Schritt. Heute „Alle ›“ → `/training?t=kalender#aktivitaeten`.
 - Paket 3 zentraler Kalender (PR #149): `app/kalender/page.tsx`, `components/kalender/KalenderView.tsx`, Einstiege in `lib/kalender.ts` (ohne „use client“, weil die Server-Seite sie prüft). `Monatskalender` hat neue Ebenen Gewohnheiten (Strich, Sage), Krank & verletzt (Quadrat, Amber, nur bis heute), Medikamente (Ring, Violett, Bedarfs-Einnahmen), Schlaf (Halbkreis, unter dem 30-Tage-Bereich); Daten über `CalendarSection` (Props `ebenen`, `start`, `merken`, `tag`, `kompakt`). Vorwahl je Einstieg, gemerkt unter `kalender.zentral.<von>`; vorgewählte Pillen stehen vorn. `PageHead` hat `kalender="<von>"` (Tagebuch, Training, Zyklus, Gesundheit), Datum auf Heute ist ein Link. Tagesblatt `kompakt` ohne Kacheln.
 - Grenze: Marken nur für die 180 Tage aus `loadInsightData`.
-- Nächster Schritt: Paket 4 Training mit zwei Reitern (Übersicht · Auswertung), Sportarten als eigene Seiten, Kalender-Reiter raus, Insights in Auswertung, `AlleAktivitaeten` ans Ende der Übersicht.
+- Training-Tagesblatt ohne Kacheln (PR #151, Wunsch der Nutzerin).
+- Paket 4 Training (PR #152): Reiter Übersicht · Auswertung (`?t=kalender` → Übersicht, `?t=insights` → Auswertung, `?t=karate|kettlebell|klettern` leitet auf `/training/karate|kettlebell|bouldern`). Übersicht: `RatioCard` kompakt (Rechenweg, Erklärkarte, Intensitätsminuten, Mit Alltag hinter `Details id="training.status"`), `CalendarSection woche kompakt` (Wochenstreifen + Tagesblatt, „Kalender ›“), Kacheln „Deine Sportarten“ (Trainingstage in 4 Wochen, `lib/sportSeiten.ts`), `AlleAktivitaeten`. Auswertung mit `useAbschnitte("training.auswertung")`: Ziel · Verlauf · Woche · Insights. Sportseiten: `components/training/SportSeite.tsx`.
+- Gemessen mit Beispieldaten: Übersicht 4,7 Bildschirme (davon gut 2 Aktivitätenliste), Auswertung 7,1 mit allen Abschnitten an, Karate 2,6.
+- Nächster Schritt: Paket 5 Zyklus kürzen (Monatskalender und Perioden nachtragen raus, Wochenstreifen mit Phasen, Abschnitts-Pillen Werte · Symptome · Gewohnheiten · Perioden).
 
 ## Karate-Prüfungsprogramm (PR #143, 25.11.)
 - Konzept `docs/konzept-karate-pruefungen.md`, freigegeben 25.11. Training › Karate: Kyu-Chips 5.–1., Ring „x von y sitzen“ mit Satz, Gruppen Kihon/Kata/Kumite/Begriffe, Wiederholung eingeklappt, eigene Punkte je Kyu. Drei Stufen per Tipp, Kata und Kumite klappen in Teile auf. „X. Kyu bestanden“ ab Prüfungsdatum, dann rückt der nächste Kyu nach.
