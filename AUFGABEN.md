@@ -7,6 +7,12 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Karate-Prüfungsprogramm (PR #143, 25.11.)
+Enthält die Migration `supabase/migrations/20261129090000_karate_pruefungen.sql` (neue Tabelle `karate_progress`, bei deinen eigenen Punkten Kyu, drei Stufen und die Gruppen Anwendung und Begriffe). Prüfungsprogramm nach DKV Shotokan. Dein Merge ist die Freigabe.
+- [ ] PR #143 ansehen und mergen
+- [x] Prüfungsordnung festgelegt: DKV Shotokan (25.11.)
+- [ ] Optional: Repo auf privat stellen (GitHub › Settings › General › Danger Zone). Der DKV erlaubt Vervielfältigungen nur mit Genehmigung; die App fasst das Programm in eigenen Worten zusammen
+
 ### Mehrere Claude-Konten (Regeln, 24.11.)
 - [ ] Im zweiten Konto unter claude.ai › Einstellungen › Connectors GitHub verbinden, mit Zugriff auf healthcoach und cashflow-app.
 - [ ] Ist es ein anderes GitHub-Konto: in beiden Repos als Collaborator mit Schreibrecht einladen.

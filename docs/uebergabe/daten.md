@@ -1,8 +1,12 @@
 # Übergabe · Daten (DA)
 Belegt: frei
-Zuletzt aktualisiert: 2026-11-24 · Sitzung: https://claude.ai/code/session_014pVPWeGvqeNgRwY9UX6dwJ
+Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWd9mT296ny9kidDGro
 
 Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`, `.github/`. Regeln: `docs/konzept-zwei-instanzen.md`.
+
+## Karate-Prüfungen (PR #143, 25.11.)
+- Migration `20261129090000_karate_pruefungen`: neue Tabelle `karate_progress` (user_id, item_key, status offen/uebe/sitzt, RLS), `karate_items.kyu` (1–5, Standard 5) und `status` (alte Haken → sitzt), Kategorie „Begriffe“. `done` bleibt und wird mitgeschrieben. Backup enthält `karate_progress`.
+- Wartet auf: Merge durch die Nutzerin, danach Lauf „Supabase-Migrationen ausführen“ prüfen.
 
 
 
