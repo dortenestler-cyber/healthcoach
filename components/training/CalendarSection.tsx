@@ -14,6 +14,7 @@ import { cycleToday, dayRule, PHASES } from "@/lib/cycle";
 import Monatskalender, { type Ebene, type Punkt, type ZeichenEbene } from "@/components/kalender/Monatskalender";
 import { personalRange, seriesOf } from "@/lib/baseline";
 import Tagesblatt from "@/components/tag/Tagesblatt";
+import ZeitraumLeiste from "@/components/kalender/Zeitraum";
 import TwoCol from "@/components/ui/TwoCol";
 import { sportOf, SPORTS, type Session, type Sport } from "@/lib/training";
 
@@ -36,6 +37,8 @@ export default function CalendarSection({
   tag,
   kompakt = false,
   woche = false,
+  zeitraum = false,
+  onChanged,
 }: {
   data: Data | null;
   ebenen?: Ebene[];
@@ -44,9 +47,21 @@ export default function CalendarSection({
   tag?: string;
   kompakt?: boolean;
   woche?: boolean; // Wochenstreifen statt Monat (Training › Übersicht), mit Link zum zentralen Kalender
+  zeitraum?: boolean; // mehrere Tage wählen (zentraler Kalender, Paket 6)
+  onChanged?: () => void; // nach Eintragen im Zeitraum: Daten der Seite neu laden
 }) {
   const today = isoDay();
   const [[first, last], setRange] = useState<readonly [string, string]>(() => (woche ? weekBounds(new Date()) : monthBounds(new Date())));
+  const [bereich, setBereich] = useState<{ von: string; bis: string } | null>(null);
+  const [anker, setAnker] = useState<string | null>(null); // erster Tag des Zeitraums
+  const waehle = (day: string) => {
+    if (!anker) return setSelected(day);
+    setBereich(day < anker ? { von: day, bis: anker } : { von: anker, bis: day });
+  };
+  const starteZeitraum = (day: string) => {
+    setAnker(day);
+    setBereich({ von: day, bis: day });
+  };
   const [selected, setSelected] = useState(tag && /^\d{4}-\d{2}-\d{2}$/.test(tag) ? tag : today);
   const [spans, setSpans] = useState<{ krank: (Span & { label: string })[]; verletzt: (Span & { spot: string })[] }>({ krank: [], verletzt: [] });
   const mitZeichen = ebenen.some((e) => ["gewohnheiten", "krank", "medikamente", "schlaf"].includes(e));
@@ -163,14 +178,39 @@ export default function CalendarSection({
             merken={merken}
             punkte={punkte}
             zeichen={mitZeichen ? zeichen : undefined}
-            selected={selected}
-            onPick={setSelected}
+            selected={bereich ? null : selected}
+            onPick={zeitraum ? waehle : setSelected}
+            bereich={bereich}
+            onLangDruck={zeitraum ? starteZeitraum : undefined}
             onMonth={(f, l) => setRange([f, l])}
             maxForward={12}
+            footer={
+              zeitraum && !bereich ? (
+                <button type="button" className="btn btn-quiet zeitraum-start" onClick={() => starteZeitraum(selected)}>
+                  Mehrere Tage wählen
+                </button>
+              ) : undefined
+            }
           />
           )
         }
         right={
+          bereich ? (
+            <ZeitraumLeiste
+              von={bereich.von}
+              bis={bereich.bis}
+              today={today}
+              data={data}
+              onDone={() => {
+                load();
+                onChanged?.();
+              }}
+              onCancel={() => {
+                setBereich(null);
+                setAnker(null);
+              }}
+            />
+          ) : (
           <Tagesblatt
             key={selected}
             day={selected}
@@ -187,6 +227,7 @@ export default function CalendarSection({
               )
             }
           />
+          )
         }
       />
     </>
