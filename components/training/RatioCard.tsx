@@ -1,5 +1,4 @@
 import { ValueRing, ZoneScale } from "@/components/charts";
-import ExplainCard from "@/components/ui/ExplainCard";
 import { Details } from "@/components/ui/Pille";
 import type { ReactNode } from "react";
 import type { Data } from "@/lib/insights";
@@ -78,13 +77,7 @@ export default function RatioCard({ today, data, alltag = true, zusatz }: { toda
             <span className="meta">Belastung 7 Tage {Math.round(r.acute)} ÷ Wochenschnitt der letzten 4 Wochen {Math.round(chronic)}{alltag ? ", mit Alltag" : ", nur Training"}</span>
           </div>
         )}
-        {r.ratio !== null && (
-          <>
-          <ExplainCard tone="training" question={`Mein Belastungsverhältnis ist ${de2(r.ratio)} (${statusWord(r.ratio)}). Wie plane ich die nächsten Tage?`}>
-            Status <strong>{statusWord(r.ratio)}</strong>: {ratioText(r.ratio)}
-          </ExplainCard>
-          </>
-        )}
+
       <div className="today-line">
         <span className="row-strong">
           Intensitätsminuten diese Woche: {im} von {WHO_MINUTES}
