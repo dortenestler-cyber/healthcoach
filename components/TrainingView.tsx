@@ -18,6 +18,7 @@ import CalendarSection from "@/components/training/CalendarSection";
 import InsightsSection from "@/components/training/InsightsSection";
 import AlleAktivitaeten from "@/components/training/AlleAktivitaeten";
 import KarateStand from "@/components/training/KarateStand";
+import ZielStandKurz from "@/components/training/ZielStandKurz";
 import SportIcon from "@/components/ui/SportIcon";
 import { useAbschnitte } from "@/components/ui/Pille";
 import { sportOf, SPORTS, type Sport } from "@/lib/training";
@@ -126,10 +127,7 @@ export default function TrainingView({ initial }: { initial: string }) {
                       {s.sport === "karate" ? (
                         <KarateStand ersatz={n === null ? "–" : `${n} ${n === 1 ? "Tag" : "Tage"}`} />
                       ) : (
-                        <>
-                          <span className="sport-kachel-wert">{n === null ? "–" : `${n} ${n === 1 ? "Tag" : "Tage"}`}</span>
-                          <span className="meta">in 4 Wochen</span>
-                        </>
+                        <ZielStandKurz sport={s.sport === "klettern" ? "klettern" : "kettlebell"} ersatz={n === null ? "–" : `${n} ${n === 1 ? "Tag" : "Tage"}`} />
                       )}
                     </Link>
                   );

@@ -5,6 +5,8 @@ import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, shortDate } from "@/lib/dates";
 import { stats } from "@/lib/garmin";
 import { weekStart } from "@/lib/health";
+import { kbZiel } from "@/lib/ziele";
+import Zielkarte from "@/components/training/Zielkarte";
 import { fromIso, KB_TEMPLATE, kgText, planWeek, targetKg, type KbItem, type KbPlan, type KbSet } from "@/lib/training";
 
 type Entry = { reps: number; kg: number; done: boolean };
@@ -144,17 +146,14 @@ export default function KettlebellSection() {
     <>
       {error && <p className="alert" role="alert">{error}</p>}
 
-      <section className="card">
-        <div className="card-row">
-          <div className="stack">
-            <span className="meta">Aktiver Plan</span>
-            <span className="row-strong">{plan.name}</span>
-          </div>
-          <span className="badge badge-training">Woche {week} von {plan.weeks}</span>
-        </div>
-        <div className="progress"><span style={{ width: Math.min(100, (sessionDays.length / total) * 100) + "%" }} /></div>
-        <span className="meta">{sessionDays.length} von {total} Einheiten · {plan.per_week} pro Woche</span>
-      </section>
+      {(() => {
+        const z = kbZiel(plan, sets);
+        return (
+          <Zielkarte ziel={z.ziel} zeit={z.zeit} zeitNote={z.zeitNote} anteil={z.total ? z.sitzt / z.total : 0} mitte={`${z.sitzt}/${z.total}`} wort={z.wort} satz={z.satz}>
+            {plan.goal && <span className="meta">{plan.goal}</span>}
+          </Zielkarte>
+        );
+      })()}
 
       {lowRecovery && (
         <div className="rule rule-stop">

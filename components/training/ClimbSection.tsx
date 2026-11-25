@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay } from "@/lib/dates";
-import { GOAL_GRADE, GRADES, sportOf, type Climb } from "@/lib/training";
+import { GRADES, GOAL_GRADE, sportOf, type Climb } from "@/lib/training";
+import { boulderZiel } from "@/lib/ziele";
+import Zielkarte from "@/components/training/Zielkarte";
 
 const RESULTS: [Climb["result"], string][] = [
   ["flash", "Flash"],
@@ -56,9 +58,13 @@ export default function ClimbSection() {
   const goalTops = tops(GOAL_GRADE) + GRADES.slice(GRADES.indexOf(GOAL_GRADE) + 1).reduce((a, g) => a + tops(g), 0);
   const below = GRADES[GRADES.indexOf(GOAL_GRADE) - 1];
 
+  const z = boulderZiel(climbs);
   return (
     <>
       {error && <p className="alert" role="alert">{error}</p>}
+      <Zielkarte ziel={z.ziel} zeit={z.zeit} zeitNote={z.zeitNote} anteil={z.total ? z.sitzt / z.total : 0} mitte={`${z.sitzt}/${z.total}`} wort={z.wort} satz={z.satz}>
+        <span className="meta">{sessions} Boulder-Einheiten aus Garmin in den letzten 8 Wochen.</span>
+      </Zielkarte>
 
       <section className="card">
         <h2>Boulder eintragen</h2>
@@ -115,15 +121,6 @@ export default function ClimbSection() {
         <span className="meta">Zahl der Tops und Erfolgsquote je Grad.</span>
       </section>
 
-      <section className="card">
-        <h2>Ziel {GOAL_GRADE}</h2>
-        <p>
-          {goalTops
-            ? `Du hast in den letzten 8 Wochen ${goalTops} Boulder ab ${GOAL_GRADE} geschafft.`
-            : `Noch kein Top ab ${GOAL_GRADE}. Ein guter Weg dorthin: viele saubere Tops in ${below}, dann gezielt ${GOAL_GRADE} probieren.`}
-        </p>
-        <span className="meta">{sessions} Boulder-Einheiten aus Garmin in den letzten 8 Wochen.</span>
-      </section>
     </>
   );
 }
