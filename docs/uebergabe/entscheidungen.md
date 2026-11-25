@@ -94,3 +94,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-25 · OF · Nutzerin: Variante A – der Coach (Claude) schreibt Tagesempfehlung auf Heute und Monatsrückblick, einmal am Tag gespeichert
 2026-11-25 · OF · Nutzerin: Schlaf mit Gesamtwert aus Menge und Erholsam (50 : 50) im Ring, Readiness nutzt ihn (docs/konzept-schlafqualitaet.md)
 2026-11-25 · OF · Nutzerin: Garmins Schlafwert (sleep_score) ganz aus der App entfernen; Uhr-Readiness, Abruf und Spalte folgen nach Freigabe (Daten)
+2026-11-25 · DA · Nutzerin: Garmin-Schlafwert auch aus Uhr, Abruf und Datenbank entfernen; Uhr-Readiness nutzt den eigenen Schlafwert

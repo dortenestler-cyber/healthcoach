@@ -6,7 +6,7 @@
 // deno-lint-ignore no-explicit-any
 type Any = any;
 
-export type Day = { day: string; sleep_score: number | null; hrv_last_night: number | null; resting_hr: number | null; bb_max: number | null };
+export type Day = { day: string; hrv_last_night: number | null; resting_hr: number | null; bb_max: number | null };
 export type DiaryRow = { day: string; bleeding: number; symptoms: Record<string, number> | null };
 export type Checkin = { energy: number | null; sleep: number | null; mood: number | null } | null;
 export type Illness = { kind?: string; severity: number; fever: boolean; below_neck: boolean } | null;
@@ -87,17 +87,17 @@ function cycleBeforeDiff(daily: Map<string, Day>, starts: string[]): { ready: bo
 // Persönlicher Bereich wie lib/baseline.ts (Stand PR #60):
 // - 30-Tage-Bereich: Tage day-30 bis day-1, mittlere Hälfte, vorläufig ab 7, stabil ab 14 Tagen
 // - je Zyklusphase (Menstruation, Follikel, Eisprung, Luteal) ein eigener Bereich aus den letzten 150 Tagen,
-//   ab 10 Tagen derselben Phase; gilt für Schlaf, HRV und Ruhepuls
+//   ab 10 Tagen derselben Phase; gilt für HRV, Ruhepuls und die Schlafwerte (schlaf.ts)
 // - Krankheitstage und die 3 Tage danach zählen nicht
 // Für die Readiness zählt nur ein stabiler Bereich (ab 14 Tagen), sonst wirkt der Wert nicht.
-type Range = { lo: number; hi: number; median: number; stable: boolean };
+export type Range = { lo: number; hi: number; median: number; stable: boolean };
 const RANGE_DAYS = 30;
 const MIN_DAYS = 14;
 const MIN_PROVISIONAL = 7;
 const PHASE_LOOKBACK = 150;
 const MIN_PHASE_DAYS = 10;
 const SICK_AFTER = 3;
-type RangePhase = "menstruation" | "follikel" | "eisprung" | "luteal";
+export type RangePhase = "menstruation" | "follikel" | "eisprung" | "luteal";
 
 const quantile = (v: number[], q: number) => {
   const pos = (v.length - 1) * q;
@@ -129,7 +129,7 @@ function rangePhaseOf(day: string, starts: string[]): RangePhase | null {
   return p === "MENS" ? "menstruation" : p === "FOLL" ? "follikel" : p === "EISP" ? "eisprung" : "luteal";
 }
 
-function rangeFor(daily: Day[], day: string, f: (r: Day) => number | null, starts: string[], sick: Set<string>, phases: Map<string, RangePhase | null>): Range | null {
+export function rangeFor<T extends { day: string }>(daily: T[], day: string, f: (r: T) => number | null, starts: string[], sick: Set<string>, phases: Map<string, RangePhase | null>): Range | null {
   const phaseOf = (d: string) => {
     if (!phases.has(d)) phases.set(d, rangePhaseOf(d, starts));
     return phases.get(d) ?? null;
@@ -191,6 +191,8 @@ export function usualLoad(day: string, rows: Any[], acts: Any[], sick: Set<strin
   const chronic = raw.reduce((a, b) => a + b, 0) / 4;
   return { usual: mean(pcts), brake: chronic > 0 && acute / chronic > 1.3 };
 }
+// Schlafwert (schlaf.ts) auf die Readiness wie computeTarget in der App
+const sleepEffect = (s: number | null) => (s === null ? 0 : s >= 85 ? 3 : s >= 70 ? 0 : s >= 55 ? -5 : -10);
 const readinessFactor = (score: number) => (score >= 85 ? 1.15 : score >= 65 ? 1 : score >= 45 ? 0.75 : 0.5);
 function targetBand(score: number, usual: number, brake: boolean): { lo: number; hi: number } {
   let mid = usual * readinessFactor(score);
@@ -208,13 +210,13 @@ const BANDS = [
   { min: 45, lo: 25, hi: 45 },
   { min: -999, lo: 10, hi: 25 },
 ];
-export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checkin: Checkin, illness: Illness, starts: string[], sick: Set<string> = new Set(), usual: { usual: number | null; brake: boolean } = { usual: null, brake: false }): { score: number; pause: boolean; lo: number; hi: number; factors: WatchFactor[] } {
+export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checkin: Checkin, illness: Illness, starts: string[], sick: Set<string> = new Set(), usual: { usual: number | null; brake: boolean } = { usual: null, brake: false }, sleep: number | null = null): { score: number; pause: boolean; lo: number; hi: number; factors: WatchFactor[] } {
   const today = daily.find((r) => r.day === day) ?? null;
   const phases = new Map<string, RangePhase | null>();
   const factors: WatchFactor[] = [];
   const add = (k: string, e: number) => factors.push({ k, e });
-  // Schlaf, HRV und Ruhepuls sind zyklusabhängig (CYCLE_SENSITIVE in lib/baseline.ts)
-  add("SCHLAF", rangeEffect(today?.sleep_score ?? null, rangeFor(daily, day, (r) => r.sleep_score, starts, sick, phases), true, 10));
+  // Schlaf: eigener Schlafwert (schlaf.ts) mit festen Stufen wie in der App; HRV und Ruhepuls zyklusabhängig
+  add("SCHLAF", sleepEffect(sleep));
   add("HRV", rangeEffect(today?.hrv_last_night ?? null, rangeFor(daily, day, (r) => r.hrv_last_night, starts, sick, phases), true, 12));
   add("PULS", rangeEffect(today?.resting_hr ?? null, rangeFor(daily, day, (r) => r.resting_hr, starts, sick, phases), false, 8));
   if (today?.bb_max !== null && today?.bb_max !== undefined) {
@@ -251,7 +253,6 @@ export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checki
 
 export const asDay = (r: Any): Day => ({
   day: r.day,
-  sleep_score: r.sleep_score ?? null,
   hrv_last_night: r.hrv_last_night ?? null,
   resting_hr: r.resting_hr ?? null,
   bb_max: r.bb_max ?? null,

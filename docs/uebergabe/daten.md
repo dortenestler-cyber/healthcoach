@@ -1,6 +1,11 @@
 # Übergabe · Daten (DA)
-Belegt: frei
-Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWd9mT296ny9kidDGro
+Belegt: Konto A · Sitzung https://claude.ai/code/session_017zWr1WGKktjg5sG2bBmQXp · seit 2026-11-25
+Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WGKktjg5sG2bBmQXp
+
+## Garmin-Schlafwert entfernt (25.11.)
+- Uhr: `supabase/functions/watch/schlaf.ts` (`sleepTotal`) rechnet den eigenen Schlafwert wie `lib/schlaf.ts` (geprüft: gleiche Werte an Testnächten). Readiness-Faktor SCHLAF mit festen Stufen (≥85 +3, ≥70 0, ≥55 −5, sonst −10), Feld `sleep` für das Zifferblatt liefert den eigenen Wert. `rangeFor` in `target.ts` exportiert und allgemein.
+- `garmin-sync` speichert `sleep_score` nicht mehr.
+- Schritt 2 nach erfolgreichem Lauf „Supabase-Funktionen“: Migration `drop column sleep_score`.
 
 Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`, `.github/`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
