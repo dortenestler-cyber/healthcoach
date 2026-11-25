@@ -2,7 +2,7 @@
 Belegt: frei
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1VwL1U1ue6ALkkaL4z
 
-## Bug: Intensitätsminuten bleiben nach dem Training stehen (25.11.)
+## Bug: Intensitätsminuten bleiben nach dem Training stehen (PR #184, 25.11.)
 - Ursache: Der kurze Abruf alle 15 Minuten (`quick`) holte nur Aktivitäten, die Tageszusammenfassung nur der volle Abruf (Morgen, 19:37–21:37, App nach 60 Min, Ziehen auf Heute). Die Training-Einheit erschien, die Intensitätsminuten blieben auf dem Stand vom Morgen.
 - `garmin-sync`: `quick` holt jetzt auch `dailysummaries` für gestern und heute und schreibt nur `steps` und `intensity_minutes` (ohne `synced_at`, damit die App den vollen Abruf weiter auslöst). Fehler landen in `summaryNote`, brechen nicht ab. Rechnung in `intensityMinutes()` ausgelagert.
 - Geprüft: Syntax (TypeScript-Transpile). `deno check` nicht möglich (Deno fehlt in der Sitzung).
