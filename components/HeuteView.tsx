@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import DayHead from "@/components/heute/DayHead";
 import RingRow from "@/components/heute/RingRow";
 import DaySentence from "@/components/heute/DaySentence";
+import Tagesempfehlung from "@/components/heute/Tagesempfehlung";
 import GlanceTiles from "@/components/heute/GlanceTiles";
 import TodayAgenda from "@/components/heute/TodayAgenda";
 import RecentActivities from "@/components/heute/RecentActivities";
@@ -90,7 +91,11 @@ export default function HeuteView() {
 
       {data && rule && <RingRow day={day} data={data} rule={rule} nowMinute={nowMinute} showLoad={feat.tagesziel} showGarmin={feat.garmin} showCycle={feat.zyklus} onCenter={setFocus} />}
 
-      {data && rule && <DaySentence focus={focus} day={day} data={data} rule={rule} nowMinute={nowMinute} isToday={isToday} showLoad={feat.tagesziel} />}
+      {data && rule && (() => {
+        const satz = <DaySentence focus={focus} day={day} data={data} rule={rule} nowMinute={nowMinute} isToday={isToday} showLoad={feat.tagesziel} />;
+        // Heute schreibt der Coach die Empfehlung; bei Warnzeichen und an anderen Tagen bleibt der Satz nach festen Regeln
+        return isToday && rule.level !== "warnzeichen" ? <Tagesempfehlung tag={day} ersatz={satz} /> : satz;
+      })()}
       {isToday && data && <SignHintCard data={data} today={day} onSaved={loadData} />}
 
       {twoCols ? (

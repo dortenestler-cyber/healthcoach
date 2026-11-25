@@ -3152,3 +3152,10 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .tb-phase { display: block; margin: -2px 0 8px; color: var(--cycle-fg); }
 .tb-ov-auf { margin-top: 10px; align-self: flex-start; width: auto; }
 .tb-jetzt { display: block; margin: 2px 0 6px; }
+
+/* Texte vom Coach (Tagesempfehlung, Dein Monat) */
+.coach-brief-kopf { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.coach-text-lage { font-size: 16px; font-weight: 600; color: var(--text); margin: 0 0 8px; }
+.coach-text-p { margin: 0 0 8px; color: var(--text-2); }
+.coach-text-liste { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--text-2); }
+.coach-text-liste strong, .coach-text-lage strong { color: var(--text); }
