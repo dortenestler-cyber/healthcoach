@@ -5,6 +5,10 @@ import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, longDate } from "@/lib/dates";
 import { SPOTS, kyuHinweis, weekStart, type Injury } from "@/lib/health";
 import { fromIso, loadSettings, saveSettings, sportOf, type Settings } from "@/lib/training";
+import { useAnsicht } from "@/lib/ansicht";
+import { Details, Pille, PillenZeile } from "@/components/ui/Pille";
+import Zielkarte from "@/components/training/Zielkarte";
+import KarateUeben from "@/components/training/KarateUeben";
 import { GRUPPEN, HINWEISE, KUERZEL, NEXT, QUELLE, STATUS_WORT, grad, satz, stand, type Punkt, type Status } from "@/lib/karate/programm";
 
 type Item = { id: string; label: string; category: string; status: Status; kyu: number };
@@ -50,6 +54,10 @@ export default function KarateSection() {
   const [label, setLabel] = useState("");
   const [category, setCategory] = useState("Kihon");
   const [error, setError] = useState("");
+  // Eine Gruppe zur Zeit, Filter „Noch zu üben“ · „Alles“ (Konzept Einfach, Paket 9), beides gemerkt
+  const [gruppe, setGruppe] = useAnsicht<string>("karate.gruppe", "Kihon");
+  const [filter, setFilter] = useAnsicht<"offen" | "alles">("karate.filter", "offen");
+  const [version, setVersion] = useState(0); // „Als Nächstes üben“ neu wählen, wenn sich hier etwas ändert
 
   const load = useCallback(async () => {
     const sb = supabase();
@@ -95,7 +103,9 @@ export default function KarateSection() {
   const today = isoDay();
 
   const saveKarate = async (next: KarateSettings) => {
-    const s: Settings = { ...settings, karate: next, examDate: next.pruefungen?.[String(next.ziel ?? 5)]?.datum };
+    // Frisch laden: „Heute üben“ merkt sich Tage in settings.data.karate, die sollen erhalten bleiben
+    const fresh = await loadSettings(sb);
+    const s: Settings = { ...fresh, karate: { ...((fresh.karate ?? {}) as object), ...next }, examDate: next.pruefungen?.[String(next.ziel ?? 5)]?.datum };
     setSettings(s);
     const { error: e } = await saveSettings(sb, s);
     setError(e ? "Das wurde nicht gespeichert: " + e.message : "");
@@ -114,7 +124,10 @@ export default function KarateSection() {
     if (e) {
       setError("Das wurde nicht gespeichert: " + e.message);
       load();
-    } else setError("");
+    } else {
+      setError("");
+      setVersion((v) => v + 1);
+    }
   };
   const run = async (q: PromiseLike<{ error: { message: string } | null }>) => {
     const { error: e } = await q;
@@ -178,29 +191,22 @@ export default function KarateSection() {
     );
   };
 
+  const zeigeFilter = (p: Punkt) => filter === "alles" || stand(p, progress) !== "sitzt";
+  const GRUPPEN_PILLEN = [...GRUPPEN, "Eigene"];
+  const aktiv = GRUPPEN_PILLEN.includes(gruppe) ? gruppe : "Kihon";
+  const zeitText = bestanden ? "bestanden" : pr.datum ? (weeksLeft !== null && weeksLeft >= 0 ? `noch ${weeksLeft} ${weeksLeft === 1 ? "Woche" : "Wochen"}` : "Datum vorbei") : "Datum offen";
+  const zeitNote = bestanden ? (pr.bestanden ? `am ${longDate(fromIso(pr.bestanden))}` : "vor der App") : pr.datum ? longDate(fromIso(pr.datum)) : undefined;
+
   return (
     <>
       {error && <p className="alert" role="alert">{error}</p>}
 
-      <section className="card">
-        <div className="card-row">
-          <div className="stack">
-            <span className="meta">Prüfung zum {kyu}. Kyu · {grad(kyu).guertel}</span>
-            {bestanden ? (
-              <span className="big-number">bestanden</span>
-            ) : (
-              <span className="big-number">{pr.datum ? (weeksLeft !== null && weeksLeft >= 0 ? `noch ${weeksLeft} ${weeksLeft === 1 ? "Woche" : "Wochen"}` : "Datum vorbei") : "Datum offen"}</span>
-            )}
-            <span className="meta">
-              {bestanden ? (pr.bestanden ? `am ${longDate(fromIso(pr.bestanden))}` : "vor der App") : pr.datum ? longDate(fromIso(pr.datum)) : "Trag das Datum ein, sobald es feststeht."}
-            </span>
-          </div>
-        </div>
+      <Zielkarte ziel={`Prüfung zum ${kyu}. Kyu · ${grad(kyu).guertel}`} zeit={zeitText} zeitNote={zeitNote} anteil={total ? sitzt / total : 0} mitte={`${sitzt}/${total}`} wort="sitzen" satz={satz(gruppen) || "Noch keine Punkte."}>
         {!bestanden && (
-          <>
+          <Details id="karate.datum" label={pr.datum ? "Datum ändern" : "Datum eintragen"} offen={!pr.datum}>
             <label className="label" htmlFor="exam">Prüfungsdatum</label>
             <input id="exam" type="date" className="input" value={pr.datum ?? ""} onChange={(e) => setDatum(e.target.value)} />
-          </>
+          </Details>
         )}
         {!bestanden && kyu === ziel && pr.datum && pr.datum <= today && (
           <button type="button" className="btn btn-primary" onClick={markBestanden}>
@@ -213,97 +219,67 @@ export default function KarateSection() {
           </button>
         )}
         {ziel === 0 && <p>Alle Kyu-Prüfungen bestanden. Glückwunsch!</p>}
-      </section>
+      </Zielkarte>
 
-      <section className="card">
-        <div className="card-row">
-          <h2>Trainings pro Woche</h2>
-          <span className="meta">{trainings} in 8 Wochen</span>
-        </div>
-        <div className="bars small" role="img" aria-label={`Karate-Trainings der letzten 8 Wochen, insgesamt ${trainings}`}>
-          {weeks.map((n, i) => (
-            <div key={i} className="bar-col">
-              <span className="bar-val">{n || ""}</span>
-              <span className="bar" style={{ height: Math.max(3, n * 18) + "px", background: i === 7 ? "var(--training)" : "var(--line-strong)" }} />
-            </div>
-          ))}
-        </div>
-        <span className="meta">Erledigte Einheiten aus dem Kalender und Karate aus Garmin.</span>
-      </section>
-
-      {injuries.map((inj) =>
-        SPOTS[inj.spot] ? (
-          <p key={inj.id} className="kyu">
-            {SPOTS[inj.spot].label} verletzt. {kyuHinweis(inj.spot, ziel)}
-          </p>
-        ) : null
-      )}
+      {ziel >= 1 && kyu === ziel && <KarateUeben key={version} tag={today} art="naechstes" onChanged={load} />}
 
       <section className="card">
         <h2>Prüfungsprogramm</h2>
-        <div className="pills wrap" role="group" aria-label="Kyu wählen">
+        <PillenZeile label="Kyu wählen">
           {KYUS.map((k) => (
-            <button key={k} type="button" className="pill kp-chip" aria-pressed={k === kyu} onClick={() => setSel(k)} aria-label={`${k}. Kyu${k > ziel ? ", bestanden" : k === ziel ? ", nächste Prüfung" : ""}`}>
+            <Pille key={k} an={k === kyu} onClick={() => setSel(k)} label={`${k}. Kyu${k > ziel ? ", bestanden" : k === ziel ? ", nächste Prüfung" : ""}`}>
               {k}. Kyu{k > ziel ? " ✓" : ""}
-            </button>
+            </Pille>
           ))}
+        </PillenZeile>
+        <PillenZeile label="Gruppe wählen" scroll>
+          {GRUPPEN_PILLEN.map((g) => {
+            const z = gruppen.find((x) => x.gruppe === g);
+            return (
+              <Pille key={g} an={aktiv === g} onClick={() => setGruppe(g)} art="abschnitt">
+                {g}{z && z.total ? ` ${z.sitzt}/${z.total}` : g === "Eigene" && eigene.length ? ` ${eigenStand.sitzt}/${eigenStand.total}` : ""}
+              </Pille>
+            );
+          })}
+        </PillenZeile>
+        <div className="segmented kp-filter" role="group" aria-label="Was zeigen">
+          <button type="button" aria-pressed={filter === "offen"} onClick={() => setFilter("offen")}>Noch zu üben</button>
+          <button type="button" aria-pressed={filter === "alles"} onClick={() => setFilter("alles")}>Alles</button>
         </div>
 
-        <div className="kp-head">
-          <svg width="56" height="56" viewBox="0 0 56 56" role="img" aria-label={`${sitzt} von ${total} Punkten sitzen`} className="cb cb-training habit-ring">
-            <g transform="rotate(-90 28 28)" fill="none">
-              <circle cx="28" cy="28" r={r} strokeWidth="5" className="cb-ring-track" />
-              {pct > 0 && <circle cx="28" cy="28" r={r} strokeWidth="5" strokeLinecap="round" className="cb-ring-value" style={{ strokeDasharray: `${(pct / 100) * c} ${c}` }} />}
-            </g>
-            <text x="28" y="32" textAnchor="middle" className="habit-ring-text">{pct}%</text>
-          </svg>
-          <div className="stack">
-            <span className="row-strong">{sitzt} von {total} sitzen</span>
-            <span className="meta">{satz(gruppen)}</span>
-          </div>
-        </div>
-
-        {GRUPPEN.map((g) => {
-          const list = haupt.filter((p) => p.gruppe === g);
-          if (!list.length) return null;
-          const z = gruppen.find((x) => x.gruppe === g) ?? { gruppe: g, ...zaehl(list.map((p) => stand(p, progress))) };
+        {aktiv !== "Eigene" && (() => {
+          const list = haupt.filter((p) => p.gruppe === aktiv);
+          const sichtbar = list.filter(zeigeFilter);
+          const repListe = aktiv === "Kata" ? rep.filter(zeigeFilter) : [];
           return (
-            <div key={g} className="stack">
-              <div className="card-row">
-                <span className="eyebrow">{g}</span>
-                <span className="meta">{z.sitzt} von {z.total}</span>
-              </div>
-              {g === "Kihon" && (
-                <div className="kp-note">
-                  {HINWEISE.map((h) => <span key={h} className="meta">{h}</span>)}
-                  <details>
-                    <summary className="meta">Kürzel</summary>
+            <div className="stack">
+              {aktiv === "Kihon" && (
+                <Details id="karate.hinweise" label="Hinweise und Kürzel">
+                  <div className="kp-note">
+                    {HINWEISE.map((h) => <span key={h} className="meta">{h}</span>)}
                     <span className="meta">{KUERZEL}</span>
-                  </details>
-                </div>
+                  </div>
+                </Details>
               )}
-              {list.map(renderPunkt)}
+              {list.length > 0 && !sichtbar.length && <p className="meta">In {aktiv} sitzt alles. „Alles“ zeigt die Punkte.</p>}
+              {sichtbar.map(renderPunkt)}
+              {aktiv === "Kata" && rep.length > 0 && (
+                <>
+                  <button type="button" className="kp-rep" aria-expanded={showRep} onClick={() => setShowRep((v) => !v)}>
+                    <span className="eyebrow">Wiederholung</span>
+                    <span className="meta">{repStand.sitzt} von {repStand.total} sitzen {showRep ? "▴" : "▾"}</span>
+                  </button>
+                  {showRep && repListe.map(renderPunkt)}
+                </>
+              )}
             </div>
           );
-        })}
+        })()}
 
-        {rep.length > 0 && (
-          <div className="stack">
-            <button type="button" className="kp-rep" aria-expanded={showRep} onClick={() => setShowRep((v) => !v)}>
-              <span className="eyebrow">Wiederholung</span>
-              <span className="meta">{repStand.sitzt} von {repStand.total} sitzen {showRep ? "▴" : "▾"}</span>
-            </button>
-            {showRep && rep.map(renderPunkt)}
-          </div>
-        )}
-
+        {aktiv === "Eigene" && (
         <div className="stack">
-          <div className="card-row">
-            <span className="eyebrow">Eigene Punkte</span>
-            {eigene.length > 0 && <span className="meta">{eigene.filter((i) => i.status === "sitzt").length} von {eigene.length}</span>}
-          </div>
           {!eigene.length && <span className="meta">Was dein Trainer dir mitgibt oder was noch wackelt, trägst du hier ein.</span>}
-          {eigene.map((i) => (
+          {eigene.filter((i) => filter === "alles" || i.status !== "sitzt").map((i) => (
             <Zeile
               key={i.id}
               name={i.label}
@@ -335,8 +311,31 @@ export default function KarateSection() {
             </button>
           </div>
         </div>
+        )}
+      </section>
 
-        <span className="meta">{QUELLE.beispiel ? `Beispielinhalt: ${QUELLE.text}` : QUELLE.text}</span>
+      <section className="card">
+        <h2>Training und Hinweise</h2>
+        <span className="meta">{trainings} Karate-Trainings in 8 Wochen{injuries.some((i) => SPOTS[i.spot]) ? " · Hinweis bei Verletzung" : ""}</span>
+        <Details id="karate.training" label="Trainings je Woche, Verletzung und Quelle">
+          <div className="bars small" role="img" aria-label={`Karate-Trainings der letzten 8 Wochen, insgesamt ${trainings}`}>
+            {weeks.map((n, i) => (
+              <div key={i} className="bar-col">
+                <span className="bar-val">{n || ""}</span>
+                <span className="bar" style={{ height: Math.max(3, n * 18) + "px", background: i === 7 ? "var(--training)" : "var(--line-strong)" }} />
+              </div>
+            ))}
+          </div>
+          <span className="meta">Erledigte Einheiten aus dem Kalender und Karate aus Garmin.</span>
+          {injuries.map((inj) =>
+            SPOTS[inj.spot] ? (
+              <p key={inj.id} className="kyu">
+                {SPOTS[inj.spot].label} verletzt. {kyuHinweis(inj.spot, ziel)}
+              </p>
+            ) : null
+          )}
+          <span className="meta">{QUELLE.beispiel ? `Beispielinhalt: ${QUELLE.text}` : QUELLE.text}</span>
+        </Details>
       </section>
     </>
   );
