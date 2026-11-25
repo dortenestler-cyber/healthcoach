@@ -76,7 +76,6 @@ export default function TodayPlan({ children }: { children?: ReactNode }) {
               <span className="row-strong">
                 <i className="dot" style={{ background: SPORTS[s.sport].color }} />
                 {SPORTS[s.sport].label}
-                {s.time ? " · " + s.time : ""}
               </span>
               <span className={done ? "badge badge-ok" : eff && eff.kind !== "angepasst" ? "badge badge-warn" : "badge badge-training"}>
                 {done ? "erledigt" : eff?.kind === "pause" ? "Pause" : eff?.kind === "gesperrt" ? "pausiert" : "geplant"}

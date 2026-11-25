@@ -46,8 +46,6 @@ export function sportOf(a: { type_key: string | null; sport_override?: string | 
   return sportOfGarmin(a.type_key);
 }
 
-// Die Wochenvorlage ist entfallen (Nutzerin 24.11.): Training wird im Kalender geplant und erfasst.
-export const DEFAULT_TIMES: Partial<Record<Sport, string>> = { karate: "19:00", kettlebell: "18:00", klettern: "10:00" };
 export const WEEKDAY_LABELS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
 export const isoWeekday = (d: Date) => ((d.getDay() + 6) % 7) + 1;
