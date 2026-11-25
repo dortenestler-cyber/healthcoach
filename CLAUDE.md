@@ -45,7 +45,7 @@ Zwei Claude-Instanzen arbeiten parallel, Regeln in `docs/konzept-zwei-instanzen.
 - Die Seite Zyklus stellt den Zyklus in den Mittelpunkt: Ring mit Phasen, was in der heutigen Phase üblich ist, Werte und Symptome nach Zyklustag, Gewohnheiten je Phase.
 - Gesundheit hat die Reiter Überblick · Medikamente · Krank & verletzt · Körper. Der Überblick zeigt heute auf einen Blick, was dir guttut (mit Wegen zu jeder Gewohnheit), „Dein Monat“ (nur deutlich Verändertes) und die Muster ohne Zyklusbezug („Weitere Muster“).
 - Gewohnheiten (früher „Einflüsse“) werden im Tagebuch per Tipp erfasst, Details nur wo nötig (Sauna: Gänge, Wann, Kältebecken). Liste und eigene Gewohnheiten unter Einstellungen › Gewohnheiten. Jede Gewohnheit hat eine Detailseite unter Gesundheit.
-- App-Symbol: Zen-Ring (Ensō), mit dem Pinsel gezeichnet, Sage hell (`#D2F1E0` → `#8FD5B0`) auf dunklem Grüngrau, hell genug für getönte Symbole in iOS (`public/icons/icon.svg`, `public/icons/icon-dark.svg`, PNG-Größen daneben).
+- App-Symbol: Blatt mit Puls – Blatt (Erholung, Zyklus) mit einem Herzschlag als Mittelrippe, Sage (`#8FD5B0`, Puls `#D2F1E0`) auf dunklem Grüngrau, hell genug für getönte Symbole in iOS (`public/icons/icon.svg`, `public/icons/icon-dark.svg`, PNG-Größen daneben, ohne Kachel `public/icons/mark.svg`).
 
 ## Gesundheit und Sicherheit
 - Keine Diagnosen, keine Dosierungsvorschläge. Mengen von Medikamenten trägt die Nutzerin selbst ein.

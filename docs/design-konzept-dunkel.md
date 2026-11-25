@@ -177,6 +177,6 @@ Biologisches Alter und Alterungstempo (05), empfohlene Schlafens- und Aufstehzei
   - Wie oft, mit Raster der letzten 13 Wochen
   - Die Nacht danach mit und ohne: HRV, Ruhepuls, Tiefschlaf, Nachtschweiß
   - Je Zyklusphase, dazu Hitzewallungen am Tag danach
-- **Sperrbildschirm**: nur der Zen-Ring ohne Kachel (`public/icons/enso.svg`), Gruß nach Tageszeit, Ziffernfeld wie beim iPhone mit Buchstaben, Face ID im Ziffernfeld. Nie ein Gesundheitswert.
+- **Sperrbildschirm**: nur das Blatt mit Puls ohne Kachel (`public/icons/mark.svg`), Gruß nach Tageszeit, Ziffernfeld wie beim iPhone mit Buchstaben, Face ID im Ziffernfeld. Nie ein Gesundheitswert.
 - **Icons** statt Kürzeln für Sportarten. Coach-Symbol: Sprechblase mit Pulslinie.
-- **App-Symbol Zen-Ring** (Ensō, mit dem Pinsel gezeichnet, trockene Pinselspuren, ausfaserndes Ende): dunkle Variante freigegeben, seit 23.11. Sage hell auf dunklem Grüngrau (passt zu getönten Symbolen in iOS), für hell und dunkel gleich.
+- **App-Symbol Blatt mit Puls** (seit 25.11.): Blatt in Sage, Mittelrippe als Herzschlag, auf dunklem Grüngrau, für hell und dunkel gleich. Vorher: Zen-Ring (Ensō, mit dem Pinsel gezeichnet, trockene Pinselspuren, ausfaserndes Ende): dunkle Variante freigegeben, seit 23.11. Sage hell auf dunklem Grüngrau (passt zu getönten Symbolen in iOS), für hell und dunkel gleich.

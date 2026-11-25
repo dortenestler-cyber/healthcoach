@@ -20,10 +20,15 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014p
 
 
 
+## App-Symbol Blatt mit Puls (25.11.)
+- Wunsch der Nutzerin: Vorschlag B statt Ensō. `public/icons/icon.svg`, `icon-dark.svg` und alle PNG (180, 192, 512, 1024) neu, `enso.svg` → `mark.svg` (PIN-Sperre). Login und Seitenleiste nutzen weiter `icon.svg`.
+- Aufs iPhone kommt es erst nach Löschen und neu „Zum Home-Bildschirm“.
+- Offen für Daten: Store-Icon der Uhr (`watch/store/`) zeigt noch den Ensō.
+
 ## Bug: Eisprung an Zyklustag 20 (25.11.)
 - Meldung der Nutzerin: Heute zeigte an Tag 20 von etwa 27 „Eisprung“. Ursache: Ein eingetragenes Eisprung-Zeichen galt ungeprüft als Eisprungtag.
 - `lib/cycle.ts` `ovulationDay`: Zeichen zählt nur, wenn danach noch mindestens 10 Tage bis zur üblichen Zykluslänge bleiben (`LUTEAL_MIN`), sonst gilt die Schätzung (Länge − 14). Temperaturanstieg allein zählt für den Vortag.
-- Nächster Schritt: Nutzerin prüft Heute und Zyklus.
+- Erledigt: Nutzerin hat am 25.11. bestätigt, Tag 20 zeigt „Luteal früh“.
 
 ## Gewohnheiten im Monat und Monatsrückblick entfernt (PR #140, 25.11.)
 - Wunsch der Nutzerin: „Dein Monat“ ersetzt beide. `MonthReviewCard` gelöscht, Karte „Gewohnheiten im …“ aus `OverviewSection` entfernt, tote Stile (`review-*` außer count/number/unit, `habit-month-*`, `habit-week*`) entfernt.
