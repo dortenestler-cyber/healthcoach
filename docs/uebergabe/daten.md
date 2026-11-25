@@ -1,6 +1,10 @@
 # Übergabe · Daten (DA)
-Belegt: frei
+Belegt: Konto A · Sitzung https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU · seit 2026-11-25
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WGKktjg5sG2bBmQXp
+
+## In Arbeit: Abschnitte aus dem Puls (25.11., Freigabe der Nutzerin)
+- Zweig `claude/training-detection-heart-rate-ypzut9`. Versuche (Bouldern), Sätze (Kettlebell), Runden (Karate), Intervalle (Ausdauer) aus dem Puls in Sekunden erkennen, in der Einheit bestätigen.
+- Nächster Schritt: Migration `20261130090000_abschnitte`, Abruf in `garmin-sync/details.ts`.
 
 ## Garmin-Schlafwert entfernt (25.11.)
 - Uhr: `supabase/functions/watch/schlaf.ts` (`sleepTotal`) rechnet den eigenen Schlafwert wie `lib/schlaf.ts` (geprüft: gleiche Werte an Testnächten). Readiness-Faktor SCHLAF mit festen Stufen (≥85 +3, ≥70 0, ≥55 −5, sonst −10), Feld `sleep` für das Zifferblatt liefert den eigenen Wert. `rangeFor` in `target.ts` exportiert und allgemein.

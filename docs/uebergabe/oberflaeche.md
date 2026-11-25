@@ -1,6 +1,10 @@
 # Übergabe · Oberfläche (OF)
-Belegt: frei
+Belegt: Konto A · Sitzung https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU · seit 2026-11-25
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WGKktjg5sG2bBmQXp
+
+## In Arbeit: Abschnitte aus dem Puls (25.11., Freigabe der Nutzerin)
+- Zweig `claude/training-detection-heart-rate-ypzut9`, zusammen mit Daten. Erkennung `lib/abschnitte.ts`, Karte in `components/training/UnitDetail.tsx`.
+- Nächster Schritt: nach der Migration die Karte bauen.
 
 ## Schlaf nach Menge und Qualität (25.11.)
 - Konzept `docs/konzept-schlafqualitaet.md` freigegeben, umgesetzt in `lib/schlaf.ts` (`sleepScore`, `sleepSentence`, `sleepRows`, `spo2Warning`).
