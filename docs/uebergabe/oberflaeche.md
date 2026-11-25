@@ -2,6 +2,10 @@
 Belegt: frei
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWcpKAVS1T6prb5SPNt
 
+## Uhrzeiten im Plan entfernt (25.11.)
+- Wunsch der Nutzerin: keine Uhrzeiten bei geplanten Einheiten. Anzeige in `TodayPlan` und `TagTraining` entfernt, neue Einheiten ohne Zeit (`DEFAULT_TIMES` gelöscht). Spalte `time` bleibt in der Datenbank.
+- Offen für Daten: `supabase/functions/watch/index.ts` gibt `time` noch an die Uhr; neue Einheiten liefern dort eine leere Zeit. Ändern nur mit Freigabe.
+
 ## Konzept Einfach bedienen (PR #146, Entwurf, 25.11.)
 - Dritte Runde nach Aufräumen und Bündeln. Prompt `docs/prompt-einfach.md`, Konzept `docs/konzept-einfach.md`, Skizze `docs/entwurf-einfach.html`, Fotos `docs/bilder/einfach/`.
 - Prüfung mit Beispieldaten über einen nachgebauten Supabase-Server (Playwright, 390 × 844). Größte Hürden: kein zentraler Kalender, keine Liste aller Aktivitäten („Alle ›“ auf Heute führt ins Leere), Status-Block über sechs Trainingsreitern, Zyklus 6,7 Bildschirme.

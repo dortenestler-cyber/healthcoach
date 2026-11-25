@@ -13,7 +13,7 @@ import { isoDay, longDate } from "@/lib/dates";
 import { activityLabel, durationText, type Activity } from "@/lib/garmin";
 import type { Illness, Injury } from "@/lib/health";
 import { announceNewData } from "@/lib/refresh";
-import { DEFAULT_TIMES, fromIso, healthEffect, sportOf, SPORTS, type Session, type Sport } from "@/lib/training";
+import { fromIso, healthEffect, sportOf, SPORTS, type Session, type Sport } from "@/lib/training";
 
 const ADDABLE: Sport[] = ["karate", "kettlebell", "klettern", "ausdauer"];
 const DURATIONS = [30, 45, 60, 90];
@@ -80,7 +80,6 @@ export default function TagTraining({ day, sessions, acts, illness, injuries, on
               <span className="row-strong tag-act">
                 <span className="today-act-icon is-training" aria-hidden="true"><SportIcon sport={s.sport} size={18} /></span>
                 {SPORTS[s.sport].label}
-                {s.time && s.status === "geplant" ? " · " + s.time : ""}
                 {s.duration_min ? " · " + s.duration_min + " min" : ""}
                 {s.rpe ? " · Anstrengung " + s.rpe : ""}
               </span>
@@ -122,7 +121,7 @@ export default function TagTraining({ day, sessions, acts, illness, injuries, on
             type="button"
             className="pill pill-sm"
             disabled={sessions.some((s) => s.sport === sp && s.source === "eigen")}
-            onClick={() => (future ? run(sb.from("planned_sessions").insert({ day, sport: sp, time: DEFAULT_TIMES[sp] ?? null, source: "eigen" })) : setLog({ id: null, day, sport: sp, duration: "", rpe: null }))}
+            onClick={() => (future ? run(sb.from("planned_sessions").insert({ day, sport: sp, time: null, source: "eigen" })) : setLog({ id: null, day, sport: sp, duration: "", rpe: null }))}
           >
             + {SPORTS[sp].label}
           </button>
