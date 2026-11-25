@@ -6,7 +6,7 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017z
 - Migration `20261130110000_tagesabschluss`: `push_subscriptions.evening_push` (an), `evening_at` ('21:00'), `evening_sent_on`. `garmin_day_tick` macht um 19:37, 20:37, 21:37 einen vollen Abruf `{days: 1}` (Belastung aus dem Alltag), sonst den kurzen.
 - `push`: `due` geht jetzt über alle Geräte; Tagesabschluss ab `evening_at` bis 23:30, einmal am Tag. `tagesabschluss`/`sleepPlan` in `push/nachrichten.ts` (Schlafbedarf wie `sleepNeed` in `lib/today.ts`, vereinfacht; ins Bett bis = übliche Aufwachzeit 14 Nächte minus Bedarf). Link `/tagebuch?abschluss=1`.
 - Geprüft: `deno check`, Text an Beispieldaten.
-- Wartet auf: Merge durch die Nutzerin (Migration), danach am Abend prüfen.
+- PR #180 gemergt 25.11., Migration und Hochladen grün. Wartet auf: erster Tagesabschluss am Abend.
 
 ## Tagesstart und Mitteilung nach dem Training (PR #179, 25.11., Freigabe der Nutzerin)
 - Migration `20261130100000_tagesstart_training`: `push_subscriptions.training_push`, `show_values` (beide Standard an), `garmin_activities.notified_at` (alle bisherigen gesetzt), Funktion `garmin_day_tick` und Zeitplan `garmin-tagsueber` (Minute 7, 22, 37, 52; nur 6–22 Uhr Berlin) ruft `garmin-sync` mit `{quick: true}`.
