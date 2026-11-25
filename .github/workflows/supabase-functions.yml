@@ -31,6 +31,8 @@ jobs:
           fi
           for dir in supabase/functions/*/; do
             name=$(basename "$dir")
+            # _shared enthält gemeinsamen Code, keine eigene Funktion
+            case "$name" in _*) continue ;; esac
             echo "Lade $name hoch …"
             extra=""
             # Die Uhr meldet sich mit ihrem eigenen Uhr-Schlüssel an, nicht mit einem Supabase-Login.

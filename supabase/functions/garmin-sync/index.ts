@@ -85,6 +85,54 @@ const int = (v: unknown): number | null => {
   return n === null ? null : Math.round(n);
 };
 
+// Eine Zeile für garmin_activities aus der Aktivitätenliste von Garmin
+function actRow(a: Any, userId: string): Record<string, unknown> {
+  return {
+    user_id: userId,
+    activity_id: a.activityId,
+    type_key: a?.activityType?.typeKey ?? null,
+    name: a?.activityName ?? null,
+    start_local: a?.startTimeLocal ?? null,
+    duration_s: int(a?.duration),
+    distance_m: num(a?.distance),
+    avg_hr: int(a?.averageHR),
+    max_hr: int(a?.maxHR),
+    training_load: num(a?.activityTrainingLoad),
+    steps: int(a?.steps),
+    synced_at: new Date().toISOString(),
+  };
+}
+
+async function saveActivities(sb: Any, rows: Record<string, unknown>[]): Promise<boolean> {
+  let { error } = await sb.from("garmin_activities").upsert(rows, { onConflict: "user_id,activity_id" });
+  let stepsMissing = false;
+  if (error && /steps/.test(error.message)) {
+    // Migration 20261124090000_alltagslast fehlt noch: ohne Schritte speichern
+    stepsMissing = true;
+    ({ error } = await sb.from("garmin_activities").upsert(rows.map(({ steps: _s, ...a }) => a), { onConflict: "user_id,activity_id" }));
+  }
+  if (error) throw new Error("Speichern der Aktivitäten: " + error.message);
+  return stepsMissing;
+}
+
+// Mitteilung nach dem Training: die Funktion push sucht neue Einheiten selbst und meldet sie.
+// Fehler brechen den Abruf nicht ab.
+async function notifyTraining(): Promise<string> {
+  const secret = Deno.env.get("PUSH_CRON_SECRET");
+  if (!secret) return "PUSH_CRON_SECRET fehlt";
+  try {
+    const res = await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/push`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-cron-secret": secret },
+      body: JSON.stringify({ action: "training" }),
+    });
+    const j = await res.json().catch(() => ({}));
+    return res.ok ? `gesendet: ${j?.sent ?? 0}` : String(j?.error ?? res.status);
+  } catch (e) {
+    return e instanceof Error ? e.message : String(e);
+  }
+}
+
 // Server-Schlüssel: alter Name oder neues Format (wie in der Funktion push)
 function serviceKey(): string {
   const legacy = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -147,6 +195,34 @@ Deno.serve(async (req) => {
       } catch (e) {
         return json(200, { ok: false, expires, error: e instanceof Error ? e.message : String(e) });
       }
+    }
+
+    // Kurzer Abruf tagsüber (Zeitplan alle 15 Minuten): nur die Aktivitäten von gestern und heute,
+    // dazu Puls in Sekunden, danach die Mitteilung nach dem Training. Kein Eintrag im Protokoll.
+    if (body?.quick) {
+      logRun = async () => {};
+      const token = await garminToken(apiKey);
+      const s = isoDay(addDays(new Date(), -1));
+      const e = isoDay(new Date());
+      const list = await garminGet(token, `/activitylist-service/activities/search/activities?startDate=${s}&endDate=${e}&start=0&limit=20&sortOrder=desc&excludeChildren=true`);
+      const items = ((Array.isArray(list) ? list : []) as Any[]).filter((a) => a?.activityId);
+      const startGmt = new Map<number, number>();
+      for (const a of items) {
+        const g = typeof a?.startTimeGMT === "string" ? Date.parse(a.startTimeGMT.replace(" ", "T") + "Z") : NaN;
+        if (Number.isFinite(g)) startGmt.set(a.activityId, g);
+      }
+      const rows = items.map((a) => actRow(a, userId));
+      let detail = { units: 0, note: "" };
+      if (rows.length) {
+        await saveActivities(sb, rows);
+        try {
+          detail = await syncDetails(sb, token, userId, rows.map((r) => r.activity_id as number), startGmt);
+        } catch (err) {
+          detail.note = err instanceof Error ? err.message : String(err);
+        }
+      }
+      const pushNote = cronKey && rows.length ? await notifyTraining() : "";
+      return json(200, { ok: true, quick: true, activities: rows.length, detailUnits: detail.units, detailNote: detail.note, pushNote });
     }
 
     const days = Math.min(MAX_DAYS, Math.max(1, Number(body?.days) || 7));
@@ -316,20 +392,7 @@ Deno.serve(async (req) => {
           if (!a?.activityId) continue;
           const g = typeof a?.startTimeGMT === "string" ? Date.parse(a.startTimeGMT.replace(" ", "T") + "Z") : NaN;
           if (Number.isFinite(g)) startGmt.set(a.activityId, g);
-          activities.push({
-            user_id: userId,
-            activity_id: a.activityId,
-            type_key: a?.activityType?.typeKey ?? null,
-            name: a?.activityName ?? null,
-            start_local: a?.startTimeLocal ?? null,
-            duration_s: int(a?.duration),
-            distance_m: num(a?.distance),
-            avg_hr: int(a?.averageHR),
-            max_hr: int(a?.maxHR),
-            training_load: num(a?.activityTrainingLoad),
-            steps: int(a?.steps),
-            synced_at: new Date().toISOString(),
-          });
+          activities.push(actRow(a, userId));
         }
         if (items.length < 20) break;
       }
@@ -381,13 +444,12 @@ Deno.serve(async (req) => {
       if (error) throw new Error("Speichern der Tageswerte: " + error.message);
     }
     if (activities.length) {
-      let { error } = await sb.from("garmin_activities").upsert(activities, { onConflict: "user_id,activity_id" });
-      if (error && /steps/.test(error.message)) {
-        // Migration 20261124090000_alltagslast fehlt noch: ohne Schritte speichern
-        alltagMissing = true;
-        ({ error } = await sb.from("garmin_activities").upsert(activities.map(({ steps: _s, ...a }) => a), { onConflict: "user_id,activity_id" }));
+      if (await saveActivities(sb, activities)) alltagMissing = true;
+      // Abruf aus der App: die Nutzerin sieht die Einheiten gerade, also keine Mitteilung mehr dazu
+      if (!cronKey) {
+        await sb.from("garmin_activities").update({ notified_at: new Date().toISOString() })
+          .eq("user_id", userId).in("activity_id", activities.map((a) => a.activity_id)).is("notified_at", null);
       }
-      if (error) throw new Error("Speichern der Aktivitäten: " + error.message);
     }
 
     // Puls in Sekunden und Satzerkennung je Aktivität (Abschnitte). Fehler brechen den Abruf nicht ab.
@@ -452,7 +514,9 @@ Deno.serve(async (req) => {
     }
 
     await logRun(true, null).catch(() => {});
+    const pushNote = cronKey && activities.length ? await notifyTraining() : "";
     return json(200, {
+      pushNote,
       ok: true,
       days,
       cycles,

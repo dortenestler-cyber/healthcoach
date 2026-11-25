@@ -54,10 +54,11 @@ export async function currentSubscription(): Promise<PushSubscription | null> {
   return (await reg?.pushManager.getSubscription()) ?? null;
 }
 
-export type Reminder = { checkin_reminder: boolean; remind_at: string };
+// checkin_reminder heißt in der App „Tagesstart“ (Migration 20261130100000_tagesstart_training)
+export type Reminder = { checkin_reminder: boolean; remind_at: string; training_push?: boolean; show_values?: boolean };
 
 export async function loadReminder(sub: PushSubscription): Promise<Reminder | null> {
-  const { data } = (await supabase()?.from("push_subscriptions").select("checkin_reminder, remind_at").eq("endpoint", sub.endpoint).maybeSingle()) ?? {};
+  const { data } = (await supabase()?.from("push_subscriptions").select("*").eq("endpoint", sub.endpoint).maybeSingle()) ?? {};
   return (data as Reminder | null) ?? null;
 }
 

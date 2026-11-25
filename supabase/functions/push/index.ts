@@ -11,10 +11,12 @@
 // Aktionen (POST, JSON):
 //   { action: "key" }   öffentlichen Schlüssel für die App liefern (mit Login)
 //   { action: "test" }  Testmitteilung an die eigenen Geräte (mit Login)
-//   { action: "due" }   fällige Erinnerungen an alle verschicken (nur Zeitplan, mit x-cron-secret)
+//   { action: "due" }   fälligen Tagesstart an alle verschicken (nur Zeitplan, mit x-cron-secret)
+//   { action: "training" } neue Einheiten melden (garmin-sync nach dem Abruf, mit x-cron-secret)
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import webpush from "npm:web-push@3.6.7";
+import { tagesstart, trainingMessages } from "./nachrichten.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -24,7 +26,7 @@ const cors = {
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
 
-type Sub = { id: string; user_id: string; endpoint: string; p256dh: string; auth: string; remind_at: string; time_zone: string; checkin_reminder: boolean; last_sent_on: string | null };
+type Sub = { id: string; user_id: string; endpoint: string; p256dh: string; auth: string; remind_at: string; time_zone: string; checkin_reminder: boolean; last_sent_on: string | null; training_push?: boolean; show_values?: boolean };
 
 function serviceKey(): string {
   const legacy = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -40,6 +42,13 @@ function serviceKey(): string {
 const localDay = (tz: string, d = new Date()) => new Intl.DateTimeFormat("sv-SE", { timeZone: tz }).format(d);
 const localTime = (tz: string, d = new Date()) =>
   new Intl.DateTimeFormat("de-DE", { timeZone: tz, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(d);
+
+// "07:30" + 2 Stunden → "09:30" (für den Vergleich als Text)
+function addHours(hhmm: string, h: number): string {
+  const [a, b] = hhmm.split(":").map(Number);
+  const m = Math.min(23 * 60 + 59, (a || 0) * 60 + (b || 0) + h * 60);
+  return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+}
 
 function safeTz(tz: string): string {
   try {
@@ -76,7 +85,8 @@ Deno.serve(async (req) => {
     const action = String(body?.action ?? "");
     const url = Deno.env.get("SUPABASE_URL")!;
 
-    // Zeitplan: fällige Erinnerungen an alle
+    // Zeitplan (alle 15 Minuten): Tagesstart ab der eingestellten Uhrzeit, einmal am Tag.
+    // Fehlen die Garmin-Werte der Nacht noch, wartet er bis zu zwei Stunden auf den Abruf.
     if (action === "due") {
       const secret = Deno.env.get("PUSH_CRON_SECRET");
       if (!secret || req.headers.get("x-cron-secret") !== secret) return json(401, { error: "Nicht erlaubt." });
@@ -84,17 +94,37 @@ Deno.serve(async (req) => {
       const { data, error } = await admin.from("push_subscriptions").select("*").eq("checkin_reminder", true);
       if (error) return json(500, { error: error.message });
       let sent = 0;
+      const cache = new Map<string, Awaited<ReturnType<typeof tagesstart>>>();
       for (const s of (data ?? []) as Sub[]) {
         const tz = safeTz(s.time_zone);
         const today = localDay(tz);
-        if (s.last_sent_on === today || localTime(tz) < s.remind_at) continue;
-        // Schon eingecheckt? Dann keine Erinnerung.
-        const { data: c } = await admin.from("checkins").select("id").eq("user_id", s.user_id).eq("day", today).maybeSingle();
+        const now = localTime(tz);
+        if (s.last_sent_on === today || now < s.remind_at) continue;
+        const key = s.user_id + today;
+        if (!cache.has(key)) cache.set(key, await tagesstart(admin, s.user_id, today));
+        const m = cache.get(key)!;
+        if (!m.ready && now < addHours(s.remind_at, 2)) continue;
         await admin.from("push_subscriptions").update({ last_sent_on: today }).eq("id", s.id);
-        if (c) continue;
-        if (await send(admin, s, { title: "Morgen-Check-in", body: "Wie hast du geschlafen? 30 Sekunden für deinen Check-in.", url: "/" })) sent++;
+        if (await send(admin, s, s.show_values === false ? m.quiet : m.full)) sent++;
       }
       return json(200, { ok: true, sent });
+    }
+
+    // Nach dem Abruf: Einheiten ohne Mitteilung melden, die vor höchstens 6 Stunden endeten
+    if (action === "training") {
+      const secret = Deno.env.get("PUSH_CRON_SECRET");
+      if (!secret || req.headers.get("x-cron-secret") !== secret) return json(401, { error: "Nicht erlaubt." });
+      const admin = createClient(url, serviceKey());
+      const msgs = await trainingMessages(admin);
+      let sent = 0;
+      for (const m of msgs) {
+        const { data: subs } = await admin.from("push_subscriptions").select("*").eq("user_id", m.user_id);
+        for (const s of (subs ?? []) as Sub[]) {
+          if (s.training_push === false) continue;
+          if (await send(admin, s, s.show_values === false ? m.quiet : m.full)) sent++;
+        }
+      }
+      return json(200, { ok: true, units: msgs.length, sent });
     }
 
     // Ab hier nur mit Login
