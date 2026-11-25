@@ -8,7 +8,7 @@ import { loadSettings, saveSettings } from "@/lib/training";
 
 // Texte vom Coach (Claude) für Heute und „Dein Monat“ (Logbuch 25.11., Variante A).
 // Einmal am Tag geschrieben, gespeichert in settings.data.briefing, auf Wunsch neu.
-// Läuft über die bestehende Funktion „coach“ (zählt zum Tageslimit, steht im Coach-Verlauf).
+// Läuft über die Funktion „coach“ mit briefing: true (ohne Verlauf, nicht gespeichert, außerhalb des Tageslimits).
 // Ist der Coach aus oder schlägt der Aufruf fehl, zeigt die Seite ihren Text nach festen Regeln.
 
 export type BriefingArt = "tag" | "monat";
@@ -20,7 +20,7 @@ async function fragen(art: BriefingArt, key: string, frage: string, zusatz: stri
   const sb = supabase();
   if (!sb) throw new Error("Keine Verbindung");
   const ctx = await buildCoachContext().catch(() => "");
-  const { data, error } = await sb.functions.invoke("coach", { body: { message: frage, context: (zusatz ? zusatz + "\n" : "") + ctx, limit: getCoachPrefs().dailyLimit } });
+  const { data, error } = await sb.functions.invoke("coach", { body: { message: frage, context: (zusatz ? zusatz + "\n" : "") + ctx, briefing: true } });
   let detail = (data as { error?: string } | null)?.error;
   if (error) {
     detail = error.message;

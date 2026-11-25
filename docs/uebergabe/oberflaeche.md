@@ -13,8 +13,7 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017z
 ## Coach schreibt Tagesempfehlung und Monatsrückblick (25.11.)
 - Variante A freigegeben. `lib/briefing.ts` (`useBriefing`): ruft die bestehende Funktion `coach` mit fester Frage und `buildCoachContext()` auf, speichert in `settings.data.briefing.{tag,monat}` mit Schlüssel (Tag; Monat: Tag + Anzahl Veränderungen), ↻ schreibt neu. Rendering `components/ui/CoachText.tsx` (erste Zeile Lage, „- “ Liste, **fett**).
 - Heute: `components/heute/Tagesempfehlung.tsx` „Für heute“ statt `DaySentence` (nur heute, nicht bei Warnzeichen; Coach aus oder Fehler → `DaySentence`). Gesundheit: `components/gesundheit/DeinMonatKarte.tsx`, Liste hinter `Details id="monat.liste"`, ohne Veränderungen keine Anfrage.
-- Nebenwirkung: jede Anfrage zählt zum Tageslimit und erscheint als eigener Chat im Coach-Verlauf.
-- Offen für Daten (Freigabe nötig): `supabase/functions/coach` – Ziele im SYSTEM-Text veraltet (5. Kyu, Frühjahr 2027), „2 bis 6 Sätze“; Schalter, damit Tagesempfehlung/Rückblick nicht im Chat-Verlauf landen.
+- Mit `briefing: true` (PR Coach-Funktion): kein Chat-Verlauf, kein Tageslimit.
 - Nächster Schritt: Erklärkarten (`ExplainCard`, 25 Stellen) prüfen: nur behalten, wo sie etwas Eigenes sagen, auf eigene Zahlen zuschneiden.
 
 ## Hinweistexte entfernt (25.11.)
@@ -27,7 +26,7 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017z
 
 ## Uhrzeiten im Plan entfernt (25.11.)
 - Wunsch der Nutzerin: keine Uhrzeiten bei geplanten Einheiten. Anzeige in `TodayPlan` und `TagTraining` entfernt, neue Einheiten ohne Zeit (`DEFAULT_TIMES` gelöscht). Spalte `time` bleibt in der Datenbank.
-- Offen für Daten: `supabase/functions/watch/index.ts` gibt `time` noch an die Uhr; neue Einheiten liefern dort eine leere Zeit. Ändern nur mit Freigabe.
+- Uhr: Funktion `watch` schickt keine Uhrzeiten mehr (Freigabe 25.11.).
 
 ## Konzept Einfach bedienen (PR #146, Entwurf, 25.11.)
 - Dritte Runde nach Aufräumen und Bündeln. Prompt `docs/prompt-einfach.md`, Konzept `docs/konzept-einfach.md`, Skizze `docs/entwurf-einfach.html`, Fotos `docs/bilder/einfach/`.

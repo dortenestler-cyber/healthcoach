@@ -33,15 +33,16 @@ const SYSTEM = `Du bist der Coach in der App „Health Coach“ einer 40-jährig
 Du kennst ihr Training, ihre Erholung, ihren Zyklus, ihre Symptome und ihre Medikamente aus der Zusammenfassung unten.
 
 Ihre Ziele:
-- Karate: grüner Gürtel, Prüfung zum 5. Kyu im Frühjahr 2027. Montag ist immer Karate.
-- Bouldern: aktuell Fontainebleau 4 bis 5, Ziel 6A.
+- Karate: Kyu-Prüfungen nach der Prüfungsordnung Shotokan des DKV. Welcher Kyu als Nächstes kommt und wann, steht in der Zusammenfassung. Montag ist immer Karate.
+- Bouldern: Ziel Fontainebleau 6A. Den aktuellen Stand nennt die Zusammenfassung.
 - Kettlebell: allgemeiner Kraftaufbau mit Kettlebells von 1 bis 20 kg, auch Übungen mit Körpergewicht.
 - Ausdauer: Joggen, Wandern, Rad fahren, Gehen. Diese Einheiten zeichnet die Garmin-Uhr auf.
 - Perimenopause: Muster erkennen und das Training an Symptome und Erholung anpassen.
 Sie trainiert 3 bis 4 Mal pro Woche.
 
 So antwortest du:
-- Auf Deutsch, klar und knapp, ohne Fachjargon. Fachbegriffe erklärst du beim ersten Mal. Meist 2 bis 6 Sätze oder eine kurze Liste.
+- Auf Deutsch, klar und knapp, ohne Fachjargon. Meist 2 bis 6 Sätze oder eine kurze Liste. Gibt die Frage eine Form vor, folgst du genau dieser Form.
+- Sie hat die App selbst gebaut und kennt ihre Werte. Du erklärst keine Begriffe und keine Rechenwege, sondern sagst, was die Zahlen für ihren Tag bedeuten und was sie konkret anders machen soll.
 - Immer „Kettlebell“, nie „Glocke“.
 - Du richtest Vorschläge an ihren Zielen aus und berücksichtigst Schlaf, HRV, Body Battery, Zyklusphase, Symptome, Krankheiten und Verletzungen. An schlechten Tagen schlägst du leichtere Varianten vor.
 - Muster benennst du vorsichtig als Zusammenhang, nie als Beweis. Wenn Daten fehlen, sagst du das.
@@ -77,6 +78,8 @@ Deno.serve(async (req) => {
     // Einrichtungs-Check: Schlüssel vorhanden, Modell nennen, keine Anfrage an Claude
     if (body?.check) return json(200, { ok: true, model });
     const question = String(body?.message ?? "").trim().slice(0, 2000);
+    // Tagesempfehlung und Monatsrückblick der App: ohne Verlauf, nicht gespeichert, zählt nicht zum Tageslimit
+    const briefing = body?.briefing === true;
     const context = String(body?.context ?? "").slice(0, 6000);
     if (!question) return json(400, { error: "Keine Frage erhalten." });
 
@@ -86,7 +89,7 @@ Deno.serve(async (req) => {
     const { count } = await sb.from("coach_messages").select("id", { count: "exact", head: true }).eq("role", "user").gte("created_at", since.toISOString());
     const wanted = Number(body?.limit);
     const limit = Number.isFinite(wanted) && wanted > 0 ? Math.min(Math.round(wanted), DAILY_LIMIT) : DAILY_LIMIT;
-    if ((count ?? 0) >= limit) return json(429, { error: `Für heute sind ${limit} Fragen erreicht. Morgen geht es weiter. Das Limit stellst du in den Einstellungen ein.` });
+    if (!briefing && (count ?? 0) >= limit) return json(429, { error: `Für heute sind ${limit} Fragen erreicht. Morgen geht es weiter. Das Limit stellst du in den Einstellungen ein.` });
 
     // Chat: bestehenden fortsetzen oder (erst nach der Antwort) neuen anlegen, Titel aus der ersten Frage.
     // Fehlt die Tabelle coach_chats noch (Migration nicht gelaufen), gilt der alte Verlauf über alle Nachrichten.
@@ -103,7 +106,7 @@ Deno.serve(async (req) => {
 
     // Bisheriger Verlauf: nur der aktuelle Chat, ein neuer Chat beginnt leer
     let hist: { role: "user" | "assistant"; content: string }[] = [];
-    if (!chats || chatId) {
+    if (!briefing && (!chats || chatId)) {
       let hq = sb.from("coach_messages").select("role, content").order("created_at", { ascending: false }).limit(HISTORY);
       if (chats && chatId) hq = hq.eq("chat_id", chatId);
       hist = ((await hq).data ?? []) as typeof hist;
@@ -149,6 +152,8 @@ Deno.serve(async (req) => {
     const outTok = Number(out?.usage?.output_tokens ?? 0);
     const [pIn, pOut] = PRICES[model] ?? PRICES["claude-sonnet-5-5"];
     const cost = (inTok * pIn + outTok * pOut) / 1_000_000;
+
+    if (briefing) return json(200, { answer, chat_id: null, used_today: count ?? 0, limit, cost_usd: cost });
 
     const now = Date.now();
     if (chats && !chatId) {

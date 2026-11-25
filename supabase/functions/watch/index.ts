@@ -276,7 +276,7 @@ async function today(sb: Any, uid: string, day: string) {
     pause,
     plan: ((plan.data ?? []) as Any[]).map((s) => ({
       label: SPORT_LABEL[s.sport] ?? "TRAINING",
-      time: s.time ?? "",
+      time: "", // Uhrzeiten im Plan entfallen (Nutzerin 25.11.); Feld bleibt für ältere Uhr-Versionen
       done: s.status === "erledigt",
       note: pause ? "PAUSE" : s.sport === "klettern" && blockedClimb ? "PAUSIERT" : "",
     })),
