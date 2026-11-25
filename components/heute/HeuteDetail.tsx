@@ -15,12 +15,14 @@ import { energyDay } from "@/lib/energie";
 import { duration, stressDay, stressSentence } from "@/lib/stress";
 import { dayRule, PHASES, STAGES, windowText, type DayRule, type Stage } from "@/lib/cycle";
 import { clock, isoDay, longDate, shiftDay } from "@/lib/dates";
-import { weekIntensity, WHO_MINUTES } from "@/lib/trainingLoad";
+import { weekIntensity, WHO_MINUTES, WHO_STRENGTH_DAYS } from "@/lib/trainingLoad";
+import { activityLabel } from "@/lib/garmin";
+import { sportOf, type Sport } from "@/lib/training";
 import type { Data } from "@/lib/insights";
 import { loadInsightData } from "@/lib/insightData";
 import { useFeatures } from "@/lib/prefs";
 import { DETAILS, type DetailKey } from "@/lib/heuteDetails";
-import { hm, metricRow, readinessFactors, readinessWhy, sleepNeed, vitalRows } from "@/lib/today";
+import { hm, loadByDay, metricRow, readinessFactors, readinessWhy, sleepNeed, vitalRows } from "@/lib/today";
 import { sleepRows, sleepScore, sleepSentence, sleepWord, spo2Warning } from "@/lib/schlaf";
 
 
@@ -309,6 +311,8 @@ function EnergyDetail({ day, data, nowMinute }: { day: string; data: Data; nowMi
 }
 
 const WEEKDAY = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+const STRENGTH: Sport[] = ["kettlebell", "klettern", "karate"];
+const listText = (xs: string[]) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} und ${xs[xs.length - 1]}`);
 const mondayOf = (iso: string) => shiftDay(iso, -((new Date(iso + "T12:00:00").getDay() + 6) % 7));
 
 // Intensitätsminuten der Woche (Montag bis heute) gegen die Empfehlung der WHO: großer Ring, Satz, Tage der Woche, 4 Wochen.
@@ -319,6 +323,27 @@ function IntensityDetail({ day, data, rule, isToday, nowMinute }: { day: string;
   const week = Array.from({ length: 7 }, (_, i) => shiftDay(mon, i));
   const weeks = Array.from({ length: 4 }, (_, i) => shiftDay(mon, -7 * (3 - i))).map((m) => ({ m, sum: weekIntensity(m === mon ? day : shiftDay(m, 6), data) }));
   const reached = weeks.filter((w) => w.sum >= WHO_MINUTES).length;
+  // Belastung nur aus Training (wie Garmin), damit Kraft und Bouldern sichtbar werden, die kaum Intensitätsminuten bringen
+  const trainLoad = loadByDay(data.acts);
+  const actsOn = (d: string) => data.acts.filter((a) => (a.start_local ?? "").slice(0, 10) === d && a.sport_override !== "ignorieren");
+  const dayLoad = Math.round(trainLoad.get(day) ?? 0);
+  const daySports = [...new Set(actsOn(day).map(activityLabel))];
+  const weekSum = Math.round(week.filter((d) => d <= day).reduce((a, d) => a + (trainLoad.get(d) ?? 0), 0));
+  const dayWord = isToday ? "Heute" : shortDay(day);
+  const loadHead = daySports.length
+    ? `${dayWord} ${dayLoad} aus ${listText(daySports)}, diese Woche ${weekSum}.`
+    : `${dayWord} kein Training, diese Woche ${weekSum}.`;
+  // Krafttage nach WHO: Tage mit Kettlebell, Bouldern oder Karate
+  const strength = week
+    .filter((d) => d <= day)
+    .map((d) => ({ d, sports: [...new Set(actsOn(d).filter((a) => STRENGTH.includes(sportOf(a))).map(activityLabel))] }))
+    .filter((x) => x.sports.length);
+  const strengthHead =
+    strength.length >= WHO_STRENGTH_DAYS
+      ? `Kraft an ${strength.length} Tagen, Empfehlung erreicht.`
+      : strength.length
+        ? `Kraft an ${strength.length} von ${WHO_STRENGTH_DAYS} Tagen.`
+        : `Diese Woche noch kein Krafttag, Empfehlung ${WHO_STRENGTH_DAYS}.`;
   return (
     <>
       <div className="ring-hero detail-hero">
@@ -350,6 +375,28 @@ function IntensityDetail({ day, data, rule, isToday, nowMinute }: { day: string;
           targetLabel={`Empfehlung ${WHO_MINUTES} min`}
           bars={weeks.map((w) => ({ label: shortDay(w.m), value: w.sum, today: w.m === mon, tip: `Woche ab ${shortDay(w.m)}` }))}
         />
+      </section>
+
+      <section className="card">
+        <span className="eyebrow">Belastung aus Training</span>
+        <h2>{loadHead}</h2>
+        <DayBars
+          tone="training"
+          fmt={(v) => String(Math.round(v))}
+          label={`Belastung aus Training je Tag: ${week.map((d) => `${WEEKDAY[new Date(d + "T12:00:00").getDay()]} ${d > day ? "noch offen" : Math.round(trainLoad.get(d) ?? 0)}`).join(", ")}`}
+          bars={week.map((d) => ({ label: WEEKDAY[new Date(d + "T12:00:00").getDay()], value: d > day ? null : Math.round(trainLoad.get(d) ?? 0), today: d === day, date: d }))}
+        />
+      </section>
+
+      <section className="card">
+        <span className="eyebrow">Kraft · Empfehlung der WHO</span>
+        <h2>{strengthHead}</h2>
+        {strength.map((x) => (
+          <div key={x.d} className="list-row">
+            <span className="list-date">{WEEKDAY[new Date(x.d + "T12:00:00").getDay()]}, {shortDay(x.d)}</span>
+            <span>{listText(x.sports)}</span>
+          </div>
+        ))}
       </section>
 
     </>
