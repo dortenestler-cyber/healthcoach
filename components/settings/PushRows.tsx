@@ -5,6 +5,7 @@ import { Row, Toggle } from "@/components/SettingsView";
 import { currentSubscription, disablePush, enablePush, loadReminder, pushSupport, setReminder, testPush, type PushSupport, type Reminder } from "@/lib/push";
 
 const TIMES = ["06:30", "07:00", "07:30", "08:00", "08:30", "09:00"];
+const EVENING = ["19:30", "20:00", "20:30", "21:00", "21:30", "22:00", "22:30"];
 
 // Mitteilungen auf diesem Gerät: Tagesstart am Morgen, Zusammenfassung nach dem Training
 export default function PushRows() {
@@ -41,7 +42,7 @@ export default function PushRows() {
     setRem(s ? await loadReminder(s) : null);
     setBusy(false);
   };
-  const flip = (k: "checkin_reminder" | "training_push" | "show_values") => {
+  const flip = (k: "checkin_reminder" | "training_push" | "show_values" | "evening_push") => {
     if (!sub) return;
     const next = !(rem?.[k] ?? true);
     run(() => setReminder(sub, { [k]: next }));
@@ -85,6 +86,36 @@ export default function PushRows() {
             }}
           >
             {(TIMES.includes(time) ? TIMES : [...TIMES, time]).map((t) => (
+              <option key={t} value={t}>
+                {t} Uhr
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      {sub && (
+        <Toggle
+          label="Tagesabschluss"
+          note={`Jeden Abend ab ${rem?.evening_at ?? "21:00"} Uhr: Belastung, Schlafbedarf und was offen ist`}
+          on={rem?.evening_push ?? true}
+          disabled={busy}
+          onChange={() => flip("evening_push")}
+        />
+      )}
+      {sub && (rem?.evening_push ?? true) && (
+        <div className="settings-row">
+          <label htmlFor="evening-at" className="row-label">Uhrzeit</label>
+          <select
+            id="evening-at"
+            className="input settings-select"
+            value={rem?.evening_at ?? "21:00"}
+            disabled={busy}
+            onChange={(e) => {
+              const t = e.target.value;
+              run(() => setReminder(sub, { evening_at: t }));
+            }}
+          >
+            {(EVENING.includes(rem?.evening_at ?? "21:00") ? EVENING : [...EVENING, rem?.evening_at ?? "21:00"]).map((t) => (
               <option key={t} value={t}>
                 {t} Uhr
               </option>

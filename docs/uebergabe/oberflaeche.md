@@ -2,11 +2,15 @@
 Belegt: frei
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WLy55so61RpYE7TaU
 
+## Tagesabschluss am Abend (PR #180, 25.11., Freigabe der Nutzerin)
+- `components/tagebuch/AbschlussCard.tsx`: Satz Belastung gegen Ziel, Kacheln Schlafbedarf und Ins Bett bis, „Ein Wort zum Tag“ in `diary_entries.note` (max. 40 Zeichen, speichert von selbst). Im Tagebuch oben, heute ab 18 Uhr oder mit `?abschluss=1` (scrollt hin).
+- Einstellungen › Mitteilungen: Schalter Tagesabschluss mit Uhrzeit 19:30–22:30.
+- Wartet auf: Merge.
+
 ## Tagesstart und Mitteilung nach dem Training (PR #179, 25.11., Freigabe der Nutzerin)
 - `components/settings/PushRows.tsx`: Schalter Mitteilungen (Gerät), Tagesstart (`checkin_reminder`) mit Uhrzeit, Nach dem Training (`training_push`), Werte in Mitteilungen zeigen (`show_values`). `lib/push.ts` lädt `*`.
 - `lib/abschnitte.ts` reicht nur noch `supabase/functions/_shared/abschnitte.ts` weiter.
-- Idee für später (nur Konzept, nicht freigegeben): Checkout am Abend, siehe Chat 25.11. und `BACKLOG.md`.
-- Wartet auf: Merge.
+- PR #179 gemergt 25.11.
 
 ## Abschnitte aus dem Puls (PR #176, 25.11., Freigabe der Nutzerin)
 - `lib/abschnitte.ts`: `detect` (Spitzen nach Prominenz in Anteil der Pulsreserve, Mindestpause je Sportart, Glättung 15 s), `learnScale` (Faktor 0,6–2,0 aus bis zu 20 bestätigten Einheiten derselben Sportart, ab 2), Regeln `SEGMENT_RULES` für Klettern, Kettlebell, Karate, Ausdauer.

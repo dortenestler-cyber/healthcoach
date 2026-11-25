@@ -48,5 +48,5 @@ Konzept: `docs/konzept-korridore-alltagslast.md`
 - [x] **Anzeige** Ring, Belastung heute und Wochenlast mit Anteil Alltag.
 - [x] **Weitere Korridore**: Tagesbelastung, Alltagsschritte, Tief- und REM-Schlaf, Schlafbeginn, Body Battery aufgeladen, hoher Stress.
 
-## 25.11.2026 · Tagesabschluss am Abend (Idee, noch nicht freigegeben)
-- [ ] **Tagesabschluss**: Gegenstück zum Tagesstart. Mitteilung am Abend mit Belastung des Tages gegen das Ziel, Schlafbedarf und Schlafenszeit, offenen Einnahmen. Tipp öffnet einen kurzen Abschluss im Tagebuch (Gewohnheiten des Tages, Symptome, ein Wort zum Tag). Vorschlag im Chat vom 25.11.
+## 25.11.2026 · Tagesabschluss am Abend (freigegeben 25.11.)
+- [x] **Tagesabschluss** (PR #180): Gegenstück zum Tagesstart. Mitteilung am Abend mit Belastung des Tages gegen das Ziel, Schlafbedarf und Schlafenszeit, offenen Einnahmen. Tipp öffnet einen kurzen Abschluss im Tagebuch (Gewohnheiten des Tages, Symptome, ein Wort zum Tag). Vorschlag im Chat vom 25.11.

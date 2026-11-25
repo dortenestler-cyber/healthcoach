@@ -7,9 +7,14 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Tagesabschluss am Abend (PR #180, 25.11.)
+Enthält die Migration `supabase/migrations/20261130110000_tagesabschluss.sql` (Schalter und Uhrzeit für den Abend, voller Garmin-Abruf um 19:37, 20:37 und 21:37 Uhr). Dein Merge ist die Freigabe.
+- [ ] PR #180 mergen
+- [ ] Heute oder morgen Abend: kommt der Tagesabschluss um 21 Uhr, und öffnet er die Karte im Tagebuch?
+
 ### Tagesstart und Mitteilung nach dem Training (PR #179, 25.11.)
 Enthält die Migration `supabase/migrations/20261130100000_tagesstart_training.sql` (Schalter für Mitteilungen, Merker je Einheit, Abruf tagsüber alle 15 Minuten von 6 bis 22 Uhr). Dein Merge ist die Freigabe.
-- [ ] PR #179 mergen
+- [x] PR #179 gemergt (25. Nov.), Migration und Hochladen grün (geprüft von Claude)
 - [ ] In der App unter Einstellungen › Mitteilungen die neuen Schalter ansehen
 - [ ] Nächstes Training: kommt die Mitteilung etwa 5–20 Minuten nach dem Ende? Claude Bescheid geben
 - [ ] Nächster Morgen: kommt der Tagesstart zur eingestellten Uhrzeit?

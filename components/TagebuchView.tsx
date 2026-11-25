@@ -15,6 +15,7 @@ import { OVULATION_SIGNS } from "@/lib/ovulation";
 import { DEFAULT_HABITS, loadHabits, SAUNA_GAENGE, SAUNA_WANN, WANN_LABEL, type Habit, type HabitDetails, type SaunaDetails } from "@/lib/habits";
 import PageHead from "@/components/PageHead";
 import CheckinCard from "@/components/tagebuch/CheckinCard";
+import AbschlussCard from "@/components/tagebuch/AbschlussCard";
 import DayIntakes from "@/components/tagebuch/DayIntakes";
 import FlashCounter from "@/components/tagebuch/FlashCounter";
 import MuscleSection from "@/components/tagebuch/MuscleSection";
@@ -36,8 +37,14 @@ const shift = (iso: string, n: number) => {
 // Speichert jeden Tipp von selbst (Konzept docs/konzept-einfach.md, Paket 7, Logbuch 25.11.), ohne Knopf.
 // Hier wird alles eingetragen; Heute zeigt nur, was offen ist. Vergangene Perioden trägst du auf der Seite Zyklus nach.
 // Dazu vergangene Perioden schnell nachtragen.
-export default function TagebuchView({ initial }: { initial?: string }) {
+export default function TagebuchView({ initial, abschluss }: { initial?: string; abschluss?: boolean }) {
   const today = isoDay();
+  // Tagesabschluss: über die Mitteilung am Abend oder heute ab 18 Uhr
+  const [evening, setEvening] = useState(!!abschluss);
+  useEffect(() => {
+    if (new Date().getHours() >= 18) setEvening(true);
+    if (abschluss) setTimeout(() => document.getElementById("abschluss")?.scrollIntoView({ block: "start" }), 300);
+  }, [abschluss]);
   const [day, setDay] = useState(initial && /^\d{4}-\d{2}-\d{2}$/.test(initial) && initial <= today ? initial : today);
   const feat = useFeatures();
   const [bleeding, setBleeding] = useState(0);
@@ -218,6 +225,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
       <TwoCol
         left={
           <>
+      {evening && day === today && <AbschlussCard key={"a" + day} day={day} />}
       <CheckinCard key={"c" + day} day={day} isToday={day === today} onSymptoms={load} />
 
       <section className="card">
