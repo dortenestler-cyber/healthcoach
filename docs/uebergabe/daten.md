@@ -4,6 +4,11 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014p
 
 Zuständig für `supabase/` (Migrationen und Funktionen), `watch/`, `watchface/`, `.github/`. Regeln: `docs/konzept-zwei-instanzen.md`.
 
+## Coach-Texte und Uhrzeiten (25.11., Freigabe der Nutzerin)
+- `supabase/functions/coach`: Ziele im SYSTEM-Text ohne festen Kyu und Termin (stehen in der Zusammenfassung), „Gibt die Frage eine Form vor, folgst du ihr“, keine Begriffe und Rechenwege erklären. Neuer Schalter `briefing: true`: kein Verlauf, keine Speicherung in `coach_messages`/`coach_chats`, kein Tageslimit. Nutzt die App für „Für heute“ und „Dein Monat“ (`lib/briefing.ts`). Kosten dieser Anfragen erscheinen deshalb nicht unter Nutzung.
+- `supabase/functions/watch`: `plan[].time` immer leer (Uhrzeiten entfallen). Uhr und Zifferblatt kommen mit leerer Zeit zurecht, kein neues Upload-Paket nötig.
+- Auslieferung über den Lauf „Supabase-Funktionen“ nach dem Merge.
+
 ## Karate-Prüfungen (PR #143, 25.11.)
 - Migration `20261129090000_karate_pruefungen`: neue Tabelle `karate_progress` (user_id, item_key, status offen/uebe/sitzt, RLS), `karate_items.kyu` (1–5, Standard 5) und `status` (alte Haken → sitzt), Kategorie „Begriffe“. `done` bleibt und wird mitgeschrieben. Backup enthält `karate_progress`.
 - Gemergt 25.11., Lauf „Supabase-Migrationen ausführen“ grün.

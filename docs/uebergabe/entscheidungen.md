@@ -92,3 +92,4 @@ Was schon in `CLAUDE.md` oder einem Konzept steht, gehört nicht hierher.
 2026-11-25 · OF · Nutzerin: Tagebuch zeigt passend zur Zyklusphase Symptome (eigene Muster zuerst, dann typische) und Eisprung-Zeichen im Fenster; Blutung bleibt sichtbar, kompakter
 2026-11-25 · OF · Nutzerin: keine Hinweis- und Erklärtexte mehr in der App (Untertitel, Bedienhinweise, Rechenwege, Disclaimer), dauerhaft in CLAUDE.md
 2026-11-25 · OF · Nutzerin: Variante A – der Coach (Claude) schreibt Tagesempfehlung auf Heute und Monatsrückblick, einmal am Tag gespeichert
+2026-11-25 · DA · Nutzerin: Funktion coach angepasst (Ziele aktuell, Form der Frage folgen, nichts erklären, Tagesempfehlung/Rückblick ohne Verlauf und außerhalb des Limits); Funktion watch schickt keine Uhrzeiten mehr
