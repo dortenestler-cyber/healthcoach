@@ -6,6 +6,7 @@ Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017z
 - Konzept `docs/konzept-schlafqualitaet.md` freigegeben, umgesetzt in `lib/schlaf.ts` (`sleepScore`, `sleepSentence`, `sleepRows`, `spo2Warning`).
 - Ring Schlaf (Heute, Detailseite, Tagesblatt) zeigt Gesamtwert 0–100 mit Wort; Detailseite: Kacheln Menge/Erholsam, Satz mit schwächstem Baustein, Faktoren ohne Legende, Karte „Wach und Sauerstoff“ entfernt (Sauerstoff nur noch als Warnzeichen).
 - Readiness (`computeTarget`, `readinessFactors`) und Coach-Kontext nutzen den eigenen Wert statt Garmins `sleep_score`. Muster (`lib/muster.ts`, `insights.ts` Zeile ~347/412) nutzen noch `sleep_score`.
+- Nachkalibriert (Nutzerin: Werte zu hoch): typische Nacht etwa 80 statt 95–100, siehe Konzept 5a.
 - Prüfen mit echten Daten: ob `awake_count`, `sleep_awake_s`, `sleep_start_min` zuverlässig gefüllt sind; Gewichte ggf. nachziehen.
 
 ## Coach schreibt Tagesempfehlung und Monatsrückblick (25.11.)
