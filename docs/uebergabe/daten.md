@@ -2,7 +2,7 @@
 Belegt: frei
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WTBNyc3ZjZhsy1RJj
 
-## Vercel Hobby (PR #NR, 25.11., Freigabe der Nutzerin)
+## Vercel Hobby (PR #183, 25.11., Freigabe der Nutzerin)
 - Pro-Tarif gekündigt, jetzt Hobby: 100 Deployments am Tag inkl. Vorschauen, Vercel-Cron nur einmal täglich (±59 Min).
 - `vercel.json`: `ignoreCommand` ersetzt durch `git.deploymentEnabled` (`**` aus, `main` und `vorschau/**` an). Der alte Ignored Build Step legte für jeden Push auf einen Arbeitszweig trotzdem ein abgebrochenes Deployment an.
 - Geprüft: Alle Zeitpläne (`garmin-morgen`, `garmin-tagsueber`, `health-coach-push`) laufen über pg_cron in Supabase, keine Vercel-Crons. Vom Tarifwechsel nicht betroffen.
