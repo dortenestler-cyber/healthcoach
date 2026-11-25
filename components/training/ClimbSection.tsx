@@ -95,7 +95,6 @@ export default function ClimbSection() {
                 </button>
               ))}
             </div>
-            <span className="meta">Tippen löscht einen Eintrag.</span>
           </>
         )}
       </section>
@@ -118,7 +117,6 @@ export default function ClimbSection() {
             </div>
           );
         })}
-        <span className="meta">Zahl der Tops und Erfolgsquote je Grad.</span>
       </section>
 
     </>

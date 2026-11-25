@@ -6,13 +6,13 @@ export type HeadTone = "heute" | "zyklus" | "training" | "gesundheit";
 // Mit `tone` liegt ein Farbverlauf in der Bereichsfarbe hinter dem Kopf (Konzept dunkel 2, Muster 10).
 // Mit `kalender` steht links neben dem Zahnrad ein Kalender-Symbol, das den zentralen Kalender
 // mit den Ebenen dieses Bereichs öffnet (Konzept docs/konzept-einfach.md, Paket 3).
-export default function PageHead({ title, sub, gear = true, tone, kalender }: { title: string; sub: string; gear?: boolean; tone?: HeadTone; kalender?: string }) {
+export default function PageHead({ title, sub, gear = true, tone, kalender }: { title: string; sub?: string; gear?: boolean; tone?: HeadTone; kalender?: string }) {
   return (
     <header className="page-head">
       {tone && <div className="page-glow" data-tone={tone} aria-hidden="true" />}
       <div className="page-head-row">
         <div className="page-head-text">
-          <span className="page-sub">{sub}</span>
+          {sub && <span className="page-sub">{sub}</span>}
           <h1 className="page-title">{title}</h1>
         </div>
         {(kalender || gear) && (

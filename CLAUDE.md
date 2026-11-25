@@ -8,6 +8,7 @@ Health Coach bringt Training, Erholung, Zyklus, Perimenopause-Symptome, Krankhei
 - Änderungen immer über einen eigenen Zweig und einen Pull Request, nie direkt auf `main`.
 - Eigene Pull Requests selbst mergen, wenn `tsc` und `npm run build` fehlerfrei sind und es keine Konflikte gibt. Bei Änderungen an der Datenbank (Migrationen) oder an Supabase-Funktionen auf Freigabe warten.
 - Antworten und Texte in der App auf Deutsch, klar und knapp, ohne Fachjargon.
+- Keine Hinweis- und Erklärtexte in der App: keine Untertitel unter Seitentiteln, keine Bedienhinweise, Rechenwege, Legenden-Sätze oder „keine Diagnose“-Sätze. Die Nutzerin hat die App gebaut und kennt sie. Erlaubt bleiben Leerzustände, Warnzeichen mit Verweis auf ärztliche Abklärung, Quellen bei Medikamenten und die Kennzeichnung von Beispieldaten.
 - Beispieldaten immer als solche kennzeichnen.
 - Was die Nutzerin selbst tun muss (Migrationen, Secrets, Einstellungen in Supabase oder GitHub), in `AUFGABEN.md` eintragen und Erledigtes abhaken.
 - Uhr-App und Zifferblätter installiert die Nutzerin nur über das Garmin-Entwicklerportal (apps.garmin.com/developer/upload), nicht per USB. Jede Änderung an `watch/` oder `watchface/` liefert ein fertiges Upload-Paket: `.iq`, Store-Icon 500 × 500 und aussagekräftige Screenshots (JPG unter 150 KB) sowie den Beschreibungstext, gebaut vom Lauf „Uhr-App bauen“.

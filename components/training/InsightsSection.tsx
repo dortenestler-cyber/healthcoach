@@ -153,7 +153,6 @@ function SportChart({ units, label }: { units: Unit[]; label: string }) {
           </rect>
         ))}
       </svg>
-      <span className="meta">Balken: Belastung je Einheit (Achse links). Linie: Puls Ø (Achse rechts). Antippen öffnet die Einheit.</span>
     </>
   );
 }

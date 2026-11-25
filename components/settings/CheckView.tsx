@@ -94,7 +94,7 @@ export default function CheckView() {
 
   return (
     <>
-      <PageHead title="Einrichtungs-Check" sub="Einstellungen" />
+      <PageHead title="Einrichtungs-Check" />
       <Group title="Status">
         {!items.length && <p className="settings-note">Prüft …</p>}
         {items.map((i) => (

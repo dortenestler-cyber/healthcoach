@@ -105,7 +105,6 @@ export default function WadenSection() {
         </h2>
         {a.ready && <ZusammenhangListe a={{ ...a, findings: shown }} mit="mit Zucken oder Krampf" start="" max={shown.length} leer="Verglichen werden Zyklusphase, Training am selben Tag, die Nacht davor, deine Einflüsse im Tagebuch, Krankheitstage und deine Einnahmen." />}
         {zyklus.length > 0 && <Link href="/zyklus" className="settings-link">Wadenkrämpfe im Zyklus ›</Link>}
-        {!a.ready && <span className="meta">Verglichen werden Zyklusphase, Training am selben Tag, die Nacht davor, deine Einflüsse im Tagebuch, Krankheitstage und deine Einnahmen, zum Beispiel Magnesium.</span>}
       </section>
     </>
   );

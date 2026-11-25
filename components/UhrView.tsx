@@ -88,7 +88,7 @@ export default function UhrView() {
   return (
     <>
       <Link href="/" className="back-link">‹ Heute</Link>
-      <PageHead title="Uhr verbinden" sub="Health Coach auf der Fenix 9 Pro" />
+      <PageHead title="Uhr verbinden" />
       {error && <p className="alert">{error}</p>}
 
       {fresh && (
@@ -123,7 +123,6 @@ export default function UhrView() {
           </div>
         ))}
         <button type="button" className="btn btn-dashed" onClick={create}>+ Neuen Uhr-Schlüssel erzeugen</button>
-        <span className="meta">Der Schlüssel erlaubt der Uhr nur das Nötige: Einträge machen und die Übersicht für heute laden. „Trennen“ sperrt ihn sofort.</span>
       </section>
     </>
   );

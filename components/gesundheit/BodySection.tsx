@@ -93,16 +93,6 @@ export default function BodySection() {
       {(mode === "umfang" || mode === "beide") && (
         <TrendCard field="waist_cm" label="Bauchumfang" unit="cm" step={0.5} digits={1} rows={rows} periodDays={periodDays} onSaved={load} onError={setError} />
       )}
-      {mode !== "aus" && (
-        <section className="card">
-          <details className="derive">
-          <summary>So geht die App mit deinen Werten um</summary>
-          <p>
-            Freiwillig und höchstens einmal pro Woche. Die App zeigt den Trend über 4 Wochen, nicht den Tageswert. Wasser vor der Periode kann den Wert ein paar Tage anheben, diese Tage sind markiert. Es gibt kein Zielgewicht und keine Abnehm-Funktion.
-          </p>
-          </details>
-        </section>
-      )}
     </>
   );
 }

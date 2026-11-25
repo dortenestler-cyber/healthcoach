@@ -73,7 +73,6 @@ export default function YesterdaySymptoms({ day, onChanged }: { day: string; onC
         <button type="button" className="pill" disabled={busy} onClick={() => answer("besser")}>Besser</button>
         <button type="button" className="pill" disabled={busy} onClick={() => answer("weg")}>Weg</button>
       </div>
-      <span className="meta">Bis du antwortest, zählen die Symptome von gestern nur halb.</span>
       {error && <p className="alert alert-inline">{error}</p>}
     </div>
   );

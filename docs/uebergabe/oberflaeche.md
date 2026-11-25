@@ -2,6 +2,10 @@
 Belegt: frei
 Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWcpKAVS1T6prb5SPNt
 
+## Hinweistexte entfernt (25.11.)
+- Wunsch der Nutzerin, dauerhaft als Regel in `CLAUDE.md` (Arbeitsweise). `PageHead.sub` ist optional, alle festen Untertitel entfernt (bleiben: Coach „Ausgeschaltet“, Nutzung, neue Hinweise, Konto). Rund 55 Bedienhinweise, Rechenwege, Legenden-Sätze und „keine Diagnose“-Sätze entfernt, ebenso die Karte „So geht die App mit deinen Werten um“ (Körper).
+- Geblieben: Leerzustände, Warnzeichen (Fieber, lange erhöhte Werte), Medikamenten-Hinweis ohne geprüfte Quelle, Inhalt hinter „Details“ (Grundlagen, WHO-Quelle), Satz in Einstellungen „keine Diagnosen“.
+
 ## Tagebuch passend zur Zyklusphase (25.11.)
 - Wunsch der Nutzerin. Phase wie auf Zyklus (`zDiary`: Tagebuch 200 Tage + Garmin-Zyklen + Eisprung-Zeichen, `cycleToday`). Blutung kompakt (`pill-sm`) mit „Zyklustag x · Phase (geschätzt)“ darüber. Eisprung-Zeichen offen im Eisprung-Fenster oder wenn eines eingetragen ist, sonst Pille „+ Eisprung-Zeichen“.
 - Symptome: Reihe „Passt zu jetzt“ = eigene Muster (`symptomeUmTag` in `lib/zyklusAuswertung.ts`: in mindestens der Hälfte der letzten bis zu 4 Zyklen am Zyklustag ±1, Zusatz „· oft“), dann typische der Phase (`PHASE_SYMPTOME` in `lib/catalog.ts`), höchstens 6. Darunter „Sonst oft“ wie bisher.

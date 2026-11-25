@@ -149,7 +149,6 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
             <p className="meta">Vorschlag: {phase.suggestion}. Anstrengung (1–10): {phase.rpe}. {phase.hint}</p>
           </div>
         )}
-        <span className="meta">Phasen sind aus deinem Tagebuch geschätzt, Lücken füllt Garmin. Dein Tagebuch hat Vorrang. Vorschlag, keine Diagnose.</span>
       </section>
 
       <ZyklusWoche today={today} diary={longDiary} />
@@ -180,8 +179,6 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
               </div>
             ))}
           </div>
-          {near.length > 0 && <span className="meta">Symptome: in mindestens der Hälfte deiner letzten {heat.n} Zyklen um diesen Zyklustag eingetragen.</span>}
-          <span className="meta">Schnitt in dieser Phase aus den letzten 6 Monaten. Ein Muster, keine Diagnose.</span>
         </section>
       )}
 
@@ -224,7 +221,6 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
               <span className="range-row-value">{pct(r)} %{ma?.ready && r === peakPhase && r.events > 0 ? " · am häufigsten" : ""}</span>
             </div>
           ))}
-          <span className="meta">Tage seit deinem ersten Eintrag, Phasen aus dem Tagebuch geschätzt. Ein Zusammenhang, kein Beweis.</span>
           <Link href="/gesundheit?t=koerper" className="settings-link">Alle Muster zu den Waden ›</Link>
         </section>
       )}
@@ -234,7 +230,6 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
         <span className="eyebrow">Täglich aktualisiert · was dir guttut je Phase</span>
         <h2 className="card-title-lg">{effectSentence}</h2>
         <Details id="zyklus.gewohnheiten" label="Balken je Phase und Grundlage">
-        <p>HRV in der Nacht danach, Tage mit Einfluss gegen Tage ohne, jeweils in derselben Phase. Ein Zusammenhang, keine Ursache. Erst ab je {MIN_DAYS} Nächten.</p>
         {effectRows.length > 0 && (
           <DivergingBars fmt={ms} scaleMin={8} neg="HRV niedriger" pos="HRV höher" label={`HRV in der Nacht danach je Phase: ${effectRows.map((r) => `${r.label} ${r.note} ${r.value! > 0 ? "plus" : "minus"} ${ms(Math.abs(r.value!))}`).join(", ")}`} rows={effectRows} />
         )}
@@ -249,7 +244,6 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
       <Link href="/gesundheit" className="card card-link-row">
         <span className="stack">
           <span className="row-strong">Weitere Muster und Gewohnheiten</span>
-          <span className="meta">Ohne Zyklusbezug, unter Gesundheit › Überblick</span>
         </span>
         <span aria-hidden="true">›</span>
       </Link>

@@ -181,7 +181,7 @@ export default function TagebuchView({ initial }: { initial?: string }) {
 
   return (
     <>
-      <PageHead title="Tagebuch" sub={(day === today ? "Eintrag für " : "Nachtrag für ") + longDate(new Date(day + "T12:00:00"))} kalender="tagebuch" />
+      <PageHead title="Tagebuch" kalender="tagebuch" />
       {error && <p className="alert" role="alert">{error}</p>}
 
       <div className="day-nav">
@@ -260,11 +260,10 @@ export default function TagebuchView({ initial }: { initial?: string }) {
       <section className="card">
         <div className="card-row">
           <h2>Symptome</h2>
-          <span className="meta">Tippen: leicht, mittel, stark</span>
         </div>
         {jetzt.length > 0 && (
           <>
-            <span className="meta tb-jetzt">Passt zu jetzt{ct?.phase ? ` · ${PHASES[ct.phase].label}` : ""}{eigeneJetzt.length ? " · „oft“ = trägst du um diesen Zyklustag oft ein" : ""}</span>
+            <span className="meta tb-jetzt">Passt zu jetzt{ct?.phase ? ` · ${PHASES[ct.phase].label}` : ""}</span>
             <div className="pills wrap">
               {jetzt.map((s) => {
                 const v = symptoms[s.key] ?? 0;
@@ -304,7 +303,6 @@ export default function TagebuchView({ initial }: { initial?: string }) {
       <section className="card">
         <div className="card-row">
           <h2>Anzeichen</h2>
-          <span className="meta">Noch nicht krank, aber etwas ist da</span>
         </div>
         <div className="pills wrap">
           {[...signSplit.top, ...(moreSign ? signSplit.rest : [])].map((s) => {
@@ -356,7 +354,6 @@ export default function TagebuchView({ initial }: { initial?: string }) {
               );
             })}
         </div>
-        {autoReady && influences.some((k) => autoSet.includes(k)) && <span className="meta">„aus Garmin“ setzt die App selbst. Abwählen gilt für diesen Tag.</span>}
         {habSplit.rest.length > 0 && (
           <button type="button" className="btn btn-link more-link" onClick={() => setMoreHab(!moreHab)} aria-expanded={moreHab}>
             {moreHab ? "Weniger anzeigen" : `Weitere anzeigen (${habSplit.rest.length})`}
@@ -400,7 +397,6 @@ export default function TagebuchView({ initial }: { initial?: string }) {
       <Link href="/kalender?von=tagebuch" className="card card-link-row">
         <span className="stack">
           <span className="row-strong">Verlauf im Kalender</span>
-          <span className="meta">Symptome und Gewohnheiten Tag für Tag</span>
         </span>
         <span aria-hidden="true">›</span>
       </Link>

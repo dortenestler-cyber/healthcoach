@@ -213,9 +213,6 @@ export default function VerlaufDetail({ metric, span, rows, diary, acts, sick, h
           <>
             <h2>{phaseSentence ?? `${m.label}: noch zu wenige Tage je Phase für einen Vergleich.`}</h2>
             <PhaseCompare means={pm} range={base.range} ranges={phaseRanges} fmt={m.fmt} label={m.label} tone={metricTone(metric)} />
-            <span className="meta">
-              {cycles} Zyklen. Mindestens 3 Tage je Phase, sonst steht ein Strich.{phaseRanges && Object.values(phaseRanges).some(Boolean) ? " Band = dein Bereich in dieser Phase." : ""} Phasen sind geschätzt. Ein Zusammenhang, keine Diagnose.
-            </span>
           </>
         ) : (
           <p>Der Vergleich erscheint, sobald zwei ganze Zyklen im Tagebuch stehen.</p>

@@ -58,7 +58,7 @@ export default function CoachHintsView() {
 
   return (
     <>
-      <PageHead title="Hinweise" sub={fresh ? `${fresh} neu seit deinem letzten Besuch` : "Alle Antworten deines Coachs"} />
+      <PageHead title="Hinweise" sub={fresh ? `${fresh} neu seit deinem letzten Besuch` : undefined} />
       {error && <p className="alert">{error}</p>}
       <input className="input" type="search" placeholder="Suchen, z. B. Kettlebell" aria-label="Hinweise durchsuchen" value={query} onChange={(e) => setQuery(e.target.value)} />
       {!hints.length && !error && (

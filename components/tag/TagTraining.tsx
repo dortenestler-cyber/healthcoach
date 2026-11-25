@@ -127,7 +127,6 @@ export default function TagTraining({ day, sessions, acts, illness, injuries, on
           </button>
         ))}
       </div>
-      <span className="meta">{future ? "Tippe auf eine Sportart, um sie für diesen Tag zu planen." : "Erfasste Einheiten zählen bei den Trainingstagen und in der Muskelbelastung. Hat Garmin die Einheit schon, brauchst du nichts einzutragen."}</span>
 
       <EditSheet
         title={log ? `${SPORTS[log.sport].label} · ${longDate(fromIso(log.day))}` : "Einheit erfassen"}
@@ -163,7 +162,7 @@ export default function TagTraining({ day, sessions, acts, illness, injuries, on
                   </button>
                 ))}
               </div>
-              <span className="meta">1 sehr leicht · 5 mittel · 10 maximal. Freiwillig.</span>
+              <span className="meta">1 sehr leicht · 5 mittel · 10 maximal</span>
             </div>
           </>
         )}

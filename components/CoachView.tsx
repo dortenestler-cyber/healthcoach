@@ -269,7 +269,7 @@ export default function CoachView({ panel, onClose }: { panel?: boolean; onClose
     </div>
   ) : (
     <>
-      <PageHead title="Coach" sub="Kennt Training, Erholung, Zyklus, Symptome und Medikamente" />
+      <PageHead title="Coach" />
       <Link href="/coach/hinweise" className="settings-link">Alle Hinweise des Coachs ansehen ›</Link>
     </>
   );
@@ -357,7 +357,6 @@ export default function CoachView({ panel, onClose }: { panel?: boolean; onClose
           </button>
         ))}
       </div>
-      {prefilled && text && <span className="meta">Frage vorbereitet. Sie geht erst an den Coach, wenn du auf Senden tippst.</span>}
       <form className="chat-input" onSubmit={submit}>
         <textarea ref={field} className="input" rows={1} value={text} onChange={(e) => setText(e.target.value)} placeholder="Frag deinen Coach" aria-label="Frage an den Coach" maxLength={2000} />
         <button type="submit" className="chat-send" disabled={busy || !text.trim()} aria-label="Senden">

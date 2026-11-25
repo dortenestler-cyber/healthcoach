@@ -92,8 +92,6 @@ export default function HabitCard({ today, data }: { today: string; data: Data }
         <span>Bestwert <strong>{best} {best === 1 ? "Woche" : "Wochen"}</strong></span>
       </div>
       <Raster today={today} weeks={WEEKS} on={(d) => trained.has(d)} label={`Trainingstage der letzten ${WEEKS} Wochen. Ziel ${goal} Tage pro Woche, erreicht in ${met.filter(Boolean).length} Wochen.`} keyOff="kein Training" keyOn="Training" />
-      {weeksWithData < 4 && <span className="meta">Das Raster füllt sich mit deinen Garmin-Aktivitäten und den im Kalender erfassten Einheiten.</span>}
-      <span className="meta">Ein Tag zählt mit mindestens einer Garmin-Aktivität oder einer im Kalender erfassten Einheit.</span>
     </section>
   );
 }

@@ -36,7 +36,6 @@ export default function EnergyCard({ day, data, nowMinute, hideValue = false }: 
           {rhythm.drain ? <>, am stärksten sinkt sie zwischen <strong>{rhythm.drain[0]} und {rhythm.drain[1]} Uhr</strong></> : null}.
         </p>
       )}
-      <span className="meta">Die Hochrechnung folgt deinem üblichen Verlauf ab jetzt. Ein Richtwert, keine Vorhersage.</span>
     </Link>
   );
 }
