@@ -1,6 +1,6 @@
 # Konzept: Karate-Prüfungen mit Prüfungsprogramm zum Abhaken
 
-Stand: 25.11.2026 · Status: **Entwurf, wartet auf Antworten und Freigabe**
+Stand: 25.11.2026 · Status: **Fragen beantwortet (25.11.), wartet auf die Prüfungsordnung und Freigabe**
 
 ## Ziel
 1. Für jede Prüfung ab dem 5. Kyu bis zum 1. Kyu steht das Prüfungsprogramm schon in der App: Kihon, Kata, Kumite.
@@ -12,12 +12,12 @@ Heute gibt es auf Training › Karate eine leere Liste „Meine Prüfungsliste�
 
 ---
 
-## 1. Offene Fragen an dich
+## 1. Entscheidungen (25.11.)
 
-1. **Welcher Verband?** Die Prüfungsordnungen unterscheiden sich, vor allem im Kihon und darin, welche Kata zu welchem Kyu gehört (z. B. DJKB/JKA, DKV Shotokan, SKID). Am sichersten: Du schickst mir die Prüfungsordnung deines Dojos (PDF oder Foto), dann übernehme ich sie Punkt für Punkt.
-2. **Zwei Stufen oder drei?** Vorschlag: drei Stufen pro Punkt, *offen · übe ich · sitzt*. „Abhaken“ heißt *sitzt*. Alternative: nur Haken.
-3. **Kata in Teilen?** Vorschlag: Eine Kata ist ein Punkt. Auf Wunsch lässt sie sich aufklappen in Teile (Abfolge, Kiai-Stellen, Rhythmus, Stände), die man einzeln abhakt.
-4. **Begriffe und Theorie** (Zählen, Namen der Techniken, Dojo-Kun): mit aufnehmen, falls dein Dojo das abfragt?
+1. **Verband**: Du schickst die Prüfungsordnung deines Dojos. Bis dahin bleibt Abschnitt 2 eine Vorlage.
+2. **Drei Stufen** pro Punkt: *offen · übe ich · sitzt*. „Abhaken“ heißt *sitzt*.
+3. **Kata in Teilen**: Jede Kata lässt sich aufklappen in Abfolge, Kiai-Stellen, Rhythmus und Stände, jeder Teil mit eigener Stufe. Die Kata gilt als *sitzt*, wenn alle Teile sitzen, sie lässt sich aber auch direkt setzen.
+4. **Begriffe und Theorie** kommen als eigene Gruppe dazu (z. B. Zählen, Namen der Techniken und Stände, Dojo-Kun), Inhalt nach deiner Prüfungsordnung.
 
 ---
 
@@ -119,7 +119,7 @@ Ort: **Training › Karate**, die Karte „Meine Prüfungsliste“ wird zu „Pr
 
 - **Kopf**: Prüfung, Datum, Wochen bis dahin (wie heute). Daneben ein dezenter Ring mit Zahl und Wort („11 von 19 sitzen“) und ein Satz, der das Ergebnis nennt („Kata sitzt, Kumite fehlt noch“).
 - **Kyu-Auswahl**: Chips 5. bis 1. Kyu. Vorausgewählt ist die nächste Prüfung. Bestandene Grade tragen „bestanden am …“. Spätere Grade kann man schon ansehen und vorab abhaken.
-- **Gruppen** Kihon, Kata, Kumite, Eigene Punkte. Jede Zeile: japanischer Name, darunter kurz auf Deutsch, was gemeint ist. Tipp auf die ganze Zeile (mindestens 44 px) wechselt *offen → übe ich → sitzt*. Zustand steht immer als Wort oder Zeichen dabei, nicht nur als Farbe.
+- **Gruppen** Kihon, Kata, Kumite, Begriffe, Eigene Punkte. Kata klappen auf in ihre Teile. Jede Zeile: japanischer Name, darunter kurz auf Deutsch, was gemeint ist. Tipp auf die ganze Zeile (mindestens 44 px) wechselt *offen → übe ich → sitzt*. Zustand steht immer als Wort oder Zeichen dabei, nicht nur als Farbe.
 - **Wiederholung**: Ältere Kata (z. B. Heian Shodan bis Yondan beim 5. Kyu) stehen in einer eingeklappten Gruppe „Wiederholung“. Was beim letzten Kyu schon „sitzt“ war, bleibt abgehakt.
 - **Eigene Punkte**: wie heute frei eintragen, jetzt mit Zuordnung zum Kyu.
 - **Prüfung bestanden**: Knopf im Kopf nach dem Prüfungsdatum. Danach ist der nächste Kyu die aktuelle Prüfung, das Datum ist wieder offen.
@@ -134,7 +134,7 @@ Ort: **Training › Karate**, die Karte „Meine Prüfungsliste“ wird zu „Pr
 
 ## 5. Technik
 
-**Prüfungsprogramm im Code**, nicht in der Datenbank: `lib/karate/programm.ts` mit Verband, Stand, Quelle und je Kyu den Punkten mit fester Kennung (z. B. `5kyu.kihon.sanbon-zuki`), Gruppe, Name, deutscher Erklärung. Ein späterer Wechsel des Verbands tauscht nur diese Datei.
+**Prüfungsprogramm im Code**, nicht in der Datenbank: `lib/karate/programm.ts` mit Verband, Stand, Quelle und je Kyu den Punkten mit fester Kennung (z. B. `5kyu.kihon.sanbon-zuki`), Gruppe (Kihon, Kata, Kumite, Begriffe), Name, deutscher Erklärung, bei Kata die Teile (Kennung z. B. `5kyu.kata.heian-godan.kiai`). Ein späterer Wechsel des Verbands tauscht nur diese Datei.
 
 **Fortschritt in der Datenbank** (Migration durch die Rolle Daten, wartet auf Freigabe):
 
@@ -148,6 +148,6 @@ Row Level Security wie bei allen Tabellen. Aktueller Grad und Prüfungen (Datum,
 **Aufteilung**: Daten `[DA]` schreibt die Migration. Oberfläche `[OF]` baut `lib/karate/programm.ts` und die Karte in `KarateSection.tsx`.
 
 ## 6. Nächste Schritte
-1. Du beantwortest die Fragen in Abschnitt 1, am besten mit deiner Prüfungsordnung.
+1. ☑ Fragen beantwortet. Offen: Du schickst die Prüfungsordnung.
 2. Ich passe das Programm in Abschnitt 2 an und markiere es als bestätigt.
 3. Nach deiner Freigabe: Migration (Daten), dann Oberfläche, je ein Pull Request.
