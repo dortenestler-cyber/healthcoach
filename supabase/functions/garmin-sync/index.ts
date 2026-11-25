@@ -217,7 +217,6 @@ Deno.serve(async (req) => {
         if (!day) continue;
         const r = row(day);
         r.sleep_seconds = int(s?.sleepTimeSeconds);
-        r.sleep_score = int(s?.sleepScores?.overall?.value);
         // Schlafphasen in Sekunden; fehlen sie in der Antwort, bleiben sie leer
         r.sleep_deep_s = int(s?.deepSleepSeconds ?? s?.deepSleepDurationInSeconds);
         r.sleep_rem_s = int(s?.remSleepSeconds ?? s?.remSleepInSeconds ?? s?.remSleepDurationInSeconds);

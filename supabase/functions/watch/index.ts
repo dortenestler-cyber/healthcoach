@@ -8,6 +8,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { asDay, cycleInfo, dayLoadPct, periodStarts, phaseShort, sickDays, targetScore, usualLoad } from "./target.ts";
 import { fitnessAge, waistOn } from "./fitness.ts";
+import { sleepTotal } from "./schlaf.ts";
 
 const TZ = "Europe/Berlin";
 // CORS, damit die Web-App die Verbindung testen kann
@@ -237,7 +238,8 @@ async function today(sb: Any, uid: string, day: string) {
   const g = days.find((r) => r.day === day) ?? null;
   // Tagesziel "Belastung heute" 0–100, wie in der App
   const sick = sickDays((ills.data ?? []) as Any[], day);
-  const target = targetScore(day, days.map(asDay), di, (checkin.data ?? null) as Any, ill, starts, sick, usualLoad(day, days, (acts.data ?? []) as Any[], sick));
+  const sleep = sleepTotal(day, days, (acts.data ?? []) as Any[], starts, sick, new Map());
+  const target = targetScore(day, days.map(asDay), di, (checkin.data ?? null) as Any, ill, starts, sick, usualLoad(day, days, (acts.data ?? []) as Any[], sick), sleep);
   // Eigenes Fitness-Alter (HUNT-Modell, wie in der App)
   const by = (settings.data as Any)?.data?.birthYear;
   const w = waistOn(((body.data ?? []) as Any[]).map((r) => ({ day: r.day, waist_cm: r.waist_cm === null ? null : Number(r.waist_cm) })), day);
@@ -269,7 +271,7 @@ async function today(sb: Any, uid: string, day: string) {
     rhr: g?.resting_hr ?? null,
     bb: g?.bb_max ?? null,
     hrv: g?.hrv_last_night ?? null,
-    sleep: g?.sleep_score ?? null,
+    sleep, // eigener Schlafwert 0–100 (schlaf.ts), wie in der App
     illness: ill ? String(ill.label).toUpperCase() : null,
     pause,
     plan: ((plan.data ?? []) as Any[]).map((s) => ({

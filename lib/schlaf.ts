@@ -151,7 +151,7 @@ export function sleepScore(day: string, data: Data): SleepScore {
 
   const w = parts.reduce((a, p) => a + p.weight, 0);
   const rest = parts.length >= 3 ? Math.round(parts.reduce((a, p) => a + p.points * p.weight, 0) / w) : null;
-  const total = amount === null ? null : rest === null ? amount : Math.round((amount + rest) / 2);
+  const total = amount === null ? null : Math.round(rest === null ? amount : (amount + rest) / 2);
   return { total, amount, pct, rest, word: total === null ? null : sleepWord(total), parts, hours: slept.hours };
 }
 
