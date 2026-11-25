@@ -7,7 +7,7 @@ import type { Row } from "@/lib/today";
 // Großbuchstaben-Name, darunter ein Wort zur Einordnung, rechts die Zahl.
 // mode "pfeil": ▲ über, ▼ unter deinem Bereich, • typisch (Erholung, Readiness).
 // mode "stufen": drei Felder unter · im · über deinem Bereich, nur das passende in Familienfarbe (Schlaf). Keine Ampel.
-export default function FactorList({ rows, mode = "pfeil", tone = "recovery", legend }: { rows: Row[]; mode?: "pfeil" | "stufen"; tone?: "recovery" | "sleep" | "neutral"; legend: string }) {
+export default function FactorList({ rows, mode = "pfeil", tone = "recovery", legend }: { rows: Row[]; mode?: "pfeil" | "stufen"; tone?: "recovery" | "sleep" | "neutral"; legend?: string }) {
   return (
     <div className={`factor-table tone-${tone}`}>
       {rows.map((r) => {
@@ -45,7 +45,7 @@ export default function FactorList({ rows, mode = "pfeil", tone = "recovery", le
           </div>
         );
       })}
-      <div className="factor-legend">
+      {legend && <div className="factor-legend">
         {mode === "pfeil" ? (
           <span>▲ ▼ {legend}</span>
         ) : (
@@ -58,7 +58,7 @@ export default function FactorList({ rows, mode = "pfeil", tone = "recovery", le
             {legend}
           </span>
         )}
-      </div>
+      </div>}
     </div>
   );
 }

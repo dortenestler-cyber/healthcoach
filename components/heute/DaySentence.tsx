@@ -4,6 +4,7 @@ import { PHASES, windowText, type DayRule } from "@/lib/cycle";
 import { energyDay, usualRhythm } from "@/lib/energie";
 import { dayLoad, type Data } from "@/lib/insights";
 import { stressDay, stressSentence } from "@/lib/stress";
+import { sleepScore } from "@/lib/schlaf";
 import { hm, readinessFactors, readinessWhy, sleepAchieved, sleepNeed, targetText } from "@/lib/today";
 import { weekIntensity, WHO_MINUTES } from "@/lib/trainingLoad";
 
@@ -132,7 +133,8 @@ function energySentence({ day, data, nowMinute, isToday }: Props): Sentence {
 function sleepSentence({ day, data, isToday }: Props): Sentence {
   const s = sleepAchieved(day, data);
   if (s.hours === null) return { tone: "sleep", body: "Für letzte Nacht gibt es noch keinen Schlafwert." };
-  const pct = s.ratio === null ? null : Math.round(s.ratio * 100);
+  const sc = sleepScore(day, data);
+  const pct = sc.total;
   const awake = data.daily.find((d) => d.day === day)?.awake_count ?? null;
   const tonight = sleepNeed(day, data.daily, data.acts);
   const wakes = data.daily
@@ -143,7 +145,7 @@ function sleepSentence({ day, data, isToday }: Props): Sentence {
   const wake = wakes.length >= 3 ? median(wakes) : null;
   return {
     tone: "sleep",
-    question: pct === null ? undefined : `Was heißt mein Schlaf von ${pct} % für ${isToday ? "heute" : "diesen Tag"}?`,
+    question: pct === null ? undefined : `Was heißt mein Schlafwert von ${pct} für ${isToday ? "heute" : "diesen Tag"}?`,
     body: (
       <>
         <strong>{hm(s.hours)}</strong> von <strong>{hm(s.need.hours)}</strong> Bedarf{awake ? `, ${awake}-mal wach` : ""}.{" "}

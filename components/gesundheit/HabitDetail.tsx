@@ -30,10 +30,10 @@ const joinDe = (p: string[]) => (p.length <= 1 ? p.join("") : `${p.slice(0, -1).
 function note(r: NightRow): { text: string; tone: string } {
   const d = r.c.diff;
   if (d === null) return { text: `Noch zu wenige Nächte: ${r.c.nWith} mit, ${r.c.nWithout} ohne (je ${MIN_NIGHTS} nötig)`, tone: "" };
-  const small = r.key === "hrv" ? 2 : r.key === "ruhepuls" ? 1 : r.key === "tief" ? 1 / 6 : r.key === "temp" ? 0.1 : 0.1;
+  const small = r.key === "schlafwert" ? 3 : r.key === "hrv" ? 2 : r.key === "ruhepuls" ? 1 : r.key === "tief" ? 1 / 6 : r.key === "temp" ? 0.1 : 0.1;
   if (Math.abs(d) < small) return { text: "kein deutlicher Unterschied", tone: "" };
   const sign = d > 0 ? "+" : "−";
-  const amount = r.key === "nacht" ? `${de(Math.abs(d) * 100)} Prozentpunkte` : r.key === "tief" ? `${de(Math.abs(d) * 60)} min` : r.fmt(Math.abs(d)).replace(/^\+/, "");
+  const amount = r.key === "nacht" ? `${de(Math.abs(d) * 100)} Prozentpunkte` : r.key === "tief" ? `${de(Math.abs(d) * 60)} min` : r.key === "schlafwert" ? `${de(Math.abs(d))} Punkte` : r.fmt(Math.abs(d)).replace(/^\+/, "");
   const good = r.higherIsBetter === null ? null : (d > 0) === r.higherIsBetter;
   return { text: `${sign}${amount}`, tone: good === null ? "note-cycle" : good ? "note-good" : "note-warn" };
 }

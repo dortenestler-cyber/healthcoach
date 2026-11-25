@@ -8,7 +8,6 @@ import { loadToPct, readLoadDay } from "@/lib/alltagslast";
 export type Daily = {
   day: string;
   sleep_seconds: number | null;
-  sleep_score: number | null;
   hrv_last_night: number | null;
   hrv_weekly_avg: number | null;
   hrv_status: string | null;

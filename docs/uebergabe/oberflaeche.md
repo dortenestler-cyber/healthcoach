@@ -1,6 +1,14 @@
 # Übergabe · Oberfläche (OF)
 Belegt: frei
-Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_014pVPWcpKAVS1T6prb5SPNt
+Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WGKktjg5sG2bBmQXp
+
+## Schlaf nach Menge und Qualität (25.11.)
+- Konzept `docs/konzept-schlafqualitaet.md` freigegeben, umgesetzt in `lib/schlaf.ts` (`sleepScore`, `sleepSentence`, `sleepRows`, `spo2Warning`).
+- Ring Schlaf (Heute, Detailseite, Tagesblatt) zeigt Gesamtwert 0–100 mit Wort; Detailseite: Kacheln Menge/Erholsam, Satz mit schwächstem Baustein, Faktoren ohne Legende, Karte „Wach und Sauerstoff“ entfernt (Sauerstoff nur noch als Warnzeichen).
+- Readiness (`computeTarget`, `readinessFactors`) und Coach-Kontext nutzen den eigenen Wert statt Garmins `sleep_score`. Muster (`lib/muster.ts`, `insights.ts`) und Gewohnheiten (`habitStats.ts`, Zeile „Schlafwert“) nutzen `sleepScores()` statt `sleep_score`.
+- `sleep_score` aus `Daily` (lib/garmin.ts) entfernt, App nutzt ihn nirgends mehr. Offen für Daten (Freigabe nötig): Uhr-Readiness `supabase/functions/watch/target.ts` Faktor SCHLAF auf eigenen Schlafwert umstellen, Feld `sleep` in der Uhr-Antwort streichen, `garmin-sync` hört auf zu speichern, danach Migration `drop column sleep_score`.
+- Nachkalibriert (Nutzerin: Werte zu hoch): typische Nacht etwa 80 statt 95–100, siehe Konzept 5a.
+- Prüfen mit echten Daten: ob `awake_count`, `sleep_awake_s`, `sleep_start_min` zuverlässig gefüllt sind; Gewichte ggf. nachziehen.
 
 ## Coach schreibt Tagesempfehlung und Monatsrückblick (25.11.)
 - Variante A freigegeben. `lib/briefing.ts` (`useBriefing`): ruft die bestehende Funktion `coach` mit fester Frage und `buildCoachContext()` auf, speichert in `settings.data.briefing.{tag,monat}` mit Schlüssel (Tag; Monat: Tag + Anzahl Veränderungen), ↻ schreibt neu. Rendering `components/ui/CoachText.tsx` (erste Zeile Lage, „- “ Liste, **fett**).

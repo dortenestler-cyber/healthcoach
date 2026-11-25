@@ -7,6 +7,8 @@ import { illnessRule, type Illness } from "@/lib/health";
 import { sportOf, type Sport } from "@/lib/training";
 import { alltagMinutes, FULL_DAY_LOAD, loadToPct, readLoadDay } from "@/lib/alltagslast";
 import { baselineFor, RANGE_PHASE_NAMES, type Baseline, type Range } from "@/lib/baseline";
+import { sleepScore } from "@/lib/schlaf";
+import { sleepScores } from "@/lib/schlaf";
 
 export type Diary = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[]; fromGarmin?: boolean; garminOnly?: boolean; ovulation?: string[]; symptoms_checked?: boolean };
 // fromGarmin: Blutung an diesem Tag stammt aus Garmin · garminOnly: kein eigener Tagebucheintrag an diesem Tag
@@ -206,10 +208,11 @@ export function computeTarget(day: string, data: Data): Target {
   const base = (f: (r: Daily) => number | null, cycleSensitive: boolean) => baselineFor(data.daily.map((r) => ({ day: r.day, value: f(r) })), day, { diary: data.diary, sick: data.sick }, cycleSensitive);
   const phaseName = (b: Baseline) => (b.phase && b.phaseKey ? RANGE_PHASE_NAMES[b.phaseKey] : null);
   const r0 = (x: number) => String(Math.round(x));
-  const sl = base((r) => r.sleep_score, true);
   const hv = base((r) => r.hrv_last_night, true);
   const rh = base((r) => r.resting_hr, true);
-  push(rangeFactor("Schlaf", today?.sleep_score ?? null, sl.active, phaseName(sl), r0, true, 10, " Punkte"));
+  // Schlaf: eigener Gesamtwert aus Menge und Erholsam (lib/schlaf.ts), feste Stufen statt Bereich
+  const sl = sleepScore(day, data);
+  if (sl.total !== null) factors.push({ name: "Schlaf", value: `${sl.total} Punkte`, note: sl.word ?? "", effect: sl.total >= 85 ? 3 : sl.total >= 70 ? 0 : sl.total >= 55 ? -5 : -10 });
   push(rangeFactor("HRV", today?.hrv_last_night ?? null, hv.active, phaseName(hv), r0, true, 12, " ms"));
   push(rangeFactor("Ruhepuls", today?.resting_hr ?? null, rh.active, phaseName(rh), r0, false, 8, " bpm"));
   if (today?.bb_max !== null && today?.bb_max !== undefined) {
@@ -342,7 +345,8 @@ export function patterns(data: Data): Pattern[] {
     const l = loadPercent(r.day, data.daily, data.acts);
     (l >= HARD_DAY_PCT ? hardDays : otherDays).push(r.day);
   }
-  const nextScore = (days: string[]) => days.map((d) => dm.get(addDays(d, 1))?.sleep_score ?? null).filter((v): v is number => v !== null);
+  const ss = sleepScores(data);
+  const nextScore = (days: string[]) => days.map((d) => ss.get(addDays(d, 1)) ?? null).filter((v): v is number => v !== null);
   const nextHrv = (days: string[]) => days.map((d) => dm.get(addDays(d, 1))?.hrv_last_night ?? null).filter((v): v is number => v !== null);
   const hs = mean(nextScore(hardDays));
   const os = mean(nextScore(otherDays));
@@ -407,7 +411,7 @@ export function patterns(data: Data): Pattern[] {
   for (const k of infl) {
     const withD = data.diary.filter((d) => d.influences?.includes(k)).map((d) => d.day);
     const withoutD = data.diary.filter((d) => !d.garminOnly && !d.influences?.includes(k)).map((d) => d.day);
-    const sleep = (days: string[]) => days.map((d) => dm.get(addDays(d, 1))?.sleep_score ?? null).filter((v): v is number => v !== null);
+    const sleep = (days: string[]) => days.map((d) => ss.get(addDays(d, 1)) ?? null).filter((v): v is number => v !== null);
     const a = mean(sleep(withD));
     const b = mean(sleep(withoutD));
     if (withD.length >= 4 && withoutD.length >= 4 && a !== null && b !== null) rows.push({ label: labels[k], with: a, without: b, n: withD.length });
