@@ -85,6 +85,15 @@ export function dayIntensity(day: string, data: Data): number {
   return garmin + data.acts.filter((a) => (a.start_local ?? "").slice(0, 10) === day).reduce((s, a) => s + extraIntensity(a), 0);
 }
 
+// Nur Garmins eigene Intensitätsminuten dieser Woche, für den ehrlichen Vergleich mit der WHO (Prüfaudit 26.11., Empfehlung 19):
+// Die App zählt jede Trainingsminute mindestens moderat, auch Pausen beim Bouldern. Garmin zählt nur Minuten mit erhöhtem Puls.
+export function garminWeekIntensity(today: string, data: Data): number {
+  const mon = mondayOf(today);
+  let sum = 0;
+  for (let d = mon; d <= today; d = addDays(d, 1)) sum += data.daily.find((r) => r.day === d)?.intensity_minutes ?? 0;
+  return sum;
+}
+
 // Intensitätsminuten dieser Woche (Montag bis heute)
 export function weekIntensity(today: string, data: Data): number {
   const mon = mondayOf(today);

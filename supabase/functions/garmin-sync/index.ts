@@ -86,6 +86,11 @@ const int = (v: unknown): number | null => {
 };
 
 // Eine Zeile für garmin_activities aus der Aktivitätenliste von Garmin
+const te = (v: unknown): number | null => {
+  const n = num(v);
+  return n === null || n < 0 || n > 5 ? null : Math.round(n * 10) / 10;
+};
+
 function actRow(a: Any, userId: string): Record<string, unknown> {
   return {
     user_id: userId,
@@ -102,6 +107,9 @@ function actRow(a: Any, userId: string): Record<string, unknown> {
     // Garmins Intensitätsminuten der Einheit (Migration 20261130130000_intensitaet_einheiten)
     im_moderate: int(a?.moderateIntensityMinutes),
     im_vigorous: int(a?.vigorousIntensityMinutes),
+    // Garmins Trainingseffekt 0–5 (Migration 20261201090000_trainingseffekt), fehlt er in der Liste, bleibt er leer
+    te_aerobic: te(a?.aerobicTrainingEffect),
+    te_anaerobic: te(a?.anaerobicTrainingEffect),
     synced_at: new Date().toISOString(),
   };
 }
@@ -149,6 +157,11 @@ async function saveSnapshot(sb: Any, userId: string, sums: Any[]): Promise<strin
 
 async function saveActivities(sb: Any, rows: Record<string, unknown>[]): Promise<boolean> {
   let { error } = await sb.from("garmin_activities").upsert(rows, { onConflict: "user_id,activity_id" });
+  if (error && /te_aerobic|te_anaerobic/.test(error.message)) {
+    // Migration 20261201090000_trainingseffekt fehlt noch: ohne Trainingseffekt speichern
+    rows = rows.map(({ te_aerobic: _a, te_anaerobic: _n, ...a }) => a);
+    ({ error } = await sb.from("garmin_activities").upsert(rows, { onConflict: "user_id,activity_id" }));
+  }
   if (error && /im_moderate|im_vigorous/.test(error.message)) {
     // Migration 20261130130000_intensitaet_einheiten fehlt noch: ohne Intensitätsminuten der Einheit speichern
     rows = rows.map(({ im_moderate: _m, im_vigorous: _v, ...a }) => a);

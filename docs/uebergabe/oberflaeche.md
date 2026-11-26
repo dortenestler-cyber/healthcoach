@@ -2,6 +2,20 @@
 Belegt: frei
 Zuletzt aktualisiert: 2026-11-26 · Sitzung: https://claude.ai/code/session_017zWr1TtsNQFhPjonCriVLT
 
+## Prüfaudit: offene Empfehlungen 8–19 und Uhr (PR #190, 26.11., Freigabe der Nutzerin, Hochladen freigegeben)
+- Readiness (`lib/insights.ts`): Startwert 75 (`READINESS_START`), Bonus bei deutlich besseren Werten halbes Gewicht, Schlaf ab 85 +5 (Nr. 17). HRV als Mittel aus letzter Nacht und 7-Tage-Schnitt (`hrvBlend`), Gewicht 15 (Nr. 8). Body Battery halb: −8 / −4 / +2 (Nr. 9). `stressFactor`: Stress der letzten 3 Tage über dem Bereich −3, deutlich darüber −6 (Nr. 10). Zielfaktor-Stützpunkte 30/50/75/92, feste Stufen ab 82/62/42. Beispieldaten: gewöhnlicher Tag im Schnitt 75,4.
+- Fünf Stufen (`lib/cycle.ts` `STAGES`, `STAGE_ORDER`): Erholen < 3, Behutsam < 5, Moderat < 6,5, Bereit < 8,5, Volle Kraft. Stufenleiste mit fünf Sage-Tönen (`--recovery-5`).
+- Zyklus unsicher (Nr. 18): `CycleToday.uncertain`, wenn die letzten Zyklen um mehr als 7 Tage schwanken und kein Eisprung-Zeichen die Phase stützt. `estWord` zeigt dann „(unsicher)“ statt „(geschätzt)“ (Heute, Tagesblatt, Tagebuch).
+- Muskeln in der Tagesbelastung (Nr. 16): `actLoad` in `lib/insights.ts`: Kraft-Einheit mit Anstrengung zählt mindestens Minuten × Anstrengung ÷ 10 × Sportgewicht × 2. Genutzt von `dayLoad` und `loadByDay`. Cardio-Belastung (`cardioPerDay`) bleibt reine Pulslast.
+- Muskelpunkte (Nr. 13, `lib/belastungZeit.ts`): `exerciseFactor` (Ganzkörper/Beine 1,2, Oberkörper 1,0, kleine Übungen 0,5) für Kettlebell-Sätze, `climbPoints` nach Boulder-Grad (Versuch halb), das Höhere aus Minuten und Graden zählt. `BelastungZeitCard` und `coachContext` laden `exercise` und `climbs`.
+- Cardio-Fokus (Nr. 12): `lib/cardioFokus.ts`, Karte `components/training/CardioFokusCard.tsx` unter Training › Auswertung › Woche. Garmin-Last je Einheit nach Pulszonen verteilt (0–2 locker, 3–4 intensiv, 5 anaerob), 4 Wochen. Mangel unter 30/20/5 %, Schwerpunkt über 60 %.
+- Muster (Nr. 14, `lib/muster.ts`): `fisherP` und `bhAdjust`, Fund nur bis korrigiert 0,2, „deutlich“ unter 0,05. Gegen R geprüft.
+- Trainingseffekt (Nr. 15): Migration `20261201090000_trainingseffekt` (`te_aerobic`, `te_anaerobic`), `garmin-sync` füllt aus `aerobicTrainingEffect`/`anaerobicTrainingEffect`, ohne Spalten wird ohne gespeichert. Kachel „Trainingseffekt“ auf der Einheit, nur wenn Werte da sind. Ungeprüft: ob die Aktivitätenliste die Felder liefert.
+- Intensität (Nr. 19): Unter dem Ring „davon Garmin x min“ (`garminWeekIntensity`).
+- Uhr (`supabase/functions/watch/target.ts`, `schlaf.ts`, `today.ts`): gleiche Rechnung wie die App, Stand dieses PRs und #189. Neue Faktoren LAST, STRESS, INFEKT; `score` ist `null` ohne HRV, Ruhepuls und Schlaf. Tagesstart (`push/nachrichten.ts`) zeigt die Readiness jetzt als 0–10 mit Komma wie die App, Texte für die neuen Faktoren. An zehn Beispieltagen rechnen App und Uhr gleich.
+- Geprüft: `tsc`, `npm run build`, Funktionsdateien mit `tsc` (kein Deno in der Sitzung). Nicht im Browser und nicht auf der Uhr angesehen.
+- Wartet auf: Merge durch die Nutzerin (Migration), danach Läufe „Supabase-Migrationen ausführen“ und „Supabase-Funktionen hochladen“ prüfen. Stufe 3 des Audits (echte Daten) wartet auf den Export.
+
 ## Prüfaudit Bewertungslogik umgesetzt (PR #189, 26.11., Freigabe der Nutzerin)
 - Anlass: Nacht über 8 Stunden hieß „knapp“. Ursache: Bewertet wurde gegen den Bedarf mit Zuschlägen (Median 30 Nächte + Schlafschuld + Belastung). Eine gewöhnliche Nacht lag damit fast immer unter 100 %.
 - `lib/today.ts` `sleepNeed`: Grundbedarf mindestens 7 h (`MIN_NEED_H`), neues Feld `gradeH` = Grundbedarf, höchstens 8 h (`GRADE_MAX_H`), ohne Zuschläge. `sleepAchieved.ratio` misst jetzt an `gradeH`. Die Zuschläge bleiben im Bedarf für die kommende Nacht. `baseRaised` für den Satz auf der Schlafseite. `SleepCard` zählt Nächte unter `gradeH`, `DaySentence` nennt `gradeH` als Bedarf.
@@ -15,8 +29,8 @@ Zuletzt aktualisiert: 2026-11-26 · Sitzung: https://claude.ai/code/session_017z
   6. `sleepEffect`: unter 55 Punkten gleitend bis −15 (bei 40).
   7. `readinessFactor` gleitend: 35 → 0,5 · 55 → 0,75 · 80 → 1,0 · 95 → 1,15.
 - Geprüft: `tsc`, `npm run build`, zehn Beispieltage mit 120 Tagen Beispieldaten (Skript nicht im Repo). Nicht im Browser angesehen.
-- Für Daten: `supabase/functions/watch/target.ts` rechnet die Readiness für die Uhr nach und ist noch auf dem alten Stand (Faktoren 1, 2, 3, 4, 6, 7 und Schlafbedarf). Angleichen braucht die Freigabe für das Hochladen der Funktion.
-- Offen aus dem Audit (mittel/niedrig, Nr. 8–10 und 12–19): noch nicht umgesetzt. Stufe 3 (echte Daten) wartet auf den Export aus Supabase.
+- Uhr angeglichen in PR #190.
+- Nr. 8–19 umgesetzt in PR #190.
 
 ## Intensität: Belastung und Krafttage (PR #185, 25.11., Freigabe der Nutzerin)
 - Anlass: Bouldern bringt kaum Intensitätsminuten (Garmin zählt gleich wenig), aber deutlich Belastung.

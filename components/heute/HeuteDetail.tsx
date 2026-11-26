@@ -14,9 +14,9 @@ import EnergyCard from "@/components/heute/EnergyCard";
 import { countInRange, positionIn } from "@/lib/baseline";
 import { energyDay } from "@/lib/energie";
 import { duration, stressDay, stressSentence } from "@/lib/stress";
-import { dayRule, PHASES, STAGES, windowText, type DayRule, type Stage } from "@/lib/cycle";
+import { dayRule, estWord, PHASES, STAGE_ORDER, STAGES, windowText, type DayRule } from "@/lib/cycle";
 import { clock, isoDay, longDate, shiftDay } from "@/lib/dates";
-import { dayIntensity, weekIntensity, WHO_MINUTES, WHO_STRENGTH_DAYS } from "@/lib/trainingLoad";
+import { dayIntensity, garminWeekIntensity, weekIntensity, WHO_MINUTES, WHO_STRENGTH_DAYS } from "@/lib/trainingLoad";
 import { activityLabel } from "@/lib/garmin";
 import { sportOf, type Sport } from "@/lib/training";
 import type { Data } from "@/lib/insights";
@@ -91,7 +91,6 @@ export default function HeuteDetail({ k, day: dayParam }: { k: DetailKey; day?: 
   );
 }
 
-const STAGE_ORDER: Stage[] = ["erholen", "behutsam", "bereit", "volle-kraft"];
 const de1 = (v: number) => v.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const shortDay = (iso: string) => new Date(iso + "T12:00:00").toLocaleDateString("de-DE", { day: "numeric", month: "short" });
 const LEGEND_30 = "Heute gegen deine letzten 30 Tage, zyklusabhängige Werte gegen frühere Tage derselben Phase";
@@ -151,7 +150,7 @@ function ReadinessDetail({ day, data, rule, showGarmin }: { day: string; data: D
       )}
 
       <p className="meta">
-        {rule.cycle.cycleDay !== null ? `Zyklustag ${rule.cycle.cycleDay}${phase ? " · " + phase + " (geschätzt)" : ""}` : "Zyklus: noch keine Periode im Tagebuch"}
+        {rule.cycle.cycleDay !== null ? `Zyklustag ${rule.cycle.cycleDay}${phase ? " · " + phase + " " + estWord(rule.cycle) : ""}` : "Zyklus: noch keine Periode im Tagebuch"}
         {rule.cycle.window ? ` · ${windowText(rule.cycle.window, isoDay())} (${rule.cycle.window.earliest === rule.cycle.window.latest ? shortDay(rule.cycle.window.earliest) : `${shortDay(rule.cycle.window.earliest)}–${shortDay(rule.cycle.window.latest)}`})` : ""}
       </p>
     </>
@@ -327,7 +326,7 @@ function IntensityDetail({ day, data, rule, isToday, nowMinute }: { day: string;
   const week = Array.from({ length: 7 }, (_, i) => shiftDay(mon, i));
   const weeks = Array.from({ length: 4 }, (_, i) => shiftDay(mon, -7 * (3 - i))).map((m) => ({ m, sum: weekIntensity(m === mon ? day : shiftDay(m, 6), data) }));
   const reached = weeks.filter((w) => w.sum >= WHO_MINUTES).length;
-  // Belastung nur aus Training (wie Garmin), damit Kraft und Bouldern sichtbar werden, die kaum Intensitätsminuten bringen
+  // Belastung nur aus Training (Kraft mit Muskelrechnung), damit Kraft und Bouldern sichtbar werden, die kaum Intensitätsminuten bringen
   const trainLoad = loadByDay(data.acts);
   const actsOn = (d: string) => data.acts.filter((a) => (a.start_local ?? "").slice(0, 10) === d && a.sport_override !== "ignorieren");
   const dayLoad = Math.round(trainLoad.get(day) ?? 0);
@@ -353,7 +352,7 @@ function IntensityDetail({ day, data, rule, isToday, nowMinute }: { day: string;
       <div className="ring-hero detail-hero">
         <ValueRing tone="training" size={208} value={im / WHO_MINUTES} center={String(im)} caption={`von ${WHO_MINUTES} min`} label={`Intensitätsminuten diese Woche ${im} von ${WHO_MINUTES}`} />
       </div>
-      <p className="gauge-meta detail-center">Montag bis {isToday ? "heute" : shortDay(day)} · Empfehlung der WHO</p>
+      <p className="gauge-meta detail-center">Montag bis {isToday ? "heute" : shortDay(day)} · Empfehlung der WHO · davon Garmin {garminWeekIntensity(day, data)} min</p>
 
       <DaySentence focus="intensitaet" day={day} data={data} rule={rule} nowMinute={nowMinute} isToday={isToday} showLoad={false} />
 

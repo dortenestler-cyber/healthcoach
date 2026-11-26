@@ -7,9 +7,15 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Prüfaudit: offene Empfehlungen und Uhr (PR #190, 26.11.)
+Enthält die Migration `supabase/migrations/20261201090000_trainingseffekt.sql` (Garmins Trainingseffekt je Einheit) und geänderte Funktionen `watch`, `push` und `garmin-sync`. Dein Merge ist die Freigabe.
+- [ ] PR #190 mergen
+- [ ] Läufe „Supabase-Migrationen ausführen“ und „Supabase-Funktionen hochladen“ grün? (Claude prüft auf Wunsch)
+- [ ] Nach dem nächsten Training: zeigt die Einheit eine Kachel „Trainingseffekt“? Wenn nicht, liefert Garmin den Wert nicht, Claude Bescheid geben
+
 ### Zifferblatt Datenraster: Layout A und C (PR #188, 26.11.)
 Nur das Zifferblatt, keine Datenbank. Das Upload-Paket baut der Lauf „Uhr-App bauen“.
-- [ ] PR #188 mergen (Prüfung und Uhr-Build sind grün; Claude durfte nicht selbst mergen)
+- [x] PR #188 mergen (gemergt 26.11.)
 - [ ] Nach dem Merge: Actions › „Uhr-App bauen“ (Lauf auf `main`) › Artifact `upload-zifferblatt` herunterladen
 - [ ] Im Garmin-Entwicklerportal (apps.garmin.com/developer/upload) `HealthCoachFace.iq` als neue Version hochladen, Screenshots und Text aus `beschreibung.md` ersetzen
 - [ ] Beim Update fragt die Uhr nach der neuen Berechtigung „Position“ (für die Sonnenzeiten): zulassen

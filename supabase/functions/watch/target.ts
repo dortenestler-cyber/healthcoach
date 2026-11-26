@@ -6,7 +6,7 @@
 // deno-lint-ignore no-explicit-any
 type Any = any;
 
-export type Day = { day: string; hrv_last_night: number | null; resting_hr: number | null; bb_max: number | null };
+export type Day = { day: string; hrv_last_night: number | null; resting_hr: number | null; bb_max: number | null; stress_avg: number | null; respiration_avg: number | null };
 export type DiaryRow = { day: string; bleeding: number; symptoms: Record<string, number> | null };
 export type Checkin = { energy: number | null; sleep: number | null; mood: number | null } | null;
 export type Illness = { kind?: string; severity: number; fever: boolean; below_neck: boolean } | null;
@@ -129,7 +129,7 @@ function rangePhaseOf(day: string, starts: string[]): RangePhase | null {
   return p === "MENS" ? "menstruation" : p === "FOLL" ? "follikel" : p === "EISP" ? "eisprung" : "luteal";
 }
 
-export function rangeFor<T extends { day: string }>(daily: T[], day: string, f: (r: T) => number | null, starts: string[], sick: Set<string>, phases: Map<string, RangePhase | null>): Range | null {
+export function rangeFor<T extends { day: string }>(daily: T[], day: string, f: (r: T) => number | null, starts: string[], sick: Set<string>, phases: Map<string, RangePhase | null>, used?: { phase: boolean }): Range | null {
   const phaseOf = (d: string) => {
     if (!phases.has(d)) phases.set(d, rangePhaseOf(d, starts));
     return phases.get(d) ?? null;
@@ -140,11 +140,14 @@ export function rangeFor<T extends { day: string }>(daily: T[], day: string, f: 
   if (ph) {
     const v = vals(addDays(day, -PHASE_LOOKBACK), (d) => phaseOf(d) === ph);
     const r = v.length >= MIN_PHASE_DAYS ? middleHalf(v, MIN_PHASE_DAYS) : null;
-    if (r) return r;
+    if (r) {
+      if (used) used.phase = true;
+      return r;
+    }
   }
   return middleHalf(vals(addDays(day, -RANGE_DAYS), () => true), MIN_PROVISIONAL);
 }
-// Abstand außerhalb des Bereichs in Bereichsbreiten: ab 0,6 voller Abzug, darunter halber, deutlich besser kleiner Bonus
+// Abstand außerhalb des Bereichs in Bereichsbreiten: ab 0,6 voller Abzug, darunter halber, deutlich besser halber Bonus
 function rangeEffect(v: number | null, range: Range | null, higherIsBetter: boolean, weight: number): number {
   if (v === null || !range || !range.stable) return 0;
   const width = range.hi - range.lo || Math.max(1, Math.abs(range.median) * 0.05);
@@ -153,7 +156,7 @@ function rangeEffect(v: number | null, range: Range | null, higherIsBetter: bool
   const bad = higherIsBetter ? below - above : above - below;
   if (bad > 0.6) return -weight;
   if (bad > 0) return -Math.round(weight / 2);
-  if (bad < -0.5) return Math.round(weight / 4);
+  if (bad < -0.5) return Math.round(weight / 2); // halber Bonus (Prüfaudit 26.11., Empfehlung 17)
   return 0;
 }
 
@@ -166,8 +169,29 @@ export function loadToPct(load: number): number {
 }
 const okLoad = (ld: Any) => ld && typeof ld === "object" && [1, 2, 3].includes(ld.v) && Array.isArray(ld.training) && Array.isArray(ld.alltag);
 // Last eines Tages (Training + Alltag, Garmin-Einheit). Ohne Alltagsdaten: 60 Intensitätsminuten wie 150 Last.
+// Sportart wie sportOf in lib/training.ts; Kraft mit Anstrengung zählt mindestens Minuten × Anstrengung ÷ 10 × Gewicht × 2 (actLoad in lib/insights.ts)
+const OWN_SPORTS = ["karate", "kettlebell", "klettern", "ausdauer", "sonstiges"];
+function sportOf(a: Any): string {
+  const o = a?.sport_override;
+  if (o && OWN_SPORTS.includes(o)) return o;
+  if (o === "ignorieren") return "sonstiges";
+  const k = String(a?.type_key ?? "");
+  if (/martial|boxing|karate|kickbox/.test(k)) return "karate";
+  if (/boulder|climb/.test(k)) return "klettern";
+  if (/strength|hiit|kettlebell/.test(k)) return "kettlebell";
+  if (/run|walk|hik|cycl|bik|swim|row|elliptical/.test(k)) return "ausdauer";
+  return "sonstiges";
+}
+const STRENGTH_WEIGHT: Record<string, number> = { kettlebell: 1, klettern: 1, karate: 0.5 };
+export function actLoad(a: Any): number {
+  const hr = Number(a?.training_load) || 0;
+  const w = STRENGTH_WEIGHT[sportOf(a)];
+  const rpe = typeof a?.rpe === "number" ? a.rpe : null;
+  if (!w || rpe === null || !a?.duration_s) return hr;
+  return Math.max(hr, ((a.duration_s / 60) * rpe * w * 2) / 10);
+}
 export function dayLoadRaw(day: string, g: Any, acts: Any[]): number {
-  const tl = acts.filter((a) => String(a.start_local ?? "").slice(0, 10) === day).reduce((s, a) => s + (Number(a.training_load) || 0), 0);
+  const tl = acts.filter((a) => String(a.start_local ?? "").slice(0, 10) === day).reduce((s, a) => s + actLoad(a), 0);
   const ld = g?.load_daily_min;
   if (!okLoad(ld)) return Math.max(((g?.intensity_minutes ?? 0) / 60) * FULL_DAY_LOAD, tl);
   return (tl || ld.last_training || 0) + Math.max(0, ld.last_alltag ?? 0);
@@ -192,8 +216,68 @@ export function usualLoad(day: string, rows: Any[], acts: Any[], sick: Set<strin
   return { usual: mean(pcts), brake: chronic > 0 && acute / chronic > 1.3 };
 }
 // Schlafwert (schlaf.ts) auf die Readiness wie computeTarget in der App
-const sleepEffect = (s: number | null) => (s === null ? 0 : s >= 85 ? 3 : s >= 70 ? 0 : s >= 55 ? -5 : -10);
-const readinessFactor = (score: number) => (score >= 85 ? 1.15 : score >= 65 ? 1 : score >= 45 ? 0.75 : 0.5);
+// Stand Prüfaudit 26.11.2026 (sleepEffect, readinessFactor, READINESS_START in lib/insights.ts)
+const sleepEffect = (s: number | null) => (s === null ? 0 : s >= 85 ? 5 : s >= 70 ? 0 : s >= 55 ? -5 : -Math.min(15, 5 + Math.round(((55 - s) * 10) / 15)));
+const READINESS_START = 75;
+const FACTOR_POINTS: [number, number][] = [[30, 0.5], [50, 0.75], [75, 1], [92, 1.15]];
+function readinessFactor(score: number): number {
+  const p = FACTOR_POINTS;
+  if (score <= p[0][0]) return p[0][1];
+  for (let i = 1; i < p.length; i++) if (score <= p[i][0]) return p[i - 1][1] + ((score - p[i - 1][0]) / (p[i][0] - p[i - 1][0])) * (p[i][1] - p[i - 1][1]);
+  return p[p.length - 1][1];
+}
+const HARD_PCT = Math.round(loadToPct(105));
+const MID_PCT = Math.round(loadToPct(60));
+
+// Belastung gestern gegen einen üblichen Trainingstag (recentLoadFactor in lib/insights.ts)
+function recentLoadEffect(day: string, rows: Any[], acts: Any[], sick: Set<string>): number {
+  const byDay = new Map(rows.map((r) => [r.day, r]));
+  const actDays = new Set(acts.map((a) => String(a.start_local ?? "").slice(0, 10)));
+  const pct = (d: string) => (byDay.has(d) || actDays.has(d) ? dayLoadPct(d, byDay.get(d), acts) : null);
+  const y = pct(addDays(day, -1));
+  if (y === null) return 0;
+  const v = pct(addDays(day, -2)) ?? 0;
+  const hist: number[] = [];
+  for (let i = 1; i <= 28; i++) {
+    const d = addDays(day, -i);
+    const p = sick.has(d) ? null : pct(d);
+    if (p !== null) hist.push(p);
+  }
+  if (hist.length < 14) return y >= HARD_PCT ? -5 : 0;
+  const sorted = [...hist].sort((a, b) => a - b);
+  const ref = Math.max(sorted[Math.floor(0.75 * (sorted.length - 1))], MID_PCT);
+  return y >= 1.6 * ref ? -10 : y >= 1.3 * ref ? -5 : y >= ref && v >= ref ? -5 : 0;
+}
+
+// HRV: halb letzte Nacht, halb Schnitt der letzten 7 Nächte (hrvBlend in lib/insights.ts)
+function hrvBlend(day: string, daily: Day[]): number | null {
+  const by = new Map(daily.map((r) => [r.day, r.hrv_last_night]));
+  const last = by.get(day) ?? null;
+  if (last === null) return null;
+  const week = Array.from({ length: 7 }, (_, i) => by.get(addDays(day, -i)) ?? null).filter((v): v is number => v !== null);
+  return week.length >= 3 ? 0.5 * last + 0.5 * (mean(week) as number) : last;
+}
+
+// Stress der letzten 3 Tage gegen den 30-Tage-Bereich (stressFactor in lib/insights.ts)
+function stressEffect(day: string, daily: Day[], sick: Set<string>): number {
+  const vals = [1, 2, 3].map((i) => daily.find((r) => r.day === addDays(day, -i))?.stress_avg ?? null).filter((v): v is number => v !== null);
+  if (vals.length < 2) return 0;
+  const b = rangeFor(daily, addDays(day, -3), (r) => r.stress_avg, [], sick, new Map());
+  if (!b?.stable) return 0;
+  const over = ((mean(vals) as number) - b.hi) / Math.max(b.hi - b.lo, 3);
+  return over > 0.6 ? -6 : over > 0 ? -3 : 0;
+}
+
+// Infektverdacht (infectionSigns in lib/insights.ts): Ruhepuls ≥ Mitte des Bereichs + 6 und HRV unter oder Atem über dem Bereich
+function infection(day: string, daily: Day[], starts: string[], sick: Set<string>, phases: Map<string, RangePhase | null>): boolean {
+  const t = daily.find((r) => r.day === day);
+  if (!t || t.resting_hr === null) return false;
+  const rh = rangeFor(daily, day, (r) => r.resting_hr, starts, sick, phases);
+  if (!rh || t.resting_hr < rh.median + 6) return false;
+  const hv = t.hrv_last_night !== null ? rangeFor(daily, day, (r) => r.hrv_last_night, starts, sick, phases) : null;
+  const at = t.respiration_avg !== null ? rangeFor(daily, day, (r) => r.respiration_avg, starts, sick, phases) : null;
+  return (!!hv && (t.hrv_last_night as number) < hv.lo) || (!!at && (t.respiration_avg as number) > at.hi);
+}
 function targetBand(score: number, usual: number, brake: boolean): { lo: number; hi: number } {
   let mid = usual * readinessFactor(score);
   if (brake) mid = Math.min(mid, usual);
@@ -205,23 +289,25 @@ function targetBand(score: number, usual: number, brake: boolean): { lo: number;
 // Tagesziel 0–100 wie computeTarget in der App, dazu Bereich und Faktoren (kurz für den Glance)
 export type WatchFactor = { k: string; e: number };
 const BANDS = [
-  { min: 85, lo: 65, hi: 85 },
-  { min: 65, lo: 45, hi: 65 },
-  { min: 45, lo: 25, hi: 45 },
+  { min: 82, lo: 65, hi: 85 },
+  { min: 62, lo: 45, hi: 65 },
+  { min: 42, lo: 25, hi: 45 },
   { min: -999, lo: 10, hi: 25 },
 ];
-export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checkin: Checkin, illness: Illness, starts: string[], sick: Set<string> = new Set(), usual: { usual: number | null; brake: boolean } = { usual: null, brake: false }, sleep: number | null = null): { score: number; pause: boolean; lo: number; hi: number; factors: WatchFactor[] } {
+export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checkin: Checkin, illness: Illness, starts: string[], sick: Set<string> = new Set(), usual: { usual: number | null; brake: boolean } = { usual: null, brake: false }, sleep: number | null = null, rows: Any[] = [], acts: Any[] = []): { score: number | null; pause: boolean; infection: boolean; lo: number; hi: number; factors: WatchFactor[] } {
   const today = daily.find((r) => r.day === day) ?? null;
   const phases = new Map<string, RangePhase | null>();
   const factors: WatchFactor[] = [];
   const add = (k: string, e: number) => factors.push({ k, e });
   // Schlaf: eigener Schlafwert (schlaf.ts) mit festen Stufen wie in der App; HRV und Ruhepuls zyklusabhängig
   add("SCHLAF", sleepEffect(sleep));
-  add("HRV", rangeEffect(today?.hrv_last_night ?? null, rangeFor(daily, day, (r) => r.hrv_last_night, starts, sick, phases), true, 12));
+  const hrvUsed = { phase: false };
+  add("HRV", rangeEffect(hrvBlend(day, daily), rangeFor(daily, day, (r) => r.hrv_last_night, starts, sick, phases, hrvUsed), true, 15));
   add("PULS", rangeEffect(today?.resting_hr ?? null, rangeFor(daily, day, (r) => r.resting_hr, starts, sick, phases), false, 8));
+  add("STRESS", stressEffect(day, daily, sick));
   if (today?.bb_max !== null && today?.bb_max !== undefined) {
     const bb = today.bb_max;
-    add("BB", bb < 30 ? -15 : bb < 50 ? -8 : bb >= 75 ? 3 : 0);
+    add("BB", bb < 30 ? -8 : bb < 50 ? -4 : bb >= 75 ? 2 : 0);
   }
   if (checkin) {
     const avg = mean([checkin.energy, checkin.sleep, checkin.mood].filter((v): v is number => v !== null));
@@ -238,17 +324,24 @@ export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checki
   const cyc = cycleInfo(day, starts);
   if (cyc.cycleDay !== null && cyc.beforePeriod) {
     const p = cycleBeforeDiff(new Map(daily.map((d) => [d.day, d])), starts);
-    if (p.ready && p.beforeDiff !== null && p.beforeDiff < -5) add("ZYKLUS", -5);
+    // Kein Abzug, wenn die HRV schon am Bereich der Phase gemessen wird
+    if (p.ready && p.beforeDiff !== null && p.beforeDiff < -5 && !hrvUsed.phase) add("ZYKLUS", -5);
   }
   const pause = !!illness && (illness.fever || illness.below_neck || illness.severity >= 4);
   if (illness) add("KRANK", pause ? -100 : -25);
+  add("LAST", rows.length ? recentLoadEffect(day, rows, acts, sick) : 0);
+  const inf = !pause && infection(day, daily, starts, sick, phases);
+  if (inf) add("INFEKT", -15);
   const shown = factors.filter((f) => f.e !== 0);
-  if (pause) return { score: 0, pause, lo: 0, hi: 15, factors: shown };
-  const score = Math.max(0, Math.min(100, 80 + factors.reduce((s, f) => s + f.e, 0)));
+  if (pause) return { score: 0, pause, infection: false, lo: 0, hi: 15, factors: shown };
+  const score = Math.max(0, Math.min(100, READINESS_START + factors.reduce((s, f) => s + f.e, 0)));
+  // Ohne HRV, Ruhepuls und Schlaf keine Zahl („Daten fehlen“ in der App)
+  const missing = today?.hrv_last_night == null && today?.resting_hr == null && sleep === null;
+  if (inf) return { score: missing ? null : score, pause, infection: true, lo: 10, hi: 25, factors: shown };
   const band = BANDS.find((b) => score >= b.min)!;
   // Persönliches Ziel aus üblicher Belastung und Readiness (Nutzerin 24.11.), sonst feste Stufen
   const b = usual.usual === null ? band : targetBand(score, usual.usual, usual.brake);
-  return { score, pause, lo: b.lo, hi: b.hi, factors: shown };
+  return { score: missing ? null : score, pause, infection: false, lo: b.lo, hi: b.hi, factors: shown };
 }
 
 export const asDay = (r: Any): Day => ({
@@ -256,4 +349,6 @@ export const asDay = (r: Any): Day => ({
   hrv_last_night: r.hrv_last_night ?? null,
   resting_hr: r.resting_hr ?? null,
   bb_max: r.bb_max ?? null,
+  stress_avg: typeof r.stress_avg === "number" ? r.stress_avg : null,
+  respiration_avg: typeof r.respiration_avg === "number" ? r.respiration_avg : null,
 });

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import ExplainCard, { type ExplainTone } from "@/components/ui/ExplainCard";
-import { PHASES, windowText, type DayRule } from "@/lib/cycle";
+import { estWord, PHASES, windowText, type DayRule } from "@/lib/cycle";
 import { energyDay, usualRhythm } from "@/lib/energie";
 import { dayLoad, type Data } from "@/lib/insights";
 import { stressDay, stressSentence } from "@/lib/stress";
@@ -80,7 +80,7 @@ function readinessSentence({ day, data, rule, showLoad }: Props): Sentence {
         {rule.level === "phase" ? (
           phase ? (
             <>
-              {phase.label} (geschätzt): {phase.suggestion}.
+              {phase.label} {estWord(rule.cycle)}: {phase.suggestion}.
             </>
           ) : null
         ) : (
@@ -224,7 +224,7 @@ function cycleSentence({ day, rule }: Props): Sentence {
         Zyklustag <strong>{c.cycleDay}</strong> von etwa {c.length}
         {phase ? (
           <>
-            , <strong>{phase.label}</strong> (geschätzt)
+            , <strong>{phase.label}</strong> {estWord(c)}
           </>
         ) : null}
         .{" "}

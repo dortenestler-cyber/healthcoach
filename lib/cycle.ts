@@ -112,7 +112,12 @@ export function windowText(w: PeriodWindow, day: string): string {
   return a === b ? `Nächste Periode in etwa ${a} ${a === 1 ? "Tag" : "Tagen"}` : `Nächste Periode in etwa ${a}–${b} Tagen`;
 }
 
-export type CycleToday = { cycleDay: number | null; length: number; phase: Phase | null; window: PeriodWindow | null; cycles: number; fromGarmin: boolean; ovDay: number | null };
+export type CycleToday = { cycleDay: number | null; length: number; phase: Phase | null; window: PeriodWindow | null; cycles: number; fromGarmin: boolean; ovDay: number | null; uncertain: boolean };
+
+// Unsichere Schätzung (Prüfaudit 26.11., Empfehlung 18): die letzten Zyklen schwanken um mehr als 7 Tage
+// und kein eingetragenes Eisprung-Zeichen stützt die Phase. In der Perimenopause häufig.
+export const CYCLE_SPREAD_DAYS = 7;
+export const estWord = (c: Pick<CycleToday, "uncertain">) => (c.uncertain ? "(unsicher)" : "(geschätzt)");
 
 // Eisprung aus den eingetragenen Zeichen im Zyklus, der am Tag `start` begann (als Zyklustag), sonst null.
 // Gesucht wird ab Zyklustag 6 bis zum nächsten Periodenbeginn.
@@ -142,13 +147,17 @@ export function cycleToday(day: string, diary: Diary[]): CycleToday {
     window: nextPeriodWindow(diary, day),
     cycles: ci.cycles,
     fromGarmin: ci.fromGarmin,
+    uncertain: ovDay === null && spread(cycleLengths(diary, day)) > CYCLE_SPREAD_DAYS,
   };
 }
+const spread = (v: number[]) => (v.length >= 2 ? Math.max(...v) - Math.min(...v) : 0);
 
 // ---------- Readiness 0–10 (aus dem Tagesziel-Wert 0–100)
 
-export type Stage = "erholen" | "behutsam" | "bereit" | "volle-kraft";
-export const STAGES: Record<Stage, string> = { erholen: "Erholen", behutsam: "Behutsam", bereit: "Bereit", "volle-kraft": "Volle Kraft" };
+// Fünf Stufen wie Garmin (Prüfaudit 26.11., Empfehlung 17)
+export type Stage = "erholen" | "behutsam" | "moderat" | "bereit" | "volle-kraft";
+export const STAGES: Record<Stage, string> = { erholen: "Erholen", behutsam: "Behutsam", moderat: "Moderat", bereit: "Bereit", "volle-kraft": "Volle Kraft" };
+export const STAGE_ORDER: Stage[] = ["erholen", "behutsam", "moderat", "bereit", "volle-kraft"];
 
 // Schwellen sind eine Annahme und werden mit echten Daten geprüft
 // Bei Pause und Infektverdacht immer „Erholen“, damit die Stufe zur Empfehlung passt (Prüfaudit 26.11., Empfehlung 4).
@@ -156,7 +165,7 @@ export const STAGES: Record<Stage, string> = { erholen: "Erholen", behutsam: "Be
 export const MISSING_LABEL = "Daten fehlen";
 export function readinessFrom(t: Target): { value: number; stage: Stage; label: string; missing: boolean } {
   const value = t.pause ? 0 : Math.round(t.score) / 10;
-  const stage: Stage = t.pause || t.infection || value < 3 ? "erholen" : value < 6 ? "behutsam" : value < 8.5 ? "bereit" : "volle-kraft";
+  const stage: Stage = t.pause || t.infection || value < 3 ? "erholen" : value < 5 ? "behutsam" : value < 6.5 ? "moderat" : value < 8.5 ? "bereit" : "volle-kraft";
   return { value, stage, label: t.missing && !t.pause ? MISSING_LABEL : STAGES[stage], missing: t.missing && !t.pause };
 }
 

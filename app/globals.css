@@ -113,6 +113,7 @@
   --recovery-2: #3f9068;
   --recovery-3: #52b788;
   --recovery-4: #8fd5b0;
+  --recovery-5: #c2ebd5;
   --sleep-rem: #aeb6c2; /* Schlafphasen: tief hell, wach dunkel */
   --sleep-leicht: #7d8794;
   --sleep-wach: #626b78;
@@ -1467,7 +1468,7 @@ button {
 
 .stage-bar {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 4px;
   margin-top: 4px;
 }
@@ -1484,11 +1485,12 @@ button {
   background: var(--stage-c, var(--recovery));
   opacity: 0.35;
 }
-/* Readiness-Stufen: vier Sage-Töne, mehr ist heller */
+/* Readiness-Stufen: fünf Sage-Töne, mehr ist heller */
 .stage:nth-child(1) { --stage-c: var(--recovery-1); }
 .stage:nth-child(2) { --stage-c: var(--recovery-2); }
 .stage:nth-child(3) { --stage-c: var(--recovery-3); }
 .stage:nth-child(4) { --stage-c: var(--recovery-4); }
+.stage:nth-child(5) { --stage-c: var(--recovery-5); }
 
 .stage small {
   font-size: 11px;
@@ -3170,3 +3172,11 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .coach-text-p { margin: 0 0 8px; color: var(--text-2); }
 .coach-text-liste { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--text-2); }
 .coach-text-liste strong, .coach-text-lage strong { color: var(--text); }
+
+/* Cardio-Fokus (Training › Auswertung): drei Balken in Pulszonen-Tönen */
+.fokus-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.fokus-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
+.fokus-label { font-size: 14px; }
+.fokus-value { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+.fokus-track { grid-column: 1 / -1; height: 8px; border-radius: 99px; background: var(--fill); overflow: hidden; }
+.fokus-fill { display: block; height: 100%; border-radius: 99px; }

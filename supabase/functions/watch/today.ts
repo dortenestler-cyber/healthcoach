@@ -33,7 +33,7 @@ export async function today(sb: Any, uid: string, day: string) {
     // Für das eigene Fitness-Alter: Geburtsjahr, Bauchumfang, Einheiten der letzten 4 Wochen, Krankheiten
     sb.from("settings").select("data").eq("user_id", uid).maybeSingle(),
     sb.from("body_measurements").select("day, waist_cm").eq("user_id", uid).gte("day", addDays(day, -179)).order("day"),
-    sb.from("garmin_activities").select("start_local, duration_s, avg_hr, training_load").eq("user_id", uid).gte("start_local", addDays(day, -28)),
+    sb.from("garmin_activities").select("*").eq("user_id", uid).gte("start_local", addDays(day, -30)), // alle Spalten: rpe, Sportart (Muskelrechnung)
     // Krankheiten: für das Fitness-Alter (4 Wochen) und damit kranke Tage nicht in die Bereiche der Readiness zählen (150 Tage)
     sb.from("illnesses").select("started_on, ended_on").eq("user_id", uid).or(`ended_on.is.null,ended_on.gte.${addDays(day, -179)}`),
   ]);
@@ -100,7 +100,7 @@ export async function today(sb: Any, uid: string, day: string) {
   // Tagesziel "Belastung heute" 0–100, wie in der App
   const sick = sickDays((ills.data ?? []) as Any[], day);
   const sleep = sleepTotal(day, days, (acts.data ?? []) as Any[], starts, sick, new Map());
-  const target = targetScore(day, days.map(asDay), di, (checkin.data ?? null) as Any, ill, starts, sick, usualLoad(day, days, (acts.data ?? []) as Any[], sick), sleep);
+  const target = targetScore(day, days.map(asDay), di, (checkin.data ?? null) as Any, ill, starts, sick, usualLoad(day, days, (acts.data ?? []) as Any[], sick), sleep, days, (acts.data ?? []) as Any[]);
   // Eigenes Fitness-Alter (HUNT-Modell, wie in der App)
   const by = (settings.data as Any)?.data?.birthYear;
   const w = waistOn(((body.data ?? []) as Any[]).map((r) => ({ day: r.day, waist_cm: r.waist_cm === null ? null : Number(r.waist_cm) })), day);

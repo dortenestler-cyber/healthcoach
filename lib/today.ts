@@ -5,7 +5,7 @@
 import { baselineFor, metricBaseline, positionIn, metricRangeSeries, middleHalf, seriesOf, type Baseline, type Range } from "@/lib/baseline";
 import { badStreak } from "@/lib/korridor";
 import { METRICS, type Activity, type Daily, type MetricKey } from "@/lib/garmin";
-import { HARD_DAY_PCT, loadPercent, MID_DAY_PCT, type Data } from "@/lib/insights";
+import { actLoad, HARD_DAY_PCT, loadPercent, MID_DAY_PCT, type Data } from "@/lib/insights";
 import { readLoadDay } from "@/lib/alltagslast";
 import { sleepScore } from "@/lib/schlaf";
 
@@ -78,7 +78,7 @@ export function loadByDay(acts: Activity[], daily?: Daily[]): Map<string, number
   const m = new Map<string, number>();
   for (const a of acts) {
     const d = (a.start_local ?? "").slice(0, 10);
-    if (d) m.set(d, (m.get(d) ?? 0) + (a.training_load ?? 0));
+    if (d) m.set(d, (m.get(d) ?? 0) + actLoad(a));
   }
   for (const r of daily ?? []) {
     const ld = readLoadDay(r.load_daily_min);

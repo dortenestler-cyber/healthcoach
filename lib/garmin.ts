@@ -62,6 +62,8 @@ export type Activity = {
   im_moderate?: number | null; // Garmins Intensitätsminuten der Einheit (ab Migration 20261130130000)
   im_vigorous?: number | null;
   hr_zones?: number[] | null; // Minuten je Pulszone 0–5
+  te_aerobic?: number | null; // Garmins Trainingseffekt 0–5 (ab Migration 20261201090000)
+  te_anaerobic?: number | null;
 };
 
 // Eigene Zuordnungen laden. Fehlt die Spalte noch (Migration nicht gelaufen), kommt null zurück.

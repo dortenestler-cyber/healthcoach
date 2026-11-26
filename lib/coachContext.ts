@@ -11,7 +11,7 @@ import { METRICS, stats } from "@/lib/garmin";
 import { SPOTS, type Injury, type Medication } from "@/lib/health";
 import { SPORTS, type Session } from "@/lib/training";
 import { ALL_SYMPTOMS } from "@/lib/catalog";
-import { cardioPerDay, musclePerDay, series, tiredCheck, ZUSTAND_NAMEN, type KbSet, type ZeitPunkt } from "@/lib/belastungZeit";
+import { cardioPerDay, musclePerDay, series, tiredCheck, ZUSTAND_NAMEN, type ClimbRow, type KbSet, type ZeitPunkt } from "@/lib/belastungZeit";
 import { sleepScore } from "@/lib/schlaf";
 
 // Kompakte Zusammenfassung für den Coach: Kennzahlen und Hinweise, keine Rohdaten
@@ -66,15 +66,16 @@ export async function buildCoachContext(): Promise<string> {
   if (unitLine) lines.push(unitLine);
 
   // Belastung über die Zeit: Schnitt der letzten 7 Tage, optimaler Bereich und Zustand (Cardio und Muskeln)
-  const [kbAll, rpeRows] = await Promise.all([
-    sb.from("kb_sets").select("day, reps, weight_kg").gte("day", isoDay(daysAgo(60))),
+  const [kbAll, rpeRows, climbAll] = await Promise.all([
+    sb.from("kb_sets").select("day, reps, weight_kg, exercise").gte("day", isoDay(daysAgo(60))),
     sb.from("garmin_activities").select("activity_id, rpe").gte("start_local", isoDay(daysAgo(60))).not("rpe", "is", null),
+    sb.from("climbs").select("day, grade, result").gte("day", isoDay(daysAgo(60))),
   ]);
   const zLine = (name: string, p: ZeitPunkt | undefined, unit: string) =>
     p?.zustand ? `${name}: ${Math.round(p.value ?? 0)}${unit} (${ZUSTAND_NAMEN[p.zustand]}${p.lo !== null ? `, optimal ${Math.round(p.lo)}–${Math.round(p.hi!)}${unit}` : ""})` : null;
   const cp = cardioPerDay(data, true);
   const rpe = new Map(((rpeRows.error ? [] : rpeRows.data ?? []) as { activity_id: number; rpe: number }[]).map((x) => [x.activity_id, x.rpe]));
-  const mp = musclePerDay(data.acts.map((a) => ({ ...a, rpe: rpe.get(a.activity_id) ?? null })), (kbAll.data ?? []) as KbSet[], data.done);
+  const mp = musclePerDay(data.acts.map((a) => ({ ...a, rpe: rpe.get(a.activity_id) ?? null })), (kbAll.data ?? []) as KbSet[], data.done, (climbAll.error ? [] : climbAll.data ?? []) as ClimbRow[]);
   const zz = [zLine("Cardio-Belastung (Schnitt 7 Tage)", series(cp.perDay, [day], cp.first, tiredCheck(data))[0], " %"), zLine("Muskelbelastung (Schnitt 7 Tage)", series(mp.perDay, [day], mp.first)[0], " Punkte")].filter(Boolean);
   if (zz.length) lines.push(zz.join("; ") + ".");
   if (acts.length) lines.push("Aktivitäten letzte 14 Tage (Garmin): " + acts.map((a) => `${(a.start_local ?? "").slice(5, 10)} ${activityLabel(a)} ${Math.round((a.duration_s ?? 0) / 60)} min`).join("; ") + ".");
