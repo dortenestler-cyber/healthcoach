@@ -1,7 +1,8 @@
 // Health Coach · Zifferblatt "Datenraster" für die Fenix 9 Pro
 // Holt alle 30 Minuten im Hintergrund eine Kurzübersicht von Health Coach
 // (Zyklustag, Tagesziel, Bufori-Hübe, nächste Einheit u. a.) und zeigt sie zusammen mit Garmin-Werten.
-// Layout, Werte in den Feldern und der Farbmodus (Einfarbig, Bedeutung, Nacht) werden in Garmin Connect eingestellt.
+// Layout (A Ruhiges Raster, C Werte am Rand), Werte in den Feldern und der Farbmodus (Einfarbig, Bedeutung, Nacht)
+// werden in Garmin Connect eingestellt.
 
 import Toybox.Application;
 import Toybox.Background;

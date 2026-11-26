@@ -7,6 +7,16 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Zifferblatt Datenraster: Layout A und C (PR #188, 26.11.)
+Nur das Zifferblatt, keine Datenbank. Das Upload-Paket baut der Lauf „Uhr-App bauen“.
+- [ ] PR #188 mergen (Prüfung und Uhr-Build sind grün; Claude durfte nicht selbst mergen)
+- [ ] Nach dem Merge: Actions › „Uhr-App bauen“ (Lauf auf `main`) › Artifact `upload-zifferblatt` herunterladen
+- [ ] Im Garmin-Entwicklerportal (apps.garmin.com/developer/upload) `HealthCoachFace.iq` als neue Version hochladen, Screenshots und Text aus `beschreibung.md` ersetzen
+- [ ] Beim Update fragt die Uhr nach der neuen Berechtigung „Position“ (für die Sonnenzeiten): zulassen
+- [ ] In Garmin Connect › Zifferblatt › Einstellungen: Layout wählen. Die Felder heißen neu (oben, Mitte, unten) und stehen wieder auf Standard; eigene Belegung bitte neu einstellen
+- [ ] Prüfen: erscheinen Sonnenauf- und -untergang? Falls nicht, unter „Ort für Sonnenzeiten“ Breite und Länge eintragen (z. B. 52,52 und 13,40) und Claude Bescheid geben
+- [ ] Layout C: stehen die Randwerte schräg und gut lesbar? Claude Bescheid geben
+
 ### Tagesabschluss am Abend (PR #180, 25.11.)
 Enthält die Migration `supabase/migrations/20261130110000_tagesabschluss.sql` (Schalter und Uhrzeit für den Abend, voller Garmin-Abruf um 19:37, 20:37 und 21:37 Uhr). Dein Merge ist die Freigabe.
 - [x] PR #180 gemergt (25. Nov.), Migration und Hochladen grün (geprüft von Claude)
