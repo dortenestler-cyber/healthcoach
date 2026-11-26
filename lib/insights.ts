@@ -62,7 +62,7 @@ export type DayLoad = {
 // Die Prozente kommen aus der Gesamtlast (abflachende Skala), Training und Alltag teilen sie nach ihrem Anteil an der Last.
 export function dayLoad(day: string, daily: Daily[], acts: Activity[]): DayLoad {
   const d = daily.find((r) => r.day === day);
-  const tl = acts.filter((a) => (a.start_local ?? "").slice(0, 10) === day).reduce((s, a) => s + (a.training_load ?? 0), 0);
+  const tl = acts.filter((a) => (a.start_local ?? "").slice(0, 10) === day).reduce((s, a) => s + actLoad(a), 0);
   const ld = readLoadDay(d?.load_daily_min);
   if (!ld) {
     const im = d?.intensity_minutes ?? 0;
@@ -75,6 +75,18 @@ export function dayLoad(day: string, daily: Daily[], acts: Activity[]): DayLoad 
   const pct = Math.round(loadToPct(total));
   const pctTraining = total > 0 ? Math.round((pct * training) / total) : 0;
   return { training, alltag, pct, pctTraining, pctAlltag: pct - pctTraining, quelle: ld.quelle, alltagMin: alltagMinutes(ld), steps: d?.steps_outside_acts ?? null };
+}
+
+// Last einer Einheit. Bei Kraft (Kettlebell, Bouldern, Karate) unterschätzt der Puls die Arbeit der Muskeln (Whoop: Strength Trainer).
+// Mit eingetragener Anstrengung zählt deshalb mindestens die Muskelrechnung: Minuten × Anstrengung ÷ 10 × Sportgewicht × 2
+// (Prüfaudit 26.11., Empfehlung 16). Das Höhere zählt, nicht die Summe, damit nichts doppelt zählt.
+export const MUSCLE_LOAD_PER_POINT = 2;
+const STRENGTH_WEIGHT: Partial<Record<Sport, number>> = { kettlebell: 1, klettern: 1, karate: 0.5 };
+export function actLoad(a: Activity & { rpe?: number | null }): number {
+  const hr = a.training_load ?? 0;
+  const w = STRENGTH_WEIGHT[sportOf(a)];
+  if (!w || a.rpe == null || !a.duration_s) return hr;
+  return Math.max(hr, ((a.duration_s / 60) * a.rpe * w * MUSCLE_LOAD_PER_POINT) / 10);
 }
 
 // Zahl für Ring und Bogen: kleine Belastung, die auf 0 % gerundet wäre, heißt „unter 1 %“

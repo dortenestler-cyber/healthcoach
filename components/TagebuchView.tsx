@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { daysAgo, isoDay, longDate } from "@/lib/dates";
 import { BLEEDING, LEVELS, PHASE_SYMPTOME, SIGNS, splitFrequent, SYMPTOMS } from "@/lib/catalog";
-import { cycleToday, PHASES } from "@/lib/cycle";
+import { cycleToday, estWord, PHASES } from "@/lib/cycle";
 import { symptomeUmTag } from "@/lib/zyklusAuswertung";
 import { loadGarminCycles, mergeGarminCycles } from "@/lib/garminZyklus";
 import { loadOvulation, withOvulation } from "@/lib/ovulation";
@@ -234,7 +234,7 @@ export default function TagebuchView({ initial, abschluss }: { initial?: string;
           {feat.zyklus && <Link href="/zyklus#perioden" className="settings-link">Frühere nachtragen ›</Link>}
         </div>
         {feat.zyklus && ct?.phase && ct.cycleDay !== null && (
-          <span className="meta tb-phase">Zyklustag {ct.cycleDay} · {PHASES[ct.phase].label}{ct.phase === "menstruation" && bleeding > 0 ? "" : " (geschätzt)"}</span>
+          <span className="meta tb-phase">Zyklustag {ct.cycleDay} · {PHASES[ct.phase].label}{ct.phase === "menstruation" && bleeding > 0 ? "" : " " + estWord(ct)}</span>
         )}
         <div className="grid-5 tb-blutung">
           {BLEEDING.map((l, i) => (

@@ -17,7 +17,7 @@ import { SPOTS, type Illness, type Injury } from "@/lib/health";
 import { ALL_SYMPTOMS, BLEEDING, INFLUENCES } from "@/lib/catalog";
 import { loadHabits } from "@/lib/habits";
 import { computeTarget, dayLoad, type Data } from "@/lib/insights";
-import { cycleToday, PHASES, readinessFrom } from "@/lib/cycle";
+import { cycleToday, estWord, PHASES, readinessFrom } from "@/lib/cycle";
 import { positionIn } from "@/lib/baseline";
 import { bereichWort, zielWort } from "@/lib/einordnung";
 import { vitalRows } from "@/lib/today";
@@ -142,7 +142,7 @@ export default function Tagesblatt({ day, data, onChanged, intro, bare = false, 
         {cyc && (
           <span className="tag-cycle">
             {cyc.cycleDay !== null ? `Zyklustag ${cyc.cycleDay}` : "Zyklus noch unbekannt"}
-            {phase ? ` · ${phase.label} (geschätzt)` : ""}
+            {phase ? ` · ${phase.label} ${estWord(cyc)}` : ""}
           </span>
         )}
       </div>

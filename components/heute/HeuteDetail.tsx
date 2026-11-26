@@ -14,7 +14,7 @@ import EnergyCard from "@/components/heute/EnergyCard";
 import { countInRange, positionIn } from "@/lib/baseline";
 import { energyDay } from "@/lib/energie";
 import { duration, stressDay, stressSentence } from "@/lib/stress";
-import { dayRule, PHASES, STAGE_ORDER, STAGES, windowText, type DayRule } from "@/lib/cycle";
+import { dayRule, estWord, PHASES, STAGE_ORDER, STAGES, windowText, type DayRule } from "@/lib/cycle";
 import { clock, isoDay, longDate, shiftDay } from "@/lib/dates";
 import { dayIntensity, weekIntensity, WHO_MINUTES, WHO_STRENGTH_DAYS } from "@/lib/trainingLoad";
 import { activityLabel } from "@/lib/garmin";
@@ -150,7 +150,7 @@ function ReadinessDetail({ day, data, rule, showGarmin }: { day: string; data: D
       )}
 
       <p className="meta">
-        {rule.cycle.cycleDay !== null ? `Zyklustag ${rule.cycle.cycleDay}${phase ? " · " + phase + " (geschätzt)" : ""}` : "Zyklus: noch keine Periode im Tagebuch"}
+        {rule.cycle.cycleDay !== null ? `Zyklustag ${rule.cycle.cycleDay}${phase ? " · " + phase + " " + estWord(rule.cycle) : ""}` : "Zyklus: noch keine Periode im Tagebuch"}
         {rule.cycle.window ? ` · ${windowText(rule.cycle.window, isoDay())} (${rule.cycle.window.earliest === rule.cycle.window.latest ? shortDay(rule.cycle.window.earliest) : `${shortDay(rule.cycle.window.earliest)}–${shortDay(rule.cycle.window.latest)}`})` : ""}
       </p>
     </>

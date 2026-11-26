@@ -112,7 +112,12 @@ export function windowText(w: PeriodWindow, day: string): string {
   return a === b ? `Nächste Periode in etwa ${a} ${a === 1 ? "Tag" : "Tagen"}` : `Nächste Periode in etwa ${a}–${b} Tagen`;
 }
 
-export type CycleToday = { cycleDay: number | null; length: number; phase: Phase | null; window: PeriodWindow | null; cycles: number; fromGarmin: boolean; ovDay: number | null };
+export type CycleToday = { cycleDay: number | null; length: number; phase: Phase | null; window: PeriodWindow | null; cycles: number; fromGarmin: boolean; ovDay: number | null; uncertain: boolean };
+
+// Unsichere Schätzung (Prüfaudit 26.11., Empfehlung 18): die letzten Zyklen schwanken um mehr als 7 Tage
+// und kein eingetragenes Eisprung-Zeichen stützt die Phase. In der Perimenopause häufig.
+export const CYCLE_SPREAD_DAYS = 7;
+export const estWord = (c: Pick<CycleToday, "uncertain">) => (c.uncertain ? "(unsicher)" : "(geschätzt)");
 
 // Eisprung aus den eingetragenen Zeichen im Zyklus, der am Tag `start` begann (als Zyklustag), sonst null.
 // Gesucht wird ab Zyklustag 6 bis zum nächsten Periodenbeginn.
@@ -142,8 +147,10 @@ export function cycleToday(day: string, diary: Diary[]): CycleToday {
     window: nextPeriodWindow(diary, day),
     cycles: ci.cycles,
     fromGarmin: ci.fromGarmin,
+    uncertain: ovDay === null && spread(cycleLengths(diary, day)) > CYCLE_SPREAD_DAYS,
   };
 }
+const spread = (v: number[]) => (v.length >= 2 ? Math.max(...v) - Math.min(...v) : 0);
 
 // ---------- Readiness 0–10 (aus dem Tagesziel-Wert 0–100)
 
