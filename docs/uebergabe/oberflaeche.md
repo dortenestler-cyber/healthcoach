@@ -1,6 +1,6 @@
 # Übergabe · Oberfläche (OF)
-Belegt: frei
-Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1VwL1U1ue6ALkkaL4z
+Belegt: Konto A · Sitzung https://claude.ai/code/session_017zWr1TtsNQFhPjonCriVLT · seit 2026-11-26 09:00
+Zuletzt aktualisiert: 2026-11-26 · Sitzung: https://claude.ai/code/session_017zWr1TtsNQFhPjonCriVLT
 
 ## Intensität: Belastung und Krafttage (PR #185, 25.11., Freigabe der Nutzerin)
 - Anlass: Bouldern bringt kaum Intensitätsminuten (Garmin zählt gleich wenig), aber deutlich Belastung.
