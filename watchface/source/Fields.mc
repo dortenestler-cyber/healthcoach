@@ -207,7 +207,9 @@ module Fields {
         return "--:--";
     }
 
-    // Standort für Sonnenzeiten: Wetter, sonst letzte Aktivitäts-Position, sonst zuletzt gespeicherter Ort
+    // Standort für Sonnenzeiten: Wetter, sonst letzte Aktivitäts-Position, sonst letzte bekannte GPS-Position der Uhr,
+    // sonst zuletzt gespeicherter Ort, sonst der Ort aus den Einstellungen (Breite/Länge in Garmin Connect).
+    // Bug 26.11.2026: Wetter und Aktivität lieferten auf der Fenix 9 Pro keine Position, die Sonnenzeiten blieben leer.
     function location(ctx) {
         var c = ctx[:cond];
         var loc = null;
@@ -218,6 +220,16 @@ module Fields {
             var ai = ctx[:ai];
             if (ai != null && ai.currentLocation != null) {
                 loc = ai.currentLocation;
+            }
+        }
+        if (loc == null && (Toybox has :Position) && (Position has :getInfo)) {
+            try {
+                var pi = Position.getInfo();
+                if (pi != null && pi.position != null) {
+                    loc = pi.position;
+                }
+            } catch (e) {
+                loc = null;
             }
         }
         if (loc != null) {
@@ -234,6 +246,24 @@ module Fields {
         var saved = Application.Storage.getValue("loc");
         if (saved instanceof Array && saved.size() == 2) {
             return new Position.Location({:latitude => saved[0], :longitude => saved[1], :format => :degrees});
+        }
+        var lat = numProp("lat");
+        var lon = numProp("lon");
+        if (lat != null && lon != null && (lat != 0.0 || lon != 0.0) && lat.abs() <= 90.0 && lon.abs() <= 180.0) {
+            return new Position.Location({:latitude => lat, :longitude => lon, :format => :degrees});
+        }
+        return null;
+    }
+
+    function numProp(key) {
+        var v = null;
+        try {
+            v = Application.Properties.getValue(key);
+        } catch (e) {
+            v = null;
+        }
+        if (v instanceof Float || v instanceof Double || v instanceof Number) {
+            return v.toFloat();
         }
         return null;
     }

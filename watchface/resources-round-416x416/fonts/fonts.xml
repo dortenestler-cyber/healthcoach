@@ -1,6 +1,6 @@
 <fonts>
     <!-- Share Tech Mono als Bitmap-Schrift (tools/make_font.py), Ziffern gleich breit für die Geisterziffern -->
+    <!-- Mono: Datum und die meisten Felder; Mid: Zeile unter der Uhrzeit (etwas größer) -->
     <font id="Mono" filename="mono.fnt" antialias="true"/>
-    <!-- Große Uhrzeit für die schlichten Layouts: nur Ziffern und Doppelpunkt -->
-    <font id="Big" filename="big.fnt" antialias="true"/>
+    <font id="Mid" filename="mid.fnt" antialias="true"/>
 </fonts>

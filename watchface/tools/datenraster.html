@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Datenraster · Vorschau für Store-Bilder</title>
+<!--
+  Zeichnet das Zifferblatt "Datenraster" (Layout A und C) mit denselben Maßen wie watchface/source/FaceView.mc
+  (344-px-Raster, skaliert auf 454 px). Nur für die Store-Screenshots (tools/store_bilder.js), Werte sind Beispieldaten.
+  Aufruf: datenraster.html?layout=A|C&color=mono|meaning|night&aod=1
+-->
+<style>
+@font-face { font-family: "Share Tech Mono"; src: url("ShareTechMono-Regular.ttf"); }
+body { margin: 0; background: #000; }
+#shot { position: relative; width: 454px; height: 454px; background: #000; overflow: hidden; font-family: "Share Tech Mono", monospace; }
+.a { position: absolute; }
+</style>
+</head>
+<body>
+<div id="shot"></div>
+<script>
+(function () {
+  const q = new URLSearchParams(location.search);
+  const LAYOUT = (q.get("layout") || "A").toUpperCase();
+  const COLOR = q.get("color") || "mono";
+  const AOD = q.get("aod") === "1";
+  const W = 454, k = W / 344;
+  const S = (v) => Math.round(v * k);
+  const night = COLOR === "night";
+  const dim = (c) => {
+    if (!night) return c;
+    const n = parseInt(c.slice(1), 16);
+    const f = (x) => Math.floor(x * 55 / 100);
+    return "#" + [f(n >> 16 & 255), f(n >> 8 & 255), f(n & 255)].map((x) => x.toString(16).padStart(2, "0")).join("");
+  };
+  const BRIGHT = "#CFD0CB", MUTED = "#7E8085", TIME_ON = "#E4E5DF", SEC = "#9C9EA3";
+  const GHOST = night ? "#17181B" : "#2A2B2F", LINE = night ? "#1E1F22" : "#2C2D31", SEG_OFF = night ? "#121316" : "#202125", BAR_OFF = night ? "#17181B" : "#2A2B2F";
+  // Farbfamilien wie Fields.FAMCOL (Farbmodus "Bedeutung")
+  const FAMCOL = [null, "#52B788", "#8FD5B0", "#E5E7EB", "#E8845A", "#F0A24A", "#7C9AE0", "#C3D1F2", "#45C4C0"];
+  const col = (fam, def) => dim(COLOR === "meaning" && fam ? FAMCOL[fam] : def);
+
+  // Icons im 16er-Raster (Sonnenzeiten 24 breit), nachgezeichnet nach watchface/source/Icons.mc
+  const I = {
+    bb: "M1 4h12v8H1zM2.5 5.5v5h9v-5zM13 6h2v4h-2zM8 5.5L5.5 8.5h2L6.5 10.5L9.5 7.5h-2z",
+    ta: "M5 1H11L15 5V11L11 15H5L1 11V5zM5.6 2.5L2.5 5.6V10.4L5.6 13.5H10.4L13.5 10.4V5.6L10.4 2.5zM4.5 9h3v3h-3z",
+    cl: "M1.5 12.5V9.5L3.5 7.5H5.5L7.5 5H11L13 7V8.5L14.5 10V12.5z",
+    dr: "M8 1L13 8L11 14H5L3 8z",
+    he: "M2 4L4 2H6L8 4L10 2H12L14 4V7.5L8 13.5L2 7.5z",
+    st: "M2.5 2h4v6.5h-4zM3 10h3v2.5H3zM9.5 4.5h4V11h-4zM10 12.5h3V15h-3z",
+    kb: "M5 1h6v1.5H5zM3.5 2.5H5V6H3.5zM11 2.5h1.5V6H11zM5 6h6l2.5 2.5v4L11 15H5l-2.5-2.5v-4z",
+    in: "M5.5 1h3.5v4.5H5.5zM3.5 6h7.5v8.5H3.5zM11 10h3.5v4.5H11z",
+    su: "M0 14h16v1.5H0zM3 14V11.5L5 9.5h6L13 11.5V14zM1 9h2v1.5H1zM13 9h2v1.5h-2zM7.25 5h1.5v3h-1.5zM3 6h1.5v1.5H3zM11.5 6h1.5v1.5h-1.5zM20.5 2L24 6.5h-2.5V15.5h-2V6.5H17z",
+    sd: "M0 14h16v1.5H0zM3 14V11.5L5 9.5h6L13 11.5V14zM1 9h2v1.5H1zM13 9h2v1.5h-2zM7.25 5h1.5v3h-1.5zM3 6h1.5v1.5H3zM11.5 6h1.5v1.5h-1.5zM20.5 15.5L24 11h-2.5V2h-2v9H17z"
+  };
+  // Beispielwerte: [Icon, Geister, Wert, Familie] (Nummern und Familien wie Fields.mc)
+  const V = {
+    3: ["su", "8888", "0756", 0], 4: ["sd", "8888", "1622", 0], 5: ["cl", "8°", "4°", 0], 6: ["dr", "88", "20", 0],
+    7: ["he", "88", "64", 0], 10: ["ta", "88", "38", 6], 9: ["st", "8888", "6420", 7],
+    1: ["bb", "88", "71", 2], 13: ["kb", "88:88", "FREI", 6], 14: ["in", "8", "1", 5]
+  };
+  const shot = document.getElementById("shot");
+  const add = (html) => shot.insertAdjacentHTML("beforeend", html);
+  const FONT = { mono: 26, mid: 29 };
+
+  function cellHtml(t, def, size, isz) {
+    const [ic, gh, val, fam] = V[t];
+    const c = col(fam, def);
+    const iw = (ic === "su" || ic === "sd") ? isz * 1.5 : isz;
+    const vb = (ic === "su" || ic === "sd") ? "0 0 24 16" : "0 0 16 16";
+    return `<span style="display:inline-flex;align-items:center;gap:${S(5)}px;color:${c};font-size:${size}px;line-height:1">` +
+      `<svg width="${iw}" height="${isz}" viewBox="${vb}" style="fill:currentColor;shape-rendering:crispEdges"><path fill-rule="evenodd" d="${I[ic]}"/></svg>` +
+      `<span style="display:inline-grid;justify-items:end;white-space:pre;letter-spacing:0.1em"><span style="grid-area:1/1;color:${GHOST}">${gh}</span><span style="grid-area:1/1">${val}</span></span></span>`;
+  }
+  function row(cells, cy, gap, size, isz) {
+    add(`<div class="a" style="left:0;right:0;top:${cy}px;transform:translateY(-50%);display:flex;justify-content:center;align-items:center;gap:${gap}px">` +
+      cells.map(([t, def]) => cellHtml(t, def, size, isz)).join("") + `</div>`);
+  }
+  function rim(t, def, mx, my, deg) {
+    add(`<div class="a" style="left:${mx}px;top:${my}px;transform:translate(-50%,-50%) rotate(${deg}deg)">${cellHtml(t, def, FONT.mono, S(16))}</div>`);
+  }
+  function hline(y, inset) {
+    add(`<div class="a" style="left:${S(inset)}px;width:${W - 2 * S(inset)}px;top:${S(y)}px;height:1px;background:${LINE}"></div>`);
+  }
+  const SEGS = { 0: "abcdef", 1: "bc", 2: "abged", 3: "abgcd", 4: "fgbc", 5: "afgcd", 6: "afgedc", 7: "abc", 8: "abcdefg", 9: "abcdfg" };
+  function digits(text, mx, top, dw, dh, t, gap, on, off) {
+    t = Math.max(2, Math.floor(t / 2) * 2); dh = Math.floor(dh / 2) * 2;
+    let total = 0;
+    for (const ch of text) total += ch === ":" ? t : dw;
+    total += gap * (text.length - 1);
+    let x = Math.floor(mx - total / 2);
+    const r = (x, y, w, h, c) => add(`<div class="a" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${c}"></div>`);
+    for (const ch of text) {
+      if (ch === ":") { r(x, top + Math.floor(dh * 0.26), t, t, on); r(x, top + Math.floor(dh * 0.66), t, t, on); x += t + gap; continue; }
+      const lit = SEGS[ch] || "", hv = dh / 2, ht = t / 2;
+      const seg = { a: [x, top, dw, t], b: [x + dw - t, top, t, hv + ht], c: [x + dw - t, top + hv - ht, t, dh - hv + ht], d: [x, top + dh - t, dw, t], e: [x, top + hv - ht, t, dh - hv + ht], f: [x, top, t, hv + ht], g: [x, top + hv - ht, dw, t] };
+      for (const s of "abcdefg") if (!lit.includes(s)) r(...seg[s], off);
+      for (const s of "abcdefg") if (lit.includes(s)) r(...seg[s], on);
+      x += dw + gap;
+    }
+  }
+  function gauge(x, top, v, on) {
+    const bh = Math.max(2, S(2)), step = bh + S(3), lit = Math.round(v * 10);
+    for (let i = 0; i < 10; i++) add(`<div class="a" style="left:${x}px;top:${top + (9 - i) * step}px;width:${S(16)}px;height:${bh}px;background:${i < lit ? on : BAR_OFF}"></div>`);
+  }
+  function date(cy) {
+    add(`<div class="a" style="left:0;right:0;top:${cy}px;transform:translateY(-50%);text-align:center;font-size:${FONT.mono}px;line-height:1;white-space:pre;letter-spacing:0.1em">` +
+      `<span style="position:relative"><span style="position:absolute;left:0;color:${GHOST}">   88.88</span><span style="position:relative;color:${dim(BRIGHT)}">DO 26.11</span></span></div>`);
+  }
+
+  if (AOD) {
+    const u = W / 454;
+    digits("10:56", W / 2, Math.round(170 * u), Math.round(80 * u), Math.round(106 * u), Math.max(2, Math.round(4 * u)), Math.round(14 * u), "#555555", "#000");
+    return;
+  }
+  const cx = W / 2;
+  if (LAYOUT === "C") {
+    hline(124, 30); hline(194, 30);
+    date(S(70));
+    row([[5, BRIGHT], [6, BRIGHT]], S(102), S(14), FONT.mono, S(16));
+    digits("10:56", cx, S(134), S(52), S(48), S(9), S(10), dim(TIME_ON), SEG_OFF);
+    row([[7, BRIGHT], [10, BRIGHT], [9, BRIGHT]], S(216), S(14), FONT.mid, S(17));
+    row([[13, BRIGHT]], S(251), 0, FONT.mono, S(17));
+    rim(3, MUTED, S(66), S(84), -48); rim(4, MUTED, W - S(66), S(84), 48);
+    rim(1, BRIGHT, S(70), S(262), 48); rim(14, BRIGHT, W - S(70), S(262), -48);
+  } else {
+    hline(62, 40); hline(104, 16); hline(204, 16); hline(248, 36);
+    date(S(46));
+    row([[3, MUTED], [5, BRIGHT], [4, MUTED]], S(85), S(16), FONT.mono, S(17));
+    digits("10:56", cx, S(118), S(56), S(52), S(9), S(11), dim(TIME_ON), SEG_OFF);
+    digits("36", cx, S(180), S(14), S(14), S(3), S(4), dim(SEC), SEG_OFF);
+    row([[7, BRIGHT], [10, BRIGHT], [9, BRIGHT]], S(226), S(16), FONT.mid, S(18));
+    row([[1, BRIGHT], [13, BRIGHT], [14, BRIGHT]], S(271), S(16), FONT.mono, S(17));
+    gauge(S(10), S(132), 0.4, col(6, "#E4E5DF"));
+    gauge(W - S(10) - S(16), S(132), 0.8, col(0, "#E4E5DF"));
+  }
+})();
+</script>
+</body>
+</html>
