@@ -1,31 +1,28 @@
 <properties>
     <property id="token" type="string"></property>
     <property id="baseUrl" type="string">https://fkvhuxjsdvssmupewwgl.supabase.co</property>
-    <!-- Layout: 0 Datenraster, 1 Monolith, 2 Zyklus-Spur, 3 Stapel, 4 Eine Zeile -->
-    <property id="layout" type="number">0</property>
-    <!-- Felder: Nummer des Werts, siehe Fields.mc -->
-    <property id="s_a1" type="number">1</property>
-    <property id="s_a2" type="number">2</property>
-    <property id="s_b1" type="number">3</property>
-    <property id="s_b2" type="number">5</property>
-    <property id="s_b3" type="number">6</property>
-    <property id="s_b4" type="number">4</property>
-    <property id="s_c1" type="number">7</property>
-    <property id="s_c2" type="number">8</property>
-    <property id="s_c3" type="number">9</property>
-    <property id="s_c4" type="number">10</property>
-    <property id="s_d1" type="number">11</property>
-    <property id="s_d2" type="number">12</property>
-    <property id="s_e1" type="number">13</property>
-    <property id="s_e2" type="number">14</property>
-    <!-- Felder der schlichten Layouts (Monolith nutzt 1, Zyklus-Spur 1 und 2, Stapel und Eine Zeile 1 bis 3) -->
-    <property id="s_l1" type="number">10</property>
-    <property id="s_l2" type="number">1</property>
-    <property id="s_l3" type="number">2</property>
+    <!-- Layout: 0 = A Ruhiges Raster, 1 = C Werte am Rand -->
+    <property id="dlayout" type="number">0</property>
+    <!-- Felder: Nummer des Werts, siehe Fields.mc. Oben 1–3, Mitte 1–3, unten 1–3; in Layout C stehen oben 1 und 3 sowie unten 1 und 3 am Rand -->
+    <property id="f_o1" type="number">3</property>
+    <property id="f_o2" type="number">5</property>
+    <property id="f_o3" type="number">4</property>
+    <property id="f_m1" type="number">7</property>
+    <property id="f_m2" type="number">10</property>
+    <property id="f_m3" type="number">9</property>
+    <property id="f_u1" type="number">1</property>
+    <property id="f_u2" type="number">13</property>
+    <property id="f_u3" type="number">14</property>
+    <!-- Nur Layout C: zweites Feld oben neben "Oben Mitte" -->
+    <property id="f_c" type="number">6</property>
+    <!-- Strich-Anzeigen (nur Layout A) -->
     <property id="g_l" type="number">1</property>
     <property id="g_r" type="number">2</property>
     <!-- Farbmodus: 0 Einfarbig, 1 Bedeutung (Farbe aus der Familie des Werts), 2 Nacht (gedimmt) -->
     <property id="cmode" type="number">0</property>
     <!-- Nacht automatisch zur Schlafenszeit aus dem Garmin-Profil -->
     <property id="nauto" type="boolean">false</property>
+    <!-- Ersatz-Ort für die Sonnenzeiten, falls die Uhr keine Position kennt (Grad, 0 = nicht gesetzt) -->
+    <property id="lat" type="float">0.0</property>
+    <property id="lon" type="float">0.0</property>
 </properties>

@@ -1,5 +1,5 @@
 // Erzeugt Store-Icons (500 × 500) und Screenshots (454 × 454, JPG unter 150 KB) für das Garmin-Entwicklerportal.
-// Zeichnet mit denselben Routinen wie die Konzeptseite docs/entwurf-zifferblatt.html (window.HC) und der echten Schrift
+// Zifferblatt: watchface/tools/datenraster.html (gleiche Maße wie FaceView.mc). Icons: Konzeptseite docs/entwurf-zifferblatt.html. Echte Schrift
 // Share Tech Mono aus watchface/tools. Alle Werte sind Beispieldaten.
 //
 // Aufruf im Repo-Hauptordner:  node watchface/tools/store_bilder.js
@@ -19,15 +19,14 @@ const ICON_BG = "#1B2622"; // Grund des App-Symbols (dunkles Grüngrau, nicht sc
 const FACE_OUT = path.join(ROOT, "watchface/store");
 const APP_OUT = path.join(ROOT, "watch/store");
 
-// Zifferblatt-Screenshots: Layout, Farbmodus, Anzeige
+// Zifferblatt-Screenshots: Layout, Farbmodus, Anzeige (gezeichnet von watchface/tools/datenraster.html)
+const DR = "file://" + path.join(ROOT, "watchface/tools/datenraster.html");
 const FACE_SHOTS = [
-  { file: "1-datenraster.jpg", kind: "raster", color: "mono", mode: "active" },
-  { file: "2-datenraster-bedeutung.jpg", kind: "raster", color: "meaning", mode: "active" },
-  { file: "3-monolith.jpg", kind: "prop", nr: "15", color: "mono" },
-  { file: "4-zyklus-spur.jpg", kind: "prop", nr: "17", color: "meaning" },
-  { file: "5-stapel.jpg", kind: "prop", nr: "19", color: "mono" },
-  { file: "6-eine-zeile.jpg", kind: "prop", nr: "20", color: "mono" },
-  { file: "7-immer-an.jpg", kind: "raster", color: "mono", mode: "aod" }
+  { file: "1-layout-a.jpg", q: "layout=A&color=mono" },
+  { file: "2-layout-a-bedeutung.jpg", q: "layout=A&color=meaning" },
+  { file: "3-layout-c.jpg", q: "layout=C&color=mono" },
+  { file: "4-layout-c-bedeutung.jpg", q: "layout=C&color=meaning" },
+  { file: "5-immer-an.jpg", q: "aod=1" }
 ];
 
 async function jpg(page, file, sel) {
@@ -42,36 +41,13 @@ async function jpg(page, file, sel) {
 }
 
 async function faceShots(page) {
-  await page.goto(CONCEPT);
-  await page.addStyleTag({ content: `@font-face{font-family:"Share Tech Mono";src:url("${FONT}")}
-    #shot{position:fixed;left:0;top:0;width:454px;height:454px;background:#000;z-index:99}` });
-  await page.evaluate(() => document.fonts.load('20px "Share Tech Mono"'));
-  await page.waitForTimeout(300);
+  for (const f of fs.readdirSync(FACE_OUT)) {
+    if (f.endsWith(".jpg")) fs.unlinkSync(path.join(FACE_OUT, f));
+  }
   for (const s of FACE_SHOTS) {
-    await page.evaluate((s) => {
-      const NS = "http://www.w3.org/2000/svg";
-      let svg = document.getElementById("shot");
-      if (svg) svg.remove();
-      svg = document.createElementNS(NS, "svg");
-      svg.id = "shot";
-      svg.setAttribute("viewBox", "0 0 454 454");
-      svg.setAttribute("width", "454");
-      svg.setAttribute("height", "454");
-      document.body.appendChild(svg);
-      const HC = window.HC;
-      HC.state.color = s.color;
-      HC.state.mode = s.mode || "active";
-      if (s.kind === "raster") {
-        HC.drawRaster(svg);
-        // Gehäusering der Konzeptseite weglassen: Screenshot zeigt nur das Display
-        const ring = svg.querySelector("circle");
-        if (ring) ring.remove();
-      } else {
-        HC.el("circle", { cx: 227, cy: 227, r: 227, fill: "#000" }, svg);
-        const p = HC.PROPS.find((x) => x.nr === s.nr);
-        p.draw(HC.el("g", {}, svg), false);
-      }
-    }, s);
+    await page.goto(DR + "?" + s.q);
+    await page.evaluate(() => document.fonts.load('20px "Share Tech Mono"'));
+    await page.waitForTimeout(300);
     await jpg(page, path.join(FACE_OUT, s.file), "#shot");
   }
 }

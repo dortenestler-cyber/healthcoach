@@ -1,7 +1,18 @@
 # Übergabe · Daten (DA)
 Belegt: frei
-Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WS7sTKnh1NfXui9YD
+Zuletzt aktualisiert: 2026-11-26 · Sitzung: https://claude.ai/code/session_017zWr1VfNKhpHP9qnQvGq9p
 
+
+## Datenraster eigenständig, Layout A und C (PR #188, 26.11., Freigabe der Nutzerin)
+- Anlass: Werte zu klein, Sonnenzeiten leer (nur Symbol, wirkte wie ein Kopf). Entwurf `Uhr-Datenraster-Lesbar` (Projekt-Dokument `claude/klickdummy-entwurf/Uhr-Datenraster-Lesbar.dc.html`, noch nicht im Klick-Dummy-Artefakt, keine Schreibrechte aus dem Projekt-Chat).
+- Zifferblatt enthält nur noch das Datenraster. Monolith, Zyklus-Spur, Stapel, Eine Zeile entfernt; Code steht in Commit `1cdd02a` (`watchface/source/FaceView.mc`, `drawMinimal`). Die Nutzerin will sie einzeln noch einmal sehen, bevor sie eigene Zifferblätter werden.
+- Einstellung `dlayout` (0 A „Ruhiges Raster“, 1 C „Werte am Rand“). Felder neu: `f_o1`–`f_o3`, `f_m1`–`f_m3`, `f_u1`–`f_u3`, `f_c` (nur C). In C stehen o1/o3 und u1/u3 schräg am Rand: Zwischenbild (`createBufferedBitmap`) und `drawBitmap2` mit `AffineTransform`, sonst gerade. Strich-Anzeigen nur in A. Alte Schlüssel `layout`, `s_*`, `s_l*` entfernt.
+- Schrift `Mono` 26 px (416er: 24), neue `Mid` 29 px (27) für die Mitte; `Big` und die Ordner 260/280 entfernt. Datum „DO 26.11“, neues Sonnen-Icon 24 breit (`Icons.width`).
+- Farbmodus unverändert (Einfarbig, Bedeutung je Wertfamilie, Nacht). Zeile Mitte jetzt hell statt gedämpft. Das Rot auf dem Foto der Nutzerin war der Nachtmodus der Uhr selbst.
+- Bug Sonnenzeiten: `Fields.location` nimmt zusätzlich `Position.getInfo()` (neue Berechtigung `Positioning`) und als letzten Ersatz `lat`/`lon` aus den Einstellungen. Ungeprüft auf der Uhr, ob die Position so ankommt.
+- Store: `watchface/tools/datenraster.html` zeichnet die Screenshots mit den Maßen aus `FaceView.mc`, `store_bilder.js` nutzt sie.
+- Geprüft: Lauf „Uhr-App bauen“ grün, keine Warnungen. Ungeprüft: Darstellung auf der Uhr (kein Simulator), besonders die gedrehten Randwerte.
+- Wartet auf: Merge durch die Nutzerin (Merge aus der Sitzung wurde abgelehnt), Upload und Rückmeldung zu Sonnenzeiten und Layout C.
 
 ## Intensität mit Training (PR #186, gemergt 25.11. 20:55, Migration und Hochladen grün) und Tagesverläufe (PR #187, 25.11., Freigabe der Nutzerin)
 - Anlass: Bouldern (1 Std) brachte kaum Garmin-Intensitätsminuten, der Ring übernahm Garmins Tageswert 1:1.

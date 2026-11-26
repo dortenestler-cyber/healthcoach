@@ -1,6 +1,0 @@
-<fonts>
-    <!-- Share Tech Mono als Bitmap-Schrift (tools/make_font.py), Ziffern gleich breit für die Geisterziffern -->
-    <font id="Mono" filename="mono.fnt" antialias="true"/>
-    <!-- Große Uhrzeit für die schlichten Layouts: nur Ziffern und Doppelpunkt -->
-    <font id="Big" filename="big.fnt" antialias="true"/>
-</fonts>

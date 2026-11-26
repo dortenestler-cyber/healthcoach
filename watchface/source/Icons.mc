@@ -46,6 +46,14 @@ module Icons {
         holeP(dc, [5.6, 2.5, 10.4, 2.5, 13.5, 5.6, 13.5, 10.4, 10.4, 13.5, 5.6, 13.5, 2.5, 10.4, 2.5, 5.6]);
     }
 
+    // Breite eines Icons in Pixeln: Sonnenzeiten sind 1,5-mal so breit (Pfeil neben der Sonne)
+    function width(name, s) {
+        if (name != null && (name.equals("su") || name.equals("sd"))) {
+            return (s * 3) / 2;
+        }
+        return s;
+    }
+
     function draw(dc, name, x, y, s, fg) {
         _x = x.toNumber();
         _y = y.toNumber();
@@ -74,16 +82,20 @@ module Icons {
             // Zyklusphase: Achteck, halb gefüllt
             octRing(dc);
             r(dc, 8, 4, 4, 8);
-        } else if (name.equals("su")) {
-            // Sonnenaufgang
-            r(dc, 2, 12, 12, 1.5);
-            p(dc, [4.5, 12, 4.5, 10, 6, 8.5, 10, 8.5, 11.5, 10, 11.5, 12]);
-            p(dc, [8, 1.5, 10.5, 4.5, 9, 4.5, 9, 7, 7, 7, 7, 4.5, 5.5, 4.5]);
-        } else if (name.equals("sd")) {
-            // Sonnenuntergang
-            r(dc, 2, 12, 12, 1.5);
-            p(dc, [4.5, 12, 4.5, 10, 6, 8.5, 10, 8.5, 11.5, 10, 11.5, 12]);
-            p(dc, [8, 7, 5.5, 4, 7, 4, 7, 1.5, 9, 1.5, 9, 4, 10.5, 4]);
+        } else if (name.equals("su") || name.equals("sd")) {
+            // Sonnenaufgang / -untergang: halbe Sonne mit Strahlen über dem Horizont, Pfeil daneben (24er-Breite)
+            r(dc, 0, 14, 16, 1.5);
+            p(dc, [3, 14, 3, 11.5, 5, 9.5, 11, 9.5, 13, 11.5, 13, 14]);
+            r(dc, 1, 9, 2, 1.5);
+            r(dc, 13, 9, 2, 1.5);
+            r(dc, 7.25, 5, 1.5, 3);
+            r(dc, 3, 6, 1.5, 1.5);
+            r(dc, 11.5, 6, 1.5, 1.5);
+            if (name.equals("su")) {
+                p(dc, [20.5, 2, 24, 6.5, 21.5, 6.5, 21.5, 15.5, 19.5, 15.5, 19.5, 6.5, 17, 6.5]);
+            } else {
+                p(dc, [20.5, 15.5, 24, 11, 21.5, 11, 21.5, 2, 19.5, 2, 19.5, 11, 17, 11]);
+            }
         } else if (name.equals("cl")) {
             // Wolke (Temperatur)
             p(dc, [1.5, 12.5, 1.5, 9.5, 3.5, 7.5, 5.5, 7.5, 7.5, 5, 11, 5, 13, 7, 13, 8.5, 14.5, 10, 14.5, 12.5]);
