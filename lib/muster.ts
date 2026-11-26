@@ -16,6 +16,43 @@ export const MIN_GROUP_DAYS = 4; // so viele Tage braucht jede Seite eines Vergl
 export const MIN_RATIO = 2; // mindestens doppelt (oder halb) so häufig
 export const MIN_EXTRA = 3; // und mindestens 3 Ereignistage auf der häufigeren Seite
 export const MAX_FINDINGS = 3;
+// Statistischer Test (Prüfaudit 26.11., Empfehlung 14): exakter Test nach Fisher je Bedingung, dann Korrektur für viele Vergleiche
+// nach Benjamini-Hochberg über alle geprüften Bedingungen. Gezeigt wird ein Muster nur bis zu diesem korrigierten Wert,
+// „deutlich“ heißt es erst unter Q_CLEAR. Bei über 40 Bedingungen fängt das Zufallsfunde ab.
+export const Q_SHOW = 0.2;
+export const Q_CLEAR = 0.05;
+
+// ---------- Statistik
+
+const LOG_FACT: number[] = [0];
+const logFact = (n: number) => {
+  for (let i = LOG_FACT.length; i <= n; i++) LOG_FACT[i] = LOG_FACT[i - 1] + Math.log(i);
+  return LOG_FACT[n];
+};
+// Zweiseitiger exakter Test nach Fisher für die Vierfeldertafel [a b; c d]
+export function fisherP(a: number, b: number, c: number, d: number): number {
+  const r1 = a + b, r2 = c + d, c1 = a + c, n = r1 + r2;
+  const logP = (x: number) => logFact(r1) + logFact(r2) + logFact(c1) + logFact(n - c1) - logFact(n) - logFact(x) - logFact(r1 - x) - logFact(c1 - x) - logFact(r2 - c1 + x);
+  const p0 = logP(a);
+  let p = 0;
+  for (let x = Math.max(0, c1 - r2); x <= Math.min(r1, c1); x++) {
+    const lp = logP(x);
+    if (lp <= p0 + 1e-7) p += Math.exp(lp);
+  }
+  return Math.min(1, p);
+}
+// Korrigierte Werte nach Benjamini-Hochberg, in der Reihenfolge der Eingabe
+export function bhAdjust(p: number[]): number[] {
+  const m = p.length;
+  const order = p.map((v, i) => [v, i] as const).sort((x, y) => x[0] - y[0]);
+  const q = new Array<number>(m);
+  let min = 1;
+  for (let k = m - 1; k >= 0; k--) {
+    min = Math.min(min, (order[k][0] * m) / (k + 1));
+    q[order[k][1]] = min;
+  }
+  return q;
+}
 
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");
@@ -143,7 +180,8 @@ export type Finding = {
   more: boolean; // häufiger unter der Bedingung
   today: boolean; // Bedingung gilt heute
   text: string;
-  sicherheit: "vorläufig" | "deutlich"; // deutlich: mindestens 16 Ereignistage und je Seite 10 Tage
+  sicherheit: "vorläufig" | "deutlich"; // deutlich: korrigierter Wert unter Q_CLEAR, mindestens 16 Ereignistage und je Seite 10 Tage
+  q: number; // korrigierter Wert nach Benjamini-Hochberg
 };
 
 export type Analysis = {
@@ -168,6 +206,8 @@ export function analyze(eventDays: Set<string>, conds: Condition[], today: strin
   const events = days.filter((d) => eventDays.has(d)).length;
   const ready = events >= MIN_EVENT_DAYS;
   const findings: Finding[] = [];
+  const pAll: number[] = []; // p je geprüfter Bedingung, für die Korrektur
+  const pOf: number[] = []; // p je Fund
   let checked = 0;
   if (ready) {
     for (const c of conds) {
@@ -185,6 +225,8 @@ export function analyze(eventDays: Set<string>, conds: Condition[], today: strin
       }
       if (wd < MIN_GROUP_DAYS || od < MIN_GROUP_DAYS) continue;
       checked++;
+      const p = fisherP(we, wd - we, oe, od - oe);
+      pAll.push(p);
       const rw = we / wd;
       const ro = oe / od;
       // Kein Ereignis auf einer Seite: Verhältnis mit einem halben Ereignis abschätzen, damit es nicht unendlich wird
@@ -192,6 +234,7 @@ export function analyze(eventDays: Set<string>, conds: Condition[], today: strin
       const more = rw > ro;
       const strong = more ? ratio >= MIN_RATIO && we >= MIN_EXTRA : ratio <= 1 / MIN_RATIO && oe >= MIN_EXTRA;
       if (!strong) continue;
+      pOf.push(p);
       findings.push({
         key: c.key,
         group: c.group,
@@ -203,11 +246,22 @@ export function analyze(eventDays: Set<string>, conds: Condition[], today: strin
         ratio,
         more,
         today: c.has(today),
-        sicherheit: we + oe >= 2 * MIN_EVENT_DAYS && wd >= 10 && od >= 10 ? "deutlich" : "vorläufig",
+        sicherheit: "vorläufig",
+        q: 1,
         text: `${c.label[0].toUpperCase() + c.label.slice(1)}: ${noun} ${frac(we, wd)}, sonst ${frac(oe, od)}.`,
       });
     }
   }
+  // Korrektur über alle geprüften Bedingungen: der Rang eines Funds ergibt sich aus seinem p unter allen p
+  const qAll = bhAdjust(pAll);
+  const qOf = (p: number) => qAll[pAll.indexOf(p)];
+  findings.forEach((f, i) => {
+    f.q = qOf(pOf[i]);
+    f.sicherheit = f.q < Q_CLEAR && f.withEvents + f.withoutEvents >= 2 * MIN_EVENT_DAYS && f.withDays >= 10 && f.withoutDays >= 10 ? "deutlich" : "vorläufig";
+  });
+  const kept = findings.filter((f) => f.q <= Q_SHOW);
+  findings.length = 0;
+  findings.push(...kept);
   findings.sort((a, b) => Math.abs(Math.log(b.ratio)) - Math.abs(Math.log(a.ratio)));
   // Gleiche Tage unter anderem Namen (z. B. harte Tage = Ausdauertage, Ruhetage = das Gegenteil) nur einmal zeigen
   const unique: Finding[] = [];
