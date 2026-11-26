@@ -177,6 +177,9 @@ function ResultCard({ unit, data }: { unit: Unit; data: Data }) {
         <Tile label="Puls Ø" value={unit.avg_hr ? `${unit.avg_hr}` : "–"} unit="bpm" note={diffNote(unit.avg_hr, c.avgHr, "", undefined, 2)} />
         <Tile label="Puls max" value={unit.max_hr ? `${unit.max_hr}` : "–"} unit="bpm" note={diffNote(unit.max_hr, c.maxHr, "", undefined, 3)} />
         <Tile label="Belastung" value={unit.training_load ? `${Math.round(loadToPct(unit.training_load))} %` : "–"} note={unit.training_load ? `Garmin-Last ${Math.round(unit.training_load)}${c.load ? ` · üblich ${Math.round(loadToPct(c.load))} %` : ""}` : ""} />
+        {(unit.te_aerobic != null || unit.te_anaerobic != null) && (
+          <Tile label="Trainingseffekt" value={`${de1(Number(unit.te_aerobic ?? 0))} · ${de1(Number(unit.te_anaerobic ?? 0))}`} note={`aerob · anaerob, ${teWord(Number(unit.te_aerobic ?? 0))}`} />
+        )}
       </div>
       {unit.rpe && unit.training_load && c.verdict && (
         <ExplainCard tone={tone}>
@@ -186,6 +189,10 @@ function ResultCard({ unit, data }: { unit: Unit; data: Data }) {
     </section>
   );
 }
+
+const de1 = (v: number) => v.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+// Garmins Stufen für den Trainingseffekt
+const teWord = (v: number) => (v < 1 ? "kein Effekt" : v < 2 ? "geringer Effekt" : v < 3 ? "erhaltend" : v < 4 ? "verbessernd" : v < 5 ? "stark verbessernd" : "überlastend");
 
 function Tile({ label, value, unit, note }: { label: string; value: string; unit?: string; note: string }) {
   return (
