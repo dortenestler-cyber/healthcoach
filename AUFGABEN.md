@@ -7,6 +7,12 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Prüfaudit: offene Empfehlungen und Uhr (PR #190, 26.11.)
+Enthält die Migration `supabase/migrations/20261201090000_trainingseffekt.sql` (Garmins Trainingseffekt je Einheit) und geänderte Funktionen `watch`, `push` und `garmin-sync`. Dein Merge ist die Freigabe.
+- [ ] PR #190 mergen
+- [ ] Läufe „Supabase-Migrationen ausführen“ und „Supabase-Funktionen hochladen“ grün? (Claude prüft auf Wunsch)
+- [ ] Nach dem nächsten Training: zeigt die Einheit eine Kachel „Trainingseffekt“? Wenn nicht, liefert Garmin den Wert nicht, Claude Bescheid geben
+
 ### Tagesabschluss am Abend (PR #180, 25.11.)
 Enthält die Migration `supabase/migrations/20261130110000_tagesabschluss.sql` (Schalter und Uhrzeit für den Abend, voller Garmin-Abruf um 19:37, 20:37 und 21:37 Uhr). Dein Merge ist die Freigabe.
 - [x] PR #180 gemergt (25. Nov.), Migration und Hochladen grün (geprüft von Claude)

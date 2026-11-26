@@ -3,7 +3,7 @@
 // hier nachgebaut, weil die Edge Function die App-Dateien nicht laden kann.
 // Wer die Rechnung in der App ändert, ändert sie hier mit.
 
-import { dayLoadPct, loadToPct, rangeFor, type Range, type RangePhase } from "./target.ts";
+import { rangeFor, type Range, type RangePhase } from "./target.ts";
 
 // deno-lint-ignore no-explicit-any
 type Any = any;
@@ -19,9 +19,6 @@ const fixed = (lo: number, hi: number): Range => ({ lo, hi, median: (lo + hi) / 
 const num = (v: Any): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
 
 const DEFAULT_NEED_H = 7.5;
-const DEBT_CAP_MIN = 60;
-const HARD_DAY_PCT = Math.round(loadToPct(105));
-const MID_DAY_PCT = Math.round(loadToPct(60));
 
 // Lage im eigenen Bereich: Mitte 80, untere Grenze 60, obere 95, deutlich besser 100 (wie rangePoints in der App)
 function rangePoints(v: number, r: Range, lower = false): number {
@@ -43,25 +40,17 @@ const startMin = (r: Any) => (r?.sleep_start_min == null ? null : r.sleep_start_
 const endMin = (r: Any) => (r?.sleep_end_min == null ? null : r.sleep_end_min);
 
 // Schlafwert der Nacht, die am Tag `day` endet. rows: garmin_daily (alle Spalten), acts: garmin_activities.
-export function sleepTotal(day: string, rows: Any[], acts: Any[], starts: string[], sick: Set<string>, phases: Map<string, RangePhase | null>): number | null {
+export function sleepTotal(day: string, rows: Any[], _acts: Any[], starts: string[], sick: Set<string>, phases: Map<string, RangePhase | null>): number | null {
   const by = new Map(rows.map((r) => [r.day, r]));
   const d = by.get(day);
   const h = hours(d);
   if (h === null) return null;
 
-  // Bedarf wie sleepNeed(day − 1): üblicher Schlaf (ab 14 Nächten), Schlafschuld, Zuschlag nach Belastung am Vortag
-  const prev = addDays(day, -1);
+  // Menge am Grundbedarf wie sleepAchieved in lib/today.ts (Prüfaudit 26.11.): üblicher Schlaf (ab 14 Nächten), mindestens 7 h,
+  // für die Bewertung höchstens 8 h. Schlafschuld und Belastung erhöhen nur den Bedarf der kommenden Nacht, nicht die Bewertung.
   const base = rangeFor(rows, day, hours, [], new Set(), new Map());
-  const baseH = base?.stable ? base.median : DEFAULT_NEED_H;
-  let debt = 0;
-  for (let i = 0; i < 7; i++) {
-    const x = hours(by.get(addDays(prev, -i)));
-    if (x !== null) debt += Math.max(0, baseH - x);
-  }
-  const debtAdd = Math.min(DEBT_CAP_MIN, Math.round((debt * 60) / 7));
-  const load = dayLoadPct(prev, by.get(prev), acts);
-  const loadAdd = load >= HARD_DAY_PCT ? 20 : load >= MID_DAY_PCT ? 10 : 0;
-  const pct = Math.round((h / (baseH + (debtAdd + loadAdd) / 60)) * 100);
+  const baseH = Math.max(7, base?.stable ? base.median : DEFAULT_NEED_H);
+  const pct = Math.round((h / Math.min(8, baseH)) * 100);
   const amount = pct >= 100 ? Math.min(100, 85 + (pct - 100) * 1.5) : clamp(85 - (100 - pct) * 2);
 
   const parts: { w: number; p: number }[] = [];

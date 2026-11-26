@@ -33,6 +33,12 @@ function factorText(k: string, e: number, t: Any): string | null {
       return "vor der Periode";
     case "KRANK":
       return "krank";
+    case "LAST":
+      return "Belastung gestern hoch";
+    case "STRESS":
+      return "Stress der letzten Tage erhöht";
+    case "INFEKT":
+      return "Ruhepuls deutlich erhöht";
     default:
       return null;
   }
@@ -53,7 +59,7 @@ export async function tagesstart(sb: Any, uid: string, day: string): Promise<{ r
   const lines = [line1, line2, t.checkinDone ? null : "Check-in offen"].filter(Boolean);
   return {
     ready,
-    full: { title: t.pause ? "Tagesstart · Pause" : `Tagesstart · Readiness ${t.goal}`, body: lines.join("\n"), url: "/" },
+    full: { title: t.pause ? "Tagesstart · Pause" : `Tagesstart · Readiness ${t.goal === null ? "–" : (t.goal / 10).toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`, body: lines.join("\n"), url: "/" },
     quiet: { title: "Tagesstart", body: t.checkinDone ? "Deine Readiness für heute ist da." : "Deine Readiness für heute ist da. Check-in offen.", url: "/" },
   };
 }
