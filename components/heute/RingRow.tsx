@@ -66,7 +66,8 @@ export default function RingRow({ day, data, rule, nowMinute, showLoad, showGarm
 
   const r = rule.readiness;
   const warn = rule.level === "warnzeichen";
-  items.push({ key: "readiness", href: `/wert/readiness${q}`, label: "Readiness", tone: "recovery", value: warn ? 0 : r.value / 10, center: warn ? "–" : de1(r.value), word: warn ? "Hinweis" : r.label, aria: warn ? "Readiness: siehe Hinweis" : `Readiness ${de1(r.value)} von 10, ${r.label}`, main: true });
+  const none = !warn && r.missing;
+  items.push({ key: "readiness", href: `/wert/readiness${q}`, label: "Readiness", tone: "recovery", value: warn || none ? 0 : r.value / 10, center: warn || none ? "–" : de1(r.value), word: warn ? "Hinweis" : r.label, aria: warn ? "Readiness: siehe Hinweis" : none ? "Readiness: Daten fehlen" : `Readiness ${de1(r.value)} von 10, ${r.label}`, main: true });
 
   if (showLoad) {
     const t = rule.target;

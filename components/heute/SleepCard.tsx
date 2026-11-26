@@ -32,7 +32,7 @@ export default function SleepCard({ data }: { data: Data }) {
 
   const below = days.filter((d) => {
     const h = hours(d);
-    return h !== null && h < need.hours;
+    return h !== null && h < need.gradeH;
   }).length;
   const sweatNights = days.filter((d) => sweat.has(d)).length;
   const withValue = days.filter((d) => hours(d) !== null).length;
