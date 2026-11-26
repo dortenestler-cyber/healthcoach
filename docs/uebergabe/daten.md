@@ -12,7 +12,7 @@ Zuletzt aktualisiert: 2026-11-26 · Sitzung: https://claude.ai/code/session_017z
 - Bug Sonnenzeiten: `Fields.location` nimmt zusätzlich `Position.getInfo()` (neue Berechtigung `Positioning`) und als letzten Ersatz `lat`/`lon` aus den Einstellungen. Ungeprüft auf der Uhr, ob die Position so ankommt.
 - Store: `watchface/tools/datenraster.html` zeichnet die Screenshots mit den Maßen aus `FaceView.mc`, `store_bilder.js` nutzt sie.
 - Geprüft: Lauf „Uhr-App bauen“ grün, keine Warnungen. Ungeprüft: Darstellung auf der Uhr (kein Simulator), besonders die gedrehten Randwerte.
-- Wartet auf: Upload durch die Nutzerin und Rückmeldung zu Sonnenzeiten und Layout C.
+- Wartet auf: Merge durch die Nutzerin (Merge aus der Sitzung wurde abgelehnt), Upload und Rückmeldung zu Sonnenzeiten und Layout C.
 
 ## Intensität mit Training (PR #186, gemergt 25.11. 20:55, Migration und Hochladen grün) und Tagesverläufe (PR #187, 25.11., Freigabe der Nutzerin)
 - Anlass: Bouldern (1 Std) brachte kaum Garmin-Intensitätsminuten, der Ring übernahm Garmins Tageswert 1:1.

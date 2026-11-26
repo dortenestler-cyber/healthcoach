@@ -9,6 +9,7 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ### Zifferblatt Datenraster: Layout A und C (PR #188, 26.11.)
 Nur das Zifferblatt, keine Datenbank. Das Upload-Paket baut der Lauf „Uhr-App bauen“.
+- [ ] PR #188 mergen (Prüfung und Uhr-Build sind grün; Claude durfte nicht selbst mergen)
 - [ ] Nach dem Merge: Actions › „Uhr-App bauen“ (Lauf auf `main`) › Artifact `upload-zifferblatt` herunterladen
 - [ ] Im Garmin-Entwicklerportal (apps.garmin.com/developer/upload) `HealthCoachFace.iq` als neue Version hochladen, Screenshots und Text aus `beschreibung.md` ersetzen
 - [ ] Beim Update fragt die Uhr nach der neuen Berechtigung „Position“ (für die Sonnenzeiten): zulassen
