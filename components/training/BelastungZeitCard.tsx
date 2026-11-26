@@ -17,6 +17,7 @@ import {
   cardioPerDay,
   lastUnitText,
   musclePerDay,
+  type ClimbRow,
   series,
   tiredCheck,
   verteilung,
@@ -44,24 +45,25 @@ const PAD_B = 34; // Leiste und Datumszeile
 const r0 = (v: number) => Math.round(v);
 
 // Kettlebell-Sätze und eigene Anstrengung je Einheit (Spalte rpe ab Migration 20261127090000; fehlt sie, ohne)
-function useMuscleInput(data: Data): { units: MuscleUnit[]; sets: KbSet[] } | null {
-  const [input, setInput] = useState<{ sets: KbSet[]; rpe: Map<number, number> } | null>(null);
+function useMuscleInput(data: Data): { units: MuscleUnit[]; sets: KbSet[]; climbs: ClimbRow[] } | null {
+  const [input, setInput] = useState<{ sets: KbSet[]; rpe: Map<number, number>; climbs: ClimbRow[] } | null>(null);
   useEffect(() => {
     const sb = supabase();
     if (!sb) {
-      setInput({ sets: [], rpe: new Map() });
+      setInput({ sets: [], rpe: new Map(), climbs: [] });
       return;
     }
     const from = isoDay(daysAgo(179));
     Promise.all([
-      sb.from("kb_sets").select("day, reps, weight_kg").gte("day", from),
+      sb.from("kb_sets").select("day, reps, weight_kg, exercise").gte("day", from),
       sb.from("garmin_activities").select("activity_id, rpe").gte("start_local", from).not("rpe", "is", null),
-    ]).then(([s, r]) => {
+      sb.from("climbs").select("day, grade, result").gte("day", from),
+    ]).then(([s, r, c]) => {
       const rpe = new Map(((r.error ? [] : r.data ?? []) as { activity_id: number; rpe: number }[]).map((x) => [x.activity_id, x.rpe]));
-      setInput({ sets: (s.data ?? []) as KbSet[], rpe });
+      setInput({ sets: (s.data ?? []) as KbSet[], rpe, climbs: (c.error ? [] : c.data ?? []) as ClimbRow[] });
     });
   }, [data]);
-  return useMemo(() => (input ? { units: data.acts.map((a) => ({ ...a, rpe: input.rpe.get(a.activity_id) ?? null })), sets: input.sets } : null), [input, data]);
+  return useMemo(() => (input ? { units: data.acts.map((a) => ({ ...a, rpe: input.rpe.get(a.activity_id) ?? null })), sets: input.sets, climbs: input.climbs } : null), [input, data]);
 }
 
 export default function BelastungZeitCard({ today, data, alltag = true }: { today: string; data: Data; alltag?: boolean }) {
@@ -77,7 +79,7 @@ export default function BelastungZeitCard({ today, data, alltag = true }: { toda
   }, [data, alltag, days]);
   const muscle = useMemo(() => {
     if (!muscleIn) return null;
-    const m = musclePerDay(muscleIn.units, muscleIn.sets, data.done);
+    const m = musclePerDay(muscleIn.units, muscleIn.sets, data.done, muscleIn.climbs);
     const pts = series(m.perDay, days, m.first);
     const estimated = days.some((d) => m.days.get(d)?.estimated);
     return { pts, last: m.last, estimated };
