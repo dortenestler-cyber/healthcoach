@@ -10,6 +10,7 @@ import TargetSection from "@/components/training/TargetSection";
 import WeekLoadCard from "@/components/training/WeekLoadCard";
 import RatioCard from "@/components/training/RatioCard";
 import BelastungZeitCard from "@/components/training/BelastungZeitCard";
+import CardioFokusCard from "@/components/training/CardioFokusCard";
 import HabitCard from "@/components/training/HabitCard";
 import { daysAgo, isoDay } from "@/lib/dates";
 import { loadInsightData } from "@/lib/insightData";
@@ -153,6 +154,7 @@ export default function TrainingView({ initial }: { initial: string }) {
             right={
               <>
                 {abschnitte.zeigt("woche") && <WeekLoadCard data={data} alltag={withAlltag} />}
+                {abschnitte.zeigt("woche") && data && <CardioFokusCard today={isoDay()} data={data} />}
                 {abschnitte.zeigt("woche") && data && <HabitCard today={isoDay()} data={data} />}
               </>
             }
