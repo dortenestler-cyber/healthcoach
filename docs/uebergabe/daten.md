@@ -1,6 +1,6 @@
 # Übergabe · Daten (DA)
-Belegt: frei
-Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1WS7sTKnh1NfXui9YD
+Belegt: https://claude.ai/code/session_017zWr1VfNKhpHP9qnQvGq9p · seit 26.11. 09:40 · Datenraster lesbar
+Zuletzt aktualisiert: 2026-11-26 · Sitzung: https://claude.ai/code/session_017zWr1VfNKhpHP9qnQvGq9p
 
 
 ## Intensität mit Training (PR #186, gemergt 25.11. 20:55, Migration und Hochladen grün) und Tagesverläufe (PR #187, 25.11., Freigabe der Nutzerin)
