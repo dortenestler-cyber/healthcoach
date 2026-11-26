@@ -158,7 +158,7 @@ export function sleepScore(day: string, data: Data): SleepScore {
 // Ein Satz: Menge, dann der schwächste Baustein, Nachtschweiß und Hitzewallungen aus dem Tagebuch
 export function sleepSentence(day: string, data: Data, s: SleepScore): string {
   if (s.pct === null || s.hours === null) return "Für diese Nacht gibt es noch keinen Schlafwert.";
-  const first = s.pct >= 100 ? `Genug geschlafen (${hm(s.hours)})` : s.pct >= 90 ? `Knapp genug geschlafen (${hm(s.hours)})` : `Zu wenig geschlafen (${hm(s.hours)})`;
+  const first = s.pct >= 95 ? `Genug geschlafen (${hm(s.hours)})` : s.pct >= 85 ? `Knapp genug geschlafen (${hm(s.hours)})` : `Zu wenig geschlafen (${hm(s.hours)})`;
   const weak = s.parts.filter((p) => p.points < 70);
   const worst = weak.length ? weak.reduce((a, b) => ((100 - b.points) * b.weight > (100 - a.points) * a.weight ? b : a)) : null;
   let out = worst ? `${first}, aber ${worst.weak}.` : s.rest !== null ? `${first}, ruhig und erholsam.` : `${first}.`;

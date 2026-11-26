@@ -58,6 +58,11 @@ Erste Fassung war zu großzügig: „im eigenen Bereich“ gab volle Punkte, ein
 - **Effizienz:** voll ab 98 %, null bei 85 %. **Regelmäßigkeit:** voll bis 10 min, null ab 75 min.
 - Ergebnis mit Testnächten: typisch 82 (mittel), sehr gut 97, unruhig 67, kurz 62, schlecht 22.
 
+## 5b. Bewertung am Grundbedarf (26.11.2026, Prüfaudit)
+- Menge und Satz messen an deinem Grundbedarf (üblicher Schlaf, mindestens 7 h, für die Bewertung höchstens 8 h), nicht am Bedarf mit Zuschlägen. Schlafschuld und Belastung erhöhen nur den Bedarf für die kommende Nacht. Vorher hieß eine Nacht über 8 Stunden „knapp“.
+- Satz: „Genug geschlafen“ ab 95 %, „Knapp genug“ ab 85 %.
+- Readiness: unter 55 Punkten gleitend bis −15 (bei 40), statt pauschal −10.
+
 ## 6. Umsetzung
 - **Keine Migration nötig.** Alle Werte liegen schon in `garmin_daily`; die Rechnung läuft in der App (`lib/today.ts`: neue Funktion `sleepQuality`, `sleepAchieved` liefert zusätzlich Gesamtwert).
 - Oberfläche `[OF]`: `HeuteDetail.tsx` (Schlafseite), `RingRow.tsx` (Ring auf Heute), Readiness-Faktor.

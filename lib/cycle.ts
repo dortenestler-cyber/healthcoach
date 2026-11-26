@@ -151,10 +151,13 @@ export type Stage = "erholen" | "behutsam" | "bereit" | "volle-kraft";
 export const STAGES: Record<Stage, string> = { erholen: "Erholen", behutsam: "Behutsam", bereit: "Bereit", "volle-kraft": "Volle Kraft" };
 
 // Schwellen sind eine Annahme und werden mit echten Daten geprüft
-export function readinessFrom(t: Target): { value: number; stage: Stage; label: string } {
+// Bei Pause und Infektverdacht immer „Erholen“, damit die Stufe zur Empfehlung passt (Prüfaudit 26.11., Empfehlung 4).
+// Ohne HRV, Ruhepuls und Schlaf: missing, die Oberfläche zeigt „–“ und „Daten fehlen“ (Empfehlung 5).
+export const MISSING_LABEL = "Daten fehlen";
+export function readinessFrom(t: Target): { value: number; stage: Stage; label: string; missing: boolean } {
   const value = t.pause ? 0 : Math.round(t.score) / 10;
-  const stage: Stage = value < 3 ? "erholen" : value < 6 ? "behutsam" : value < 8.5 ? "bereit" : "volle-kraft";
-  return { value, stage, label: STAGES[stage] };
+  const stage: Stage = t.pause || t.infection || value < 3 ? "erholen" : value < 6 ? "behutsam" : value < 8.5 ? "bereit" : "volle-kraft";
+  return { value, stage, label: t.missing && !t.pause ? MISSING_LABEL : STAGES[stage], missing: t.missing && !t.pause };
 }
 
 // ---------- Regelreihenfolge
@@ -171,7 +174,7 @@ export type DayRule = {
   throttle: boolean; // Belastung senken: nur wenn Symptome und niedrige HRV zusammenkommen
   corridorFactor: number; // 1 = normal, 0,78 = etwa 22 % weniger
   cycle: CycleToday;
-  readiness: { value: number; stage: Stage; label: string };
+  readiness: { value: number; stage: Stage; label: string; missing: boolean };
   target: Target;
 };
 
@@ -189,19 +192,7 @@ function redFlagFor(day: string, diary: Diary[]): string | null {
   return null;
 }
 
-// 2. Infekt-Verdacht: Ruhepuls mindestens 6 bpm über dem Schnitt und HRV darunter
-function infectionFor(day: string, data: Data): boolean {
-  const today = data.daily.find((r) => r.day === day);
-  if (!today || today.hrv_last_night === null) return false;
-  if (today.resting_hr === null) return false;
-  const hist = data.daily.filter((r) => r.day < day && r.day >= addDays(day, -30));
-  const rhr = mean(hist.map((r) => r.resting_hr).filter((v): v is number => v !== null));
-  const hrv = mean(hist.map((r) => r.hrv_last_night).filter((v): v is number => v !== null));
-  if (rhr === null || hrv === null || hist.length < 7) return false;
-  // Ruhepuls deutlich höher, zusammen mit niedriger HRV
-  return today.resting_hr >= rhr + 6 && today.hrv_last_night < hrv;
-}
-
+// 2. Infekt-Verdacht: lib/insights.ts infectionSigns (Bereich der Zyklusphase, zweites Zeichen HRV oder Atem)
 // 4. Symptome plus niedrige HRV (beides muss zusammenkommen)
 function throttleFor(day: string, data: Data): boolean {
   // Symptome von gestern ohne Bestätigung im Check-in zählen halb
@@ -226,7 +217,7 @@ export function dayRule(day: string, data: Data, injuredSports: string[] = []): 
   const cycle = cycleToday(day, data.diary);
   const readiness = readinessFrom(target);
   const redFlag = redFlagFor(day, data.diary);
-  const infection = !redFlag && infectionFor(day, data);
+  const infection = !redFlag && target.infection;
   const rehaSports = [...new Set(injuredSports)];
   const throttle = throttleFor(day, data);
   const corridorFactor = throttle ? 0.78 : 1;

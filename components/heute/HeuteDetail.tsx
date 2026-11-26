@@ -108,7 +108,7 @@ function ReadinessDetail({ day, data, rule, showGarmin }: { day: string; data: D
       </section>
     );
   }
-  const { value, stage, label } = rule.readiness;
+  const { value, stage, label, missing } = rule.readiness;
   const factors = readinessFactors(day, data);
   const count = countInRange(factors.map((f) => ({ value: f.value, range: f.base.active })));
   const reason = readinessWhy(factors, label);
@@ -119,11 +119,11 @@ function ReadinessDetail({ day, data, rule, showGarmin }: { day: string; data: D
   return (
     <>
       <div className="ring-hero detail-hero">
-        <ValueRing tone="recovery" size={208} value={value / 10} center={de1(value)} caption={label} label={`Readiness ${de1(value)} von 10, ${label}`} />
+        <ValueRing tone="recovery" size={208} value={missing ? 0 : value / 10} center={missing ? "–" : de1(value)} caption={label} label={missing ? "Readiness: Daten fehlen" : `Readiness ${de1(value)} von 10, ${label}`} />
       </div>
       <div className="stage-bar" aria-label={`Stufe: ${label}`}>
         {STAGE_ORDER.map((st) => (
-          <div key={st} className="stage" data-on={st === stage}>
+          <div key={st} className="stage" data-on={!missing && st === stage}>
             <span />
             <small>{STAGES[st]}</small>
           </div>
@@ -134,7 +134,7 @@ function ReadinessDetail({ day, data, rule, showGarmin }: { day: string; data: D
         <FactorList rows={factors} legend={LEGEND_30} />
       </section>
 
-      <ExplainCard tone="recovery" question={`Warum ist meine Readiness heute ${de1(value)} von 10 („${label}“)?`}>
+      <ExplainCard tone="recovery" question={missing ? undefined : `Warum ist meine Readiness heute ${de1(value)} von 10 („${label}“)?`}>
         {reason ?? (count.total ? `${count.inRange} von ${count.total} Faktoren in deinem Bereich.` : "Deine Bereiche entstehen ab 14 Tagen Daten.")}
       </ExplainCard>
 
@@ -213,7 +213,7 @@ function SleepDetail({ day, data }: { day: string; data: Data }) {
         </span>
         <ul className="derive-list">
           <li>
-            Grundbedarf {hm(need.baseH)} {need.baseFromData ? "(dein üblicher Schlaf der letzten 30 Nächte)" : "(Startwert, eigener Wert ab 14 Nächten)"}
+            Grundbedarf {hm(need.baseH)} {need.baseRaised ? "(mindestens 7 Stunden, dein üblicher Schlaf liegt darunter)" : need.baseFromData ? "(dein üblicher Schlaf der letzten 30 Nächte)" : "(Startwert, eigener Wert ab 14 Nächten)"}
           </li>
           <li>
             Schlafschuld der letzten 7 Nächte {hm(need.debtH)}, davon {need.debtAddMin} min dazu
