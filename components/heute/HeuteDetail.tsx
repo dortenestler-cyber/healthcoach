@@ -14,7 +14,7 @@ import EnergyCard from "@/components/heute/EnergyCard";
 import { countInRange, positionIn } from "@/lib/baseline";
 import { energyDay } from "@/lib/energie";
 import { duration, stressDay, stressSentence } from "@/lib/stress";
-import { dayRule, PHASES, STAGES, windowText, type DayRule, type Stage } from "@/lib/cycle";
+import { dayRule, PHASES, STAGE_ORDER, STAGES, windowText, type DayRule } from "@/lib/cycle";
 import { clock, isoDay, longDate, shiftDay } from "@/lib/dates";
 import { dayIntensity, weekIntensity, WHO_MINUTES, WHO_STRENGTH_DAYS } from "@/lib/trainingLoad";
 import { activityLabel } from "@/lib/garmin";
@@ -91,7 +91,6 @@ export default function HeuteDetail({ k, day: dayParam }: { k: DetailKey; day?: 
   );
 }
 
-const STAGE_ORDER: Stage[] = ["erholen", "behutsam", "bereit", "volle-kraft"];
 const de1 = (v: number) => v.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const shortDay = (iso: string) => new Date(iso + "T12:00:00").toLocaleDateString("de-DE", { day: "numeric", month: "short" });
 const LEGEND_30 = "Heute gegen deine letzten 30 Tage, zyklusabhängige Werte gegen frühere Tage derselben Phase";

@@ -188,8 +188,9 @@ export const TARGET_MIN_DAYS = 14; // darunter gelten die festen Stufen
 export const TARGET_HALF = 10; // Zielbereich: Mitte ± 10 Prozentpunkte
 export const TARGET_BRAKE = 1.3; // Bremse ab diesem Verhältnis 7 Tage zu den 4 Wochen davor
 // Gleitend statt in Stufen, damit ein Punkt mehr das Ziel nicht springen lässt (Prüfaudit 26.11., Empfehlung 7).
-// Stützpunkte: bis 35 → 0,5 · 55 → 0,75 · 80 (Startwert, normaler Tag) → 1,0 · ab 95 → 1,15, dazwischen linear.
-const FACTOR_POINTS: [number, number][] = [[35, 0.5], [55, 0.75], [80, 1], [95, 1.15]];
+// Stützpunkte: bis 30 → 0,5 · 50 → 0,75 · 75 (Startwert, normaler Tag) → 1,0 · ab 92 → 1,15, dazwischen linear.
+export const READINESS_START = 75; // Startwert ohne Zu- und Abschläge (Prüfaudit 26.11., Empfehlung 17: Skala gestreckt)
+const FACTOR_POINTS: [number, number][] = [[30, 0.5], [50, 0.75], [75, 1], [92, 1.15]];
 export function readinessFactor(score: number): number {
   const p = FACTOR_POINTS;
   if (score <= p[0][0]) return p[0][1];
@@ -226,15 +227,15 @@ export function targetBand(score: number, usual: number, brake: boolean): { lo: 
 }
 
 const BANDS = [
-  { min: 85, label: "Hart möglich", lo: 65, hi: 85 },
-  { min: 65, label: "Moderat", lo: 45, hi: 65 },
-  { min: 45, label: "Leicht", lo: 25, hi: 45 },
+  { min: 82, label: "Hart möglich", lo: 65, hi: 85 },
+  { min: 62, label: "Moderat", lo: 45, hi: 65 },
+  { min: 42, label: "Leicht", lo: 25, hi: 45 },
   { min: -999, label: "Erholung", lo: 10, hi: 25 },
 ];
 
 // Ein Faktor der Readiness: heutiger Wert gegen den persönlichen Bereich (30 Tage ohne heute, mittlere Hälfte, ab 14 Tagen).
 // In der Lutealphase gilt für HRV und Ruhepuls der Luteal-Bereich (lib/baseline.ts).
-// Abstand außerhalb des Bereichs in Bereichsbreiten: ab 0,6 voller Abzug, darunter halber Abzug, deutlich besser ein kleiner Bonus.
+// Abstand außerhalb des Bereichs in Bereichsbreiten: ab 0,6 voller Abzug, darunter halber Abzug, deutlich besser ein halber Bonus.
 function rangeFactor(name: string, v: number | null, range: Range | null, phaseName: string | null, fmt: (x: number) => string, higherIsBetter: boolean, weight: number, unit = ""): Factor | null {
   if (v === null) return null;
   if (!range) return { name, value: fmt(v) + unit, note: "Dein Bereich entsteht ab 7 Tagen", effect: 0 };
@@ -246,15 +247,37 @@ function rangeFactor(name: string, v: number | null, range: Range | null, phaseN
   let effect = 0;
   if (bad > 0.6) effect = -weight;
   else if (bad > 0) effect = -Math.round(weight / 2);
-  else if (bad < -0.5) effect = Math.round(weight / 4);
+  else if (bad < -0.5) effect = Math.round(weight / 2); // deutlich besser: halbes Gewicht als Bonus (Empfehlung 17)
   const where = `${phaseName ? `Bereich ${phaseName}` : "dein Bereich"} ${fmt(range.lo)}–${fmt(range.hi)}${unit}`;
   const note = !below && !above ? `im Bereich (${where})` : `${above ? "über" : "unter"} dem Bereich (${where})`;
   return { name, value: fmt(v) + unit, note, effect };
 }
 
-// Schlaf auf die Readiness: ab 85 +3, ab 70 ±0, ab 55 −5, darunter gleitend bis −15 bei 40 Punkten (Empfehlung 6)
+// HRV für die Readiness: halb letzte Nacht, halb der Schnitt der letzten 7 Nächte (ab 3 Werten), sonst nur letzte Nacht
+export function hrvBlend(day: string, data: Data): number | null {
+  const byDay = new Map(data.daily.map((r) => [r.day, r.hrv_last_night]));
+  const last = byDay.get(day) ?? null;
+  if (last === null) return null;
+  const week = Array.from({ length: 7 }, (_, i) => byDay.get(addDays(day, -i)) ?? null).filter((v): v is number => v !== null);
+  return week.length >= 3 ? 0.5 * last + 0.5 * (mean(week) as number) : last;
+}
+
+// Stress der letzten 3 Tage gegen deinen Bereich (Empfehlung 10, wie Garmins Stresshistorie). Über dem Bereich −3, deutlich darüber −6.
+function stressFactor(day: string, data: Data): Factor | null {
+  const vals = [1, 2, 3].map((i) => data.daily.find((r) => r.day === addDays(day, -i))?.stress_avg ?? null).filter((v): v is number => v !== null);
+  if (vals.length < 2) return null;
+  const v = mean(vals) as number;
+  const b = baselineFor(data.daily.map((r) => ({ day: r.day, value: r.stress_avg })), addDays(day, -3), { diary: data.diary, sick: data.sick }, false).active;
+  if (!b?.stable) return null;
+  const width = Math.max(b.hi - b.lo, 3);
+  const over = (v - b.hi) / width;
+  const effect = over > 0.6 ? -6 : over > 0 ? -3 : 0;
+  return { name: "Stress 3 Tage", value: String(Math.round(v)), note: effect ? `über deinem Bereich (${Math.round(b.lo)}–${Math.round(b.hi)})` : `im Bereich (${Math.round(b.lo)}–${Math.round(b.hi)})`, effect };
+}
+
+// Schlaf auf die Readiness: ab 85 +5, ab 70 ±0, ab 55 −5, darunter gleitend bis −15 bei 40 Punkten (Empfehlung 6)
 export function sleepEffect(total: number): number {
-  if (total >= 85) return 3;
+  if (total >= 85) return 5;
   if (total >= 70) return 0;
   if (total >= 55) return -5;
   return -Math.min(15, 5 + Math.round(((55 - total) * 10) / 15));
@@ -275,11 +298,13 @@ export function computeTarget(day: string, data: Data): Target {
   // Schlaf: eigener Gesamtwert aus Menge und Erholsam (lib/schlaf.ts), feste Stufen statt Bereich
   const sl = sleepScore(day, data);
   if (sl.total !== null) factors.push({ name: "Schlaf", value: `${sl.total} Punkte`, note: sl.word ?? "", effect: sleepEffect(sl.total) });
-  push(rangeFactor("HRV", today?.hrv_last_night ?? null, hv.active, phaseName(hv), r0, true, 12, " ms"));
+  // HRV: Mittel aus letzter Nacht und dem Schnitt der letzten 7 Nächte, damit eine einzelne unruhige Nacht weniger kippt (Empfehlung 8, wie Garmins HRV-Status)
+  push(rangeFactor("HRV", hrvBlend(day, data), hv.active, phaseName(hv), r0, true, 15, " ms"));
   push(rangeFactor("Ruhepuls", today?.resting_hr ?? null, rh.active, phaseName(rh), r0, false, 8, " bpm"));
+  push(stressFactor(day, data));
   if (today?.bb_max !== null && today?.bb_max !== undefined) {
     const bb = today.bb_max;
-    factors.push({ name: "Body Battery", value: String(bb), note: bb < 30 ? "sehr niedrig" : bb < 50 ? "niedrig" : bb >= 75 ? "gut aufgeladen" : "mittel", effect: bb < 30 ? -15 : bb < 50 ? -8 : bb >= 75 ? 3 : 0 });
+    factors.push({ name: "Body Battery", value: String(bb), note: bb < 30 ? "sehr niedrig" : bb < 50 ? "niedrig" : bb >= 75 ? "gut aufgeladen" : "mittel", effect: bb < 30 ? -8 : bb < 50 ? -4 : bb >= 75 ? 2 : 0 }); // halbes Gewicht: Body Battery enthält HRV, Stress und Schlaf schon (Empfehlung 9)
   }
 
   const ci = data.checkins.find((c) => c.day === day);
@@ -324,7 +349,7 @@ export function computeTarget(day: string, data: Data): Target {
   const enoughData = hist.length >= 14; // ab 14 Tagen gibt es persönliche Bereiche
   // Ohne HRV, Ruhepuls und Schlaf keine Zahl (Empfehlung 5): sonst stünde ohne Daten der Startwert 80 als „Bereit“ da
   const missing = today?.hrv_last_night == null && today?.resting_hr == null && sl.total === null;
-  const score = Math.max(0, Math.min(100, 80 + factors.reduce((s, f) => s + f.effect, 0)));
+  const score = Math.max(0, Math.min(100, READINESS_START + factors.reduce((s, f) => s + f.effect, 0)));
   const common = { factors, pause, enoughData, infection, missing };
   if (pause) return { score: 0, label: "Pause", lo: 0, hi: 15, ...common, usual: null, brake: false };
   const band = BANDS.find((b) => score >= b.min)!;

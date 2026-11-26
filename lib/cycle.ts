@@ -147,8 +147,10 @@ export function cycleToday(day: string, diary: Diary[]): CycleToday {
 
 // ---------- Readiness 0–10 (aus dem Tagesziel-Wert 0–100)
 
-export type Stage = "erholen" | "behutsam" | "bereit" | "volle-kraft";
-export const STAGES: Record<Stage, string> = { erholen: "Erholen", behutsam: "Behutsam", bereit: "Bereit", "volle-kraft": "Volle Kraft" };
+// Fünf Stufen wie Garmin (Prüfaudit 26.11., Empfehlung 17)
+export type Stage = "erholen" | "behutsam" | "moderat" | "bereit" | "volle-kraft";
+export const STAGES: Record<Stage, string> = { erholen: "Erholen", behutsam: "Behutsam", moderat: "Moderat", bereit: "Bereit", "volle-kraft": "Volle Kraft" };
+export const STAGE_ORDER: Stage[] = ["erholen", "behutsam", "moderat", "bereit", "volle-kraft"];
 
 // Schwellen sind eine Annahme und werden mit echten Daten geprüft
 // Bei Pause und Infektverdacht immer „Erholen“, damit die Stufe zur Empfehlung passt (Prüfaudit 26.11., Empfehlung 4).
@@ -156,7 +158,7 @@ export const STAGES: Record<Stage, string> = { erholen: "Erholen", behutsam: "Be
 export const MISSING_LABEL = "Daten fehlen";
 export function readinessFrom(t: Target): { value: number; stage: Stage; label: string; missing: boolean } {
   const value = t.pause ? 0 : Math.round(t.score) / 10;
-  const stage: Stage = t.pause || t.infection || value < 3 ? "erholen" : value < 6 ? "behutsam" : value < 8.5 ? "bereit" : "volle-kraft";
+  const stage: Stage = t.pause || t.infection || value < 3 ? "erholen" : value < 5 ? "behutsam" : value < 6.5 ? "moderat" : value < 8.5 ? "bereit" : "volle-kraft";
   return { value, stage, label: t.missing && !t.pause ? MISSING_LABEL : STAGES[stage], missing: t.missing && !t.pause };
 }
 

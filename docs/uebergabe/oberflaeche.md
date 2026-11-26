@@ -1,5 +1,5 @@
 # Übergabe · Oberfläche (OF)
-Belegt: frei
+Belegt: Konto A · Sitzung https://claude.ai/code/session_017zWr1TtsNQFhPjonCriVLT · seit 2026-11-26 10:00 (auch Uhr-Rechnung in supabase/functions/watch)
 Zuletzt aktualisiert: 2026-11-26 · Sitzung: https://claude.ai/code/session_017zWr1TtsNQFhPjonCriVLT
 
 ## Prüfaudit Bewertungslogik umgesetzt (PR #189, 26.11., Freigabe der Nutzerin)
