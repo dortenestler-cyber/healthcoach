@@ -20,25 +20,31 @@ const sleepHours = (d: Daily | undefined) => (d?.sleep_seconds ? d.sleep_seconds
 // ---------- Schlafbedarf
 
 export const DEFAULT_NEED_H = 7.5; // Startwert, solange es weniger als 14 Nächte gibt
+export const MIN_NEED_H = 7; // Untergrenze: Empfehlung für Erwachsene, damit sich ein Defizit nicht als üblich einschleicht
+export const GRADE_MAX_H = 8; // Für die Bewertung gilt höchstens dieser Bedarf: ab 8 Stunden ist eine Nacht nie „knapp“
 const DEBT_CAP_MIN = 60; // höchstens eine Stunde Zuschlag aus der Schlafschuld
 
 export type SleepNeed = {
   hours: number; // gesamter Bedarf in Stunden
   baseH: number; // Grundbedarf
   baseFromData: boolean; // false: Startwert 7,5 h
+  baseRaised: boolean; // dein üblicher Schlaf liegt unter 7 h, der Grundbedarf wurde angehoben
+  gradeH: number; // Maßstab für Menge und Satz: Grundbedarf, begrenzt auf 7–8 h, ohne Zuschläge
   debtH: number; // Schlafschuld der letzten 7 Nächte (Summe)
   debtAddMin: number; // Zuschlag daraus in Minuten
   loadAddMin: number; // Zuschlag nach Belastung gestern
 };
 
-// Bedarf für die Nacht nach `day`. Grundbedarf: dein üblicher Schlaf (Median der letzten 30 Nächte).
+// Bedarf für die Nacht nach `day`. Grundbedarf: dein üblicher Schlaf (Median der letzten 30 Nächte), mindestens 7 Stunden.
+// Die Zuschläge sind eine Empfehlung für die kommende Nacht. Bewertet wird die Nacht nur am Grundbedarf (gradeH),
+// sonst läge eine gewöhnliche Nacht fast immer unter 100 % und hieße „knapp“.
 // Schlafschuld: Summe der fehlenden Stunden der letzten 7 Nächte, davon ein Siebtel als Zuschlag, höchstens 60 Minuten.
 // Zuschlag nach Belastung am Tag: 20 Minuten nach einer harten Einheit, 10 nach einer mittleren.
 export function sleepNeed(day: string, daily: Daily[], acts: Activity[]): SleepNeed {
   const byDay = new Map(daily.map((d) => [d.day, d]));
   const range = baselineFor(daily.map((d) => ({ day: d.day, value: sleepHours(d) })), addDays(day, 1), { diary: [] }, false).range;
   const stable = range?.stable ? range : null; // erst ab 14 Nächten eigener Grundbedarf
-  const baseH = stable ? stable.median : DEFAULT_NEED_H;
+  const baseH = Math.max(MIN_NEED_H, stable ? stable.median : DEFAULT_NEED_H);
   let debtH = 0;
   for (let i = 0; i < 7; i++) {
     const h = sleepHours(byDay.get(addDays(day, -i)));
@@ -47,7 +53,7 @@ export function sleepNeed(day: string, daily: Daily[], acts: Activity[]): SleepN
   const debtAddMin = Math.min(DEBT_CAP_MIN, Math.round((debtH * 60) / 7));
   const load = loadPercent(day, daily, acts);
   const loadAddMin = load >= HARD_DAY_PCT ? 20 : load >= MID_DAY_PCT ? 10 : 0;
-  return { hours: baseH + (debtAddMin + loadAddMin) / 60, baseH, baseFromData: !!stable, debtH, debtAddMin, loadAddMin };
+  return { hours: baseH + (debtAddMin + loadAddMin) / 60, baseH, baseFromData: !!stable, baseRaised: !!stable && stable.median < MIN_NEED_H, gradeH: Math.min(GRADE_MAX_H, baseH), debtH, debtAddMin, loadAddMin };
 }
 
 // Dauer wie „7 h 55“
@@ -58,11 +64,11 @@ export function hm(hours: number): string {
   return h ? `${h} h ${String(m).padStart(2, "0")}` : `${m} min`;
 }
 
-// Letzte Nacht im Verhältnis zum Bedarf, der für sie galt (Garmin ordnet die Nacht dem Aufwachtag zu)
+// Letzte Nacht im Verhältnis zum Grundbedarf, der für sie galt (Garmin ordnet die Nacht dem Aufwachtag zu)
 export function sleepAchieved(day: string, data: Data): { hours: number | null; need: SleepNeed; ratio: number | null } {
   const hours = sleepHours(data.daily.find((d) => d.day === day));
   const need = sleepNeed(addDays(day, -1), data.daily, data.acts);
-  return { hours, need, ratio: hours === null ? null : hours / need.hours };
+  return { hours, need, ratio: hours === null ? null : hours / need.gradeH };
 }
 
 // ---------- Last der letzten 7 Tage

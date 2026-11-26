@@ -66,7 +66,8 @@ function sentenceFor(p: Props): Sentence {
 }
 
 function readinessSentence({ day, data, rule, showLoad }: Props): Sentence {
-  const { value, label } = rule.readiness;
+  const { value, label, missing } = rule.readiness;
+  if (missing) return { tone: "recovery", body: "Für heute fehlen HRV, Ruhepuls und Schlaf. Nach dem nächsten Synchronisieren gibt es wieder eine Readiness." };
   const reason = readinessWhy(readinessFactors(day, data), label)?.replace(/ Darum heute „[^“]+“\.$/, "") ?? null;
   const t = rule.target;
   const phase = rule.cycle.phase ? PHASES[rule.cycle.phase] : null;
@@ -148,7 +149,7 @@ function sleepSentence({ day, data, isToday }: Props): Sentence {
     question: pct === null ? undefined : `Was heißt mein Schlafwert von ${pct} für ${isToday ? "heute" : "diesen Tag"}?`,
     body: (
       <>
-        <strong>{hm(s.hours)}</strong> von <strong>{hm(s.need.hours)}</strong> Bedarf{awake ? `, ${awake}-mal wach` : ""}.{" "}
+        <strong>{hm(s.hours)}</strong> von <strong>{hm(s.need.gradeH)}</strong> Bedarf{awake ? `, ${awake}-mal wach` : ""}.{" "}
         {tonight.debtH >= 0.25 ? (
           <>
             Schlafschuld aus 7 Nächten: <strong>{hm(tonight.debtH)}</strong>.{" "}

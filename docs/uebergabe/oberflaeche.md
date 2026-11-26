@@ -1,6 +1,22 @@
 # Übergabe · Oberfläche (OF)
 Belegt: frei
-Zuletzt aktualisiert: 2026-11-25 · Sitzung: https://claude.ai/code/session_017zWr1VwL1U1ue6ALkkaL4z
+Zuletzt aktualisiert: 2026-11-26 · Sitzung: https://claude.ai/code/session_017zWr1TtsNQFhPjonCriVLT
+
+## Prüfaudit Bewertungslogik umgesetzt (PR #189, 26.11., Freigabe der Nutzerin)
+- Anlass: Nacht über 8 Stunden hieß „knapp“. Ursache: Bewertet wurde gegen den Bedarf mit Zuschlägen (Median 30 Nächte + Schlafschuld + Belastung). Eine gewöhnliche Nacht lag damit fast immer unter 100 %.
+- `lib/today.ts` `sleepNeed`: Grundbedarf mindestens 7 h (`MIN_NEED_H`), neues Feld `gradeH` = Grundbedarf, höchstens 8 h (`GRADE_MAX_H`), ohne Zuschläge. `sleepAchieved.ratio` misst jetzt an `gradeH`. Die Zuschläge bleiben im Bedarf für die kommende Nacht. `baseRaised` für den Satz auf der Schlafseite. `SleepCard` zählt Nächte unter `gradeH`, `DaySentence` nennt `gradeH` als Bedarf.
+- `lib/schlaf.ts` `sleepSentence`: „Genug“ ab 95 %, „Knapp genug“ ab 85 %.
+- `lib/insights.ts` `computeTarget` (Empfehlungen 1–7 des Audits):
+  1. Faktor „Belastung gestern“ (`recentLoadFactor`): Maßstab ist ein üblicher Trainingstag (oberes Viertel der letzten 28 Tage, mindestens `MID_DAY_PCT`). Gestern ab 1,3× −5, ab 1,6× −10, zwei Trainingstage in Folge −5. Unter 14 Tagen: harter Tag −5.
+  2. Zyklusabzug −5 entfällt, wenn die HRV schon am Bereich der Phase gemessen wird.
+  3. `infectionSigns`: Ruhepuls ≥ Median der Phase (sonst 30 Tage) + 6 und dazu HRV unter dem Bereich oder Atemfrequenz über dem Bereich. Ersetzt `infectionFor` in `lib/cycle.ts`.
+  4. Bei Infektverdacht Faktor −15, Ziel 10–25 %, Stufe „Erholen“ (`readinessFrom`). Bei Pause ebenfalls „Erholen“.
+  5. `Target.missing`: ohne HRV, Ruhepuls und Schlaf zeigen Ring, Detailseite, Tagesblatt und Satz „–“ und „Daten fehlen“.
+  6. `sleepEffect`: unter 55 Punkten gleitend bis −15 (bei 40).
+  7. `readinessFactor` gleitend: 35 → 0,5 · 55 → 0,75 · 80 → 1,0 · 95 → 1,15.
+- Geprüft: `tsc`, `npm run build`, zehn Beispieltage mit 120 Tagen Beispieldaten (Skript nicht im Repo). Nicht im Browser angesehen.
+- Für Daten: `supabase/functions/watch/target.ts` rechnet die Readiness für die Uhr nach und ist noch auf dem alten Stand (Faktoren 1, 2, 3, 4, 6, 7 und Schlafbedarf). Angleichen braucht die Freigabe für das Hochladen der Funktion.
+- Offen aus dem Audit (mittel/niedrig, Nr. 8–10 und 12–19): noch nicht umgesetzt. Stufe 3 (echte Daten) wartet auf den Export aus Supabase.
 
 ## Intensität: Belastung und Krafttage (PR #185, 25.11., Freigabe der Nutzerin)
 - Anlass: Bouldern bringt kaum Intensitätsminuten (Garmin zählt gleich wenig), aber deutlich Belastung.

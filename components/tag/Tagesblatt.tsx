@@ -104,7 +104,7 @@ export default function Tagesblatt({ day, data, onChanged, intro, bare = false, 
     const t = computeTarget(day, data);
     if (d && t.factors.length) {
       const r = readinessFrom(t);
-      tiles.push({ key: "readiness", label: "Readiness", value: de1(r.value), word: r.label, href: `/wert/readiness${q}` });
+      tiles.push({ key: "readiness", label: "Readiness", value: r.missing ? "–" : de1(r.value), word: r.label, href: `/wert/readiness${q}` });
     }
     const sl = sleepScore(day, data);
     if (sl.total !== null) tiles.push({ key: "schlaf", label: "Schlaf", value: String(sl.total), word: d?.sleep_seconds ? `${Math.floor(d.sleep_seconds / 3600)} h ${String(Math.round((d.sleep_seconds % 3600) / 60)).padStart(2, "0")}` : "Punkte", href: `/wert/schlaf${q}` });

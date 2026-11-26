@@ -134,15 +134,69 @@ export type Target = {
   enoughData: boolean;
   usual: number | null; // übliche Tagesbelastung in % (Schnitt der letzten 28 Tage), null: Ziel aus festen Stufen
   brake: boolean; // Last der letzten 7 Tage über 130 % der 4 Wochen davor: Ziel nicht über der üblichen Belastung
+  infection: boolean; // Infektverdacht: Readiness zeigt „Erholen“, Ziel wie bei Erholung
+  missing: boolean; // weder HRV noch Ruhepuls noch Schlaf: keine Zahl, „Daten fehlen“
 };
+
+// ---------- Infektverdacht (Prüfaudit 26.11., Empfehlung 3)
+// Ruhepuls mindestens 6 Schläge über dem Üblichen und dazu ein zweites Zeichen: HRV unter oder Atemfrequenz über deinem Bereich.
+// Maßstab ist der Bereich der heutigen Zyklusphase (sonst 30 Tage), damit der höhere Ruhepuls der Lutealphase keinen Fehlalarm auslöst.
+export const INFECTION_RHR = 6;
+export function infectionSigns(day: string, data: Data): boolean {
+  const today = data.daily.find((r) => r.day === day);
+  if (!today || today.resting_hr === null) return false;
+  const ctx = { diary: data.diary, sick: data.sick };
+  const b = (f: (r: Daily) => number | null) => baselineFor(data.daily.map((r) => ({ day: r.day, value: f(r) })), day, ctx, true).active;
+  const rh = b((r) => r.resting_hr);
+  if (!rh || rh.n < 7 || today.resting_hr < rh.median + INFECTION_RHR) return false;
+  const hv = today.hrv_last_night !== null ? b((r) => r.hrv_last_night) : null;
+  const hrvLow = !!hv && hv.n >= 7 && (today.hrv_last_night as number) < hv.lo;
+  const atem = typeof today.respiration_avg === "number" ? today.respiration_avg : null;
+  const at = atem !== null ? b((r) => (typeof r.respiration_avg === "number" ? r.respiration_avg : null)) : null;
+  const atemHigh = !!at && at.n >= 7 && (atem as number) > at.hi;
+  return hrvLow || atemHigh;
+}
+
+// Belastung der letzten Tage (Prüfaudit 26.11., Empfehlung 1, nach Garmins akuter Belastung).
+// Maßstab ist ein üblicher Trainingstag: das obere Viertel deiner Tage der letzten 28 Tage (ohne kranke Tage).
+// Gestern ab dem 1,3-Fachen −5, ab dem 1,6-Fachen −10. Zwei Tage in Folge auf Trainingstag-Niveau: −5.
+// Unter 14 Tagen mit Daten: gestern ein harter Tag −5.
+function recentLoadFactor(day: string, data: Data): Factor | null {
+  const has = new Set(data.daily.map((r) => r.day));
+  const actDays = new Set(data.acts.map((a) => (a.start_local ?? "").slice(0, 10)));
+  const pct = (d: string) => (has.has(d) || actDays.has(d) ? dayLoad(d, data.daily, data.acts).pct : null);
+  const y = pct(addDays(day, -1));
+  if (y === null) return null;
+  const v = pct(addDays(day, -2)) ?? 0;
+  const hist: number[] = [];
+  for (let i = 1; i <= TARGET_DAYS; i++) {
+    const d = addDays(day, -i);
+    const p = data.sick?.has(d) ? null : pct(d);
+    if (p !== null) hist.push(p);
+  }
+  if (hist.length < TARGET_MIN_DAYS) return y >= HARD_DAY_PCT ? { name: "Belastung gestern", value: `${y} %`, note: "harter Tag", effect: -5 } : null;
+  const sorted = [...hist].sort((a, b) => a - b);
+  const ref = Math.max(sorted[Math.floor(0.75 * (sorted.length - 1))], MID_DAY_PCT);
+  const effect = y >= 1.6 * ref ? -10 : y >= 1.3 * ref ? -5 : y >= ref && v >= ref ? -5 : 0;
+  const note = effect === 0 ? `im Rahmen (üblicher Trainingstag ${Math.round(ref)} %)` : y >= 1.3 * ref ? `deutlich über einem üblichen Trainingstag (${Math.round(ref)} %)` : "zwei Trainingstage in Folge";
+  return { name: "Belastung gestern", value: `${y} %`, note, effect };
+}
 
 // Persönliches Belastungsziel (Konzept docs/konzept-belastung-skala.md, Nutzerin 24.11.)
 export const TARGET_DAYS = 28; // übliche Belastung: Schnitt der letzten 28 Tage ohne heute und ohne kranke Tage
 export const TARGET_MIN_DAYS = 14; // darunter gelten die festen Stufen
 export const TARGET_HALF = 10; // Zielbereich: Mitte ± 10 Prozentpunkte
 export const TARGET_BRAKE = 1.3; // Bremse ab diesem Verhältnis 7 Tage zu den 4 Wochen davor
+// Gleitend statt in Stufen, damit ein Punkt mehr das Ziel nicht springen lässt (Prüfaudit 26.11., Empfehlung 7).
+// Stützpunkte: bis 35 → 0,5 · 55 → 0,75 · 80 (Startwert, normaler Tag) → 1,0 · ab 95 → 1,15, dazwischen linear.
+const FACTOR_POINTS: [number, number][] = [[35, 0.5], [55, 0.75], [80, 1], [95, 1.15]];
 export function readinessFactor(score: number): number {
-  return score >= 85 ? 1.15 : score >= 65 ? 1 : score >= 45 ? 0.75 : 0.5;
+  const p = FACTOR_POINTS;
+  if (score <= p[0][0]) return p[0][1];
+  for (let i = 1; i < p.length; i++) {
+    if (score <= p[i][0]) return p[i - 1][1] + ((score - p[i - 1][0]) / (p[i][0] - p[i - 1][0])) * (p[i][1] - p[i - 1][1]);
+  }
+  return p[p.length - 1][1];
 }
 
 // Übliche Belastung und Bremse für das Ziel an `day`
@@ -198,6 +252,14 @@ function rangeFactor(name: string, v: number | null, range: Range | null, phaseN
   return { name, value: fmt(v) + unit, note, effect };
 }
 
+// Schlaf auf die Readiness: ab 85 +3, ab 70 ±0, ab 55 −5, darunter gleitend bis −15 bei 40 Punkten (Empfehlung 6)
+export function sleepEffect(total: number): number {
+  if (total >= 85) return 3;
+  if (total >= 70) return 0;
+  if (total >= 55) return -5;
+  return -Math.min(15, 5 + Math.round(((55 - total) * 10) / 15));
+}
+
 export function computeTarget(day: string, data: Data): Target {
   const factors: Factor[] = [];
   const hist = data.daily.filter((r) => r.day < day && r.day >= addDays(day, -30));
@@ -212,7 +274,7 @@ export function computeTarget(day: string, data: Data): Target {
   const rh = base((r) => r.resting_hr, true);
   // Schlaf: eigener Gesamtwert aus Menge und Erholsam (lib/schlaf.ts), feste Stufen statt Bereich
   const sl = sleepScore(day, data);
-  if (sl.total !== null) factors.push({ name: "Schlaf", value: `${sl.total} Punkte`, note: sl.word ?? "", effect: sl.total >= 85 ? 3 : sl.total >= 70 ? 0 : sl.total >= 55 ? -5 : -10 });
+  if (sl.total !== null) factors.push({ name: "Schlaf", value: `${sl.total} Punkte`, note: sl.word ?? "", effect: sleepEffect(sl.total) });
   push(rangeFactor("HRV", today?.hrv_last_night ?? null, hv.active, phaseName(hv), r0, true, 12, " ms"));
   push(rangeFactor("Ruhepuls", today?.resting_hr ?? null, rh.active, phaseName(rh), r0, false, 8, " bpm"));
   if (today?.bb_max !== null && today?.bb_max !== undefined) {
@@ -239,11 +301,13 @@ export function computeTarget(day: string, data: Data): Target {
   const cyc = cycleInfo(day, data.diary);
   if (cyc.cycleDay !== null) {
     const p = cyclePattern(data);
-    const lowBefore = p.ready && p.beforeDiff !== null && p.beforeDiff < -5;
+    // Wird die HRV heute schon am Bereich der Zyklusphase gemessen, steckt die Phase bereits darin: kein zweiter Abzug (Empfehlung 2)
+    const phaseInHrv = !!hv.phase && hv.active === hv.phase;
+    const lowBefore = p.ready && p.beforeDiff !== null && p.beforeDiff < -5 && !phaseInHrv;
     factors.push({
       name: `Zyklustag ${cyc.cycleDay}`,
       value: cyc.beforePeriod ? "vor der Periode" : cyc.cycleDay <= 5 ? "Periode" : "",
-      note: cyc.beforePeriod && lowBefore ? "Deine HRV ist in diesen Tagen meist niedriger" : "Kein Abzug, deine Daten zeigen hier keinen Unterschied",
+      note: cyc.beforePeriod && lowBefore ? "Deine HRV ist in diesen Tagen meist niedriger" : cyc.beforePeriod && phaseInHrv ? "Kein Abzug, HRV und Ruhepuls werden schon an dieser Phase gemessen" : "Kein Abzug, deine Daten zeigen hier keinen Unterschied",
       effect: cyc.beforePeriod && lowBefore ? -5 : 0,
     });
   }
@@ -251,13 +315,22 @@ export function computeTarget(day: string, data: Data): Target {
   const pause = !!data.illness && illnessRule(data.illness).stop;
   if (data.illness) factors.push({ name: data.illness.label, value: `Stärke ${data.illness.severity}`, note: pause ? "Pause statt Training" : "Nur leichte Bewegung", effect: pause ? -100 : -25 });
 
-  const enoughData = hist.length >= 14; // ab 14 Tagen gibt es persönliche Bereiche
-  const score = Math.max(0, Math.min(100, 80 + factors.reduce((s, f) => s + f.effect, 0)));
-  if (pause) return { score: 0, label: "Pause", lo: 0, hi: 15, factors, pause, enoughData, usual: null, brake: false };
-  const band = BANDS.find((b) => score >= b.min)!;
   const { usual, brake } = usualLoad(day, data);
-  if (usual === null) return { score, label: band.label, lo: band.lo, hi: band.hi, factors, pause, enoughData, usual, brake };
-  return { score, label: band.label, ...targetBand(score, usual, brake), factors, pause, enoughData, usual: Math.round(usual), brake };
+  push(recentLoadFactor(day, data));
+
+  const infection = !pause && infectionSigns(day, data);
+  if (infection) factors.push({ name: "Infektverdacht", value: "Ruhepuls deutlich höher", note: "Schongang statt Training", effect: -15 });
+
+  const enoughData = hist.length >= 14; // ab 14 Tagen gibt es persönliche Bereiche
+  // Ohne HRV, Ruhepuls und Schlaf keine Zahl (Empfehlung 5): sonst stünde ohne Daten der Startwert 80 als „Bereit“ da
+  const missing = today?.hrv_last_night == null && today?.resting_hr == null && sl.total === null;
+  const score = Math.max(0, Math.min(100, 80 + factors.reduce((s, f) => s + f.effect, 0)));
+  const common = { factors, pause, enoughData, infection, missing };
+  if (pause) return { score: 0, label: "Pause", lo: 0, hi: 15, ...common, usual: null, brake: false };
+  const band = BANDS.find((b) => score >= b.min)!;
+  if (infection) return { score, label: "Erholung", lo: 10, hi: 25, ...common, usual: usual === null ? null : Math.round(usual), brake };
+  if (usual === null) return { score, label: band.label, lo: band.lo, hi: band.hi, ...common, usual, brake };
+  return { score, label: band.label, ...targetBand(score, usual, brake), ...common, usual: Math.round(usual), brake };
 }
 
 export function sportAdvice(t: Target, injuredSports: string[]): { sport: string; tip: string }[] {
