@@ -86,17 +86,31 @@ self.addEventListener("push", (e) => {
     d = { body: e.data ? e.data.text() : "" };
   }
   e.waitUntil(
-    self.registration.showNotification(d.title || "Health Coach", {
-      body: d.body || "",
-      icon: "/icons/icon-192.png",
-      badge: "/icons/icon-192.png",
-      data: { url: d.url || "/" },
-    })
+    self.registration
+      .showNotification(d.title || "Health Coach", {
+        body: d.body || "",
+        icon: "/icons/icon-192.png",
+        badge: "/icons/icon-192.png",
+        data: { url: d.url || "/" },
+      })
+      .then(updateBadge)
   );
 });
 
+// Zahl am App-Symbol: so viele Mitteilungen liegen ungelesen da (ohne Speicher, direkt aus den angezeigten Mitteilungen)
+async function updateBadge() {
+  try {
+    const n = (await self.registration.getNotifications()).length;
+    if (n > 0) await self.navigator.setAppBadge(n);
+    else await self.navigator.clearAppBadge();
+  } catch {
+    // Browser ohne Badge-Unterstützung
+  }
+}
+
 self.addEventListener("notificationclick", (e) => {
   e.notification.close();
+  e.waitUntil(updateBadge());
   const url = (e.notification.data && e.notification.data.url) || "/";
   e.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {

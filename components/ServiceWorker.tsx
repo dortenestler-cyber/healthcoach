@@ -31,6 +31,23 @@ export default function ServiceWorker() {
     };
   }, []);
 
+  // Beim Öffnen der App gelten die Mitteilungen als gesehen: Zahl am Symbol weg, Mitteilungen im Center geräumt
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+    const clear = () => {
+      if (document.visibilityState !== "visible") return;
+      (navigator as Navigator & { clearAppBadge?: () => Promise<void> }).clearAppBadge?.().catch(() => undefined);
+      navigator.serviceWorker
+        .getRegistration()
+        .then((r) => r?.getNotifications())
+        .then((list) => list?.forEach((n) => n.close()))
+        .catch(() => undefined);
+    };
+    clear();
+    document.addEventListener("visibilitychange", clear);
+    return () => document.removeEventListener("visibilitychange", clear);
+  }, []);
+
   useEffect(() => {
     const update = () => setOffline(!navigator.onLine);
     update();
