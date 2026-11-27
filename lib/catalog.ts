@@ -112,7 +112,7 @@ export const CHECKIN_QUESTIONS: { key: "energy" | "sleep" | "mood"; label: strin
   { key: "mood", label: "Stimmung" },
 ];
 
-export const CHECKIN_LEVELS = ["niedrig", "mittel", "gut"];
+export const CHECKIN_LEVELS = ["sehr niedrig", "niedrig", "mittel", "gut", "sehr gut"]; // 1 bis 5 (früher 3 Stufen, Migration rechnet 1/2/3 auf 1/3/5)
 
 // Zeilen im 4-Wochen-Raster
 export const GRID_ROWS: { key: string; label: string }[] = [

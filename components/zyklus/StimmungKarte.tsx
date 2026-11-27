@@ -4,7 +4,7 @@ import { DivergingBars, LineBand } from "@/components/charts";
 import { Details } from "@/components/ui/Pille";
 import type { Data } from "@/lib/insights";
 import { PHASE_GROUP_LABEL } from "@/lib/cycle";
-import { GROUPS, MIN_DAYS, moodByHabit, moodByPhase, moodSentence, moodSeries, moodWord } from "@/lib/stimmung";
+import { GROUPS, MIN_DAYS, MIN_DIFF, moodByHabit, moodByPhase, moodSentence, moodSeries, moodWord } from "@/lib/stimmung";
 
 const MONTHS = ["Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sep.", "Okt.", "Nov.", "Dez."];
 const short = (iso: string) => `${Number(iso.slice(8, 10))}. ${MONTHS[Number(iso.slice(5, 7)) - 1]}`;
@@ -16,7 +16,7 @@ const PHASE_NAME = { menstruation: "Menstruation", follikel: "Follikelphase", ei
 export default function StimmungKarte({ today, data }: { today: string; data: Data }) {
   const rows = moodByPhase(data);
   const series = moodSeries(data, today, 90);
-  const nCheckins = data.checkins.filter((c) => c.mood !== null).length;
+  const nCheckins = data.checkins.filter((c) => c.mood !== null || c.mood_evening != null).length;
   const habits = moodByHabit(data);
   const habitRows = habits.flatMap((h) =>
     (["follikel", "luteal"] as const).map((g) => ({ h, g, c: h.byGroup[g] })).filter((x) => x.c.diff !== null).map((x) => ({
@@ -28,7 +28,7 @@ export default function StimmungKarte({ today, data }: { today: string; data: Da
   );
   const waiting = habits.filter((h) => GROUPS.every((g) => h.byGroup[g].diff === null)).map((h) => h.label);
   const top = [...habitRows].sort((a, b) => Math.abs(b.value as number) - Math.abs(a.value as number))[0];
-  const habitSentence = top && Math.abs(top.value as number) >= 0.3
+  const habitSentence = top && Math.abs(top.value as number) >= MIN_DIFF
     ? `Am Tag nach „${top.label}“ ist deine Stimmung ${(top.value as number) > 0 ? "höher" : "niedriger"} als sonst (${PHASE_NAME[top.g]}).`
     : habitRows.length
       ? "Bisher hängt keine Gewohnheit deutlich mit deiner Stimmung am nächsten Tag zusammen."
@@ -36,7 +36,7 @@ export default function StimmungKarte({ today, data }: { today: string; data: Da
 
   return (
     <section className="card">
-      <span className="meta">Stimmung · Check-in und Symptome je Phase</span>
+      <span className="meta">Stimmung · Check-in, Check-out und Symptome je Phase</span>
       <h2>{moodSentence(rows, (g) => PHASE_NAME[g])}</h2>
 
       {nCheckins >= MIN_DAYS * 2 ? (
@@ -46,7 +46,7 @@ export default function StimmungKarte({ today, data }: { today: string; data: Da
           tone="cycle"
           phases={series.phases}
           dates={series.days}
-          label={`Stimmung der letzten 90 Tage als 7-Tage-Schnitt von 1 niedrig bis 3 gut, mit Zyklusphasen`}
+          label={`Stimmung der letzten 90 Tage als 7-Tage-Schnitt von 1 sehr niedrig bis 5 sehr gut, mit Zyklusphasen`}
           xLabels={[{ index: 0, text: short(series.days[0]) }, { index: series.days.length - 1, text: short(series.days[series.days.length - 1]) }]}
           height={160}
         />
@@ -71,7 +71,7 @@ export default function StimmungKarte({ today, data }: { today: string; data: Da
         {habitRows.length > 0 && (
           <DivergingBars
             fmt={(v) => de1(v)}
-            scaleMin={0.5}
+            scaleMin={1}
             neg="Stimmung niedriger"
             pos="Stimmung höher"
             tone="cycle"

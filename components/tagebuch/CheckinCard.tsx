@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { CHECKIN_LEVELS, CHECKIN_QUESTIONS } from "@/lib/catalog";
+import StufenRegler from "@/components/ui/StufenRegler";
 import YesterdaySymptoms from "@/components/tagebuch/YesterdaySymptoms";
 
 type Checkin = { energy: number | null; sleep: number | null; mood: number | null };
@@ -74,25 +75,16 @@ export default function CheckinCard({ day, isToday, onSymptoms }: { day: string;
       </div>
       {error && <p className="alert alert-inline">{error}</p>}
       {CHECKIN_QUESTIONS.map((q) => (
-        <div key={q.key} className="card-row">
-          <span className="row-label">{q.label}</span>
-          <div className="pills">
-            {CHECKIN_LEVELS.map((l, i) => (
-              <button
-                key={l}
-                type="button"
-                className="pill pill-sm"
-                aria-pressed={checkin[q.key] === i + 1}
-                onClick={() => {
-                  setCheckin({ ...checkin, [q.key]: i + 1 });
-                  setSaved(false);
-                }}
-              >
-                {l}
-              </button>
-            ))}
-          </div>
-        </div>
+        <StufenRegler
+          key={q.key}
+          label={q.label}
+          levels={CHECKIN_LEVELS}
+          value={checkin[q.key]}
+          onChange={(v) => {
+            setCheckin((c) => ({ ...c, [q.key]: v }));
+            setSaved(false);
+          }}
+        />
       ))}
       {yesterday}
       {!saved && (

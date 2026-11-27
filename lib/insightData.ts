@@ -21,7 +21,7 @@ export async function loadInsightData(days = 180): Promise<Data | null> {
     sb.from("garmin_daily").select("*").gte("day", from).order("day"),
     sb.from("garmin_activities").select("activity_id, type_key, name, start_local, duration_s, distance_m, avg_hr, max_hr, training_load, sport_override, sport_label, rpe, segment_count").gte("start_local", from),
     sb.from("diary_entries").select("*").gte("day", from).order("day"),
-    sb.from("checkins").select("day, energy, sleep, mood").gte("day", from),
+    sb.from("checkins").select("*").gte("day", from),
     sb.from("medication_intakes").select("day").eq("as_needed", true).gte("day", from),
     sb.from("illnesses").select("*").is("ended_on", null).limit(1),
     sb.from("garmin_cycles").select("start_date, period_length").gte("start_date", from),
