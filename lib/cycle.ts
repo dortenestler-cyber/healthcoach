@@ -188,7 +188,7 @@ export type DayRule = {
 };
 
 // 1. Warnzeichen aus dem Tagebuch
-function redFlagFor(day: string, diary: Diary[]): string | null {
+export function redFlagFor(day: string, diary: Diary[]): string | null {
   const byDay = new Map(diary.map((d) => [d.day, d]));
   // starke Blutung (Stufe 4) an 3 Tagen in Folge
   let strongRun = 0;

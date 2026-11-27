@@ -3197,3 +3197,26 @@ button.back-link { background: none; border: 0; padding: 0; color: var(--text); 
 .stufen-ticks { display: flex; justify-content: space-between; padding: 0 12px; margin-top: -10px; }
 .stufen-tick { width: 4px; height: 4px; border-radius: 50%; background: var(--line-strong); }
 .stufen-tick-on { background: var(--primary); }
+
+/* Zahl am Reiter (Navigation) */
+.nav-icon {
+  position: relative;
+  display: inline-flex;
+}
+
+.nav-badge {
+  position: absolute;
+  top: -5px;
+  right: -9px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
