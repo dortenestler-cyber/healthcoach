@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { clearPin } from "@/lib/pin";
 import { tabs } from "@/components/TabBar";
+import { useHealthBadge } from "@/lib/navBadges";
 import { syncState } from "@/components/heute/DayHead";
 import { syncGarmin } from "@/lib/garmin";
 import { announceNewData, REFRESH_EVENT } from "@/lib/refresh";
@@ -14,6 +15,7 @@ import { announceNewData, REFRESH_EVENT } from "@/lib/refresh";
 // 768–1199 px nur Symbole, ab 1200 px mit Namen.
 export default function SideNav() {
   const pathname = usePathname();
+  const health = useHealthBadge();
   const [lastSync, setLastSync] = useState(0);
   const [now, setNow] = useState(() => Date.now());
   const [busy, setBusy] = useState(false);
@@ -70,10 +72,18 @@ export default function SideNav() {
         const active = t.href === "/" ? pathname === "/" || pathname.startsWith("/heute") : pathname.startsWith(t.href);
         return (
           <Link key={t.href} href={t.href} className="sidenav-item" aria-current={active ? "page" : undefined} title={t.label}>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d={t.icon} />
-            </svg>
+            <span className="nav-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d={t.icon} />
+              </svg>
+              {t.href === "/gesundheit" && health > 0 && (
+                <span className="nav-badge" aria-hidden="true">
+                  {health}
+                </span>
+              )}
+            </span>
             <span className="sidenav-label">{t.label}</span>
+            {t.href === "/gesundheit" && health > 0 && <span className="sr-only">, {health} neu</span>}
           </Link>
         );
       })}

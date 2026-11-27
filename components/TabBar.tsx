@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useHealthBadge } from "@/lib/navBadges";
 
 export const tabs = [
   { href: "/", label: "Heute", icon: "M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" },
@@ -13,6 +14,7 @@ export const tabs = [
 
 export default function TabBar() {
   const pathname = usePathname();
+  const health = useHealthBadge();
   return (
     <nav className="tabbar" aria-label="Hauptnavigation">
       <div className="tabbar-inner">
@@ -20,10 +22,18 @@ export default function TabBar() {
           const active = t.href === "/" ? pathname === "/" : pathname.startsWith(t.href);
           return (
             <Link key={t.href} href={t.href} className="tab" aria-current={active ? "page" : undefined}>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d={t.icon} />
-              </svg>
+              <span className="nav-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d={t.icon} />
+                </svg>
+                {t.href === "/gesundheit" && health > 0 && (
+                  <span className="nav-badge" aria-hidden="true">
+                    {health}
+                  </span>
+                )}
+              </span>
               <span>{t.label}</span>
+              {t.href === "/gesundheit" && health > 0 && <span className="sr-only">, {health} neu</span>}
             </Link>
           );
         })}
