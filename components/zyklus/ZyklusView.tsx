@@ -9,6 +9,7 @@ import ZyklusWoche from "@/components/zyklus/ZyklusWoche";
 import { Details } from "@/components/ui/Pille";
 import CycleDayChart from "@/components/zyklus/CycleDayChart";
 import CycleHistory from "@/components/zyklus/CycleHistory";
+import StimmungKarte from "@/components/zyklus/StimmungKarte";
 import { cycleToday, PHASES, windowText } from "@/lib/cycle";
 import { METRICS, type MetricKey } from "@/lib/garmin";
 import type { Data, Diary } from "@/lib/insights";
@@ -27,7 +28,7 @@ const addDays = (iso: string, n: number) => {
 };
 const isNew = (n: number) => n >= MIN_DAYS && n <= MIN_DAYS + 1; // Schwelle gerade erreicht
 
-export type ZyklusAbschnitt = "werte" | "symptome" | "gewohnheiten" | "perioden";
+export type ZyklusAbschnitt = "werte" | "symptome" | "stimmung" | "gewohnheiten" | "perioden";
 type Props = { today: string; data: Data; longDiary: Diary[]; flashes: string[]; showFlashes: boolean; extra?: MusterExtra | null; zeile?: React.ReactNode; zeigt?: (k: ZyklusAbschnitt) => boolean };
 
 // Seite Zyklus: dein Zyklus im Mittelpunkt, Muster innerhalb des Zyklus. Ohne Netzwerk, die Daten kommen von ZyklusPage.
@@ -223,6 +224,8 @@ export default function ZyklusView({ today, data, longDiary, flashes, showFlashe
           <Link href="/gesundheit?t=koerper" className="settings-link">Alle Muster zu den Waden ›</Link>
         </section>
       )}
+
+      {zeigt("stimmung") && <StimmungKarte today={today} data={{ ...data, diary: longDiary }} />}
 
       {zeigt("gewohnheiten") && (
       <section className="card">

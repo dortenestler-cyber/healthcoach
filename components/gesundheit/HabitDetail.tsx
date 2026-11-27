@@ -10,6 +10,7 @@ import { daysAgo, isoDay } from "@/lib/dates";
 import { cycleToday, groupOf } from "@/lib/cycle";
 import { DEFAULT_HABITS, labelOf, loadHabitDetails, loadHabits, WANN_LABEL, type Habit, type HabitDetails } from "@/lib/habits";
 import { flashesNextDay, frequency, hrvByPhase, MIN_NIGHTS, nightAfter, type NightRow } from "@/lib/habitStats";
+import { MIN_DAYS as MOOD_MIN, moodByHabit } from "@/lib/stimmung";
 import { loadInsightData } from "@/lib/insightData";
 import type { Data } from "@/lib/insights";
 import { useFeatures } from "@/lib/prefs";
@@ -62,6 +63,15 @@ export default function HabitDetail({ habitKey }: { habitKey: string }) {
   const f = data ? frequency(data.diary, habitKey, today) : null;
   const rows = data ? nightAfter(data, habitKey, from) : [];
   const phases = data ? hrvByPhase(data, habitKey, from) : [];
+  const mood = data ? moodByHabit(data, [{ key: habitKey, label }])[0] : null;
+  const moodRows = mood ? (Object.keys(PHASE_LABEL) as (keyof typeof PHASE_LABEL)[]).map((g) => ({ group: g, ...mood.byGroup[g] })) : [];
+  const moodReady = moodRows.filter((r) => r.diff !== null);
+  const moodTop = [...moodReady].sort((a, b) => Math.abs(b.diff as number) - Math.abs(a.diff as number))[0];
+  const moodSentence = !moodReady.length
+    ? `Der Vergleich der Stimmung je Phase erscheint ab je ${MOOD_MIN} Tagen mit und ohne „${label}“ in derselben Phase.`
+    : Math.abs(moodTop.diff as number) < 0.3
+      ? `In keiner Phase hängt „${label}“ bisher deutlich mit deiner Stimmung am nächsten Tag zusammen.`
+      : `In der ${PHASE_LABEL[moodTop.group]} ist deine Stimmung am Tag nach „${label}“ ${(moodTop.diff as number) > 0 ? "höher" : "niedriger"} als sonst.`;
   const fl = data && feat.perimenopause && flashes.length ? flashesNextDay(data.diary, habitKey, flashes, from) : null;
   const temp = rows.find((r) => r.key === "temp");
   const month = MONTHS[Number(today.slice(5, 7)) - 1];
@@ -192,6 +202,26 @@ export default function HabitDetail({ habitKey }: { habitKey: string }) {
                   )}
                 </div>
               )}
+            </section>
+          )}
+
+          {feat.zyklus && (
+            <section className="card">
+              <span className="eyebrow eyebrow-cycle">Stimmung je Phase</span>
+              <h2 className="card-title-lg">{moodSentence}</h2>
+              <DivergingBars
+                fmt={(v) => de(v, 1)}
+                scaleMin={0.5}
+                tone="cycle"
+                neg="Stimmung niedriger"
+                pos="Stimmung höher"
+                label={`Stimmung am Tag nach ${label} je Phase: ${moodRows.map((r) => `${PHASE_LABEL[r.group]} ${r.diff === null ? "noch zu wenige Tage" : `${r.diff > 0 ? "plus" : "minus"} ${de(Math.abs(r.diff), 1)}`}`).join(", ")}`}
+                rows={moodRows.map((r) => ({
+                  label: PHASE_LABEL[r.group],
+                  value: r.diff,
+                  note: r.diff === null ? `Noch zu wenige Tage: ${r.nWith} mit, ${r.nWithout} ohne (je ${MOOD_MIN} nötig)` : `${r.nWith} Tage mit ${label}, ${r.nWithout} ohne`,
+                }))}
+              />
             </section>
           )}
 

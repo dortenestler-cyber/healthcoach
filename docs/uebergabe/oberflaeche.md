@@ -1,6 +1,13 @@
 # Übergabe · Oberfläche (OF)
 Belegt: frei
-Zuletzt aktualisiert: 2026-11-26 · Sitzung: https://claude.ai/code/session_017zWr1TtsNQFhPjonCriVLT
+Zuletzt aktualisiert: 2026-11-27 · Sitzung: https://claude.ai/code/session_017zWr1TtsNQFhPjonCriVLT
+
+## Stimmung im Zyklus (Variante B, Freigabe der Nutzerin 27.11., ohne Migration)
+- `lib/stimmung.ts`: Check-in-Stimmung (1–3) und Stimmungs-Symptome (Stimmungstief, Reizbarkeit, Unruhe, ab mittel) je Phase, 7-Tage-Schnitt, Gewohnheiten gegen die Stimmung am Folgetag je Phase. Mindestens `MIN_DAYS` = 5 Tage je Seite, Unterschied ab 0,3 Stufen.
+- `components/zyklus/StimmungKarte.tsx`: Abschnitt „Stimmung“ auf Zyklus (Pille, standardmäßig an): Verlauf mit Phasenleiste, Schnitt je Phase, aufklappbar Gewohnheiten × Phase (Follikel, Luteal).
+- `components/gesundheit/HabitDetail.tsx`: Karte „Stimmung je Phase“ je Gewohnheit.
+- Geprüft: `tsc`, `npm run build`. Nicht im Browser angesehen, nicht mit echten Daten.
+- Nächster Schritt: nach dem Merge mit echten Daten prüfen, ob 3 Stufen reichen (sonst 5 Stufen oder Abend-Eintrag, braucht Migration durch DA).
 
 ## Prüfaudit: offene Empfehlungen 8–19 und Uhr (PR #190, 26.11., Freigabe der Nutzerin, Hochladen freigegeben)
 - Readiness (`lib/insights.ts`): Startwert 75 (`READINESS_START`), Bonus bei deutlich besseren Werten halbes Gewicht, Schlaf ab 85 +5 (Nr. 17). HRV als Mittel aus letzter Nacht und 7-Tage-Schnitt (`hrvBlend`), Gewicht 15 (Nr. 8). Body Battery halb: −8 / −4 / +2 (Nr. 9). `stressFactor`: Stress der letzten 3 Tage über dem Bereich −3, deutlich darüber −6 (Nr. 10). Zielfaktor-Stützpunkte 30/50/75/92, feste Stufen ab 82/62/42. Beispieldaten: gewöhnlicher Tag im Schnitt 75,4.
