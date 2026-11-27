@@ -7,10 +7,16 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Infektverdacht empfindlicher (Prüfaudit Stufe 3, 27.11.)
+Ändert die App und die Uhr-Funktion `watch`, keine Migration. Dein Merge ist die Freigabe, danach läuft „Supabase-Funktionen hochladen“.
+- [ ] PR mergen
+- [ ] Schau auf 1.–4. und 14. November: Warst du dort angeschlagen? Wenn nicht, ist der Schwellenwert zu empfindlich, Claude Bescheid geben
+- [ ] Welche Tage hat dir die Belastung („hart“) falsch angezeigt? Claude Bescheid geben, dann wird sie angepasst
+
 ### Prüfaudit: offene Empfehlungen und Uhr (PR #190, 26.11.)
 Enthält die Migration `supabase/migrations/20261201090000_trainingseffekt.sql` (Garmins Trainingseffekt je Einheit) und geänderte Funktionen `watch`, `push` und `garmin-sync`. Dein Merge ist die Freigabe.
-- [ ] PR #190 mergen
-- [ ] Läufe „Supabase-Migrationen ausführen“ und „Supabase-Funktionen hochladen“ grün? (Claude prüft auf Wunsch)
+- [x] PR #190 gemergt (26.11.)
+- [x] Läufe „Supabase-Migrationen ausführen“ und „Supabase-Funktionen hochladen“ grün (geprüft von Claude)
 - [ ] Nach dem nächsten Training: zeigt die Einheit eine Kachel „Trainingseffekt“? Wenn nicht, liefert Garmin den Wert nicht, Claude Bescheid geben
 
 ### Zifferblatt Datenraster: Layout A und C (PR #188, 26.11.)

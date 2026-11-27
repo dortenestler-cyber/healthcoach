@@ -151,18 +151,24 @@ export type Target = {
 };
 
 // ---------- Infektverdacht (Prüfaudit 26.11., Empfehlung 3)
-// Ruhepuls mindestens 6 Schläge über dem Üblichen und dazu ein zweites Zeichen: HRV unter oder Atemfrequenz über deinem Bereich.
+// Ruhepuls mindestens 4 Schläge über dem Üblichen und dazu ein zweites Zeichen: HRV unter oder Atemfrequenz über deinem Bereich.
+// Ist die HRV um mindestens 20 % unter dem Bereich, genügen 3 Schläge (echte Daten 27.11.: vor einem Infekt lag der Ruhepuls nur um 3,5 über dem Üblichen, die HRV 35 % unter dem Bereich).
 // Maßstab ist der Bereich der heutigen Zyklusphase (sonst 30 Tage), damit der höhere Ruhepuls der Lutealphase keinen Fehlalarm auslöst.
-export const INFECTION_RHR = 6;
+export const INFECTION_RHR = 4;
+export const INFECTION_RHR_HRV = 3;
+export const INFECTION_HRV_DROP = 0.2;
 export function infectionSigns(day: string, data: Data): boolean {
   const today = data.daily.find((r) => r.day === day);
   if (!today || today.resting_hr === null) return false;
   const ctx = { diary: data.diary, sick: data.sick };
   const b = (f: (r: Daily) => number | null) => baselineFor(data.daily.map((r) => ({ day: r.day, value: f(r) })), day, ctx, true).active;
   const rh = b((r) => r.resting_hr);
-  if (!rh || rh.n < 7 || today.resting_hr < rh.median + INFECTION_RHR) return false;
+  if (!rh || rh.n < 7 || today.resting_hr < rh.median + INFECTION_RHR_HRV) return false;
+  const over = today.resting_hr - rh.median;
   const hv = today.hrv_last_night !== null ? b((r) => r.hrv_last_night) : null;
   const hrvLow = !!hv && hv.n >= 7 && (today.hrv_last_night as number) < hv.lo;
+  const hrvFar = !!hv && hv.n >= 7 && (today.hrv_last_night as number) <= hv.lo * (1 - INFECTION_HRV_DROP);
+  if (over < INFECTION_RHR) return hrvFar;
   const atem = typeof today.respiration_avg === "number" ? today.respiration_avg : null;
   const at = atem !== null ? b((r) => (typeof r.respiration_avg === "number" ? r.respiration_avg : null)) : null;
   const atemHigh = !!at && at.n >= 7 && (atem as number) > at.hi;

@@ -1,6 +1,6 @@
 # Übergabe · Oberfläche (OF)
 Belegt: frei
-Zuletzt aktualisiert: 2026-11-27 · Sitzung: https://claude.ai/code/session_017zWr1TtsNQFhPjonCriVLT
+Zuletzt aktualisiert: 2026-11-27 · Sitzung: https://claude.ai/code/session_017zWr1TvBzHgMpMzbCqZdWV
 
 ## Stimmung im Zyklus (Variante B, Freigabe der Nutzerin 27.11., ohne Migration)
 - `lib/stimmung.ts`: Check-in-Stimmung (1–3) und Stimmungs-Symptome (Stimmungstief, Reizbarkeit, Unruhe, ab mittel) je Phase, 7-Tage-Schnitt, Gewohnheiten gegen die Stimmung am Folgetag je Phase. Mindestens `MIN_DAYS` = 5 Tage je Seite, Unterschied ab 0,3 Stufen.
@@ -8,6 +8,14 @@ Zuletzt aktualisiert: 2026-11-27 · Sitzung: https://claude.ai/code/session_017z
 - `components/gesundheit/HabitDetail.tsx`: Karte „Stimmung je Phase“ je Gewohnheit.
 - Geprüft: `tsc`, `npm run build`. Nicht im Browser angesehen, nicht mit echten Daten.
 - Nächster Schritt: nach dem Merge mit echten Daten prüfen, ob 3 Stufen reichen (sonst 5 Stufen oder Abend-Eintrag, braucht Migration durch DA).
+
+## Prüfaudit Stufe 3: Infektverdacht empfindlicher (27.11., Freigabe der Nutzerin „passe sie an“)
+- Anlass: Auswertung mit echten Daten (75 Tage, Sicherung 27.11.). Der Infektverdacht griff an 0 Tagen, auch am 21.11., zwei Tage vor dem eingetragenen Infekt: Ruhepuls nur 3,5 über dem Üblichen, HRV 21 gegen Bereichsgrenze 32 (35 % darunter). Größte Ruhepuls-Abweichung in 68 Tagen war 5.
+- `infectionSigns` (`lib/insights.ts`) und `infection` (`supabase/functions/watch/target.ts`): Ruhepuls ab +4 mit HRV unter oder Atem über dem Bereich (vorher +6), oder ab +3, wenn die HRV mindestens 20 % unter der Bereichsgrenze liegt (`INFECTION_RHR`, `INFECTION_RHR_HRV`, `INFECTION_HRV_DROP`).
+- Wirkung an den echten Daten: 6 Tage statt 0 (1., 3., 4., 14., 20., 21.11.), der Verdacht vor dem Infekt am 23.11. wird gefunden (20. und 21.11.). Offen: ob 1.–4. und 14.11. sich schlecht anfühlten, es gibt nur einen eingetragenen Infekt zum Eichen.
+- Belastung unverändert: 7 der „harten Tage“ stammen aus den ersten 14 Tagen der Daten (Rückfall ohne Verlauf), danach nur 8 Abzüge in 61 Tagen. Wartet auf Rückmeldung der Nutzerin, welche Tage falsch wirkten.
+- Geprüft: `tsc`, `npm run build`, Syntax der Uhr-Funktion (Transpile), Auswertung mit echten Daten. Nicht im Browser angesehen.
+- Wartet auf: Merge durch die Nutzerin (ändert die Funktion `watch`, danach Lauf „Supabase-Funktionen hochladen“ prüfen).
 
 ## Prüfaudit: offene Empfehlungen 8–19 und Uhr (PR #190, 26.11., Freigabe der Nutzerin, Hochladen freigegeben)
 - Readiness (`lib/insights.ts`): Startwert 75 (`READINESS_START`), Bonus bei deutlich besseren Werten halbes Gewicht, Schlaf ab 85 +5 (Nr. 17). HRV als Mittel aus letzter Nacht und 7-Tage-Schnitt (`hrvBlend`), Gewicht 15 (Nr. 8). Body Battery halb: −8 / −4 / +2 (Nr. 9). `stressFactor`: Stress der letzten 3 Tage über dem Bereich −3, deutlich darüber −6 (Nr. 10). Zielfaktor-Stützpunkte 30/50/75/92, feste Stufen ab 82/62/42. Beispieldaten: gewöhnlicher Tag im Schnitt 75,4.
