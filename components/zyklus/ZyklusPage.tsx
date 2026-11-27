@@ -58,10 +58,11 @@ export default function ZyklusPage() {
     [
       ["werte", "Werte"],
       ["symptome", "Symptome"],
+      ["stimmung", "Stimmung"],
       ["gewohnheiten", "Gewohnheiten"],
       ["perioden", "Perioden"],
     ],
-    ["werte", "symptome"],
+    ["werte", "symptome", "stimmung"],
   );
 
   // Link auf #perioden (Tagebuch, „Perioden nachtragen“): Abschnitt einschalten, nach dem Laden hinscrollen
