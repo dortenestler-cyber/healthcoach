@@ -13,7 +13,7 @@ import { sleepScores } from "@/lib/schlaf";
 export type Diary = { day: string; bleeding: number; symptoms: Record<string, number>; influences: string[]; fromGarmin?: boolean; garminOnly?: boolean; ovulation?: string[]; symptoms_checked?: boolean };
 // fromGarmin: Blutung an diesem Tag stammt aus Garmin · garminOnly: kein eigener Tagebucheintrag an diesem Tag
 // (Periode aus Garmin oder nur Sport/Stress von garmin-sync, Spalte manual = false)
-export type Checkin = { day: string; energy: number | null; sleep: number | null; mood: number | null };
+export type Checkin = { day: string; energy: number | null; sleep: number | null; mood: number | null; energy_evening?: number | null; mood_evening?: number | null };
 export type Hub = { day: string };
 
 export type Data = {
@@ -323,7 +323,7 @@ export function computeTarget(day: string, data: Data): Target {
   if (ci) {
     const vals = [ci.energy, ci.sleep, ci.mood].filter((v): v is number => v !== null);
     const avg = mean(vals);
-    if (avg !== null) factors.push({ name: "Check-in", value: avg < 1.7 ? "niedrig" : avg < 2.4 ? "mittel" : "gut", note: "Dein eigenes Gefühl heute Morgen", effect: avg < 1.7 ? -10 : avg < 2.4 ? -3 : 3 });
+    if (avg !== null) factors.push({ name: "Check-in", value: avg < 2.4 ? "niedrig" : avg < 3.8 ? "mittel" : "gut", note: "Dein eigenes Gefühl heute Morgen", effect: avg < 2.4 ? -10 : avg < 3.8 ? -3 : 3 });
   }
 
   const sb = symptomBasis(data.diary, day);
@@ -544,7 +544,7 @@ export function patterns(data: Data): Pattern[] {
   const pairs = data.checkins
     .map((c) => ({ c, d: dm.get(c.day) }))
     .filter((p) => p.c.energy !== null && p.d?.bb_max !== null && p.d?.bb_max !== undefined);
-  const byEnergy = [1, 2, 3].map((e) => mean(pairs.filter((p) => p.c.energy === e).map((p) => p.d!.bb_max as number)));
+  const byEnergy = [(e: number) => e <= 2, (e: number) => e === 3, (e: number) => e >= 4].map((inGroup) => mean(pairs.filter((p) => inGroup(p.c.energy as number)).map((p) => p.d!.bb_max as number)));
   out.push({
     key: "gefuehl",
     title: "Gefühl gegen Messwert",

@@ -311,7 +311,7 @@ export function targetScore(day: string, daily: Day[], diary: DiaryRow[], checki
   }
   if (checkin) {
     const avg = mean([checkin.energy, checkin.sleep, checkin.mood].filter((v): v is number => v !== null));
-    if (avg !== null) add("CHECK-IN", avg < 1.7 ? -10 : avg < 2.4 ? -3 : 3);
+    if (avg !== null) add("CHECK-IN", avg < 2.4 ? -10 : avg < 3.8 ? -3 : 3);
   }
   const di = diary.find((d) => d.day === day) ?? diary.find((d) => d.day === addDays(day, -1));
   if (di) {

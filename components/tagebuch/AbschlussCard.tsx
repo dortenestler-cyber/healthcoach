@@ -2,22 +2,30 @@
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { CHECKIN_LEVELS } from "@/lib/catalog";
 import { loadInsightData } from "@/lib/insightData";
 import { computeTarget, dayLoad, type Data } from "@/lib/insights";
 import { hm, sleepNeed } from "@/lib/today";
 
 // Tagesabschluss (freigegeben 25.11.): Belastung gegen das Ziel, Schlafbedarf mit „ins Bett bis“,
-// ein Wort zum Tag (diary_entries.note). Gewohnheiten, Symptome und Einnahmen stehen darunter im Tagebuch.
+// Check-out (Energie und Stimmung am Abend, 5 Stufen, checkins.energy_evening / mood_evening), ein Wort zum Tag (diary_entries.note). Gewohnheiten, Symptome und Einnahmen stehen darunter im Tagebuch.
 export default function AbschlussCard({ day }: { day: string }) {
   const [data, setData] = useState<Data | null>(null);
   const [word, setWord] = useState("");
   const [saved, setSaved] = useState("");
   const [status, setStatus] = useState<"" | "speichert" | "gespeichert">("");
   const [msg, setMsg] = useState("");
+  const [out, setOut] = useState<{ energy_evening: number | null; mood_evening: number | null }>({ energy_evening: null, mood_evening: null });
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     loadInsightData(60).then(setData).catch(() => setData(null));
+    supabase()
+      ?.from("checkins")
+      .select("energy_evening, mood_evening")
+      .eq("day", day)
+      .maybeSingle()
+      .then(({ data: c }) => setOut({ energy_evening: c?.energy_evening ?? null, mood_evening: c?.mood_evening ?? null }));
     supabase()
       ?.from("diary_entries")
       .select("note")
@@ -43,6 +51,18 @@ export default function AbschlussCard({ day }: { day: string }) {
     setMsg("");
     setSaved(v);
     setStatus("gespeichert");
+  };
+  // Check-out: jede Antwort wird sofort gespeichert
+  const answer = async (key: "energy_evening" | "mood_evening", value: number) => {
+    const sb = supabase();
+    if (!sb) return;
+    const before = out;
+    setOut({ ...out, [key]: value });
+    const { error } = await sb.from("checkins").upsert({ day, [key]: value, updated_at: new Date().toISOString() }, { onConflict: "user_id,day" });
+    if (error) {
+      setOut(before);
+      setMsg("Check-out nicht gespeichert: " + error.message);
+    } else setMsg("");
   };
   const change = (v: string) => {
     setWord(v);
@@ -76,6 +96,19 @@ export default function AbschlussCard({ day }: { day: string }) {
           </div>
         </div>
       )}
+      <h3 className="row-strong">Check-out</h3>
+      {([["energy_evening", "Energie"], ["mood_evening", "Stimmung"]] as const).map(([key, label]) => (
+        <div key={key} className="card-row">
+          <span className="row-label">{label}</span>
+          <div className="pills">
+            {CHECKIN_LEVELS.map((l, i) => (
+              <button key={l} type="button" className="pill pill-sm" aria-pressed={out[key] === i + 1} onClick={() => answer(key, i + 1)}>
+                {l}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
       <label htmlFor="tag-wort" className="row-label">Ein Wort zum Tag</label>
       <input id="tag-wort" className="input" value={word} maxLength={40} placeholder="z. B. ruhig, voll, gut" onChange={(e) => change(e.target.value)} onBlur={() => save(word.trim())} />
       <span className="meta" role="status" aria-live="polite">{status === "speichert" ? "Speichert …" : status === "gespeichert" ? "✓ Gespeichert" : ""}</span>

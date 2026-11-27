@@ -1,4 +1,4 @@
-// Stimmung im Zyklus: Check-in-Stimmung (1 niedrig · 2 mittel · 3 gut) und Stimmungs-Symptome je Zyklusphase,
+// Stimmung im Zyklus: Check-in-Stimmung (1 sehr niedrig bis 5 sehr gut, morgens und abends) und Stimmungs-Symptome je Zyklusphase,
 // dazu Gewohnheiten gegen die Stimmung am Tag danach. Reine Berechnungen ohne Netzwerk.
 // Zusammenhänge aus den eigenen Daten, keine Ursachen. Erst ab MIN_DAYS Tagen je Seite eines Vergleichs.
 
@@ -9,8 +9,9 @@ import type { Data, Diary } from "@/lib/insights";
 export const MIN_DAYS = 5;
 export const MOOD_SYMPTOMS = ["stimmung", "reiz", "unruhe"]; // Stimmungstief, Reizbarkeit, Ängstlichkeit/innere Unruhe
 export const GROUPS: PhaseGroup[] = ["menstruation", "follikel", "eisprung", "luteal"];
-const MOOD_WORD = ["", "niedrig", "mittel", "gut"];
-export const moodWord = (v: number) => MOOD_WORD[Math.min(3, Math.max(1, Math.round(v)))];
+const MOOD_WORD = ["", "sehr niedrig", "niedrig", "mittel", "gut", "sehr gut"];
+export const moodWord = (v: number) => MOOD_WORD[Math.min(5, Math.max(1, Math.round(v)))];
+export const MIN_DIFF = 0.5; // Unterschied in Stufen (1 bis 5), ab dem ein Satz ihn nennt
 
 const addDays = (iso: string, n: number) => {
   const d = new Date(iso + "T12:00:00");
@@ -28,7 +29,17 @@ function phaseLookup(diary: Diary[]) {
   };
 }
 
-const moodMap = (data: Data) => new Map(data.checkins.filter((c) => c.mood !== null).map((c) => [c.day, c.mood as number]));
+// Stimmung je Tag: Schnitt aus Morgen und Abend, wenn beide da sind
+const moodMap = (data: Data) => {
+  const m = new Map<string, number>();
+  for (const c of data.checkins) {
+    const v = [c.mood, c.mood_evening ?? null].filter((x): x is number => x !== null);
+    if (v.length) m.set(c.day, mean(v) as number);
+  }
+  return m;
+};
+// Nur der Morgen: für „Stimmung am Tag nach der Gewohnheit“ (der Abend desselben Tages gehört noch zur Gewohnheit)
+const morningMap = (data: Data) => new Map(data.checkins.filter((c) => c.mood !== null).map((c) => [c.day, c.mood as number]));
 // Tag mit belasteter Stimmung: mindestens eines der Stimmungs-Symptome mittel oder stärker
 export const lowMoodDay = (e: Diary) => MOOD_SYMPTOMS.some((k) => (e.symptoms?.[k] ?? 0) >= 2);
 
@@ -52,7 +63,7 @@ export function moodByPhase(data: Data): MoodPhase[] {
   });
 }
 
-// Stimmung als gleitender 7-Tage-Schnitt der letzten `days` Tage, mit Phase je Tag
+// Stimmung (Morgen und Abend) als gleitender 7-Tage-Schnitt der letzten `days` Tage, mit Phase je Tag
 export function moodSeries(data: Data, today: string, days = 90): { days: string[]; values: (number | null)[]; phases: (PhaseGroup | null)[] } {
   const g = phaseLookup(data.diary);
   const mm = moodMap(data);
@@ -70,7 +81,7 @@ export type MoodHabit = { key: string; label: string; byGroup: Record<PhaseGroup
 // „Ohne“ sind nur Tage mit eigenem Tagebuch-Eintrag.
 export function moodByHabit(data: Data, keys?: { key: string; label: string }[], from?: string): MoodHabit[] {
   const g = phaseLookup(data.diary);
-  const mm = moodMap(data);
+  const mm = morningMap(data);
   const rows = from ? data.diary.filter((d) => d.day >= from) : data.diary;
   const own = rows.filter((d) => !d.garminOnly);
   const list = keys ?? INFLUENCES;
@@ -89,7 +100,7 @@ export function moodByHabit(data: Data, keys?: { key: string; label: string }[],
   });
 }
 
-// Ein Satz zur Stimmung je Phase: größter Unterschied zwischen zwei Phasen, ab 0,3 Stufen
+// Ein Satz zur Stimmung je Phase: größter Unterschied zwischen zwei Phasen, ab MIN_DIFF Stufen
 export function moodSentence(rows: MoodPhase[], label: (g: PhaseGroup) => string): string {
   const ready = rows.filter((r) => r.mood !== null);
   if (ready.length < 2) {
@@ -101,6 +112,6 @@ export function moodSentence(rows: MoodPhase[], label: (g: PhaseGroup) => string
   const lo = sorted[sorted.length - 1];
   const d = (hi.mood as number) - (lo.mood as number);
   const f = (v: number) => v.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  if (d < 0.3) return "Deine Stimmung liegt in allen Phasen etwa gleich.";
-  return `Deine Stimmung ist in der ${label(lo.group)} im Schnitt niedriger (${f(lo.mood as number)} von 3) als in der ${label(hi.group)} (${f(hi.mood as number)}).`;
+  if (d < MIN_DIFF) return "Deine Stimmung liegt in allen Phasen etwa gleich.";
+  return `Deine Stimmung ist in der ${label(lo.group)} im Schnitt niedriger (${f(lo.mood as number)} von 5) als in der ${label(hi.group)} (${f(hi.mood as number)}).`;
 }

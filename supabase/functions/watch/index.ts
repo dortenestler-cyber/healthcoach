@@ -81,7 +81,8 @@ Deno.serve(async (req) => {
       const { error } = await sb.from("medication_intakes").insert(rows);
       if (error) return json(500, { error: error.message });
     } else if (action === "checkin") {
-      const v = (x: unknown) => (typeof x === "number" && x >= 1 && x <= 3 ? Math.round(x) : null);
+      // Die Uhr fragt mit 3 Stufen (1, 2, 3), die App speichert 5 Stufen: 1 → 1, 2 → 3, 3 → 5
+      const v = (x: unknown) => (typeof x === "number" && x >= 1 && x <= 3 ? [1, 3, 5][Math.round(x) - 1] : null);
       const { error } = await sb
         .from("checkins")
         .upsert({ user_id: uid, day, energy: v(body?.energy), sleep: v(body?.sleep), mood: v(body?.mood), source: "uhr", updated_at: now }, { onConflict: "user_id,day" });
