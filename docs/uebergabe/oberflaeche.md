@@ -5,6 +5,7 @@ Zuletzt aktualisiert: 2026-11-27 · Sitzung: https://claude.ai/code/session_017z
 ## Check-in mit 5 Stufen und Check-out am Abend (Wunsch der Nutzerin 27.11., Migration, wartet auf Merge)
 - Migration `20261202090000_checkin_fuenf_stufen`: `checkins.energy/sleep/mood` 1–5 (alt 1/2/3 → 1/3/5, läuft nur einmal), neue Spalten `energy_evening`, `mood_evening`.
 - `CHECKIN_LEVELS` hat 5 Wörter. Readiness-Faktor „Check-in“ (App `lib/insights.ts`, Uhr `watch/target.ts`): Grenzen 2,4 und 3,8 (vorher 1,7 / 2,4). „Gefühl gegen Messwert“: Energie ≤ 2, 3, ≥ 4.
+- Schieberegler (`components/ui/StufenRegler.tsx`, Stil `.stufen-*` in `globals.css`) statt Pillen in Check-in und Check-out: 5 Stufen, Wort über dem Regler, ohne Antwort gedimmt mit „–“; als Antwort zählt Loslassen, Antippen oder Pfeiltaste.
 - Check-out: in `AbschlussCard` (Tagebuch, heute ab 18 Uhr), Energie und Stimmung am Abend, speichert jede Antwort sofort.
 - Stimmungs-Auswertung (`lib/stimmung.ts`): Tag = Schnitt aus Morgen und Abend, Gewohnheiten gegen den Morgen danach, Unterschied ab 0,5 Stufen (`MIN_DIFF`).
 - Uhr-App bleibt bei 3 Stufen, die Funktion `watch` rechnet 1/2/3 auf 1/3/5 um (kein neues Upload-Paket nötig).

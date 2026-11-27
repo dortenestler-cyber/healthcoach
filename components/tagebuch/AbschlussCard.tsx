@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import StufenRegler from "@/components/ui/StufenRegler";
 import { CHECKIN_LEVELS } from "@/lib/catalog";
 import { loadInsightData } from "@/lib/insightData";
 import { computeTarget, dayLoad, type Data } from "@/lib/insights";
@@ -98,16 +99,7 @@ export default function AbschlussCard({ day }: { day: string }) {
       )}
       <h3 className="row-strong">Check-out</h3>
       {([["energy_evening", "Energie"], ["mood_evening", "Stimmung"]] as const).map(([key, label]) => (
-        <div key={key} className="card-row">
-          <span className="row-label">{label}</span>
-          <div className="pills">
-            {CHECKIN_LEVELS.map((l, i) => (
-              <button key={l} type="button" className="pill pill-sm" aria-pressed={out[key] === i + 1} onClick={() => answer(key, i + 1)}>
-                {l}
-              </button>
-            ))}
-          </div>
-        </div>
+        <StufenRegler key={key} label={label} levels={CHECKIN_LEVELS} value={out[key]} onChange={(v) => setOut((o) => ({ ...o, [key]: v }))} onCommit={(v) => answer(key, v)} />
       ))}
       <label htmlFor="tag-wort" className="row-label">Ein Wort zum Tag</label>
       <input id="tag-wort" className="input" value={word} maxLength={40} placeholder="z. B. ruhig, voll, gut" onChange={(e) => change(e.target.value)} onBlur={() => save(word.trim())} />
