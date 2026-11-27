@@ -268,13 +268,14 @@ function stressEffect(day: string, daily: Day[], sick: Set<string>): number {
   return over > 0.6 ? -6 : over > 0 ? -3 : 0;
 }
 
-// Infektverdacht (infectionSigns in lib/insights.ts): Ruhepuls ≥ Mitte des Bereichs + 6 und HRV unter oder Atem über dem Bereich
+// Infektverdacht (infectionSigns in lib/insights.ts): Ruhepuls ≥ Mitte des Bereichs + 4 und HRV unter oder Atem über dem Bereich; bei HRV ≥ 20 % unter dem Bereich genügen + 3
 function infection(day: string, daily: Day[], starts: string[], sick: Set<string>, phases: Map<string, RangePhase | null>): boolean {
   const t = daily.find((r) => r.day === day);
   if (!t || t.resting_hr === null) return false;
   const rh = rangeFor(daily, day, (r) => r.resting_hr, starts, sick, phases);
-  if (!rh || t.resting_hr < rh.median + 6) return false;
+  if (!rh || t.resting_hr < rh.median + 3) return false;
   const hv = t.hrv_last_night !== null ? rangeFor(daily, day, (r) => r.hrv_last_night, starts, sick, phases) : null;
+  if (t.resting_hr < rh.median + 4) return !!hv && (t.hrv_last_night as number) <= hv.lo * 0.8;
   const at = t.respiration_avg !== null ? rangeFor(daily, day, (r) => r.respiration_avg, starts, sick, phases) : null;
   return (!!hv && (t.hrv_last_night as number) < hv.lo) || (!!at && (t.respiration_avg as number) > at.hi);
 }
