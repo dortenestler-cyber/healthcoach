@@ -7,6 +7,7 @@ import type { MetricKey } from "@/lib/garmin";
 import type { Data } from "@/lib/insights";
 import { monatsBlick, MONATE } from "@/lib/monat";
 import { sportOf, SPORTS, type Sport } from "@/lib/training";
+import { LEGACY_HABIT_KEYS } from "@/lib/catalog";
 
 export type MonatsZeile = { key: string; text: string; href: string };
 
@@ -44,6 +45,7 @@ export function deinMonat(data: Data, today: string, habitLabel: (key: string) =
     const n = inNow(e.day), p = inPrev(e.day);
     if (!n && !p) continue;
     for (const k of e.influences ?? []) {
+      if (LEGACY_HABIT_KEYS.includes(k)) continue;
       const c = counts.get(k) ?? { now: 0, before: 0 };
       if (n) c.now++;
       else c.before++;

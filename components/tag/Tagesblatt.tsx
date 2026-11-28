@@ -14,7 +14,7 @@ import { supabase } from "@/lib/supabase";
 import { isoDay, longDate } from "@/lib/dates";
 import { loadActivityOverrides, withOverrides, type Activity } from "@/lib/garmin";
 import { SPOTS, type Illness, type Injury } from "@/lib/health";
-import { ALL_SYMPTOMS, BLEEDING, INFLUENCES } from "@/lib/catalog";
+import { ALL_SYMPTOMS, BLEEDING, INFLUENCES, LEGACY_HABIT_LABELS } from "@/lib/catalog";
 import { loadHabits } from "@/lib/habits";
 import { computeTarget, dayLoad, type Data } from "@/lib/insights";
 import { cycleToday, estWord, PHASES, readinessFrom } from "@/lib/cycle";
@@ -78,7 +78,7 @@ export default function Tagesblatt({ day, data, onChanged, intro, bare = false, 
       intakes: it.count ?? 0,
       cramps: mu.error ? 0 : (mu.count ?? 0),
       flashes: fl.error ? 0 : (fl.count ?? 0),
-      habitLabels: new Map((habits ?? INFLUENCES).map((h) => [h.key, h.label])),
+      habitLabels: new Map([...Object.entries(LEGACY_HABIT_LABELS), ...(habits ?? INFLUENCES).map((h): [string, string] => [h.key, h.label])]),
     });
   }, [day]);
 

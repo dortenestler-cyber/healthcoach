@@ -67,12 +67,16 @@ export const LEVELS = ["", "leicht", "mittel", "stark"];
 export const INFLUENCES: { key: string; label: string }[] = [
   { key: "sauna", label: "Sauna" },
   { key: "alkohol", label: "Alkohol" },
-  { key: "koffein", label: "Koffein" },
+  { key: "koffein_nach_14", label: "Koffein nach 14 Uhr" },
   { key: "stress", label: "Stress" },
   { key: "sport", label: "Sport" },
   { key: "wenig_trinken", label: "Wenig getrunken" },
   { key: "schwitzen", label: "Viel geschwitzt" },
 ];
+
+// Alter Eintrag „Koffein“ ohne Uhrzeit: bleibt lesbar, zählt aber in keiner Auswertung mehr
+export const LEGACY_HABIT_KEYS = ["koffein"];
+export const LEGACY_HABIT_LABELS: Record<string, string> = { koffein: "Koffein (früher)" };
 
 // Wadenzucken und Wadenkrämpfe: eine Sache mit Intensität
 export const MUSCLE_LEVELS: { value: 1 | 2 | 3; label: string }[] = [
