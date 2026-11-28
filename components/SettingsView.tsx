@@ -16,6 +16,7 @@ import {
 import { startOfToday } from "@/lib/dates";
 import PageHead from "@/components/PageHead";
 import PushRows from "@/components/settings/PushRows";
+import WaterGoalRows from "@/components/settings/WaterGoalRows";
 import { disablePush } from "@/lib/push";
 
 // Einstellungen: nur, was du einmal einrichtest. Gruppen: Konto & Sicherheit, Funktionen & Gewohnheiten,
@@ -61,6 +62,7 @@ export default function SettingsView() {
           href="/einstellungen/funktionen"
         />
         <Row label="Gewohnheiten" note="Sauna, Alkohol, eigene · ein- und ausblenden" href="/einstellungen/gewohnheiten" />
+        <WaterGoalRows />
       </Group>
 
       <Group title="Geräte">

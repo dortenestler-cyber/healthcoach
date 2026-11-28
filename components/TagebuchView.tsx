@@ -19,6 +19,7 @@ import AbschlussCard from "@/components/tagebuch/AbschlussCard";
 import DayIntakes from "@/components/tagebuch/DayIntakes";
 import FlashCounter from "@/components/tagebuch/FlashCounter";
 import MuscleSection from "@/components/tagebuch/MuscleSection";
+import DrinkSection from "@/components/tagebuch/DrinkSection";
 import { useFeatures } from "@/lib/prefs";
 import EditSheet from "@/components/ui/EditSheet";
 import Monatskalender from "@/components/kalender/Monatskalender";
@@ -398,6 +399,8 @@ export default function TagebuchView({ initial, abschluss }: { initial?: string;
         }
         right={
           <>
+      <DrinkSection key={"d" + day} day={day} />
+
       <DayIntakes key={"i" + day} day={day} />
 
       {feat.muskeln && <MuscleSection key={"m" + day} day={day} />}
