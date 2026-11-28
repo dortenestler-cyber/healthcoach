@@ -1,5 +1,5 @@
 // Health Coach · Uhr-App für die Fenix 9 Pro
-// Hitzewallung, Bufori-Hub, Einnahmen, Check-in, Heute geplant, Kettlebell-Timer.
+// Getränke mit Füllstand, Infektverdacht, Einnahmen, Check-in, Heute geplant, Kettlebell-Timer.
 // Spricht über das Handy mit der Supabase-Funktion "watch" und meldet sich mit dem Uhr-Schlüssel an.
 
 import Toybox.Application;
@@ -14,13 +14,13 @@ class HealthCoachApp extends Application.AppBase {
     }
 
     function getInitialView() {
-        var menu = MainMenu.build(Store.today());
+        var view = new MenuView(0);
         // Beim Öffnen gleich die aktuelle Übersicht holen
         try {
             Api.call("today", {}, new Net(null).method(:onReceive));
         } catch (e) {
         }
-        return [menu, new MainMenuDelegate()];
+        return [view, new MenuDelegate(view)];
     }
 
     (:glance)

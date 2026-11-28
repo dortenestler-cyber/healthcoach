@@ -3,7 +3,7 @@
 // (Authorization: Bearer hcw_…), nicht mit dem Passwort. Gespeichert ist nur der Hash des Schlüssels.
 // Diese Funktion wird ohne Supabase-Login-Prüfung hochgeladen (--no-verify-jwt) und prüft den Schlüssel selbst.
 //
-// Aktionen (POST, JSON): today, flash, intake, checkin, kbsets
+// Aktionen (POST, JSON): today, flash, intake, checkin, kbsets, drink
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { today } from "./today.ts";
@@ -106,6 +106,14 @@ Deno.serve(async (req) => {
         if (error) return json(500, { error: error.message });
         await sb.from("planned_sessions").update({ status: "erledigt" }).eq("user_id", uid).eq("day", day).eq("sport", "kettlebell");
       }
+    } else if (action === "drink") {
+      // Ein Getränk mit der Uhrzeit des Tippens. Haken (Koffein nach 14 Uhr, Alkohol) setzt die Datenbank selbst.
+      const kind = String(body?.kind ?? "");
+      const amount = Number(body?.amount);
+      const max: Record<string, number> = { wasser: 2, kaffee: 6, tee: 6, alkohol: 6 };
+      if (!(kind in max) || !Number.isFinite(amount) || amount <= 0 || amount > max[kind]) return json(400, { error: "Getränk unklar" });
+      const { error } = await sb.from("drink_log").insert({ user_id: uid, at: now, day, kind, amount, source: "uhr" });
+      if (error) return json(500, { error: error.message });
     } else if (action !== "today") {
       return json(400, { error: "Unbekannte Aktion" });
     }

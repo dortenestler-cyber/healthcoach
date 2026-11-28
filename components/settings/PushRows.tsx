@@ -42,7 +42,7 @@ export default function PushRows() {
     setRem(s ? await loadReminder(s) : null);
     setBusy(false);
   };
-  const flip = (k: "checkin_reminder" | "training_push" | "show_values" | "evening_push") => {
+  const flip = (k: "checkin_reminder" | "training_push" | "show_values" | "evening_push" | "drink_push") => {
     if (!sub) return;
     const next = !(rem?.[k] ?? true);
     run(() => setReminder(sub, { [k]: next }));
@@ -139,6 +139,15 @@ export default function PushRows() {
           on={rem?.show_values ?? true}
           disabled={busy}
           onChange={() => flip("show_values")}
+        />
+      )}
+      {sub && (
+        <Toggle
+          label="Trinkerinnerung"
+          note="Zwischen 8 und 20 Uhr, wenn 3 Stunden kein Getränk eingetragen ist"
+          on={rem?.drink_push ?? true}
+          disabled={busy}
+          onChange={() => flip("drink_push")}
         />
       )}
       {sub && <Row label="Testmitteilung senden" onClick={busy ? undefined : () => run(async () => { await testPush(); return "Gesendet. Sie sollte gleich erscheinen."; })} />}

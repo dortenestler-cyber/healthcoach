@@ -1,4 +1,5 @@
 import Toybox.Application;
+import Toybox.Attention;
 import Toybox.Communications;
 import Toybox.Lang;
 import Toybox.WatchUi;
@@ -112,8 +113,11 @@ class Net {
     function handle(code, data) {
         if (code == 200 && data instanceof Dictionary) {
             Store.save(data);
-            WatchUi.switchToView(MainMenu.build(data), new MainMenuDelegate(), WatchUi.SLIDE_IMMEDIATE);
+            WatchUi.requestUpdate();
             if (mAfter != null) {
+                if (Attention has :vibrate) {
+                    Attention.vibrate([new Attention.VibeProfile(60, 150)]);
+                }
                 WatchUi.pushView(new InfoView(mAfter), new InfoDelegate(), WatchUi.SLIDE_UP);
             }
         } else {
