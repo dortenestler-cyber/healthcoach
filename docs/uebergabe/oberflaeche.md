@@ -1,6 +1,10 @@
 # Übergabe · Oberfläche (OF)
 Belegt: frei
-Zuletzt aktualisiert: 2026-11-27 · Sitzung: https://claude.ai/code/session_017zWr1TvBzHgMpMzbCqZdWV
+Zuletzt aktualisiert: 2026-11-28 · Sitzung: https://claude.ai/code/session_017zWr1WikVp35JDLSBfpPWt
+
+## Getränke im Tagebuch (PR #198, 28.11., gemeinsam mit Daten)
+- `components/tagebuch/DrinkSection.tsx` (Tagebuch, vor den Einnahmen): Wasserstand gegen das Tagesziel, Schnelleinträge, Liste mit Uhrzeit zum Löschen, optionale Uhrzeit. Ziel 2 L, an Trainingstagen 2,5 L; Einstellungen › Funktionen & Gewohnheiten (`WaterGoalRows`). `lib/drinks.ts`. Schalter „Trinkerinnerung“ in `PushRows`. `drink_log` in der Sicherung.
+- Geprüft: `tsc`, `npm run build`. Nicht im Browser, Tabelle fehlt bis zur Migration (dann Fehlermeldung statt Liste).
 
 ## Koffein nach 14 Uhr (28.11., gemergt nach grünem Build)
 Gewohnheit `koffein_nach_14` ersetzt `koffein`. Alter Schlüssel bleibt als „Koffein (früher)“ lesbar, ist in der Liste aus und zählt in Korridor und „Dein Monat“ nicht mehr (`LEGACY_HABIT_KEYS`). Keine Migration.

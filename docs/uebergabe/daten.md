@@ -1,7 +1,15 @@
 # Übergabe · Daten (DA)
 Belegt: frei
-Zuletzt aktualisiert: 2026-11-26 · Sitzung: https://claude.ai/code/session_017zWr1VfNKhpHP9qnQvGq9p
+Zuletzt aktualisiert: 2026-11-28 · Sitzung: https://claude.ai/code/session_017zWr1WikVp35JDLSBfpPWt
 
+
+## Uhr-App überarbeitet, Getränke loggen (PR #198, 28.11., Freigabe der Nutzerin)
+- Migration `20261203090000_getraenke`: Tabelle `drink_log` (at, day, kind wasser/kaffee/tee/alkohol, amount, source), RLS. Trigger setzt die Tages-Haken `koffein_nach_14` (Kaffee ab 14:00 Berlin) und `alkohol` in `diary_entries.influences`, nimmt sie nur bei Ändern oder Löschen zurück. „Wenig getrunken“ bleibt Handeintrag. `push_subscriptions.drink_push`, `drink_sent_at`.
+- `watch`: Aktion `drink` (kind, amount), `today` liefert `infection` und `drinks` (Wasser, Ziel 2 L / 2,5 L an Trainingstagen aus `settings.data.waterGoal`/`waterGoalTraining`, Kaffee, Tee, Alkohol, `coffeeAt`, `last`). Aktionen `flash` und `intake` bleiben für ältere Uhr-Versionen.
+- `push` (`due`, alle 15 Min.): Erinnerung „Seit 3 Stunden nichts getrunken“ zwischen 8 und 20 Uhr, Anker = letztes Getränk, letzte Erinnerung oder 8:00.
+- Uhr-App (`watch/source`): `MainMenu.mc` ersetzt durch `MainView.mc` (Liste mit Zeichen), `DrinkViews.mc` (Stand mit Glas, Mengenwahl), `Icons.mc`. Hitzewallung und Bufori entfernt (Bufori-Einnahmen erscheinen nicht mehr), Infekt-Zeile, Check-in als pushView. Store-Bilder und Beschreibung neu.
+- Geprüft: Syntax der Funktionen (Transpile), `tsc`, `npm run build`. Ungeprüft: Monkey-C-Build (Lauf „Uhr-App bauen“ im PR), Darstellung auf der Uhr, Migration.
+- Wartet auf: Freigabe und Merge durch die Nutzerin, danach Läufe „Supabase-Migrationen ausführen“, „Supabase-Funktionen hochladen“ und „Uhr-App bauen“ (Paket `upload-uhr-app`).
 
 ## Datenraster eigenständig, Layout A und C (PR #188, 26.11., Freigabe der Nutzerin)
 - Anlass: Werte zu klein, Sonnenzeiten leer (nur Symbol, wirkte wie ein Kopf). Entwurf `Uhr-Datenraster-Lesbar` (Projekt-Dokument `claude/klickdummy-entwurf/Uhr-Datenraster-Lesbar.dc.html`, noch nicht im Klick-Dummy-Artefakt, keine Schreibrechte aus dem Projekt-Chat).

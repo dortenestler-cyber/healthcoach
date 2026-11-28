@@ -7,6 +7,15 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Uhr-App überarbeitet und Getränke loggen (PR #198, 28.11.)
+Enthält die Migration `supabase/migrations/20261203090000_getraenke.sql` (Tabelle `drink_log`, Haken aus dem Log, Schalter für die Trinkerinnerung) und geänderte Funktionen `watch` und `push`. Dein Merge ist die Freigabe.
+- [ ] PR #198 mergen, wenn der Lauf „Uhr-App bauen“ im PR grün ist
+- [ ] Läufe „Supabase-Migrationen ausführen“ und „Supabase-Funktionen hochladen“ prüfen
+- [ ] Actions › „Uhr-App bauen“ (Lauf auf `main`) › Artifact `upload-uhr-app` laden, `HealthCoach.iq` im Garmin-Entwicklerportal hochladen, Screenshots und Text ersetzen, nach der Freigabe auf der Uhr aktualisieren
+- [ ] Auf der Uhr: Getränk eintragen, erscheint es im Tagebuch? Bei Kaffee nach 14 Uhr: ist die Gewohnheit „Koffein nach 14 Uhr“ gesetzt?
+- [ ] Wasserziel prüfen (Einstellungen), Trinkerinnerung am Nachmittag testen
+- [ ] Bufori-Einnahmen gibt es auf der Uhr nicht mehr: bei Bedarf Bescheid geben
+
 ### Infektverdacht empfindlicher (Prüfaudit Stufe 3, 27.11.)
 Ändert die App und die Uhr-Funktion `watch`, keine Migration. Dein Merge ist die Freigabe, danach läuft „Supabase-Funktionen hochladen“.
 - [ ] PR mergen

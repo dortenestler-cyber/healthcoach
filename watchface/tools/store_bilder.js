@@ -52,7 +52,7 @@ async function faceShots(page) {
   }
 }
 
-// Uhr-App: Glance in der Glance-Liste und das Menü, nachgezeichnet nach watch/source (GlanceView.mc, MainMenu.mc)
+// Uhr-App: Glance in der Glance-Liste und das Menü, nachgezeichnet nach watch/source (GlanceView.mc, MainView.mc, Icons.mc)
 function appHtml(which) {
   const seg = `
   function seg7(g, str, x, top, w, h, t, gap, on, off) {
@@ -87,25 +87,52 @@ function appHtml(which) {
     <script>${seg}
       seg7(document.getElementById("dg"), "18", 66, 162, 44, 72, 8, 10, "#E4E5DF", "#2A2B2F");
     </script>`;
-  const items = [["HITZEWALLUNG", "24 H: 2"], ["BUFORI BEDARF", "HEUTE 1 · WOCHE 3"], ["CHECK-IN", "3 FRAGEN"], ["HEUTE GEPLANT", "KETTLEBELL 18:00"], ["KETTLEBELL", "WOCHE 3"]];
+  // Zeichen wie in watch/source/Icons.mc: Glas mit Füllstand, Kreis, Ring, Tasse
+  const W = "#E4E5DF", M = "#7E8085", G = "#2A2B2F";
+  const glass = (cx, top, w, h, p) => {
+    const inset = w * 0.14, y = top + h * (1 - p), t = 1 - p;
+    const ht = w / 2 - inset * t, hb = w / 2 - inset;
+    const fill = p > 0 ? `<polygon points="${cx - ht},${y} ${cx + ht},${y} ${cx + hb},${top + h} ${cx - hb},${top + h}" fill="${W}"/>` : "";
+    return fill + `<polygon points="${cx - w / 2},${top} ${cx + w / 2},${top} ${cx + w / 2 - inset},${top + h} ${cx - w / 2 + inset},${top + h}" fill="none" stroke="${W}" stroke-width="2"/>`;
+  };
+  const ring = (cx, cy, r, p) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${G}" stroke-width="3"/>` +
+    (p > 0 ? `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${W}" stroke-width="3" stroke-dasharray="${2 * Math.PI * r * p} 999" transform="rotate(-90 ${cx} ${cy})"/>` : "");
+  const cup = (x, y, sz, on) => `<rect x="${x}" y="${y}" width="${sz}" height="${sz * 0.8}" fill="${on ? W : "none"}" stroke="${W}" stroke-width="2"/><rect x="${x + sz}" y="${y + sz * 0.15}" width="${sz * 0.28}" height="${sz * 0.4}" fill="none" stroke="${W}" stroke-width="2"/>`;
+  const F = 'font-family="Inter, Arial, sans-serif"';
+  const rows = [
+    ["GETRÄNK", "1,5 L", (cy) => glass(90, cy - 18, 28, 36, 0.75)],
+    ["INFEKT", "KEIN VERDACHT", (cy) => `<circle cx="90" cy="${cy}" r="13" fill="none" stroke="${W}" stroke-width="2"/>`],
+    ["CHECK-IN", "OFFEN", (cy) => ring(90, cy, 13, 0)],
+    ["HEUTE GEPLANT", "KETTLEBELL", (cy) => ring(90, cy, 13, 0)]
+  ];
   const menu = `
     <svg id="shot" viewBox="0 0 454 454" width="454" height="454">
       <circle cx="227" cy="227" r="227" fill="#000"/>
-      <text x="227" y="70" fill="#9AA3AE" font-family="Inter, Arial, sans-serif" font-weight="600" font-size="20" text-anchor="middle" letter-spacing="2">HEALTH COACH</text>
-      ${items.map((it, i) => {
-        const y = 118 + i * 66, sel = i === 1;
-        return `${sel ? `<rect x="40" y="${y - 30}" width="374" height="62" rx="10" fill="#1C2026"/>` : ""}
-          <text x="227" y="${y}" fill="${sel ? "#F2F4F7" : "#C9CFD6"}" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="${sel ? 26 : 22}" text-anchor="middle">${it[0]}</text>
-          <text x="227" y="${y + 24}" fill="#9AA3AE" font-family="Inter, Arial, sans-serif" font-size="17" text-anchor="middle">${it[1]}</text>`;
+      <text x="227" y="48" fill="${M}" ${F} font-weight="600" font-size="18" text-anchor="middle" letter-spacing="2">HEALTH COACH</text>
+      ${rows.map((r, i) => {
+        const top = 78 + i * 78, cy = top + 39, sel = i === 0;
+        return `${sel ? `<rect x="46" y="${top + 2}" width="362" height="74" rx="16" fill="#1C2026"/>` : ""}${r[2](cy)}
+          <text x="136" y="${cy - 8}" fill="${M}" ${F} font-size="16" letter-spacing="1">${r[0]}</text>
+          <text x="136" y="${cy + 22}" fill="${W}" ${F} font-weight="600" font-size="28">${r[1]}</text>`;
       }).join("")}
+    </svg>`;
+  const drink = `
+    <svg id="shot" viewBox="0 0 454 454" width="454" height="454">
+      <circle cx="227" cy="227" r="227" fill="#000"/>
+      ${glass(227, 54, 90, 130, 0.75)}
+      <text x="227" y="262" fill="${W}" ${F} font-weight="600" font-size="44" text-anchor="middle">1,5 L</text>
+      <text x="227" y="296" fill="${M}" ${F} font-size="17" text-anchor="middle" letter-spacing="1">VON 2 L</text>
+      <rect x="154" y="320" width="146" height="1" fill="${G}"/>
+      ${cup(163, 340, 30, true)}${cup(227 - 15, 340, 30, true)}${cup(257, 340, 30, false)}
+      <text x="227" y="398" fill="${M}" ${F} font-size="17" text-anchor="middle" letter-spacing="1">KAFFEE 2</text>
     </svg>`;
   return `<!doctype html><meta charset="utf-8"><style>
     @font-face{font-family:"Share Tech Mono";src:url("${FONT}")}
-    body{margin:0;background:#000}</style>${which === "glance" ? glance : menu}`;
+    body{margin:0;background:#000}</style>${which === "glance" ? glance : which === "drink" ? drink : menu}`;
 }
 
 async function appShots(page) {
-  for (const [which, file] of [["glance", "1-glance.jpg"], ["menu", "2-menue.jpg"]]) {
+  for (const [which, file] of [["glance", "1-glance.jpg"], ["menu", "2-menue.jpg"], ["drink", "3-getraenk.jpg"]]) {
     await page.setContent(appHtml(which));
     await page.evaluate(() => document.fonts.load('20px "Share Tech Mono"'));
     await page.waitForTimeout(200);
