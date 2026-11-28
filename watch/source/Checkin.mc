@@ -56,11 +56,11 @@ class CheckinDelegate extends WatchUi.Menu2InputDelegate {
             WatchUi.switchToView(Checkin.menu(mStep + 1), new CheckinDelegate(mStep + 1, mAnswers), WatchUi.SLIDE_LEFT);
             return;
         }
-        WatchUi.switchToView(MainMenu.build(Store.today()), new MainMenuDelegate(), WatchUi.SLIDE_RIGHT);
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
         Api.call("checkin", {"energy" => mAnswers[0], "sleep" => mAnswers[1], "mood" => mAnswers[2]}, new Net(["CHECK-IN", "GESPEICHERT"]).method(:onReceive));
     }
 
     function onBack() {
-        WatchUi.switchToView(MainMenu.build(Store.today()), new MainMenuDelegate(), WatchUi.SLIDE_RIGHT);
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
     }
 }
