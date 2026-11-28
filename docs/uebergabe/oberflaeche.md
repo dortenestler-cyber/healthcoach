@@ -2,6 +2,9 @@
 Belegt: frei
 Zuletzt aktualisiert: 2026-11-27 · Sitzung: https://claude.ai/code/session_017zWr1TvBzHgMpMzbCqZdWV
 
+## Koffein nach 14 Uhr (28.11., gemergt nach grünem Build)
+Gewohnheit `koffein_nach_14` ersetzt `koffein`. Alter Schlüssel bleibt als „Koffein (früher)“ lesbar, ist in der Liste aus und zählt in Korridor und „Dein Monat“ nicht mehr (`LEGACY_HABIT_KEYS`). Keine Migration.
+
 ## Check-in mit 5 Stufen und Check-out am Abend (Wunsch der Nutzerin 27.11., Migration, wartet auf Merge)
 - Migration `20261202090000_checkin_fuenf_stufen`: `checkins.energy/sleep/mood` 1–5 (alt 1/2/3 → 1/3/5, läuft nur einmal), neue Spalten `energy_evening`, `mood_evening`.
 - `CHECKIN_LEVELS` hat 5 Wörter. Readiness-Faktor „Check-in“ (App `lib/insights.ts`, Uhr `watch/target.ts`): Grenzen 2,4 und 3,8 (vorher 1,7 / 2,4). „Gefühl gegen Messwert“: Energie ≤ 2, 3, ≥ 4.

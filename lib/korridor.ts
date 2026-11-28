@@ -6,6 +6,7 @@ import { personalRange, positionIn, type Point, type Position, type Range } from
 import type { Activity, Daily } from "@/lib/garmin";
 import { bereichWort } from "@/lib/einordnung";
 import { HARD_DAY_PCT, loadPercent, type Diary } from "@/lib/insights";
+import { LEGACY_HABIT_KEYS } from "@/lib/catalog";
 
 const SHARE_DAYS = 30; // „so oft im Bereich“
 const LOOK_DAYS = 180; // Erholungszeit und „was davor war“
@@ -147,7 +148,7 @@ function beforeLine(inp: KorridorInput): Line | null {
     const f: string[] = [];
     const e = diaryBy.get(c);
     if (e) {
-      for (const k of e.influences ?? []) f.push(`h:${k}`);
+      for (const k of e.influences ?? []) if (!LEGACY_HABIT_KEYS.includes(k)) f.push(`h:${k}`);
       if (Object.values(e.symptoms ?? {}).some((v) => v >= 3)) f.push("symptome");
     }
     if (loadPercent(c, inp.daily, inp.acts) >= HARD_DAY_PCT) f.push("hart");

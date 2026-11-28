@@ -5,7 +5,7 @@
 // in diary_entries.habit_details (ab Migration 20261123100000_gewohnheiten).
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { INFLUENCES } from "@/lib/catalog";
+import { INFLUENCES, LEGACY_HABIT_LABELS } from "@/lib/catalog";
 import { loadSettings, saveSettings } from "@/lib/training";
 
 export type Habit = { key: string; label: string; on: boolean; custom?: boolean };
@@ -23,7 +23,7 @@ export const DEFAULT_HABITS: Habit[] = INFLUENCES.map((i) => ({ key: i.key, labe
 export function habitsFrom(stored: unknown): Habit[] {
   const list = Array.isArray(stored) ? (stored as Habit[]).filter((h) => h && typeof h.key === "string" && typeof h.label === "string") : [];
   const keys = new Set(list.map((h) => h.key));
-  return [...list.map((h) => ({ key: h.key, label: h.label, on: h.on !== false, custom: !!h.custom })), ...DEFAULT_HABITS.filter((h) => !keys.has(h.key))];
+  return [...list.map((h) => (h.key in LEGACY_HABIT_LABELS ? { key: h.key, label: LEGACY_HABIT_LABELS[h.key], on: false, custom: false } : { key: h.key, label: h.label, on: h.on !== false, custom: !!h.custom })), ...DEFAULT_HABITS.filter((h) => !keys.has(h.key))];
 }
 
 export async function loadHabits(sb: SupabaseClient): Promise<Habit[]> {
@@ -50,7 +50,7 @@ export const habitKey = (label: string) =>
     .replace(/^_|_$/g, "")
     .slice(0, 30);
 
-export const labelOf = (habits: Habit[], key: string) => habits.find((h) => h.key === key)?.label ?? INFLUENCES.find((i) => i.key === key)?.label ?? key;
+export const labelOf = (habits: Habit[], key: string) => habits.find((h) => h.key === key)?.label ?? INFLUENCES.find((i) => i.key === key)?.label ?? LEGACY_HABIT_LABELS[key] ?? key;
 
 // Details aus der Datenbank laden. Fehlt die Spalte noch (Migration nicht gelaufen), gibt es einfach keine Details.
 export async function loadHabitDetails(sb: SupabaseClient, from: string, to?: string): Promise<Map<string, HabitDetails>> {
