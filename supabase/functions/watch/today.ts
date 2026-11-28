@@ -16,7 +16,7 @@ type Any = any;
 
 // Alles, was die Uhr für heute braucht, kompakt und in Großbuchstaben für das Datenraster
 export async function today(sb: Any, uid: string, day: string) {
-  const [meds, intakes, flashes, checkin, plan, illness, injuries, daily, kbPlan, diary, gcycles, settings, body, acts, ills] = await Promise.all([
+  const [meds, intakes, flashes, checkin, plan, illness, injuries, daily, kbPlan, diary, gcycles, settings, body, acts, ills, drinkRows] = await Promise.all([
     sb.from("medications").select("id, name, kind, regular, as_needed, times, notes_key").eq("user_id", uid).eq("active", true).order("created_at"),
     sb.from("medication_intakes").select("medication_id, as_needed, slot, day, at").eq("user_id", uid).gte("day", addDays(day, -6)),
     sb.from("hot_flashes").select("id", { count: "exact", head: true }).eq("user_id", uid).gte("at", new Date(Date.now() - 864e5).toISOString()),
@@ -36,6 +36,8 @@ export async function today(sb: Any, uid: string, day: string) {
     sb.from("garmin_activities").select("*").eq("user_id", uid).gte("start_local", addDays(day, -30)), // alle Spalten: rpe, Sportart (Muskelrechnung)
     // Krankheiten: für das Fitness-Alter (4 Wochen) und damit kranke Tage nicht in die Bereiche der Readiness zählen (150 Tage)
     sb.from("illnesses").select("started_on, ended_on").eq("user_id", uid).or(`ended_on.is.null,ended_on.gte.${addDays(day, -179)}`),
+    // Getränke von heute (Tabelle ab Migration 20261203090000; fehlt sie noch, bleibt die Liste leer)
+    sb.from("drink_log").select("at, kind, amount").eq("user_id", uid).eq("day", day).order("at"),
   ]);
 
   const ins = (intakes.data ?? []) as Any[];
@@ -116,9 +118,32 @@ export async function today(sb: Any, uid: string, day: string) {
   // Belastung bisher in Prozent, wie dayLoad in der App (lib/insights.ts)
   const load = dayLoadPct(day, g, (acts.data ?? []) as Any[]);
 
+  // Getränke: Wasser in Litern, Kaffee/Tee/Alkohol als Anzahl; Kaffee mit Uhrzeit als Dezimalstunde (Berlin) für die Zeitleiste
+  const drinks = (drinkRows.error ? [] : drinkRows.data ?? []) as Any[];
+  const sumOf = (k: string) => Math.round(drinks.filter((d) => d.kind === k).reduce((a, d) => a + Number(d.amount), 0) * 100) / 100;
+  const hourOf = (at: string) => {
+    const [h, m] = new Intl.DateTimeFormat("de-DE", { timeZone: TZ, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(at)).split(":");
+    return Math.round((Number(h) + Number(m) / 60) * 100) / 100;
+  };
+  const sd = (settings.data as Any)?.data ?? {};
+  const trainingToday = ((plan.data ?? []) as Any[]).length > 0 || ((acts.data ?? []) as Any[]).some((a) => String(a.start_local ?? "").startsWith(day));
+  const num = (v: unknown, d: number) => (typeof v === "number" && v > 0 && v <= 10 ? v : d);
+  const waterGoal = trainingToday ? num(sd.waterGoalTraining, 2.5) : num(sd.waterGoal, 2);
+  const lastDrink = drinks.length ? localTime(new Date(drinks[drinks.length - 1].at)) : null;
+
   return {
     day,
     time: localTime(),
+    infection: !!target.infection,
+    drinks: {
+      water: sumOf("wasser"),
+      goal: waterGoal,
+      coffee: sumOf("kaffee"),
+      tea: sumOf("tee"),
+      alcohol: sumOf("alkohol"),
+      coffeeAt: drinks.filter((d) => d.kind === "kaffee").map((d) => hourOf(d.at)),
+      last: lastDrink,
+    },
     flashes24h: flashes.count ?? 0,
     checkinDone: !!checkin.data,
     cycleDay,
