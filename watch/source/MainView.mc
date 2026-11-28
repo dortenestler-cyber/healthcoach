@@ -31,6 +31,10 @@ class MenuView extends WatchUi.View {
     }
 
     function water(d) {
+        return Icons.fluid(d);
+    }
+
+    function rawWater(d) {
         if (d != null && d["water"] != null) {
             return d["water"].toFloat();
         }
@@ -44,8 +48,8 @@ class MenuView extends WatchUi.View {
         var d = drinks(t);
         if (mMode == 1) {
             var g = goal(d);
-            var w = water(d);
-            out.add({"id" => "wasser", "label" => "WASSER", "value" => Icons.num(w) + " L", "icon" => "glass", "p" => w / g});
+            var w = rawWater(d);
+            out.add({"id" => "wasser", "label" => "WASSER", "value" => Icons.num(w) + " L", "icon" => "glass", "p" => Icons.fluid(d) / g});
             out.add({"id" => "kaffee", "label" => "KAFFEE", "value" => "HEUTE " + Icons.num(d != null ? d["coffee"] : 0), "icon" => "cup", "p" => d != null && d["coffee"] != null && d["coffee"] > 0 ? 1 : 0});
             out.add({"id" => "tee", "label" => "TEE", "value" => "HEUTE " + Icons.num(d != null ? d["tea"] : 0), "icon" => "cup", "p" => d != null && d["tea"] != null && d["tea"] > 0 ? 1 : 0});
             out.add({"id" => "alkohol", "label" => "ALKOHOL", "value" => "HEUTE " + Icons.num(d != null ? d["alcohol"] : 0), "icon" => "wine", "p" => d != null && d["alcohol"] != null && d["alcohol"] > 0 ? 1 : 0});

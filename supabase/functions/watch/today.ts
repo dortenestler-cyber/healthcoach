@@ -128,6 +128,9 @@ export async function today(sb: Any, uid: string, day: string) {
   const sd = (settings.data as Any)?.data ?? {};
   const trainingToday = ((plan.data ?? []) as Any[]).length > 0 || ((acts.data ?? []) as Any[]).some((a) => String(a.start_local ?? "").startsWith(day));
   const num = (v: unknown, d: number) => (typeof v === "number" && v > 0 && v <= 10 ? v : d);
+  // Angerechnete Flüssigkeit: Tasse oder Glas = 0,2 L, davon der Anteil je Getränk (Schätzung, settings.data.drinkFactors)
+  const fac = (k: string, d: number) => (typeof sd.drinkFactors?.[k] === "number" && sd.drinkFactors[k] >= 0 && sd.drinkFactors[k] <= 1 ? sd.drinkFactors[k] : d);
+  const fluid = Math.round((sumOf("wasser") + 0.2 * (sumOf("kaffee") * fac("kaffee", 0.8) + sumOf("tee") * fac("tee", 0.9) + sumOf("alkohol") * fac("alkohol", 0))) * 100) / 100;
   const waterGoal = trainingToday ? num(sd.waterGoalTraining, 2.5) : num(sd.waterGoal, 2);
   const lastDrink = drinks.length ? localTime(new Date(drinks[drinks.length - 1].at)) : null;
 
@@ -137,6 +140,7 @@ export async function today(sb: Any, uid: string, day: string) {
     infection: !!target.infection,
     drinks: {
       water: sumOf("wasser"),
+      fluid, // Wasser plus angerechnete Getränke, für das Glas
       goal: waterGoal,
       coffee: sumOf("kaffee"),
       tea: sumOf("tee"),

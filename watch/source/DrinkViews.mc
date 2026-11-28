@@ -23,7 +23,7 @@ class DrinkView extends WatchUi.View {
         if (t != null && t instanceof Dictionary && t["drinks"] instanceof Dictionary) {
             d = t["drinks"];
         }
-        var water = d != null && d["water"] != null ? d["water"].toFloat() : 0.0;
+        var water = Icons.fluid(d);
         var goal = d != null && d["goal"] != null ? d["goal"].toFloat() : 2.0;
         var coffee = d != null && d["coffee"] != null ? d["coffee"] : 0;
         var p = goal > 0 ? water / goal : 0;
@@ -171,7 +171,7 @@ class AmountView extends WatchUi.View {
         var clock = System.getClockTime();
         var nowH = clock.hour + clock.min / 60.0;
         if (mKind.equals("wasser")) {
-            var water = d != null && d["water"] != null ? d["water"].toFloat() : 0.0;
+            var water = Icons.fluid(d);
             var goal = d != null && d["goal"] != null ? d["goal"].toFloat() : 2.0;
             var p = water / goal;
             var p2 = (water + amount()) / goal;
