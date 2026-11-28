@@ -16,18 +16,18 @@ module Fields {
     // Icon und Geisterziffern je Wert (Index = Nummer aus den Einstellungen)
     const ICON = [null, "bb", "cy", "su", "sd", "cl", "dr", "he", "fl", "st", "ta", "be", "hg", "kb", "in",
         "stress", "rhr", "floors", "intens", "kcal", "dist", "spo2", "resp", "alt", "press", "batt", "alarm", "move", "recov",
-        "hrv", "sleep", null, "ready", "phase", "pill"];
+        "hrv", "sleep", null, "ready", "phase", "pill", "drink"];
     const GHOST = ["", "88", "88", "8888", "8888", "8°", "88", "88", "8", "8888", "88", "8", "88", "88:88", "8",
         "88", "88", "88", "888", "8888", "88,8", "88", "88", "8888", "8888", "88", "8", "8", "88",
-        "88", "88", "", "8,8", "8888", "8"];
+        "88", "88", "", "8,8", "8888", "8", "8,8"];
 
     // Farbfamilie je Wert für den Farbmodus "Bedeutung" (Farbsystem "Nacht"):
     // 0 neutral, 1 Erholung, 2 Energie, 3 Schlaf, 4 Zyklus, 5 Symptome, 6 Training, 7 Alltag, 8 Stress
     const FAM = [0, 2, 4, 0, 0, 0, 0, 0, 5, 7, 6, 0, 6, 6, 5,
         8, 1, 7, 6, 0, 7, 0, 0, 0, 0, 0, 0, 7, 6,
-        1, 3, 0, 1, 4, 0];
+        1, 3, 0, 1, 4, 0, 7];
     // Familie je Strich-Anzeige (Nummern wie in settings.xml)
-    const GFAM = [0, 6, 0, 2, 7, 8, 7, 6, 7, 1];
+    const GFAM = [0, 6, 0, 2, 7, 8, 7, 6, 7, 1, 7];
     const FAMCOL = [-1, 0x52B788, 0x8FD5B0, 0xE5E7EB, 0xE8845A, 0xF0A24A, 0x7C9AE0, 0xC3D1F2, 0x45C4C0];
 
     const NONE = "--";
@@ -104,6 +104,10 @@ module Fields {
             return (hc != null && hc["phase"] instanceof String) ? hc["phase"] : NONE;
         }
         if (t == 34) { return hcNum(hc, "open"); }
+        if (t == 35) {
+            if (hc == null || hc["water"] == null) { return NONE; }
+            return comma(hc["water"].toFloat() / 10.0);
+        }
         return "";
     }
 
@@ -131,6 +135,10 @@ module Fields {
             return am.floorsClimbed.toFloat() / am.floorsClimbedGoal;
         }
         if (g == 9) { return (hc != null && hc["goal"] != null) ? hc["goal"].toFloat() / 100.0 : null; }
+        if (g == 10) {
+            if (hc == null || hc["water"] == null || hc["waterGoal"] == null || hc["waterGoal"] == 0) { return null; }
+            return hc["water"].toFloat() / hc["waterGoal"];
+        }
         return null;
     }
 

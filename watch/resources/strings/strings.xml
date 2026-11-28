@@ -1,5 +1,5 @@
 <strings>
-    <string id="AppName">Health Coach</string>
+    <string id="AppName">Health Coach Uhr</string>
     <string id="TokenTitle">Uhr-Schlüssel</string>
     <string id="TokenPrompt">Schlüssel aus der App unter „Uhr verbinden“</string>
     <string id="UrlTitle">Server</string>

@@ -51,6 +51,7 @@
             <listEntry value="32">@Strings.T32</listEntry>
             <listEntry value="33">@Strings.T33</listEntry>
             <listEntry value="34">@Strings.T34</listEntry>
+            <listEntry value="35">@Strings.T35</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.f_o2" title="@Strings.N_f_o2">
@@ -89,6 +90,7 @@
             <listEntry value="32">@Strings.T32</listEntry>
             <listEntry value="33">@Strings.T33</listEntry>
             <listEntry value="34">@Strings.T34</listEntry>
+            <listEntry value="35">@Strings.T35</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.f_o3" title="@Strings.N_f_o3">
@@ -127,6 +129,7 @@
             <listEntry value="32">@Strings.T32</listEntry>
             <listEntry value="33">@Strings.T33</listEntry>
             <listEntry value="34">@Strings.T34</listEntry>
+            <listEntry value="35">@Strings.T35</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.f_m1" title="@Strings.N_f_m1">
@@ -165,6 +168,7 @@
             <listEntry value="32">@Strings.T32</listEntry>
             <listEntry value="33">@Strings.T33</listEntry>
             <listEntry value="34">@Strings.T34</listEntry>
+            <listEntry value="35">@Strings.T35</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.f_m2" title="@Strings.N_f_m2">
@@ -203,6 +207,7 @@
             <listEntry value="32">@Strings.T32</listEntry>
             <listEntry value="33">@Strings.T33</listEntry>
             <listEntry value="34">@Strings.T34</listEntry>
+            <listEntry value="35">@Strings.T35</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.f_m3" title="@Strings.N_f_m3">
@@ -241,6 +246,7 @@
             <listEntry value="32">@Strings.T32</listEntry>
             <listEntry value="33">@Strings.T33</listEntry>
             <listEntry value="34">@Strings.T34</listEntry>
+            <listEntry value="35">@Strings.T35</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.f_u1" title="@Strings.N_f_u1">
@@ -279,6 +285,7 @@
             <listEntry value="32">@Strings.T32</listEntry>
             <listEntry value="33">@Strings.T33</listEntry>
             <listEntry value="34">@Strings.T34</listEntry>
+            <listEntry value="35">@Strings.T35</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.f_u2" title="@Strings.N_f_u2">
@@ -317,6 +324,7 @@
             <listEntry value="32">@Strings.T32</listEntry>
             <listEntry value="33">@Strings.T33</listEntry>
             <listEntry value="34">@Strings.T34</listEntry>
+            <listEntry value="35">@Strings.T35</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.f_u3" title="@Strings.N_f_u3">
@@ -355,6 +363,7 @@
             <listEntry value="32">@Strings.T32</listEntry>
             <listEntry value="33">@Strings.T33</listEntry>
             <listEntry value="34">@Strings.T34</listEntry>
+            <listEntry value="35">@Strings.T35</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.f_c" title="@Strings.N_f_c">
@@ -393,6 +402,7 @@
             <listEntry value="32">@Strings.T32</listEntry>
             <listEntry value="33">@Strings.T33</listEntry>
             <listEntry value="34">@Strings.T34</listEntry>
+            <listEntry value="35">@Strings.T35</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.g_l" title="@Strings.N_g_l">
@@ -407,6 +417,7 @@
             <listEntry value="7">@Strings.G7</listEntry>
             <listEntry value="8">@Strings.G8</listEntry>
             <listEntry value="9">@Strings.G9</listEntry>
+            <listEntry value="10">@Strings.G10</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.g_r" title="@Strings.N_g_r">
@@ -421,6 +432,7 @@
             <listEntry value="7">@Strings.G7</listEntry>
             <listEntry value="8">@Strings.G8</listEntry>
             <listEntry value="9">@Strings.G9</listEntry>
+            <listEntry value="10">@Strings.G10</listEntry>
         </settingConfig>
     </setting>
     <setting propertyKey="@Properties.lat" title="@Strings.N_lat">
