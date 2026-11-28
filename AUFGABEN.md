@@ -7,6 +7,12 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Kaffee und Tee zählen zum Wasserziel (28.11.)
+Ändert App, Funktion `watch` und Uhr-App, keine Migration. Dein Merge ist die Freigabe.
+- [ ] PR mergen, danach Lauf „Supabase-Funktionen hochladen“ prüfen
+- [ ] Neues Paket `upload-uhr-app` ins Garmin-Portal laden (Glas zeigt die angerechnete Flüssigkeit). Bis dahin zeigt die alte Uhr-App nur Wasser
+- [ ] Einstellungen › Prozentwerte für Kaffee, Tee, Alkohol prüfen (Schätzungen: 80 %, 90 %, 0 %)
+
 ### Uhr-App überarbeitet und Getränke loggen (PR #198, 28.11.)
 Enthält die Migration `supabase/migrations/20261203090000_getraenke.sql` (Tabelle `drink_log`, Haken aus dem Log, Schalter für die Trinkerinnerung) und geänderte Funktionen `watch` und `push`. Dein Merge ist die Freigabe.
 - [ ] PR #198 mergen, wenn der Lauf „Uhr-App bauen“ im PR grün ist

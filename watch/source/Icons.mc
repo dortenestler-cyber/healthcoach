@@ -129,6 +129,17 @@ module Icons {
         }
     }
 
+    // Angerechnete Flüssigkeit (Wasser plus Kaffee und Tee anteilig), sonst nur Wasser (ältere Server)
+    function fluid(d) {
+        if (d == null) {
+            return 0.0;
+        }
+        if (d["fluid"] != null) {
+            return d["fluid"].toFloat();
+        }
+        return d["water"] != null ? d["water"].toFloat() : 0.0;
+    }
+
     // Zahl mit Komma, höchstens zwei Stellen: 1.5 → "1,5", 0.25 → "0,25", 2 → "2"
     function num(v) {
         if (v == null) {

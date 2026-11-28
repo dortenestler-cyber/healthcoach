@@ -37,3 +37,20 @@ export function totals(rows: DrinkRow[]) {
   const sum = (k: DrinkKind) => Math.round(rows.filter((r) => r.kind === k).reduce((a, r) => a + Number(r.amount), 0) * 100) / 100;
   return { wasser: sum("wasser"), kaffee: sum("kaffee"), tee: sum("tee"), alkohol: sum("alkohol") };
 }
+
+// Anrechnung aufs Tagesziel: eine Tasse oder ein Glas zählt als 0,2 L Flüssigkeit, davon der Anteil je Getränk.
+// Die Faktoren sind Schätzungen ohne Quelle und in den Einstellungen änderbar (settings.data.drinkFactors, 0 bis 1).
+export const CUP_L = 0.2;
+export type DrinkFactors = { kaffee: number; tee: number; alkohol: number };
+export const DEFAULT_FACTORS: DrinkFactors = { kaffee: 0.8, tee: 0.9, alkohol: 0 };
+
+export function factorsFrom(settings: Record<string, unknown>): DrinkFactors {
+  const f = (settings.drinkFactors ?? {}) as Record<string, unknown>;
+  const pick = (k: keyof DrinkFactors) => (typeof f[k] === "number" && (f[k] as number) >= 0 && (f[k] as number) <= 1 ? (f[k] as number) : DEFAULT_FACTORS[k]);
+  return { kaffee: pick("kaffee"), tee: pick("tee"), alkohol: pick("alkohol") };
+}
+
+// Angerechnete Flüssigkeit in Litern
+export function fluidOf(t: ReturnType<typeof totals>, f: DrinkFactors): number {
+  return Math.round((t.wasser + CUP_L * (t.kaffee * f.kaffee + t.tee * f.tee + t.alkohol * f.alkohol)) * 100) / 100;
+}

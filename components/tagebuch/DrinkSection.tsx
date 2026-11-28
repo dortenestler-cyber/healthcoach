@@ -7,9 +7,12 @@ import { loadSettings } from "@/lib/training";
 import {
   amountText,
   DEFAULT_WATER_GOAL,
+  DEFAULT_FACTORS,
   DEFAULT_WATER_GOAL_TRAINING,
   DRINK_LABEL,
   DRINK_QUICK,
+  factorsFrom,
+  fluidOf,
   fmtAmount,
   isLate,
   timeOf,
@@ -23,6 +26,7 @@ import {
 export default function DrinkSection({ day }: { day: string }) {
   const [rows, setRows] = useState<DrinkRow[]>([]);
   const [goal, setGoal] = useState(DEFAULT_WATER_GOAL);
+  const [factors, setFactors] = useState(DEFAULT_FACTORS);
   const [time, setTime] = useState("");
   const [error, setError] = useState("");
 
@@ -47,6 +51,7 @@ export default function DrinkSection({ day }: { day: string }) {
     ]).then(([s, plan, acts]) => {
       const num = (v: unknown, d: number) => (typeof v === "number" && v > 0 && v <= 10 ? v : d);
       const training = (plan.count ?? 0) > 0 || (acts.count ?? 0) > 0;
+      setFactors(factorsFrom(s));
       setGoal(training ? num(s.waterGoalTraining, DEFAULT_WATER_GOAL_TRAINING) : num(s.waterGoal, DEFAULT_WATER_GOAL));
     });
   }, [day, load]);
@@ -67,7 +72,8 @@ export default function DrinkSection({ day }: { day: string }) {
   };
 
   const t = totals(rows);
-  const pct = Math.min(100, Math.round((t.wasser / goal) * 100));
+  const fluid = fluidOf(t, factors);
+  const pct = Math.min(100, Math.round((fluid / goal) * 100));
   const late = rows.some(isLate);
 
   return (
@@ -75,8 +81,8 @@ export default function DrinkSection({ day }: { day: string }) {
       <h2>Getränke</h2>
       <div className="card-row">
         <div className="stack">
-          <span className="big-number">{fmtAmount(t.wasser)} L</span>
-          <span className="meta">von {fmtAmount(goal)} L Wasser</span>
+          <span className="big-number">{fmtAmount(fluid)} L</span>
+          <span className="meta">von {fmtAmount(goal)} L · davon Wasser {fmtAmount(t.wasser)} L</span>
         </div>
         <div className="stack drink-sum">
           <span>Kaffee {fmtAmount(t.kaffee)}</span>
@@ -84,7 +90,7 @@ export default function DrinkSection({ day }: { day: string }) {
           <span>Alkohol {fmtAmount(t.alkohol)}</span>
         </div>
       </div>
-      <div className="progress" role="img" aria-label={`Wasser ${pct} Prozent vom Tagesziel`}>
+      <div className="progress" role="img" aria-label={`Flüssigkeit ${pct} Prozent vom Tagesziel`}>
         <span className="drink-fill" style={{ width: pct + "%" }} />
       </div>
       <div className="drink-quick">

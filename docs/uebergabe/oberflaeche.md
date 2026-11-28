@@ -2,6 +2,9 @@
 Belegt: frei
 Zuletzt aktualisiert: 2026-11-28 · Sitzung: https://claude.ai/code/session_017zWr1WikVp35JDLSBfpPWt
 
+## Kaffee und Tee zählen zum Wasserziel (28.11.)
+- `lib/drinks.ts` (`factorsFrom`, `fluidOf`): Tagebuch-Karte „Getränke“ zeigt die angerechnete Flüssigkeit, darunter „davon Wasser“. Prozentwerte unter Einstellungen (`WaterGoalRows`). Geprüft: `tsc`, `npm run build`.
+
 ## Getränke im Tagebuch (PR #198, 28.11., gemeinsam mit Daten)
 - `components/tagebuch/DrinkSection.tsx` (Tagebuch, vor den Einnahmen): Wasserstand gegen das Tagesziel, Schnelleinträge, Liste mit Uhrzeit zum Löschen, optionale Uhrzeit. Ziel 2 L, an Trainingstagen 2,5 L; Einstellungen › Funktionen & Gewohnheiten (`WaterGoalRows`). `lib/drinks.ts`. Schalter „Trinkerinnerung“ in `PushRows`. `drink_log` in der Sicherung.
 - Geprüft: `tsc`, `npm run build`. Nicht im Browser, Tabelle fehlt bis zur Migration (dann Fehlermeldung statt Liste).

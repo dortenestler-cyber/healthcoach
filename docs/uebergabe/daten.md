@@ -3,6 +3,10 @@ Belegt: frei
 Zuletzt aktualisiert: 2026-11-28 · Sitzung: https://claude.ai/code/session_017zWr1WikVp35JDLSBfpPWt
 
 
+## Kaffee und Tee zählen zum Wasserziel (28.11., Wunsch der Nutzerin, ohne Migration)
+- Tasse oder Glas = 0,2 L, Anrechnung Kaffee 80 %, Tee 90 %, Alkohol 0 % (Schätzungen ohne Quelle, änderbar unter Einstellungen, `settings.data.drinkFactors` 0–1). `watch` liefert `drinks.fluid` (Wasser plus angerechnet), die Uhr zeichnet das Glas damit (ohne `fluid` nur Wasser). „Wenig getrunken“ bleibt Handeintrag.
+- Uhr-App geändert (`Icons.fluid`): neues Paket `upload-uhr-app` nötig, Funktion `watch` hochladen.
+
 ## Uhr-App überarbeitet, Getränke loggen (PR #198, 28.11., Freigabe der Nutzerin)
 - Migration `20261203090000_getraenke`: Tabelle `drink_log` (at, day, kind wasser/kaffee/tee/alkohol, amount, source), RLS. Trigger setzt die Tages-Haken `koffein_nach_14` (Kaffee ab 14:00 Berlin) und `alkohol` in `diary_entries.influences`, nimmt sie nur bei Ändern oder Löschen zurück. „Wenig getrunken“ bleibt Handeintrag. `push_subscriptions.drink_push`, `drink_sent_at`.
 - `watch`: Aktion `drink` (kind, amount), `today` liefert `infection` und `drinks` (Wasser, Ziel 2 L / 2,5 L an Trainingstagen aus `settings.data.waterGoal`/`waterGoalTraining`, Kaffee, Tee, Alkohol, `coffeeAt`, `last`). Aktionen `flash` und `intake` bleiben für ältere Uhr-Versionen.
