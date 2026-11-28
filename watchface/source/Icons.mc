@@ -175,6 +175,10 @@ module Icons {
             // Kapsel, untere Hälfte offen (offene Einnahmen)
             p(dc, [5, 1, 11, 1, 13, 3, 13, 13, 11, 15, 5, 15, 3, 13, 3, 3]);
             holeP(dc, [4.5, 8.5, 11.5, 8.5, 11.5, 12.5, 10.5, 13.5, 5.5, 13.5, 4.5, 12.5]);
+        } else if (name.equals("drink")) {
+            // Glas (Getränke)
+            p(dc, [3, 1, 13, 1, 11.5, 15, 4.5, 15]);
+            holeP(dc, [4.4, 3, 11.6, 3, 10.8, 13, 5.2, 13]);
         } else if (name.equals("stress")) {
             // Blitz (Stress)
             p(dc, [10, 1, 4, 9, 7.5, 9, 6, 15, 12.5, 6.5, 9, 6.5]);

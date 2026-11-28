@@ -141,6 +141,9 @@ Deno.serve(async (req) => {
           sleep: t.sleep,
           fa: t.fitnessAge,
           rhr: t.rhr,
+          // Getränke in Deziliter (angerechnet) und Tagesziel, wie "goal"
+          water: Math.round(((t.drinks as Any).fluid ?? 0) * 10),
+          waterGoal: Math.round(((t.drinks as Any).goal ?? 0) * 10),
         });
       }
       return json(200, t);

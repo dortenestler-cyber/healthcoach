@@ -7,6 +7,12 @@ Migrationen laufen ab jetzt automatisch: Nach dem Merge eines Pull Requests füh
 
 ## Jetzt
 
+### Getränke im Zifferblatt und neue Uhr-App-Kennung (28.11.)
+Ändert die Funktion `watch` (Kurzübersicht um `water`, `waterGoal`), Zifferblatt und Uhr-App, keine Migration. Dein Merge ist die Freigabe. Die Uhr-App hat eine neue Kennung und heißt „Health Coach Uhr“, weil Garmin die alte nach dem Löschen nicht freigibt.
+- [ ] PR mergen, danach Lauf „Supabase-Funktionen hochladen“ prüfen
+- [ ] Artifact `upload-uhr-app` als **neue** App hochladen (Name „Health Coach Uhr“), alte Uhr-App auf der Uhr deinstallieren, neue installieren und den Uhr-Schlüssel neu eintragen
+- [ ] Artifact `upload-zifferblatt` als neue Version des Zifferblatts hochladen. In den Zifferblatt-Einstellungen ein Feld auf „Getränke (Liter)“ oder eine Strich-Anzeige auf „Getränke-Ziel“ stellen
+
 ### Kaffee und Tee zählen zum Wasserziel (28.11.)
 Ändert App, Funktion `watch` und Uhr-App, keine Migration. Dein Merge ist die Freigabe.
 - [ ] PR mergen, danach Lauf „Supabase-Funktionen hochladen“ prüfen

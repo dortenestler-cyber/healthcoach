@@ -37,6 +37,7 @@
     <string id="T32">Readiness</string>
     <string id="T33">Zyklusphase</string>
     <string id="T34">Offene Einnahmen</string>
+    <string id="T35">Getränke (Liter)</string>
     <string id="G0">Leer</string>
     <string id="G1">Tagesziel</string>
     <string id="G2">Akku</string>
@@ -47,6 +48,7 @@
     <string id="G7">Intensitätsminuten-Ziel</string>
     <string id="G8">Etagen-Ziel</string>
     <string id="G9">Readiness</string>
+    <string id="G10">Getränke-Ziel</string>
     <string id="N_f_o1">Feld: Oben links (C: Rand oben links)</string>
     <string id="N_f_o2">Feld: Oben Mitte</string>
     <string id="N_f_o3">Feld: Oben rechts (C: Rand oben rechts)</string>

@@ -154,3 +154,4 @@ Korridore Teil B Daten ist fertig und läuft (PR #63–#73): Alltagslast aus dem
 - PR #70 gemergt: Alltag Version 2, Readiness der Uhr wie in der App
 - PR #66 gemergt: Ablauf „Daten prüfen“ (nur lesend)
 - PR #63 gemergt: Alltagslast Daten, Migration `20261124090000_alltagslast.sql` und Upload von `garmin-sync` grün
+- Zifferblatt: Feld 35 „Getränke (Liter)“ und Strich-Anzeige 10 „Getränke-Ziel“ aus `water`/`waterGoal` (Deziliter) der Kurzübersicht. Uhr-App: neue Manifest-Kennung und Name „Health Coach Uhr“ (alte Kennung bei Garmin gesperrt).

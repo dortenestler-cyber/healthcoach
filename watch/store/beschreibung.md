@@ -3,7 +3,7 @@
 Texte zum Einfügen im Garmin-Entwicklerportal (apps.garmin.com/developer/upload). Bilder liegen in diesem Ordner, die Datei `HealthCoach.iq` baut der Lauf „Uhr-App bauen“.
 
 ## Name
-Health Coach
+Health Coach Uhr
 
 ## Typ
 Geräte-App (Watch App) mit Glance
